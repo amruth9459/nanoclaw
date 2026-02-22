@@ -480,7 +480,7 @@ async function runQuery(
   // Buffer for streaming text chunks
   let textBuffer = '';
   const enableStreaming = process.env.NANOCLAW_ENABLE_STREAMING !== '0';
-  const minChunkSize = parseInt(process.env.NANOCLAW_MIN_CHUNK_SIZE || '200', 10);
+  const minChunkSize = parseInt(process.env.NANOCLAW_MIN_CHUNK_SIZE || '80', 10);
 
   // Poll IPC for follow-up messages and _close sentinel during the query
   let ipcPolling = true;
