@@ -30,10 +30,11 @@ interface ContainerInput {
 }
 
 interface ContainerOutput {
-  status: 'success' | 'error';
+  status: 'success' | 'error' | 'streaming';
   result: string | null;
   newSessionId?: string;
   error?: string;
+  isPartial?: boolean;
 }
 
 interface SessionEntry {
@@ -188,6 +189,111 @@ function createPreCompactHook(): HookCallback {
 // These are needed by claude-code for API auth but should never
 // be visible to commands Kit runs.
 const SECRET_ENV_VARS = ['ANTHROPIC_API_KEY', 'CLAUDE_CODE_OAUTH_TOKEN'];
+
+const IPC_MESSAGES_DIR = '/workspace/ipc/messages';
+
+/**
+ * Write a security alert IPC message so the host sends it to the user via WhatsApp.
+ */
+function writeSecurityAlert(text: string, chatJid: string, groupFolder: string): void {
+  try {
+    fs.mkdirSync(IPC_MESSAGES_DIR, { recursive: true });
+    const filepath = path.join(IPC_MESSAGES_DIR, `${Date.now()}-security.json`);
+    const data = { type: 'message', chatJid, text, groupFolder, timestamp: new Date().toISOString() };
+    const tmp = `${filepath}.tmp`;
+    fs.writeFileSync(tmp, JSON.stringify(data, null, 2));
+    fs.renameSync(tmp, filepath);
+  } catch (err) {
+    log(`Failed to write security alert: ${err instanceof Error ? err.message : String(err)}`);
+  }
+}
+
+/**
+ * Security hook: intercepts destructive and exfiltration-prone Bash commands.
+ *
+ * Blocks:
+ *   1. Writes to /workspace/project/src/ or /workspace/project/container/ (self-mutation)
+ *   2. rm -rf targeting /workspace/project/src/ or /workspace/project/container/
+ *   3. curl/wget to external hosts when NANOCLAW_NETWORK_RESTRICTED=1
+ *
+ * When blocked: replaces the command with an informative echo AND sends a
+ * WhatsApp alert via IPC so the user is notified immediately.
+ */
+function createSecurityHook(chatJid: string, groupFolder: string): HookCallback {
+  const isNetworkRestricted = process.env.NANOCLAW_NETWORK_RESTRICTED === '1';
+
+  return async (input, _toolUseId, _context) => {
+    const preInput = input as PreToolUseHookInput;
+    const command = (preInput.tool_input as { command?: string })?.command;
+    if (!command) return {};
+
+    // ── Check 1: Self-mutation (writes to project source code via shell redirects) ──
+    // Targets: echo/printf/cat/tee redirected into src/ or container/ subdirs
+    const SELF_MUTATION = /(?:>>?\s*|tee\s+(?:-a\s+)?)['"]?\/workspace\/project\/(?:src|container)\//;
+    if (SELF_MUTATION.test(command)) {
+      const preview = command.slice(0, 120);
+      const alert = `🛡️ *Security Block — Self-Mutation*\n\nAn agent attempted to write to project source code and was blocked.\n\n\`${preview}\`\n\n_Incident logged._`;
+      writeSecurityAlert(alert, chatJid, groupFolder);
+      log(`[SECURITY] Self-mutation blocked: ${preview}`);
+      return {
+        hookSpecificOutput: {
+          hookEventName: 'PreToolUse',
+          updatedInput: {
+            ...(preInput.tool_input as Record<string, unknown>),
+            command: `echo "[SECURITY BLOCK] Writing to project source code is not permitted. This incident has been reported."`,
+          },
+        },
+      };
+    }
+
+    // ── Check 2: Destructive delete of project source ──────────────────────────
+    const hasRm = /\brm\b/.test(command);
+    if (hasRm) {
+      const hasRecursive = /-[a-zA-Z]*r[a-zA-Z]*\b|--recursive/.test(command);
+      const hasForce = /-[a-zA-Z]*f[a-zA-Z]*\b|--force/.test(command);
+      const targetsSource = /\/workspace\/project\/(?:src|container)/.test(command);
+      if (hasRecursive && hasForce && targetsSource) {
+        const preview = command.slice(0, 120);
+        const alert = `🛡️ *Security Block — Destructive Delete*\n\nAn agent attempted \`rm -rf\` on project source code and was blocked.\n\n\`${preview}\`\n\n_Incident logged._`;
+        writeSecurityAlert(alert, chatJid, groupFolder);
+        log(`[SECURITY] Destructive rm blocked: ${preview}`);
+        return {
+          hookSpecificOutput: {
+            hookEventName: 'PreToolUse',
+            updatedInput: {
+              ...(preInput.tool_input as Record<string, unknown>),
+              command: `echo "[SECURITY BLOCK] Recursive force-delete of project source code is not permitted. This incident has been reported."`,
+            },
+          },
+        };
+      }
+    }
+
+    // ── Check 3: Network exfiltration in restricted containers ─────────────────
+    if (isNetworkRestricted) {
+      // Match curl/wget/nc with an HTTP/HTTPS/FTP target, excluding api.anthropic.com
+      const EXFIL = /\b(?:curl|wget|nc|ncat)\b/;
+      const EXTERNAL_URL = /https?:\/\/(?!api\.anthropic\.com)|ftp:\/\//;
+      if (EXFIL.test(command) && EXTERNAL_URL.test(command)) {
+        const preview = command.slice(0, 120);
+        const alert = `🛡️ *Security Block — Network Exfiltration*\n\nAn agent in a restricted container attempted to contact an external host and was blocked.\n\n\`${preview}\`\n\n_Incident logged._`;
+        writeSecurityAlert(alert, chatJid, groupFolder);
+        log(`[SECURITY] Network exfiltration blocked: ${preview}`);
+        return {
+          hookSpecificOutput: {
+            hookEventName: 'PreToolUse',
+            updatedInput: {
+              ...(preInput.tool_input as Record<string, unknown>),
+              command: `echo "[SECURITY BLOCK] Network access to external hosts is blocked in this container. This incident has been reported."`,
+            },
+          },
+        };
+      }
+    }
+
+    return {};
+  };
+}
 
 function createSanitizeBashHook(): HookCallback {
   return async (input, _toolUseId, _context) => {
@@ -348,6 +454,13 @@ function waitForIpcMessage(): Promise<string | null> {
 }
 
 /**
+ * Check if text ends with a sentence boundary
+ */
+function isSentenceBoundary(text: string): boolean {
+  return /[.!?]\s*$/.test(text.trim());
+}
+
+/**
  * Run a single query and stream results via writeOutput.
  * Uses MessageStream (AsyncIterable) to keep isSingleUserTurn=false,
  * allowing agent teams subagents to run to completion.
@@ -363,6 +476,11 @@ async function runQuery(
 ): Promise<{ newSessionId?: string; lastAssistantUuid?: string; closedDuringQuery: boolean }> {
   const stream = new MessageStream();
   stream.push(prompt);
+
+  // Buffer for streaming text chunks
+  let textBuffer = '';
+  const enableStreaming = process.env.NANOCLAW_ENABLE_STREAMING !== '0';
+  const minChunkSize = parseInt(process.env.NANOCLAW_MIN_CHUNK_SIZE || '200', 10);
 
   // Poll IPC for follow-up messages and _close sentinel during the query
   let ipcPolling = true;
@@ -396,6 +514,9 @@ async function runQuery(
   if (!containerInput.isMain && fs.existsSync(globalClaudeMdPath)) {
     globalClaudeMd = fs.readFileSync(globalClaudeMdPath, 'utf-8');
   }
+
+  // Prompt caching configuration
+  const enableCaching = process.env.NANOCLAW_ENABLE_PROMPT_CACHING !== '0';
 
   // Discover additional directories mounted at /workspace/extra/*
   // These are passed to the SDK so their CLAUDE.md files are loaded automatically
@@ -437,6 +558,12 @@ async function runQuery(
       permissionMode: 'bypassPermissions',
       allowDangerouslySkipPermissions: true,
       settingSources: ['project', 'user'],
+      // PERFORMANCE: Prompt caching is enabled automatically by the SDK
+      // when using resume (session persistence). The SDK caches:
+      // - System prompts (CLAUDE.md files)
+      // - Conversation history
+      // - Tool definitions
+      // Caching can be disabled via NANOCLAW_ENABLE_PROMPT_CACHING=0
       mcpServers: {
         nanoclaw: {
           command: 'node',
@@ -450,7 +577,13 @@ async function runQuery(
       },
       hooks: {
         PreCompact: [{ hooks: [createPreCompactHook()] }],
-        PreToolUse: [{ matcher: 'Bash', hooks: [createSanitizeBashHook()] }],
+        PreToolUse: [{
+          matcher: 'Bash',
+          hooks: [
+            createSanitizeBashHook(),
+            createSecurityHook(containerInput.chatJid, containerInput.groupFolder),
+          ],
+        }],
       },
     }
   })) {
@@ -460,6 +593,28 @@ async function runQuery(
 
     if (message.type === 'assistant' && 'uuid' in message) {
       lastAssistantUuid = (message as { uuid: string }).uuid;
+    }
+
+    // Streaming: Detect assistant text content and emit partial results
+    if (enableStreaming && message.type === 'assistant' && (message as any).message?.content) {
+      const content = (message as any).message.content;
+      for (const block of content) {
+        if (block.type === 'text' && block.text) {
+          textBuffer += block.text;
+
+          // Emit chunk if we hit a sentence boundary and meet min size
+          if (textBuffer.length >= minChunkSize && isSentenceBoundary(textBuffer)) {
+            log(`[streaming] Emitting chunk (${textBuffer.length} chars)`);
+            writeOutput({
+              status: 'streaming',
+              result: textBuffer,
+              isPartial: true,
+              newSessionId
+            });
+            textBuffer = '';
+          }
+        }
+      }
     }
 
     if (message.type === 'system' && message.subtype === 'init') {
@@ -473,6 +628,18 @@ async function runQuery(
     }
 
     if (message.type === 'result') {
+      // Flush any remaining buffered text before the result
+      if (textBuffer.length > 0) {
+        log(`[streaming] Flushing final buffer (${textBuffer.length} chars)`);
+        writeOutput({
+          status: 'streaming',
+          result: textBuffer,
+          isPartial: true,
+          newSessionId
+        });
+        textBuffer = '';
+      }
+
       resultCount++;
       const textResult = 'result' in message ? (message as { result?: string }).result : null;
       log(`Result #${resultCount}: subtype=${message.subtype}${textResult ? ` text=${textResult.slice(0, 200)}` : ''}`);

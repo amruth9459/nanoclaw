@@ -5,6 +5,7 @@ import {
   ASSISTANT_NAME,
   DATA_DIR,
   IDLE_TIMEOUT,
+  INSTANT_ACK,
   MAIN_GROUP_FOLDER,
   POLL_INTERVAL,
   TRIGGER_PATTERN,
@@ -32,7 +33,9 @@ import {
   storeChatMetadata,
   storeMessage,
 } from './db.js';
+import { startDashboard } from './dashboard.js';
 import { GroupQueue } from './group-queue.js';
+import { HitlGate } from './hitl.js';
 import { startIpcWatcher } from './ipc.js';
 import { findChannel, formatMessages, formatOutbound } from './router.js';
 import { startSchedulerLoop } from './task-scheduler.js';
@@ -51,6 +54,7 @@ let messageLoopRunning = false;
 let whatsapp: WhatsAppChannel;
 const channels: Channel[] = [];
 const queue = new GroupQueue();
+const hitlGate = new HitlGate();
 
 function loadState(): void {
   lastTimestamp = getRouterState('last_timestamp') || '';
@@ -157,6 +161,12 @@ async function processGroupMessages(chatJid: string): Promise<boolean> {
     'Processing messages',
   );
 
+  // INSTANT FEEDBACK: Send acknowledgment and typing indicator immediately
+  if (INSTANT_ACK) {
+    await channel.sendMessage(chatJid, '👀');
+  }
+  await channel.setTyping?.(chatJid, true);
+
   // Track idle timer for closing stdin when agent is idle
   let idleTimer: ReturnType<typeof setTimeout> | null = null;
 
@@ -167,27 +177,44 @@ async function processGroupMessages(chatJid: string): Promise<boolean> {
       queue.closeStdin(chatJid);
     }, IDLE_TIMEOUT);
   };
-
-  await channel.setTyping?.(chatJid, true);
   let hadError = false;
   let outputSentToUser = false;
+  let streamingBuffer = '';  // Accumulate streaming chunks for logging
 
   const output = await runAgent(group, prompt, chatJid, async (result) => {
     // Streaming output callback — called for each agent result
-    if (result.result) {
+
+    // Handle streaming chunks (partial results)
+    if (result.status === 'streaming' && result.isPartial && result.result) {
       const raw = typeof result.result === 'string' ? result.result : JSON.stringify(result.result);
       // Strip <internal>...</internal> blocks — agent uses these for internal reasoning
+      const text = raw.replace(/<internal>[\s\S]*?<\/internal>/g, '').trim();
+
+      if (text) {
+        streamingBuffer += text;
+        logger.info({ group: group.name }, `Streaming chunk: ${text.slice(0, 100)}...`);
+        await channel.sendMessage(chatJid, text);
+        outputSentToUser = true;
+        resetIdleTimer();
+      }
+    }
+    // Handle final result
+    else if (result.result) {
+      const raw = typeof result.result === 'string' ? result.result : JSON.stringify(result.result);
       const text = raw.replace(/<internal>[\s\S]*?<\/internal>/g, '').trim();
       logger.info({ group: group.name }, `Agent output: ${raw.slice(0, 200)}`);
       if (text) {
         await channel.sendMessage(chatJid, text);
         outputSentToUser = true;
       }
-      // Only reset idle timer on actual results, not session-update markers (result: null)
       resetIdleTimer();
     }
 
     if (result.status === 'success') {
+      if (streamingBuffer) {
+        logger.info({ group: group.name, totalChars: streamingBuffer.length }, 'Streaming complete');
+        streamingBuffer = '';
+      }
       queue.notifyIdle(chatJid);
     }
 
@@ -338,6 +365,18 @@ async function startMessageLoop(): Promise<void> {
           }
 
           const isMainGroup = group.folder === MAIN_GROUP_FOLDER;
+
+          // HITL: check incoming messages from humans for approval/rejection tokens
+          if (isMainGroup) {
+            for (const msg of groupMessages) {
+              if (msg.sender === ASSISTANT_NAME) continue;
+              hitlGate.tryHandleApproval(msg.content, (text) =>
+                channel.sendMessage(chatJid, text),
+              ).catch((err) =>
+                logger.warn({ err }, 'HITL approval handling error'),
+              );
+            }
+          }
           const needsTrigger = !isMainGroup && group.requiresTrigger !== false;
 
           // For non-main groups, only act on trigger messages.
@@ -439,6 +478,7 @@ async function main(): Promise<void> {
   await whatsapp.connect();
 
   // Start subsystems (independently of connection handler)
+  startDashboard(queue);
   startSchedulerLoop({
     registeredGroups: () => registeredGroups,
     getSessions: () => sessions,
@@ -465,6 +505,11 @@ async function main(): Promise<void> {
     syncGroupMetadata: (force) => whatsapp?.syncGroupMetadata(force) ?? Promise.resolve(),
     getAvailableGroups,
     writeGroupsSnapshot: (gf, im, ag, rj) => writeGroupsSnapshot(gf, im, ag, rj),
+    hitlGate,
+    getMainGroupJid: () =>
+      Object.entries(registeredGroups).find(
+        ([, g]) => g.folder === MAIN_GROUP_FOLDER,
+      )?.[0],
   });
   queue.setProcessMessagesFn(processGroupMessages);
   recoverPendingMessages();

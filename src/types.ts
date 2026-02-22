@@ -30,6 +30,14 @@ export interface AllowedRoot {
 export interface ContainerConfig {
   additionalMounts?: AdditionalMount[];
   timeout?: number; // Default: 300000 (5 minutes)
+  /** Extra env vars injected into the container at spawn time. */
+  env?: Record<string, string>;
+  /**
+   * When true, the container is spawned on the nanoclaw-restricted Docker network
+   * (no external internet access) and NANOCLAW_NETWORK_RESTRICTED=1 is set.
+   * Create the network first: ./scripts/setup-egress.sh
+   */
+  networkRestricted?: boolean;
 }
 
 export interface RegisteredGroup {

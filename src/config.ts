@@ -15,7 +15,10 @@ export const ASSISTANT_NAME =
   process.env.ASSISTANT_NAME || envConfig.ASSISTANT_NAME || 'Andy';
 export const ASSISTANT_HAS_OWN_NUMBER =
   (process.env.ASSISTANT_HAS_OWN_NUMBER || envConfig.ASSISTANT_HAS_OWN_NUMBER) === 'true';
-export const POLL_INTERVAL = 2000;
+export const POLL_INTERVAL = parseInt(
+  process.env.NANOCLAW_POLL_INTERVAL || '500',
+  10,
+); // 500ms for faster response (was 2000ms)
 export const SCHEDULER_POLL_INTERVAL = 60000;
 
 // Absolute paths needed for container mounts
@@ -62,6 +65,22 @@ export const TRIGGER_PATTERN = new RegExp(
   `^@${escapeRegex(ASSISTANT_NAME)}\\b`,
   'i',
 );
+
+// Performance optimizations
+export const ENABLE_STREAMING =
+  process.env.NANOCLAW_ENABLE_STREAMING !== '0'; // Default: enabled
+export const MIN_CHUNK_SIZE = parseInt(
+  process.env.NANOCLAW_MIN_CHUNK_SIZE || '200',
+  10,
+);
+export const ENABLE_PROMPT_CACHING =
+  process.env.NANOCLAW_ENABLE_PROMPT_CACHING !== '0'; // Default: enabled
+export const CACHE_MIN_TOKENS = parseInt(
+  process.env.NANOCLAW_CACHE_MIN_TOKENS || '1024',
+  10,
+);
+export const INSTANT_ACK =
+  process.env.NANOCLAW_INSTANT_ACK === '1'; // Send "👀" on message receipt
 
 // Timezone for scheduled tasks (cron expressions, etc.)
 // Uses system timezone by default

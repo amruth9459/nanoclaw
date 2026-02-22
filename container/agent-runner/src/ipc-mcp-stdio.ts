@@ -274,6 +274,90 @@ Use available_groups.json to find the JID for a group. The folder name should be
   },
 );
 
+server.tool(
+  'semantic_search',
+  `Search your indexed documents and conversation history using semantic similarity.
+Searches OCR output, conversation archives, and any other indexed documents.
+Returns the most relevant text chunks for your query.`,
+  {
+    query: z.string().describe('Natural language search query, e.g. "cardamom recipe" or "Naren contact info"'),
+    top_k: z.number().int().min(1).max(20).default(5).describe('Number of results to return (default: 5)'),
+    group_folder: z.string().optional().describe('Limit search to a specific group folder (e.g. "ocr"). Omit to search all groups.'),
+  },
+  async (args) => {
+    // Write a search IPC request and wait for the host to process it
+    const requestId = `search-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+    const requestFile = path.join(IPC_DIR, `${requestId}.search.json`);
+    const responseFile = path.join(IPC_DIR, `${requestId}.result.json`);
+
+    const request = {
+      type: 'semantic_search',
+      requestId,
+      query: args.query,
+      topK: args.top_k ?? 5,
+      groupFolder: args.group_folder,
+      responseFile,
+    };
+
+    // Write request
+    const tmp = `${requestFile}.tmp`;
+    fs.writeFileSync(tmp, JSON.stringify(request, null, 2));
+    fs.renameSync(tmp, requestFile);
+
+    // Poll for response (host processes and writes responseFile)
+    const timeout = Date.now() + 30000;
+    while (Date.now() < timeout) {
+      await new Promise(r => setTimeout(r, 300));
+      if (fs.existsSync(responseFile)) {
+        try {
+          const result = JSON.parse(fs.readFileSync(responseFile, 'utf-8'));
+          fs.unlinkSync(responseFile);
+          if (result.error) {
+            return { content: [{ type: 'text' as const, text: `Search error: ${result.error}` }], isError: true };
+          }
+          const formatted = (result.results as Array<{ source: string; content: string; distance: number }>)
+            .map((r, i) =>
+              `[${i + 1}] ${r.source} (distance: ${r.distance.toFixed(3)})\n${r.content.slice(0, 400)}`
+            ).join('\n\n---\n\n');
+          return {
+            content: [{ type: 'text' as const, text: formatted || 'No results found.' }],
+          };
+        } catch {
+          return { content: [{ type: 'text' as const, text: 'Failed to parse search results.' }], isError: true };
+        }
+      }
+    }
+    return { content: [{ type: 'text' as const, text: 'Search timed out. Is the host semantic index running?' }], isError: true };
+  },
+);
+
+server.tool(
+  'index_document',
+  'Index a text document for semantic search. Use after processing OCR output or saving important notes.',
+  {
+    source: z.string().describe('Unique identifier for this document, e.g. "ocr/scan_001.json"'),
+    content: z.string().describe('The text content to index'),
+  },
+  async (args) => {
+    const requestId = `index-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+    const requestFile = path.join(IPC_DIR, `${requestId}.index.json`);
+
+    const request = {
+      type: 'index_document',
+      requestId,
+      source: args.source,
+      groupFolder,
+      content: args.content,
+    };
+
+    const tmp = `${requestFile}.tmp`;
+    fs.writeFileSync(tmp, JSON.stringify(request, null, 2));
+    fs.renameSync(tmp, requestFile);
+
+    return { content: [{ type: 'text' as const, text: `Indexing requested for "${args.source}". Processing in background.` }] };
+  },
+);
+
 // Start the stdio transport
 const transport = new StdioServerTransport();
 await server.connect(transport);
