@@ -179,6 +179,7 @@ async function processGroupMessages(chatJid: string): Promise<boolean> {
   };
   let hadError = false;
   let outputSentToUser = false;
+  let streamingChunksSent = false;  // True if we sent ≥1 streaming chunk
   let streamingBuffer = '';  // Accumulate streaming chunks for logging
 
   const output = await runAgent(group, prompt, chatJid, async (result) => {
@@ -195,11 +196,13 @@ async function processGroupMessages(chatJid: string): Promise<boolean> {
         logger.info({ group: group.name }, `Streaming chunk: ${text.slice(0, 100)}...`);
         await channel.sendMessage(chatJid, text);
         outputSentToUser = true;
+        streamingChunksSent = true;
         resetIdleTimer();
       }
     }
-    // Handle final result
-    else if (result.result) {
+    // Handle final result — suppress if streaming already delivered the content
+    // (the success result text is the same accumulated response, just repeated)
+    else if (result.result && !streamingChunksSent) {
       const raw = typeof result.result === 'string' ? result.result : JSON.stringify(result.result);
       const text = raw.replace(/<internal>[\s\S]*?<\/internal>/g, '').trim();
       logger.info({ group: group.name }, `Agent output: ${raw.slice(0, 200)}`);
@@ -215,6 +218,7 @@ async function processGroupMessages(chatJid: string): Promise<boolean> {
         logger.info({ group: group.name, totalChars: streamingBuffer.length }, 'Streaming complete');
         streamingBuffer = '';
       }
+      streamingChunksSent = false;
       queue.notifyIdle(chatJid);
     }
 
