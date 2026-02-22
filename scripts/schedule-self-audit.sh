@@ -48,7 +48,7 @@ fi
 TASK_ID="self-audit-$(date +%s)"
 NOW=$(date -u +"%Y-%m-%dT%H:%M:%S.000Z")
 
-read -r -d '' PROMPT << 'EOF'
+read -r -d '' PROMPT << 'EOF' || true
 [SCHEDULED SELF-AUDIT]
 
 Run the /self-audit skill now to perform the nightly operational health check.
@@ -75,19 +75,23 @@ Send a Safety Brief to WhatsApp:
 _Next audit: tomorrow 3 AM_
 EOF
 
-sqlite3 "$DB_PATH" <<SQL
-INSERT INTO scheduled_tasks (
-  id, group_folder, chat_jid, prompt,
-  schedule_type, schedule_value,
-  next_run, last_run, last_result,
-  status, created_at
-) VALUES (
-  '${TASK_ID}', 'main', '${MAIN_JID}',
-  '${PROMPT//\'/\'\'}',
-  'cron', '0 3 * * *',
-  datetime('now', 'start of day', '+1 day', '+3 hours'),
-  NULL, NULL, 'active', '${NOW}'
-);
-SQL
+_PROMPT_FILE=$(mktemp)
+printf '%s' "$PROMPT" > "$_PROMPT_FILE"
+python3 - "$DB_PATH" "$TASK_ID" "$MAIN_JID" "$NOW" "$_PROMPT_FILE" <<'PYEOF'
+import sys, sqlite3
+db_path, task_id, jid, now, prompt_file = sys.argv[1:]
+prompt = open(prompt_file).read()
+conn = sqlite3.connect(db_path)
+conn.execute("""
+  INSERT INTO scheduled_tasks
+    (id, group_folder, chat_jid, prompt, schedule_type, schedule_value,
+     next_run, last_run, last_result, status, created_at)
+  VALUES
+    (?, 'main', ?, ?, 'cron', '0 3 * * *',
+     datetime('now','start of day','+1 day','+3 hours'), NULL, NULL, 'active', ?)
+""", (task_id, jid, prompt, now))
+conn.commit(); conn.close()
+PYEOF
+rm -f "$_PROMPT_FILE"
 
 echo "✅ Nightly self-audit scheduled at 3 AM (task: $TASK_ID)"
