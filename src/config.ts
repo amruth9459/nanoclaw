@@ -82,6 +82,11 @@ export const CACHE_MIN_TOKENS = parseInt(
 export const INSTANT_ACK =
   process.env.NANOCLAW_INSTANT_ACK === '1'; // Send "👀" on message receipt
 
+// Pre-warm containers for registered groups on startup so the first user
+// message hits a running container instead of a cold start.
+export const WARMUP_ON_START =
+  process.env.NANOCLAW_WARMUP_ON_START !== '0'; // Default: enabled
+
 // Timezone for scheduled tasks (cron expressions, etc.)
 // Uses system timezone by default
 export const TIMEZONE =

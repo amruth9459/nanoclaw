@@ -91,6 +91,35 @@ export class GroupQueue {
     );
   }
 
+  /**
+   * Pre-warm a container for a group by running a provided async function.
+   * Silently skips if the group already has an active container or the
+   * concurrency cap is hit. Never retries — warmup is best-effort.
+   */
+  warmup(groupJid: string, fn: () => Promise<boolean>): void {
+    if (this.shuttingDown) return;
+    const state = this.getGroup(groupJid);
+    if (state.active) return; // already warm
+    if (this.activeCount >= MAX_CONCURRENT_CONTAINERS) return;
+
+    state.active = true;
+    state.idleWaiting = false;
+    state.isTaskContainer = false;
+    state.pendingMessages = false;
+    this.activeCount++;
+
+    fn()
+      .catch((err) => logger.error({ groupJid, err }, 'Warmup failed'))
+      .finally(() => {
+        state.active = false;
+        state.process = null;
+        state.containerName = null;
+        state.groupFolder = null;
+        this.activeCount--;
+        this.drainGroup(groupJid);
+      });
+  }
+
   enqueueTask(groupJid: string, taskId: string, fn: () => Promise<void>): void {
     if (this.shuttingDown) return;
 
