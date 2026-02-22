@@ -18,6 +18,7 @@ interface GroupState {
   active: boolean;
   idleWaiting: boolean;
   isTaskContainer: boolean;
+  isWarmupContainer: boolean;
   pendingMessages: boolean;
   pendingTasks: QueuedTask[];
   process: ChildProcess | null;
@@ -41,6 +42,7 @@ export class GroupQueue {
         active: false,
         idleWaiting: false,
         isTaskContainer: false,
+        isWarmupContainer: false,
         pendingMessages: false,
         pendingTasks: [],
         process: null,
@@ -70,7 +72,12 @@ export class GroupQueue {
 
     if (state.active) {
       state.pendingMessages = true;
-      logger.debug({ groupJid }, 'Container active, message queued');
+      // If the container is idle-waiting (warmup done, no real work yet),
+      // preempt it immediately so the pending message gets processed promptly.
+      if (state.idleWaiting) {
+        this.closeStdin(groupJid);
+      }
+      logger.debug({ groupJid, idleWaiting: state.idleWaiting }, 'Container active, message queued');
       return;
     }
 
@@ -105,6 +112,7 @@ export class GroupQueue {
     state.active = true;
     state.idleWaiting = false;
     state.isTaskContainer = false;
+    state.isWarmupContainer = true;
     state.pendingMessages = false;
     this.activeCount++;
 
@@ -112,6 +120,7 @@ export class GroupQueue {
       .catch((err) => logger.error({ groupJid, err }, 'Warmup failed'))
       .finally(() => {
         state.active = false;
+        state.isWarmupContainer = false;
         state.process = null;
         state.containerName = null;
         state.groupFolder = null;
@@ -167,12 +176,12 @@ export class GroupQueue {
 
   /**
    * Mark the container as idle-waiting (finished work, waiting for IPC input).
-   * If tasks are pending, preempt the idle container immediately.
+   * If tasks or messages are pending, preempt the idle container immediately.
    */
   notifyIdle(groupJid: string): void {
     const state = this.getGroup(groupJid);
     state.idleWaiting = true;
-    if (state.pendingTasks.length > 0) {
+    if (state.pendingTasks.length > 0 || state.pendingMessages) {
       this.closeStdin(groupJid);
     }
   }
@@ -183,7 +192,7 @@ export class GroupQueue {
    */
   sendMessage(groupJid: string, text: string): boolean {
     const state = this.getGroup(groupJid);
-    if (!state.active || !state.groupFolder || state.isTaskContainer) return false;
+    if (!state.active || !state.groupFolder || state.isTaskContainer || state.isWarmupContainer) return false;
     state.idleWaiting = false; // Agent is about to receive work, no longer idle
 
     const inputDir = path.join(DATA_DIR, 'ipc', state.groupFolder, 'input');
@@ -224,6 +233,7 @@ export class GroupQueue {
     state.active = true;
     state.idleWaiting = false;
     state.isTaskContainer = false;
+    state.isWarmupContainer = false;
     state.pendingMessages = false;
     this.activeCount++;
 
@@ -259,6 +269,7 @@ export class GroupQueue {
     state.active = true;
     state.idleWaiting = false;
     state.isTaskContainer = true;
+    state.isWarmupContainer = false;
     this.activeCount++;
 
     logger.debug(
@@ -273,6 +284,7 @@ export class GroupQueue {
     } finally {
       state.active = false;
       state.isTaskContainer = false;
+      state.isWarmupContainer = false;
       state.process = null;
       state.containerName = null;
       state.groupFolder = null;

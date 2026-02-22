@@ -6,11 +6,13 @@ import makeWASocket, {
   Browsers,
   DisconnectReason,
   WASocket,
+  WAMessage,
+  downloadMediaMessage,
   makeCacheableSignalKeyStore,
   useMultiFileAuthState,
 } from '@whiskeysockets/baileys';
 
-import { ASSISTANT_HAS_OWN_NUMBER, ASSISTANT_NAME, STORE_DIR } from '../config.js';
+import { ASSISTANT_HAS_OWN_NUMBER, ASSISTANT_NAME, STORE_DIR, MEDIA_DIR } from '../config.js';
 import {
   getLastGroupSync,
   setLastGroupSync,
@@ -20,6 +22,13 @@ import { logger } from '../logger.js';
 import { Channel, OnInboundMessage, OnChatMetadata, RegisteredGroup } from '../types.js';
 
 const GROUP_SYNC_INTERVAL_MS = 24 * 60 * 60 * 1000; // 24 hours
+
+interface MediaInfo {
+  type: 'image' | 'video' | 'audio' | 'document';
+  path: string;
+  mimetype: string;
+  size: number;
+}
 
 export interface WhatsAppChannelOpts {
   onMessage: OnInboundMessage;
@@ -169,10 +178,14 @@ export class WhatsAppChannel implements Channel {
             msg.message?.extendedTextMessage?.text ||
             msg.message?.imageMessage?.caption ||
             msg.message?.videoMessage?.caption ||
+            msg.message?.documentMessage?.caption ||
             '';
 
-          // Skip protocol messages with no text content (encryption keys, read receipts, etc.)
-          if (!content) continue;
+          // Download media if present
+          const mediaInfo = await this.downloadAndSaveMedia(msg);
+
+          // Skip protocol messages with no text content AND no media (encryption keys, read receipts, etc.)
+          if (!content && !mediaInfo) continue;
 
           const sender = msg.key.participant || msg.key.remoteJid || '';
           const senderName = msg.pushName || sender.split('@')[0];
@@ -191,10 +204,14 @@ export class WhatsAppChannel implements Channel {
             chat_jid: chatJid,
             sender,
             sender_name: senderName,
-            content,
+            content: content || (mediaInfo ? `[${mediaInfo.type}]` : ''),
             timestamp,
             is_from_me: fromMe,
             is_bot_message: isBotMessage,
+            media_type: mediaInfo?.type ?? null,
+            media_path: mediaInfo?.path ?? null,
+            media_mimetype: mediaInfo?.mimetype ?? null,
+            media_size: mediaInfo?.size ?? null,
           });
         }
       }
@@ -328,6 +345,88 @@ export class WhatsAppChannel implements Channel {
     }
 
     return jid;
+  }
+
+  /**
+   * Download media from a WhatsApp message and save it to disk.
+   * Returns media metadata if successful, null otherwise.
+   */
+  private async downloadAndSaveMedia(msg: WAMessage): Promise<MediaInfo | null> {
+    try {
+      // Determine media type and get the message content
+      const messageContent = msg.message;
+      if (!messageContent) return null;
+
+      let mediaType: 'image' | 'video' | 'audio' | 'document' | null = null;
+      let mimetype: string | null = null;
+      let extension = '';
+
+      if (messageContent.imageMessage) {
+        mediaType = 'image';
+        mimetype = messageContent.imageMessage.mimetype || 'image/jpeg';
+        extension = mimetype.split('/')[1] || 'jpg';
+      } else if (messageContent.videoMessage) {
+        mediaType = 'video';
+        mimetype = messageContent.videoMessage.mimetype || 'video/mp4';
+        extension = mimetype.split('/')[1] || 'mp4';
+      } else if (messageContent.audioMessage) {
+        mediaType = 'audio';
+        mimetype = messageContent.audioMessage.mimetype || 'audio/ogg';
+        extension = mimetype.includes('ogg') ? 'ogg' : 'mp3';
+      } else if (messageContent.documentMessage) {
+        mediaType = 'document';
+        mimetype = messageContent.documentMessage.mimetype || 'application/octet-stream';
+        const fileName = messageContent.documentMessage.fileName || '';
+        extension = fileName.split('.').pop() || 'bin';
+      } else {
+        return null; // No media to download
+      }
+
+      // Download the media
+      const buffer = await downloadMediaMessage(
+        msg,
+        'buffer',
+        {},
+        {
+          logger: logger,
+          reuploadRequest: this.sock.updateMediaMessage,
+        },
+      ) as Buffer;
+
+      if (!buffer || buffer.length === 0) {
+        logger.warn({ messageId: msg.key.id }, 'Downloaded media buffer is empty');
+        return null;
+      }
+
+      // Ensure media directory exists
+      fs.mkdirSync(MEDIA_DIR, { recursive: true });
+
+      // Save to disk with message ID as filename
+      const messageId = msg.key.id || `${Date.now()}`;
+      const sanitizedId = messageId.replace(/[^a-zA-Z0-9-_]/g, '_');
+      const filename = `${sanitizedId}.${extension}`;
+      const filePath = path.join(MEDIA_DIR, filename);
+
+      fs.writeFileSync(filePath, buffer);
+
+      logger.info({
+        messageId,
+        mediaType,
+        mimetype,
+        size: buffer.length,
+        path: filePath
+      }, 'Media downloaded and saved');
+
+      return {
+        type: mediaType,
+        path: filePath,
+        mimetype,
+        size: buffer.length,
+      };
+    } catch (err) {
+      logger.error({ err, messageId: msg.key.id }, 'Failed to download media');
+      return null;
+    }
   }
 
   private async flushOutgoingQueue(): Promise<void> {
