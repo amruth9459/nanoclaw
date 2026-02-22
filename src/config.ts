@@ -92,3 +92,13 @@ export const WARMUP_ON_START =
 // Uses system timezone by default
 export const TIMEZONE =
   process.env.TZ || Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+// Media settings
+export const MAX_MEDIA_SIZE_MB = parseInt(
+  process.env.NANOCLAW_MAX_MEDIA_SIZE_MB || '50',
+  10,
+); // 50MB default
+export const MEDIA_RETENTION_DAYS = parseInt(
+  process.env.NANOCLAW_MEDIA_RETENTION_DAYS || '30',
+  10,
+); // 30 days default

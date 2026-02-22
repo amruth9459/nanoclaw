@@ -18,6 +18,7 @@ import {
   logTaskRun,
   updateTaskAfterRun,
 } from './db.js';
+import { cleanupOldMedia } from './media-cleanup.js';
 import { GroupQueue } from './group-queue.js';
 import { logger } from './logger.js';
 import { RegisteredGroup, ScheduledTask } from './types.js';
@@ -191,8 +192,21 @@ export function startSchedulerLoop(deps: SchedulerDependencies): void {
   schedulerRunning = true;
   logger.info('Scheduler loop started');
 
+  // Run media cleanup on startup
+  cleanupOldMedia();
+
+  // Track when we last ran cleanup (once per day)
+  let lastCleanupDay = new Date().getDate();
+
   const loop = async () => {
     try {
+      // Run daily media cleanup at midnight
+      const currentDay = new Date().getDate();
+      if (currentDay !== lastCleanupDay) {
+        lastCleanupDay = currentDay;
+        cleanupOldMedia();
+      }
+
       const dueTasks = getDueTasks();
       if (dueTasks.length > 0) {
         logger.info({ count: dueTasks.length }, 'Found due tasks');
