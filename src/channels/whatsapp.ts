@@ -248,6 +248,25 @@ export class WhatsAppChannel implements Channel {
     }
   }
 
+  async sendReaction(jid: string, messageId: string, senderJid: string, emoji: string): Promise<void> {
+    try {
+      await this.sock.sendMessage(jid, {
+        react: {
+          text: emoji,
+          key: {
+            id: messageId,
+            remoteJid: jid,
+            participant: senderJid,
+            fromMe: false,
+          },
+        },
+      });
+      logger.debug({ jid, messageId, emoji }, 'Reaction sent');
+    } catch (err) {
+      logger.debug({ jid, messageId, err }, 'Failed to send reaction');
+    }
+  }
+
   /**
    * Sync group metadata from WhatsApp.
    * Fetches all participating groups and stores their names in the database.
