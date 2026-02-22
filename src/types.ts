@@ -94,7 +94,11 @@ export interface Channel {
   ownsJid(jid: string): boolean;
   disconnect(): Promise<void>;
   // Optional: typing indicator. Channels that support it implement it.
+  // Note: won't show to users who share the bot's phone number (solo groups).
   setTyping?(jid: string, isTyping: boolean): Promise<void>;
+  // Optional: react to a specific message with an emoji.
+  // More reliable than typing indicators for shared-number setups.
+  sendReaction?(jid: string, messageId: string, senderJid: string, emoji: string): Promise<void>;
 }
 
 // Callback type that channels use to deliver inbound messages

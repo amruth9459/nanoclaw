@@ -161,9 +161,16 @@ async function processGroupMessages(chatJid: string): Promise<boolean> {
     'Processing messages',
   );
 
-  // INSTANT FEEDBACK: Send acknowledgment and typing indicator immediately
+  // INSTANT FEEDBACK: React to the last user message with 👀
+  // Using sendReaction (emoji on the message) rather than a standalone text
+  // message — reactions are visible even when bot and user share a phone number.
   if (INSTANT_ACK) {
-    await channel.sendMessage(chatJid, '👀');
+    const lastMsg = missedMessages[missedMessages.length - 1];
+    if (channel.sendReaction) {
+      await channel.sendReaction(chatJid, lastMsg.id, lastMsg.sender, '👀').catch(() => {});
+    } else {
+      await channel.sendMessage(chatJid, '👀').catch(() => {});
+    }
   }
   await channel.setTyping?.(chatJid, true);
 
@@ -412,7 +419,13 @@ async function startMessageLoop(): Promise<void> {
             lastAgentTimestamp[chatJid] =
               messagesToSend[messagesToSend.length - 1].timestamp;
             saveState();
-            // Show typing indicator while the container processes the piped message
+            // ACK the message and show typing indicator
+            if (INSTANT_ACK) {
+              const lastMsg = messagesToSend[messagesToSend.length - 1];
+              if (channel.sendReaction) {
+                channel.sendReaction(chatJid, lastMsg.id, lastMsg.sender, '👀').catch(() => {});
+              }
+            }
             channel.setTyping?.(chatJid, true)?.catch((err) =>
               logger.warn({ chatJid, err }, 'Failed to set typing indicator'),
             );
