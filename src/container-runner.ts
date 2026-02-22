@@ -46,10 +46,11 @@ export interface ContainerInput {
 }
 
 export interface ContainerOutput {
-  status: 'success' | 'error';
+  status: 'success' | 'error' | 'streaming';
   result: string | null;
   newSessionId?: string;
   error?: string;
+  isPartial?: boolean;
 }
 
 interface VolumeMount {
@@ -185,7 +186,11 @@ function readSecrets(): Record<string, string> {
   return readEnvFile(['CLAUDE_CODE_OAUTH_TOKEN', 'ANTHROPIC_API_KEY']);
 }
 
-function buildContainerArgs(mounts: VolumeMount[], containerName: string): string[] {
+function buildContainerArgs(
+  mounts: VolumeMount[],
+  containerName: string,
+  group: RegisteredGroup,
+): string[] {
   const args: string[] = ['run', '-i', '--rm', '--name', containerName];
 
   // Run as host user so bind-mounted files are accessible.
@@ -196,6 +201,19 @@ function buildContainerArgs(mounts: VolumeMount[], containerName: string): strin
   if (hostUid != null && hostUid !== 0 && hostUid !== 1000) {
     args.push('--user', `${hostUid}:${hostGid}`);
     args.push('-e', 'HOME=/home/node');
+  }
+
+  // Network isolation: use restricted bridge network (no external internet).
+  // Requires the nanoclaw-restricted Docker network to exist (run setup-egress.sh first).
+  if (group.containerConfig?.networkRestricted) {
+    args.push('--network', 'nanoclaw-restricted');
+    args.push('-e', 'NANOCLAW_NETWORK_RESTRICTED=1');
+    logger.info({ group: group.name }, 'Container spawned on restricted network (no external internet)');
+  }
+
+  // Extra env vars from containerConfig
+  for (const [key, value] of Object.entries(group.containerConfig?.env ?? {})) {
+    args.push('-e', `${key}=${value}`);
   }
 
   for (const mount of mounts) {
@@ -225,7 +243,7 @@ export async function runContainerAgent(
   const mounts = buildVolumeMounts(group, input.isMain);
   const safeName = group.folder.replace(/[^a-zA-Z0-9-]/g, '-');
   const containerName = `nanoclaw-${safeName}-${Date.now()}`;
-  const containerArgs = buildContainerArgs(mounts, containerName);
+  const containerArgs = buildContainerArgs(mounts, containerName, group);
 
   logger.debug(
     {

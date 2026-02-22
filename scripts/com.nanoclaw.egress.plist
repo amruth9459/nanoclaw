@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>com.nanoclaw.egress</string>
+
+  <key>ProgramArguments</key>
+  <array>
+    <string>/bin/sh</string>
+    <string>-c</string>
+    <!-- Reload the anchor on boot (IPs already baked in from last setup-egress.sh run) -->
+    <string>pfctl -e; pfctl -a nanoclaw_egress -f /etc/pf.anchors/nanoclaw</string>
+  </array>
+
+  <key>RunAtLoad</key>
+  <true/>
+
+  <!-- Run once at boot, not as a daemon -->
+  <key>LaunchOnlyOnce</key>
+  <true/>
+
+  <key>StandardOutPath</key>
+  <string>/var/log/nanoclaw-egress.log</string>
+  <key>StandardErrorPath</key>
+  <string>/var/log/nanoclaw-egress.log</string>
+</dict>
+</plist>

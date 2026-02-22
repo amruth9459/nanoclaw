@@ -57,6 +57,12 @@ export class GroupQueue {
     this.processMessagesFn = fn;
   }
 
+  /** Returns true if the group has an active running container. */
+  isActive(groupJid: string): boolean {
+    const state = this.groups.get(groupJid);
+    return !!(state?.active && state.process);
+  }
+
   enqueueMessageCheck(groupJid: string): void {
     if (this.shuttingDown) return;
 
