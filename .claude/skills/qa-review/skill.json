@@ -1,0 +1,7 @@
+{
+  "name": "qa-review",
+  "version": "1.0.0",
+  "description": "Run QA review on recent code changes",
+  "triggerWords": ["/qa-review", "/qa", "/review"],
+  "agentType": "general-purpose"
+}

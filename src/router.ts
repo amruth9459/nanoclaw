@@ -10,9 +10,18 @@ export function escapeXml(s: string): string {
 }
 
 export function formatMessages(messages: NewMessage[]): string {
-  const lines = messages.map((m) =>
-    `<message sender="${escapeXml(m.sender_name)}" time="${m.timestamp}">${escapeXml(m.content)}</message>`,
-  );
+  const lines = messages.map((m) => {
+    let content = escapeXml(m.content);
+
+    // If there's media, add metadata about it
+    if (m.media_type && m.media_path) {
+      const mediaPath = m.media_path.replace(/^.*\/media\//, '/workspace/media/');
+      const mediaInfo = `[${m.media_type}: ${mediaPath}]`;
+      content = content ? `${mediaInfo} ${content}` : mediaInfo;
+    }
+
+    return `<message sender="${escapeXml(m.sender_name)}" time="${m.timestamp}">${content}</message>`;
+  });
   return `<messages>\n${lines.join('\n')}\n</messages>`;
 }
 

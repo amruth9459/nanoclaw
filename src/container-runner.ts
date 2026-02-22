@@ -14,6 +14,7 @@ import {
   DATA_DIR,
   GROUPS_DIR,
   IDLE_TIMEOUT,
+  STORE_DIR,
 } from './config.js';
 import { readEnvFile } from './env.js';
 import { logger } from './logger.js';
@@ -154,6 +155,16 @@ function buildVolumeMounts(
     hostPath: groupIpcDir,
     containerPath: '/workspace/ipc',
     readonly: false,
+  });
+
+  // Media directory (read-only): shared media files (images, documents, etc.)
+  // Mounted read-only to prevent agents from tampering with media files
+  const mediaDir = path.join(STORE_DIR, 'media');
+  fs.mkdirSync(mediaDir, { recursive: true });
+  mounts.push({
+    hostPath: mediaDir,
+    containerPath: '/workspace/media',
+    readonly: true,
   });
 
   // No runtime src mount — agent code is pre-compiled into the image during
