@@ -12,7 +12,7 @@ import makeWASocket, {
   useMultiFileAuthState,
 } from '@whiskeysockets/baileys';
 
-import { ASSISTANT_HAS_OWN_NUMBER, ASSISTANT_NAME, STORE_DIR, MEDIA_DIR } from '../config.js';
+import { ASSISTANT_HAS_OWN_NUMBER, ASSISTANT_NAME, STORE_DIR, MEDIA_DIR, MAX_MEDIA_SIZE_MB } from '../config.js';
 import {
   getLastGroupSync,
   setLastGroupSync,
@@ -360,26 +360,44 @@ export class WhatsAppChannel implements Channel {
       let mediaType: 'image' | 'video' | 'audio' | 'document' | null = null;
       let mimetype: string | null = null;
       let extension = '';
+      let fileSize = 0;
 
       if (messageContent.imageMessage) {
         mediaType = 'image';
         mimetype = messageContent.imageMessage.mimetype || 'image/jpeg';
         extension = mimetype.split('/')[1] || 'jpg';
+        fileSize = Number(messageContent.imageMessage.fileLength || 0);
       } else if (messageContent.videoMessage) {
         mediaType = 'video';
         mimetype = messageContent.videoMessage.mimetype || 'video/mp4';
         extension = mimetype.split('/')[1] || 'mp4';
+        fileSize = Number(messageContent.videoMessage.fileLength || 0);
       } else if (messageContent.audioMessage) {
         mediaType = 'audio';
         mimetype = messageContent.audioMessage.mimetype || 'audio/ogg';
         extension = mimetype.includes('ogg') ? 'ogg' : 'mp3';
+        fileSize = Number(messageContent.audioMessage.fileLength || 0);
       } else if (messageContent.documentMessage) {
         mediaType = 'document';
         mimetype = messageContent.documentMessage.mimetype || 'application/octet-stream';
         const fileName = messageContent.documentMessage.fileName || '';
         extension = fileName.split('.').pop() || 'bin';
+        fileSize = Number(messageContent.documentMessage.fileLength || 0);
       } else {
         return null; // No media to download
+      }
+
+      // Check file size limit
+      const maxSizeBytes = MAX_MEDIA_SIZE_MB * 1024 * 1024;
+      if (fileSize > maxSizeBytes) {
+        logger.warn({
+          messageId: msg.key.id,
+          fileSize,
+          maxSize: maxSizeBytes,
+          fileSizeMB: (fileSize / 1024 / 1024).toFixed(2),
+          maxSizeMB: MAX_MEDIA_SIZE_MB
+        }, 'Media file exceeds size limit, skipping download');
+        return null;
       }
 
       // Download the media
