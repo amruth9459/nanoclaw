@@ -18,6 +18,7 @@ import {
   setLastGroupSync,
   updateChatName,
 } from '../db.js';
+import { validateFileType } from '../file-validation.js';
 import { logger } from '../logger.js';
 import { Channel, OnInboundMessage, OnChatMetadata, RegisteredGroup } from '../types.js';
 
@@ -413,6 +414,16 @@ export class WhatsAppChannel implements Channel {
 
       if (!buffer || buffer.length === 0) {
         logger.warn({ messageId: msg.key.id }, 'Downloaded media buffer is empty');
+        return null;
+      }
+
+      // Validate file type matches claimed MIME type (magic byte check)
+      if (!validateFileType(buffer, mimetype)) {
+        logger.warn({
+          messageId: msg.key.id,
+          claimedMimetype: mimetype,
+          actualSize: buffer.length,
+        }, 'File type validation failed - magic bytes do not match claimed MIME type');
         return null;
       }
 
