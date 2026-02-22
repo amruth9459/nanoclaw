@@ -69,7 +69,7 @@ NOW=$(date -u +"%Y-%m-%dT%H:%M:%S.000Z")
 # Next 2 AM local time (for cron we use the cron expression)
 CRON_VALUE="0 2 * * *"
 
-read -r -d '' PROMPT << 'PROMPT_EOF'
+read -r -d '' PROMPT << 'PROMPT_EOF' || true
 [SCHEDULED SECURITY REVIEW]
 
 You are the nightly security agent for NanoClaw. Run the /security-review skill now.
@@ -109,27 +109,25 @@ _Next review: tomorrow 2 AM_
 Use 🚨 instead of 🛡️ if any finding is HIGH severity.
 PROMPT_EOF
 
-# ── Insert task into SQLite ────────────────────────────────────────────────────
-sqlite3 "$DB_PATH" <<SQL
-INSERT INTO scheduled_tasks (
-  id, group_folder, chat_jid, prompt,
-  schedule_type, schedule_value,
-  next_run, last_run, last_result,
-  status, created_at
-) VALUES (
-  '${TASK_ID}',
-  'main',
-  '${MAIN_JID}',
-  '${PROMPT//\'/\'\'}',
-  'cron',
-  '${CRON_VALUE}',
-  datetime('now', 'start of day', '+1 day', '+2 hours'),
-  NULL,
-  NULL,
-  'active',
-  '${NOW}'
-);
-SQL
+# ── Insert task into SQLite (parameterized to handle special chars in prompt) ──
+_PROMPT_FILE=$(mktemp)
+printf '%s' "$PROMPT" > "$_PROMPT_FILE"
+python3 - "$DB_PATH" "$TASK_ID" "$MAIN_JID" "$CRON_VALUE" "$NOW" "$_PROMPT_FILE" <<'PYEOF'
+import sys, sqlite3
+db_path, task_id, jid, cron, now, prompt_file = sys.argv[1:]
+prompt = open(prompt_file).read()
+conn = sqlite3.connect(db_path)
+conn.execute("""
+  INSERT INTO scheduled_tasks
+    (id, group_folder, chat_jid, prompt, schedule_type, schedule_value,
+     next_run, last_run, last_result, status, created_at)
+  VALUES
+    (?, 'main', ?, ?, 'cron', ?,
+     datetime('now','start of day','+1 day','+2 hours'), NULL, NULL, 'active', ?)
+""", (task_id, jid, prompt, cron, now))
+conn.commit(); conn.close()
+PYEOF
+rm -f "$_PROMPT_FILE"
 
 echo ""
 echo "✅ Nightly security review scheduled"
