@@ -9,6 +9,7 @@ import {
   MAIN_GROUP_FOLDER,
   POLL_INTERVAL,
   TRIGGER_PATTERN,
+  WARMUP_ON_START,
 } from './config.js';
 import { WhatsAppChannel } from './channels/whatsapp.js';
 import {
@@ -460,6 +461,32 @@ function recoverPendingMessages(): void {
   }
 }
 
+/**
+ * Pre-warm the container for a group so the first user message hits a
+ * running instance instead of paying cold-start cost.
+ *
+ * Runs a minimal prompt through the agent (output suppressed). The container
+ * stays alive for IDLE_TIMEOUT after responding, ready for real messages.
+ */
+async function warmupGroupContainer(chatJid: string): Promise<boolean> {
+  const group = registeredGroups[chatJid];
+  if (!group) return true;
+
+  logger.info({ group: group.name }, 'Pre-warming container');
+
+  await runAgent(group, '[system: warming up — do not respond to the user]', chatJid, async (result) => {
+    // Suppress all output — this is a silent warmup run
+    if (result.status === 'success') {
+      queue.notifyIdle(chatJid);
+    }
+    if (result.status === 'error') {
+      logger.warn({ group: group.name }, 'Warmup run errored (non-fatal)');
+    }
+  });
+
+  return true;
+}
+
 function ensureContainerSystemRunning(): void {
   ensureContainerRuntimeRunning();
   cleanupOrphans();
@@ -530,6 +557,17 @@ async function main(): Promise<void> {
   });
   queue.setProcessMessagesFn(processGroupMessages);
   recoverPendingMessages();
+
+  // Pre-warm containers for registered groups after a short delay to let
+  // WhatsApp finish its initial sync. Warmup is best-effort and non-blocking.
+  if (WARMUP_ON_START) {
+    setTimeout(() => {
+      for (const [chatJid] of Object.entries(registeredGroups)) {
+        queue.warmup(chatJid, () => warmupGroupContainer(chatJid));
+      }
+    }, 30000); // 30s after startup — after WA initial sync settles
+  }
+
   startMessageLoop().catch((err) => {
     logger.fatal({ err }, 'Message loop crashed unexpectedly');
     process.exit(1);
