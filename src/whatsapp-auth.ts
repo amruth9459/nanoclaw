@@ -19,9 +19,12 @@ import makeWASocket, {
   useMultiFileAuthState,
 } from '@whiskeysockets/baileys';
 
-const AUTH_DIR = './store/auth';
-const QR_FILE = './store/qr-data.txt';
-const STATUS_FILE = './store/auth-status.txt';
+// Support --slot 2 for authenticating a second WhatsApp number
+const slotArg = process.argv.find((_, i, arr) => arr[i - 1] === '--slot');
+const slot = slotArg === '2' ? '2' : '';
+const AUTH_DIR = slot ? `./store/auth${slot}` : './store/auth';
+const QR_FILE = slot ? `./store/qr-data${slot}.txt` : './store/qr-data.txt';
+const STATUS_FILE = slot ? `./store/auth-status${slot}.txt` : './store/auth-status.txt';
 
 const logger = pino({
   level: 'warn', // Quiet logging - only show errors

@@ -88,6 +88,16 @@ export const INSTANT_ACK =
 export const WARMUP_ON_START =
   process.env.NANOCLAW_WARMUP_ON_START !== '0'; // Default: enabled
 
+// When enabled, respond to @-mentions from any WhatsApp chat, not just
+// registered groups. Each new chat gets an isolated guest agent.
+export const OPEN_MENTIONS =
+  process.env.NANOCLAW_OPEN_MENTIONS === '1'; // Default: disabled
+
+// When enabled, connect a second WhatsApp account (auth stored in store/auth2/).
+// Authenticate it first with: npm run auth -- --slot 2
+export const WA2_ENABLED =
+  process.env.NANOCLAW_WA2 === '1'; // Default: disabled
+
 // Timezone for scheduled tasks (cron expressions, etc.)
 // Uses system timezone by default
 export const TIMEZONE =

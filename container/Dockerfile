@@ -23,6 +23,10 @@ RUN apt-get update && apt-get install -y \
     libxshmfence1 \
     curl \
     git \
+    poppler-utils \
+    imagemagick \
+    tesseract-ocr \
+    tesseract-ocr-all \
     && rm -rf /var/lib/apt/lists/*
 
 # Set Chromium path for agent-browser
@@ -46,6 +50,10 @@ COPY agent-runner/ ./
 
 # Build TypeScript
 RUN npm run build
+
+# Install OCR helper script
+COPY skills/ocr.sh /usr/local/bin/ocr
+RUN chmod +x /usr/local/bin/ocr
 
 # Create workspace directories
 RUN mkdir -p /workspace/group /workspace/global /workspace/extra /workspace/ipc/messages /workspace/ipc/tasks /workspace/ipc/input

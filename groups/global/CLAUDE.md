@@ -15,6 +15,10 @@ You help with tasks, answer questions, and can schedule reminders.
 - **Browse the web** with `agent-browser` — open pages, click, fill forms, take screenshots, extract data (run `agent-browser open <url>` to start, then `agent-browser snapshot -i` to see interactive elements)
 - Read and write files in your workspace
 - Run bash commands in your sandbox
+- **Read any document or image** sent by users (available at `/workspace/media/<filename>`):
+  - `ocr /workspace/media/file.pdf` — free text extraction (digital or scanned PDF, 160+ languages)
+  - `ocr /workspace/media/image.jpg [lang]` — free OCR on images (`hin`, `ara`, `chi_sim`, etc.)
+  - Only use the `Read` tool (Claude Vision) when `ocr` output is garbled, for complex handwriting, or visual analysis
 - Schedule tasks to run later or on a recurring basis
 - Send messages back to the chat
 

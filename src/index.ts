@@ -4,11 +4,15 @@ import path from 'path';
 import {
   ASSISTANT_NAME,
   DATA_DIR,
+  GROUPS_DIR,
   IDLE_TIMEOUT,
   INSTANT_ACK,
   MAIN_GROUP_FOLDER,
+  OPEN_MENTIONS,
   POLL_INTERVAL,
+  STORE_DIR,
   TRIGGER_PATTERN,
+  WA2_ENABLED,
   WARMUP_ON_START,
 } from './config.js';
 import { WhatsAppChannel } from './channels/whatsapp.js';
@@ -24,7 +28,9 @@ import {
   getAllRegisteredGroups,
   getAllSessions,
   getAllTasks,
+  getChatName,
   getMessagesSince,
+  getNewMentions,
   getNewMessages,
   getRouterState,
   initDatabase,
@@ -49,6 +55,9 @@ export { escapeXml, formatMessages } from './router.js';
 let lastTimestamp = '';
 let sessions: Record<string, string> = {};
 let registeredGroups: Record<string, RegisteredGroup> = {};
+// In-memory guest groups created on first @-mention from unregistered chats.
+// Ephemeral: cleared on restart. Guests get isolated agent sessions.
+const guestGroups = new Map<string, RegisteredGroup>();
 let lastAgentTimestamp: Record<string, string> = {};
 let messageLoopRunning = false;
 
@@ -97,6 +106,44 @@ function registerGroup(jid: string, group: RegisteredGroup): void {
 }
 
 /**
+ * Return the guest RegisteredGroup for a chat JID, creating it on first call.
+ * Guest groups are ephemeral (in-memory only) and get isolated agent sessions.
+ */
+function getOrCreateGuestGroup(chatJid: string): RegisteredGroup {
+  const existing = guestGroups.get(chatJid);
+  if (existing) return existing;
+
+  const jidPrefix = chatJid.split('@')[0];
+  const folder = `guest-${jidPrefix}`;
+  const chatName = getChatName(chatJid) || jidPrefix;
+
+  const group: RegisteredGroup = {
+    name: chatName,
+    folder,
+    trigger: `@${ASSISTANT_NAME}`,
+    added_at: new Date().toISOString(),
+  };
+
+  guestGroups.set(chatJid, group);
+
+  // Create group directory (mirrors what registerGroup does for real groups)
+  const groupDir = path.join(GROUPS_DIR, folder);
+  fs.mkdirSync(path.join(groupDir, 'logs'), { recursive: true });
+
+  // Copy CLAUDE.md from the guest template on first contact
+  const claudeMdPath = path.join(groupDir, 'CLAUDE.md');
+  if (!fs.existsSync(claudeMdPath)) {
+    const templatePath = path.join(GROUPS_DIR, 'guest-template', 'CLAUDE.md');
+    if (fs.existsSync(templatePath)) {
+      fs.copyFileSync(templatePath, claudeMdPath);
+    }
+  }
+
+  logger.info({ chatJid, folder, name: chatName }, 'Guest group created');
+  return group;
+}
+
+/**
  * Get available groups list for the agent.
  * Returns groups ordered by most recent activity.
  */
@@ -124,7 +171,7 @@ export function _setRegisteredGroups(groups: Record<string, RegisteredGroup>): v
  * Called by the GroupQueue when it's this group's turn.
  */
 async function processGroupMessages(chatJid: string): Promise<boolean> {
-  const group = registeredGroups[chatJid];
+  const group = registeredGroups[chatJid] ?? guestGroups.get(chatJid);
   if (!group) return true;
 
   const channel = findChannel(channels, chatJid);
@@ -140,10 +187,13 @@ async function processGroupMessages(chatJid: string): Promise<boolean> {
 
   if (missedMessages.length === 0) return true;
 
-  // For non-main groups, check if trigger is required and present
+  // For non-main groups, check if trigger is required and present.
+  // Use multiline mode so the anchor matches at the start of any line —
+  // quoted replies prepend "> [context]\n" before the actual "@Claw" text.
   if (!isMainGroup && group.requiresTrigger !== false) {
+    const triggerMultiline = new RegExp(TRIGGER_PATTERN.source, TRIGGER_PATTERN.flags + 'm');
     const hasTrigger = missedMessages.some((m) =>
-      TRIGGER_PATTERN.test(m.content.trim()),
+      triggerMultiline.test(m.content.trim()),
     );
     if (!hasTrigger) return true;
   }
@@ -201,7 +251,7 @@ async function processGroupMessages(chatJid: string): Promise<boolean> {
 
       if (text) {
         streamingBuffer += text;
-        logger.info({ group: group.name }, `Streaming chunk: ${text.slice(0, 100)}...`);
+        logger.info({ group: group.name }, `Streaming chunk: ${text.slice(0, 300)}...`);
         await channel.sendMessage(chatJid, text);
         outputSentToUser = true;
         streamingChunksSent = true;
@@ -346,6 +396,18 @@ async function startMessageLoop(): Promise<void> {
   while (true) {
     try {
       const jids = Object.keys(registeredGroups);
+
+      // Capture cursor before any advancement so both registered and
+      // open-mention queries start from the same point each iteration.
+      const oldTimestamp = lastTimestamp;
+
+      // Query open mentions first (before advancing the cursor) so that
+      // mention timestamps are never accidentally skipped when registered
+      // messages arrive in the same poll with later timestamps.
+      const openMentionMsgs: NewMessage[] = OPEN_MENTIONS
+        ? getNewMentions(oldTimestamp, jids, ASSISTANT_NAME)
+        : [];
+
       const { messages, newTimestamp } = getNewMessages(jids, lastTimestamp, ASSISTANT_NAME);
 
       if (messages.length > 0) {
@@ -436,6 +498,53 @@ async function startMessageLoop(): Promise<void> {
           }
         }
       }
+
+      // --- Open mentions: respond in unregistered chats ---
+      if (OPEN_MENTIONS && openMentionMsgs.length > 0) {
+        // Advance the global cursor to cover mention timestamps
+        const maxMentionTs = openMentionMsgs[openMentionMsgs.length - 1].timestamp;
+        if (maxMentionTs > lastTimestamp) {
+          lastTimestamp = maxMentionTs;
+          saveState();
+        }
+
+        // Group mentions by chat
+        const mentionsByChat = new Map<string, NewMessage[]>();
+        for (const msg of openMentionMsgs) {
+          const existing = mentionsByChat.get(msg.chat_jid);
+          if (existing) {
+            existing.push(msg);
+          } else {
+            mentionsByChat.set(msg.chat_jid, [msg]);
+          }
+        }
+
+        for (const [chatJid, msgs] of mentionsByChat) {
+          const group = getOrCreateGuestGroup(chatJid);
+
+          // Set cursor just before the first mention so processGroupMessages
+          // only pulls the mention itself (not the full chat history).
+          if (!lastAgentTimestamp[chatJid]) {
+            const firstMsgTs = new Date(new Date(msgs[0].timestamp).getTime() - 1).toISOString();
+            lastAgentTimestamp[chatJid] = firstMsgTs;
+            saveState();
+          }
+
+          logger.info(
+            { chatJid, name: group.name, count: msgs.length },
+            'Open mention — queuing guest agent',
+          );
+
+          // ACK with 👀 so the user knows we saw it
+          const channel = findChannel(channels, chatJid);
+          if (channel && INSTANT_ACK) {
+            const last = msgs[msgs.length - 1];
+            channel.sendReaction?.(chatJid, last.id, last.sender, '👀').catch(() => {});
+          }
+
+          queue.enqueueMessageCheck(chatJid);
+        }
+      }
     } catch (err) {
       logger.error({ err }, 'Error in message loop');
     }
@@ -520,6 +629,21 @@ async function main(): Promise<void> {
   whatsapp = new WhatsAppChannel(channelOpts);
   channels.push(whatsapp);
   await whatsapp.connect();
+
+  // Optional second WhatsApp number (enable with NANOCLAW_WA2=1)
+  if (WA2_ENABLED) {
+    const wa2 = new WhatsAppChannel({
+      ...channelOpts,
+      name: 'whatsapp2',
+      authDir: path.join(STORE_DIR, 'auth2'),
+      primary: false,
+    });
+    channels.push(wa2);
+    await wa2.connect().catch((err: Error) => {
+      logger.warn({ err: err.message }, 'Second WhatsApp channel not connected — authenticate first: npm run auth -- --slot 2');
+      channels.splice(channels.indexOf(wa2), 1);
+    });
+  }
 
   // Start subsystems (independently of connection handler)
   startDashboard(queue);
