@@ -33,40 +33,60 @@ Do not advise the user to run `./deploy.sh --dev` or switch to dev mode unless t
 
 When users send images or documents via WhatsApp, they are automatically downloaded and made available to you.
 
-### Images
+### Images and Documents — Cost-efficient workflow
+
+**Always try free tools first. Only use the `Read` tool (Claude Vision) when free tools can't do the job.**
+
+#### Images
 
 Images appear in messages like this:
 ```
 <message sender="User Name" time="2026-02-22T14:00:00.000Z">[image: /workspace/media/ABC123.jpg] Can you identify what's in this picture?</message>
 ```
 
-To analyze an image:
-1. Use the `Read` tool to read the image file
-2. Claude's vision capabilities will automatically analyze it
-3. Describe what you see in the image
+*To extract text from an image (OCR):*
+```bash
+ocr /workspace/media/ABC123.jpg           # typed/printed text, auto language
+ocr /workspace/media/ABC123.jpg hin       # Hindi text in image
+ocr /workspace/media/ABC123.jpg ara       # Arabic text in image
+```
 
-Example:
+*Only use `Read` tool when you need visual analysis* (describe objects, understand context, identify non-text content, or when `ocr` output is garbled/unreadable):
 ```typescript
 Read({ file_path: "/workspace/media/ABC123.jpg" })
 ```
 
-The image will be displayed visually and you can describe its contents, identify objects, read text from it, etc.
+#### Documents (PDFs)
 
-### Documents
-
-Documents (PDFs, Word files, etc.) appear similarly:
+Documents appear similarly:
 ```
 <message sender="User Name" time="2026-02-22T14:00:00.000Z">[document: /workspace/media/XYZ789.pdf] Please summarize this document</message>
 ```
 
-For PDFs:
-- Use `Read` tool with the `pages` parameter to read specific pages
-- Maximum 20 pages per request
-- Example: `Read({ file_path: "/workspace/media/XYZ789.pdf", pages: "1-5" })`
+**Decision order (cheapest first):**
 
-For other document types:
-- Check the file extension and mimetype
-- Use appropriate tools to extract content
+1. *Digital PDF (has selectable text)* — `ocr` handles this automatically via `pdftotext`:
+   ```bash
+   ocr /workspace/media/XYZ789.pdf
+   ```
+
+2. *Scanned PDF or typed text in any language* — Tesseract OCR, free, 160+ languages:
+   ```bash
+   ocr /workspace/media/XYZ789.pdf hin       # Hindi
+   ocr /workspace/media/XYZ789.pdf ara       # Arabic
+   ocr /workspace/media/XYZ789.pdf chi_sim   # Chinese Simplified
+   ocr /workspace/media/XYZ789.pdf hin+eng   # mixed Hindi/English
+   ocr /workspace/media/XYZ789.pdf list      # show all supported languages
+   ```
+   Language codes: `hin` Hindi · `ara` Arabic · `chi_sim` Chinese · `jpn` Japanese · `kor` Korean · `rus` Russian · `ben` Bengali · `tam` Tamil · `tel` Telugu · `urd` Urdu · `guj` Gujarati · `mar` Marathi · `pan` Punjabi · `fra` French · `deu` German · `spa` Spanish
+
+3. *Only use `Read` tool when:* Tesseract output is garbled, the document has complex handwriting that didn't OCR well, or you need to visually understand layout/diagrams:
+   ```typescript
+   Read({ file_path: "/workspace/media/XYZ789.pdf", pages: "1-5" })  // max 20 pages per call
+   ```
+
+For other document types (Word, etc.):
+- Check the file extension and use appropriate tools to extract content
 
 ### Media Location
 

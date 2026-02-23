@@ -12,8 +12,9 @@ import makeWASocket, {
   useMultiFileAuthState,
 } from '@whiskeysockets/baileys';
 
-import { ASSISTANT_HAS_OWN_NUMBER, ASSISTANT_NAME, STORE_DIR, MEDIA_DIR, MAX_MEDIA_SIZE_MB } from '../config.js';
+import { ASSISTANT_HAS_OWN_NUMBER, ASSISTANT_NAME, OPEN_MENTIONS, STORE_DIR, MEDIA_DIR, MAX_MEDIA_SIZE_MB } from '../config.js';
 import {
+  getChatChannel,
   getLastGroupSync,
   setLastGroupSync,
   updateChatName,
@@ -23,6 +24,14 @@ import { logger } from '../logger.js';
 import { Channel, OnInboundMessage, OnChatMetadata, RegisteredGroup } from '../types.js';
 
 const GROUP_SYNC_INTERVAL_MS = 24 * 60 * 60 * 1000; // 24 hours
+
+// Shared across all channel instances to deduplicate messages received by
+// multiple connections (e.g. multi-device sync delivering the same message
+// to both WhatsApp accounts).  Cleared every 10 minutes; a message that
+// genuinely arrives 10 minutes late would be processed twice, but that is
+// an acceptable edge-case compared to the alternative of a memory leak.
+const processedMessageIds = new Set<string>();
+setInterval(() => processedMessageIds.clear(), 10 * 60 * 1000);
 
 interface MediaInfo {
   type: 'image' | 'video' | 'audio' | 'document';
@@ -35,11 +44,18 @@ export interface WhatsAppChannelOpts {
   onMessage: OnInboundMessage;
   onChatMetadata: OnChatMetadata;
   registeredGroups: () => Record<string, RegisteredGroup>;
+  /** Channel identifier — used for routing replies. Default: 'whatsapp' */
+  name?: string;
+  /** Auth state directory. Default: store/auth */
+  authDir?: string;
+  /** If false, QR auth and logout don't crash the process. Default: true */
+  primary?: boolean;
 }
 
 export class WhatsAppChannel implements Channel {
-  name = 'whatsapp';
+  name: string;
 
+  private isPrimary: boolean;
   private sock!: WASocket;
   private connected = false;
   private lidToPhoneMap: Record<string, string> = {};
@@ -51,16 +67,21 @@ export class WhatsAppChannel implements Channel {
 
   constructor(opts: WhatsAppChannelOpts) {
     this.opts = opts;
+    this.name = opts.name ?? 'whatsapp';
+    this.isPrimary = opts.primary !== false;
   }
 
   async connect(): Promise<void> {
     return new Promise<void>((resolve, reject) => {
-      this.connectInternal(resolve).catch(reject);
+      this.connectInternal(resolve, reject).catch(reject);
     });
   }
 
-  private async connectInternal(onFirstOpen?: () => void): Promise<void> {
-    const authDir = path.join(STORE_DIR, 'auth');
+  private async connectInternal(
+    onFirstOpen?: () => void,
+    onFirstFail?: (err: Error) => void,
+  ): Promise<void> {
+    const authDir = this.opts.authDir ?? path.join(STORE_DIR, 'auth');
     fs.mkdirSync(authDir, { recursive: true });
 
     const { state, saveCreds } = await useMultiFileAuthState(authDir);
@@ -79,6 +100,16 @@ export class WhatsAppChannel implements Channel {
       const { connection, lastDisconnect, qr } = update;
 
       if (qr) {
+        if (!this.isPrimary) {
+          // Secondary channel: fail gracefully — don't crash the process
+          logger.warn(
+            { channel: this.name },
+            'Secondary WhatsApp channel needs QR auth. Run: npm run auth -- --slot 2',
+          );
+          onFirstFail?.(new Error(`${this.name}: QR authentication required — run: npm run auth -- --slot 2`));
+          onFirstFail = undefined;
+          return;
+        }
         const msg =
           'WhatsApp authentication required. Run /setup in Claude Code.';
         logger.error(msg);
@@ -105,8 +136,9 @@ export class WhatsAppChannel implements Channel {
             }, 5000);
           });
         } else {
-          logger.info('Logged out. Run /setup to re-authenticate.');
-          process.exit(0);
+          logger.info({ channel: this.name }, 'Logged out. Run /setup to re-authenticate.');
+          if (this.isPrimary) process.exit(0);
+          // Secondary: just stop — don't bring down the whole process
         }
       } else if (connection === 'open') {
         this.connected = true;
@@ -160,6 +192,12 @@ export class WhatsAppChannel implements Channel {
         const rawJid = msg.key.remoteJid;
         if (!rawJid || rawJid === 'status@broadcast') continue;
 
+        // Skip messages already handled by another channel instance (multi-device
+        // sync can deliver the same message to multiple connected accounts).
+        const msgId = msg.key.id ?? '';
+        if (msgId && processedMessageIds.has(msgId)) continue;
+        if (msgId) processedMessageIds.add(msgId);
+
         // Translate LID JID to phone JID if applicable
         const chatJid = await this.translateJid(rawJid);
 
@@ -169,24 +207,108 @@ export class WhatsAppChannel implements Channel {
 
         // Always notify about chat metadata for group discovery
         const isGroup = chatJid.endsWith('@g.us');
-        this.opts.onChatMetadata(chatJid, timestamp, undefined, 'whatsapp', isGroup);
+        this.opts.onChatMetadata(chatJid, timestamp, undefined, this.name, isGroup);
 
-        // Only deliver full message for registered groups
+        // Deliver full message for registered groups, and for non-registered
+        // chats when open mentions is enabled and the message contains a trigger.
         const groups = this.opts.registeredGroups();
-        if (groups[chatJid]) {
-          const content =
-            msg.message?.conversation ||
-            msg.message?.extendedTextMessage?.text ||
-            msg.message?.imageMessage?.caption ||
-            msg.message?.videoMessage?.caption ||
-            msg.message?.documentMessage?.caption ||
-            '';
+        const inRegisteredGroup = Boolean(groups[chatJid]);
 
-          // Download media if present
+        // Extract text content for registered groups and for mention detection
+        const content =
+          msg.message?.conversation ||
+          msg.message?.extendedTextMessage?.text ||
+          msg.message?.imageMessage?.caption ||
+          msg.message?.videoMessage?.caption ||
+          msg.message?.documentMessage?.caption ||
+          '';
+
+        // For non-registered chats: only proceed if open mentions is on and
+        // the message @-mentions the assistant (text-only, no media download)
+        const isOpenMention =
+          !inRegisteredGroup &&
+          OPEN_MENTIONS &&
+          content.toLowerCase().includes(`@${ASSISTANT_NAME.toLowerCase()}`);
+
+        if (inRegisteredGroup || isOpenMention) {
+          // Download media attached to this message
           const mediaInfo = await this.downloadAndSaveMedia(msg);
 
-          // Skip protocol messages with no text content AND no media (encryption keys, read receipts, etc.)
-          if (!content && !mediaInfo) continue;
+          // Extract quoted message context (when user replies to a message)
+          const contextInfo =
+            msg.message?.extendedTextMessage?.contextInfo ??
+            msg.message?.imageMessage?.contextInfo ??
+            msg.message?.videoMessage?.contextInfo ??
+            msg.message?.audioMessage?.contextInfo ??
+            msg.message?.documentMessage?.contextInfo;
+
+          let quotedText = '';
+          let quotedMediaInfo: MediaInfo | null = null;
+
+          if (contextInfo?.quotedMessage) {
+            const qm = contextInfo.quotedMessage;
+
+            // Extract the quoted text
+            quotedText =
+              qm.conversation ||
+              qm.extendedTextMessage?.text ||
+              qm.imageMessage?.caption ||
+              qm.videoMessage?.caption ||
+              qm.documentMessage?.caption ||
+              '';
+
+            // Download quoted media if present
+            const hasQuotedMedia = !!(
+              qm.imageMessage || qm.videoMessage || qm.audioMessage || qm.documentMessage
+            );
+            if (hasQuotedMedia) {
+              const qmType = qm.imageMessage ? 'image'
+                : qm.videoMessage ? 'video'
+                : qm.audioMessage ? 'audio'
+                : 'document';
+              const qmFileName = qm.documentMessage?.fileName ?? '';
+              const quotedWAMsg: WAMessage = {
+                key: {
+                  id: contextInfo.stanzaId ?? `quoted-${Date.now()}`,
+                  remoteJid: chatJid,
+                  participant: contextInfo.participant ?? undefined,
+                  fromMe: false,
+                },
+                message: qm,
+              };
+              logger.debug({
+                messageId: msg.key.id,
+                quotedId: contextInfo.stanzaId,
+                qmType,
+                qmFileName,
+                hasUrl: !!(qm.documentMessage?.url ?? qm.imageMessage?.url ?? qm.videoMessage?.url ?? qm.audioMessage?.url),
+              }, 'Attempting quoted media download');
+              // downloadAndSaveMedia catches errors internally and returns null on failure.
+              // If it returns null here, we know the download failed (hasQuotedMedia is true),
+              // so notify the agent rather than silently omitting the quoted file.
+              quotedMediaInfo = await this.downloadAndSaveMedia(quotedWAMsg);
+              if (!quotedMediaInfo) {
+                const fileDesc = qmFileName ? `${qmType}: ${qmFileName}` : qmType;
+                logger.warn({ messageId: msg.key.id, qmType, qmFileName }, 'Failed to download quoted media');
+                quotedText = `${quotedText ? quotedText + ' ' : ''}[quoted ${fileDesc} — could not download]`;
+              }
+            }
+          }
+
+          // Build full content — prefix with quoted context so the agent sees it
+          let fullContent = content;
+          if (quotedText || quotedMediaInfo) {
+            const label = quotedText
+              ? `> ${quotedText.slice(0, 300)}${quotedText.length > 300 ? '…' : ''}`
+              : `> [${quotedMediaInfo!.type}]`;
+            fullContent = `${label}\n${content}`;
+          }
+
+          // New message media takes priority; fall back to quoted media
+          const effectiveMedia = mediaInfo ?? quotedMediaInfo;
+
+          // Skip protocol messages with no content of any kind
+          if (!fullContent && !effectiveMedia) continue;
 
           const sender = msg.key.participant || msg.key.remoteJid || '';
           const senderName = msg.pushName || sender.split('@')[0];
@@ -205,14 +327,14 @@ export class WhatsAppChannel implements Channel {
             chat_jid: chatJid,
             sender,
             sender_name: senderName,
-            content: content || (mediaInfo ? `[${mediaInfo.type}]` : ''),
+            content: fullContent || (effectiveMedia ? `[${effectiveMedia.type}]` : ''),
             timestamp,
             is_from_me: fromMe,
             is_bot_message: isBotMessage,
-            media_type: mediaInfo?.type ?? null,
-            media_path: mediaInfo?.path ?? null,
-            media_mimetype: mediaInfo?.mimetype ?? null,
-            media_size: mediaInfo?.size ?? null,
+            media_type: effectiveMedia?.type ?? null,
+            media_path: effectiveMedia?.path ?? null,
+            media_mimetype: effectiveMedia?.mimetype ?? null,
+            media_size: effectiveMedia?.size ?? null,
           });
         }
       }
@@ -248,7 +370,11 @@ export class WhatsAppChannel implements Channel {
   }
 
   ownsJid(jid: string): boolean {
-    return jid.endsWith('@g.us') || jid.endsWith('@s.whatsapp.net');
+    if (!jid.endsWith('@g.us') && !jid.endsWith('@s.whatsapp.net')) return false;
+    const chatChannel = getChatChannel(jid);
+    // Unknown chats (no DB entry yet) fall to the primary channel
+    if (!chatChannel) return this.isPrimary;
+    return chatChannel === this.name;
   }
 
   async disconnect(): Promise<void> {
@@ -401,8 +527,9 @@ export class WhatsAppChannel implements Channel {
         return null;
       }
 
-      // Download the media
-      const buffer = await downloadMediaMessage(
+      // Download the media. Baileys only auto-retries reupload for 404/410;
+      // 403 is not in its list, so we catch it and refresh the URL manually.
+      let buffer = await downloadMediaMessage(
         msg,
         'buffer',
         {},
@@ -410,7 +537,14 @@ export class WhatsAppChannel implements Channel {
           logger: logger,
           reuploadRequest: this.sock.updateMediaMessage,
         },
-      ) as Buffer;
+      ).catch(async (err) => {
+        if (err?.output?.statusCode === 403) {
+          logger.debug({ messageId: msg.key.id }, 'Got 403 on media download, refreshing URL via reupload');
+          const refreshed = await this.sock.updateMediaMessage(msg);
+          return downloadMediaMessage(refreshed, 'buffer', {}, { logger, reuploadRequest: this.sock.updateMediaMessage }) as Promise<Buffer>;
+        }
+        throw err;
+      }) as Buffer;
 
       if (!buffer || buffer.length === 0) {
         logger.warn({ messageId: msg.key.id }, 'Downloaded media buffer is empty');

@@ -316,6 +316,73 @@ export function storeMessageDirect(msg: {
   );
 }
 
+/**
+ * Get the channel name that owns a given chat JID.
+ * Used by WhatsApp channel instances to route replies to the right number.
+ */
+export function getChatChannel(jid: string): string | undefined {
+  const row = db
+    .prepare('SELECT channel FROM chats WHERE jid = ?')
+    .get(jid) as { channel: string | null } | undefined;
+  return row?.channel ?? undefined;
+}
+
+/**
+ * Get the display name for a chat from the chats table.
+ * Returns undefined if the chat is unknown or if no real name is stored.
+ */
+export function getChatName(jid: string): string | undefined {
+  const row = db
+    .prepare('SELECT name FROM chats WHERE jid = ?')
+    .get(jid) as { name: string } | undefined;
+  // When no name is known, storeChatMetadata falls back to the jid itself
+  if (!row || row.name === jid) return undefined;
+  return row.name;
+}
+
+/**
+ * Find @-mention messages from chats NOT in the registered set.
+ * Used by the open mentions feature to trigger guest agent sessions.
+ */
+export function getNewMentions(
+  lastTimestamp: string,
+  registeredJids: string[],
+  assistantName: string,
+): NewMessage[] {
+  const likePattern = `%@${assistantName}%`;
+
+  if (registeredJids.length === 0) {
+    // No registered groups — search all chats
+    return db
+      .prepare(
+        `
+      SELECT id, chat_jid, sender, sender_name, content, timestamp
+      FROM messages
+      WHERE timestamp > ?
+        AND is_bot_message = 0
+        AND content LIKE ?
+      ORDER BY timestamp
+    `,
+      )
+      .all(lastTimestamp, likePattern) as NewMessage[];
+  }
+
+  const placeholders = registeredJids.map(() => '?').join(',');
+  return db
+    .prepare(
+      `
+    SELECT id, chat_jid, sender, sender_name, content, timestamp
+    FROM messages
+    WHERE timestamp > ?
+      AND is_bot_message = 0
+      AND chat_jid NOT IN (${placeholders})
+      AND content LIKE ?
+    ORDER BY timestamp
+  `,
+    )
+    .all(lastTimestamp, ...registeredJids, likePattern) as NewMessage[];
+}
+
 export function getNewMessages(
   jids: string[],
   lastTimestamp: string,
@@ -327,7 +394,7 @@ export function getNewMessages(
   // Filter bot messages using both the is_bot_message flag AND the content
   // prefix as a backstop for messages written before the migration ran.
   const sql = `
-    SELECT id, chat_jid, sender, sender_name, content, timestamp
+    SELECT id, chat_jid, sender, sender_name, content, timestamp, media_type, media_path, media_mimetype, media_size
     FROM messages
     WHERE timestamp > ? AND chat_jid IN (${placeholders})
       AND is_bot_message = 0 AND content NOT LIKE ?
@@ -354,7 +421,7 @@ export function getMessagesSince(
   // Filter bot messages using both the is_bot_message flag AND the content
   // prefix as a backstop for messages written before the migration ran.
   const sql = `
-    SELECT id, chat_jid, sender, sender_name, content, timestamp
+    SELECT id, chat_jid, sender, sender_name, content, timestamp, media_type, media_path, media_mimetype, media_size
     FROM messages
     WHERE chat_jid = ? AND timestamp > ?
       AND is_bot_message = 0 AND content NOT LIKE ?
