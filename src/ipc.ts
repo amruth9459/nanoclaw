@@ -5,12 +5,33 @@ import { CronExpressionParser } from 'cron-parser';
 
 import {
   DATA_DIR,
+  GROUPS_DIR,
   IPC_POLL_INTERVAL,
   MAIN_GROUP_FOLDER,
+  PAYPAL_EMAIL,
+  STORE_DIR,
   TIMEZONE,
 } from './config.js';
 import { AvailableGroup } from './container-runner.js';
-import { createTask, deleteTask, getTaskById, updateTask } from './db.js';
+import {
+  addEarnings,
+  createBountyOpportunity,
+  createTask,
+  deleteTask,
+  getActiveTask,
+  getAllBounties,
+  getOrCreateEconomics,
+  getTaskById,
+  saveLearn,
+  updateBountyStatus,
+  updateTask,
+  updateTaskEvaluation,
+  updateTaskSubmission,
+} from './db.js';
+import { evaluateWork } from './clawwork.js';
+import { Bounty, findBounties } from './bounty-hunter.js';
+import { BountyGate } from './bounty-gate.js';
+import { getSurvivalTier } from './economics.js';
 import { HitlGate } from './hitl.js';
 import { logger } from './logger.js';
 import { indexDocument, semanticSearch } from './semantic-index.js';
@@ -18,6 +39,7 @@ import { RegisteredGroup } from './types.js';
 
 export interface IpcDeps {
   sendMessage: (jid: string, text: string) => Promise<void>;
+  sendFile?: (jid: string, buffer: Buffer, mimetype: string, filename: string, caption?: string) => Promise<void>;
   registeredGroups: () => Record<string, RegisteredGroup>;
   registerGroup: (jid: string, group: RegisteredGroup) => void;
   syncGroupMetadata: (force: boolean) => Promise<void>;
@@ -30,6 +52,8 @@ export interface IpcDeps {
   ) => void;
   /** HITL gate — intercepts sends to unregistered JIDs */
   hitlGate?: HitlGate;
+  /** Bounty gate — HITL approval for bounty proposals */
+  bountyGate?: BountyGate;
   /** Returns the JID of the main group (used for HITL notifications) */
   getMainGroupJid?: () => string | undefined;
 }
@@ -85,10 +109,12 @@ export function startIpcWatcher(deps: IpcDeps): void {
                   logger.warn({ err }, 'Semantic search failed');
                   return null;
                 });
-                const responseFile = req.responseFile as string;
+                const rawRF = req.responseFile as string;
+                const responseFile = toHostIpcPath(rawRF, sourceGroup);
                 const response = results
                   ? { results }
                   : { error: 'Search failed — check ANTHROPIC_API_KEY and index status' };
+                fs.mkdirSync(path.dirname(responseFile), { recursive: true });
                 fs.writeFileSync(responseFile + '.tmp', JSON.stringify(response));
                 fs.renameSync(responseFile + '.tmp', responseFile);
               } else if (req.type === 'index_document') {
@@ -107,7 +133,7 @@ export function startIpcWatcher(deps: IpcDeps): void {
           if (fs.existsSync(messagesDir)) {
             const messageFiles = fs
               .readdirSync(messagesDir)
-              .filter((f) => f.endsWith('.json'))
+              .filter((f) => f.endsWith('.json') && !f.endsWith('.response.json'))
               .sort(); // Preserve order within group
 
             // Process messages sequentially within each group to maintain order
@@ -115,6 +141,74 @@ export function startIpcWatcher(deps: IpcDeps): void {
               const filePath = path.join(messagesDir, file);
               try {
                 const data = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+
+                // ── ClawWork + Bounty IPC handlers ─────────────────────────
+                const CLAWWORK_BOUNTY_TYPES = new Set([
+                  'clawwork_get_status', 'clawwork_decide_activity', 'clawwork_learn', 'clawwork_submit_work',
+                  'find_bounties', 'propose_bounty', 'submit_bounty',
+                ]);
+                if (data.type && CLAWWORK_BOUNTY_TYPES.has(data.type)) {
+                  await processClawworkMessage(data, sourceGroup, messagesDir, deps);
+                  fs.unlinkSync(filePath);
+                  continue;
+                }
+
+                if (data.type === 'remote_shell' && data.command) {
+                  // Only main group can execute remote shell commands
+                  if (!isMain) {
+                    logger.warn({ sourceGroup }, 'Unauthorized remote_shell attempt blocked');
+                    const responseFile = filePath.replace('.json', '.response.json');
+                    fs.writeFileSync(responseFile, JSON.stringify({ error: 'Unauthorized: only main group can execute remote shell commands' }));
+                    fs.unlinkSync(filePath);
+                    continue;
+                  }
+
+                  const { executeRemoteCommand, formatRemoteShellResult, PRESET_COMMANDS } = await import('./remote-shell.js');
+
+                  // Resolve preset commands
+                  const command = (PRESET_COMMANDS as Record<string, string>)[data.command as string] || (data.command as string);
+
+                  const result = await executeRemoteCommand({
+                    command,
+                    workingDir: data.working_dir as string | undefined,
+                    timeout: data.timeout as number | undefined,
+                    requester: sourceGroup,
+                  });
+
+                  const formatted = formatRemoteShellResult({ command, requester: sourceGroup }, result);
+
+                  const responseFile = filePath.replace('.json', '.response.json');
+                  fs.writeFileSync(responseFile, JSON.stringify({
+                    success: result.success,
+                    output: result.output,
+                    formatted_output: formatted,
+                    exit_code: result.exitCode,
+                    duration: result.duration,
+                  }));
+
+                  fs.unlinkSync(filePath);
+                  continue;
+                }
+
+                if (data.type === 'send_file' && data.chatJid && data.filePath) {
+                  const hostPath = toHostWorkspacePath(data.filePath as string, sourceGroup);
+                  if (!fs.existsSync(hostPath)) {
+                    logger.warn({ hostPath, sourceGroup }, 'send_file: file not found on host');
+                  } else if (!deps.sendFile) {
+                    logger.warn({ hostPath }, 'send_file: channel does not support file sending');
+                  } else {
+                    const buffer = fs.readFileSync(hostPath);
+                    const mimetype = (data.mimetype as string) || 'application/octet-stream';
+                    const filename = (data.filename as string) || path.basename(hostPath);
+                    const caption = (data.caption as string) || undefined;
+                    const targetJid = (data.chatJid as string);
+                    await deps.sendFile(targetJid, buffer, mimetype, filename, caption);
+                    logger.info({ targetJid, filename, bytes: buffer.length, sourceGroup }, 'File sent via IPC');
+                  }
+                  fs.unlinkSync(filePath);
+                  continue;
+                }
+
                 if (data.type === 'message' && data.chatJid && data.text) {
                   // Authorization: verify this group can send to this chatJid
                   const targetGroup = registeredGroups[data.chatJid];
@@ -215,6 +309,270 @@ export function startIpcWatcher(deps: IpcDeps): void {
 
   processIpcFiles();
   logger.info('IPC watcher started (per-group namespaces)');
+}
+
+/**
+ * Translate a container-relative IPC path to the host filesystem path.
+ * Container sees: /workspace/ipc/messages/foo.json
+ * Host maps to:   data/ipc/{groupFolder}/messages/foo.json
+ */
+function toHostIpcPath(containerPath: string, groupFolder: string): string {
+  const containerPrefix = '/workspace/ipc/';
+  if (containerPath.startsWith(containerPrefix)) {
+    return path.join(DATA_DIR, 'ipc', groupFolder, containerPath.slice(containerPrefix.length));
+  }
+  return containerPath; // already a host-side path
+}
+
+/**
+ * Translate a container workspace path to the host filesystem path.
+ * Handles all mount points:
+ *   /workspace/group/  → groups/{groupFolder}/
+ *   /workspace/global/ → groups/global/
+ *   /workspace/ipc/    → data/ipc/{groupFolder}/
+ *   /workspace/media/  → store/media/
+ */
+function toHostWorkspacePath(containerPath: string, groupFolder: string): string {
+  if (containerPath.startsWith('/workspace/group/')) {
+    return path.join(GROUPS_DIR, groupFolder, containerPath.slice('/workspace/group/'.length));
+  }
+  if (containerPath.startsWith('/workspace/global/')) {
+    return path.join(GROUPS_DIR, 'global', containerPath.slice('/workspace/global/'.length));
+  }
+  if (containerPath.startsWith('/workspace/ipc/')) {
+    return toHostIpcPath(containerPath, groupFolder);
+  }
+  if (containerPath.startsWith('/workspace/media/')) {
+    return path.join(STORE_DIR, 'media', containerPath.slice('/workspace/media/'.length));
+  }
+  return containerPath;
+}
+
+function writeIpcResponse(responseFile: string, data: object): void {
+  const tmp = `${responseFile}.tmp`;
+  fs.mkdirSync(path.dirname(responseFile), { recursive: true });
+  fs.writeFileSync(tmp, JSON.stringify(data));
+  fs.renameSync(tmp, responseFile);
+}
+
+async function processClawworkMessage(
+  data: Record<string, unknown>,
+  groupFolder: string,
+  messagesDir: string,
+  deps: IpcDeps,
+): Promise<void> {
+  // Translate container IPC path → host path so we can write the response
+  const rawResponseFile = data.responseFile as string | undefined;
+  const responseFile = rawResponseFile ? toHostIpcPath(rawResponseFile, groupFolder) : undefined;
+
+  switch (data.type) {
+    case 'clawwork_get_status': {
+      const econ = getOrCreateEconomics(groupFolder);
+      const activeTask = getActiveTask(groupFolder);
+      const response = {
+        balance: econ.balance,
+        total_earned: econ.total_earned,
+        total_spent: econ.total_spent,
+        tier: getSurvivalTier(econ.balance),
+        active_task: activeTask ? {
+          id: activeTask.id,
+          occupation: activeTask.occupation,
+          prompt: activeTask.prompt,
+          max_payment: activeTask.max_payment,
+          status: activeTask.status,
+        } : null,
+      };
+      if (responseFile) writeIpcResponse(responseFile, response);
+      logger.debug({ groupFolder }, 'ClawWork: get_status processed');
+      break;
+    }
+
+    case 'clawwork_decide_activity': {
+      // Fire-and-forget: just log the decision
+      logger.info(
+        { groupFolder, activity: data.activity, reasoning: data.reasoning },
+        'ClawWork: activity decision',
+      );
+      // No response needed for fire-and-forget
+      break;
+    }
+
+    case 'clawwork_learn': {
+      const topic = data.topic as string;
+      const knowledge = data.knowledge as string;
+      if (topic && knowledge) {
+        saveLearn(groupFolder, topic, knowledge);
+        // Append to MEMORY.md
+        const memoryPath = path.join(GROUPS_DIR, groupFolder, 'MEMORY.md');
+        const entry = `\n## Learned Knowledge\n\n**Topic:** ${topic}\n\n${knowledge}\n`;
+        try {
+          fs.appendFileSync(memoryPath, entry);
+        } catch {
+          // MEMORY.md may not exist yet — create it
+          fs.mkdirSync(path.join(GROUPS_DIR, groupFolder), { recursive: true });
+          fs.writeFileSync(memoryPath, entry);
+        }
+        if (responseFile) writeIpcResponse(responseFile, { success: true, topic, knowledge_length: knowledge.length });
+        logger.info({ groupFolder, topic, length: knowledge.length }, 'ClawWork: learn saved');
+      } else {
+        if (responseFile) writeIpcResponse(responseFile, { error: 'Missing topic or knowledge' });
+      }
+      break;
+    }
+
+    case 'clawwork_submit_work': {
+      const workOutput = data.work_output as string;
+      const artifactPaths = (data.artifact_file_paths as string[]) ?? [];
+
+      const task = getActiveTask(groupFolder);
+      if (!task) {
+        if (responseFile) writeIpcResponse(responseFile, { error: 'No active task assigned' });
+        break;
+      }
+
+      const { score, feedback } = await evaluateWork(task, workOutput, artifactPaths);
+      const payment = score >= 0.6 ? Math.round(score * task.max_payment * 100) / 100 : 0;
+
+      updateTaskSubmission(task.id, workOutput, artifactPaths);
+      updateTaskEvaluation(task.id, score, payment);
+      if (payment > 0) addEarnings(groupFolder, payment);
+
+      if (responseFile) {
+        writeIpcResponse(responseFile, {
+          accepted: score >= 0.6,
+          evaluation_score: score,
+          payment,
+          feedback,
+          success: true,
+        });
+      }
+      logger.info({ groupFolder, taskId: task.id, score, payment }, 'ClawWork: work evaluated');
+      break;
+    }
+
+    case 'find_bounties': {
+      const limit = typeof data.limit === 'number' ? data.limit : 20;
+      const bounties = await findBounties(limit);
+      // Store any new bounties in DB so they can be referenced by propose_bounty
+      for (const b of bounties) {
+        try {
+          createBountyOpportunity({
+            id: b.id,
+            group_id: groupFolder,
+            platform: b.platform,
+            title: b.title,
+            url: b.url,
+            reward_usd: b.reward_usd,
+            reward_raw: b.reward_raw,
+            description: b.description ?? '',
+          });
+        } catch { /* already exists */ }
+      }
+      if (responseFile) {
+        writeIpcResponse(responseFile, { bounties: bounties.map(b => ({
+          id: b.id,
+          platform: b.platform,
+          title: b.title,
+          url: b.url,
+          reward_usd: b.reward_usd,
+          reward_raw: b.reward_raw,
+          repo: b.repo,
+        })) });
+      }
+      logger.info({ groupFolder, count: bounties.length }, 'Bounty: find_bounties processed');
+      break;
+    }
+
+    case 'propose_bounty': {
+      const bountyId = data.bounty_id as string;
+      const reason = data.reason as string | undefined;
+
+      if (!bountyId) {
+        if (responseFile) writeIpcResponse(responseFile, { error: 'Missing bounty_id' });
+        break;
+      }
+
+      // Find the bounty in DB (must have been fetched via find_bounties first)
+      const storedBounties = getAllBounties(100);
+      const storedBounty = storedBounties.find(b => b.id === bountyId);
+      if (!storedBounty) {
+        if (responseFile) writeIpcResponse(responseFile, { error: `Bounty not found: ${bountyId}` });
+        break;
+      }
+
+      const bountyObj: Bounty = {
+        id: storedBounty.id,
+        platform: storedBounty.platform as 'algora' | 'github',
+        title: storedBounty.title,
+        url: storedBounty.url,
+        reward_usd: storedBounty.reward_usd,
+        reward_raw: storedBounty.reward_raw ?? '',
+        description: storedBounty.description ?? '',
+      };
+
+      if (!deps.bountyGate) {
+        if (responseFile) writeIpcResponse(responseFile, { error: 'BountyGate not configured' });
+        break;
+      }
+
+      const mainJid = deps.getMainGroupJid?.();
+      if (!mainJid) {
+        if (responseFile) writeIpcResponse(responseFile, { error: 'Main group JID not configured' });
+        break;
+      }
+
+      const token = deps.bountyGate.proposeBounty(
+        bountyObj,
+        groupFolder,
+        () => { updateBountyStatus(bountyId, 'approved'); },
+        () => { updateBountyStatus(bountyId, 'rejected'); },
+      );
+
+      const reasonLine = reason ? `\nReason: ${reason}` : '';
+      const msg = BountyGate.formatProposalMessage(bountyObj, token) + reasonLine;
+      await deps.sendMessage(mainJid, msg);
+
+      if (responseFile) writeIpcResponse(responseFile, { proposed: true, token });
+      logger.info({ groupFolder, bountyId, token }, 'Bounty: propose_bounty processed');
+      break;
+    }
+
+    case 'submit_bounty': {
+      const bountyId = data.bounty_id as string;
+      const workSummary = data.work_summary as string | undefined;
+      const prUrl = data.pr_url as string | undefined;
+      const notes = data.submission_notes as string | undefined;
+
+      if (!bountyId) {
+        if (responseFile) writeIpcResponse(responseFile, { error: 'Missing bounty_id' });
+        break;
+      }
+
+      updateBountyStatus(bountyId, 'submitted', notes);
+
+      const mainJid = deps.getMainGroupJid?.();
+      if (mainJid) {
+        const prLine = prUrl ? `\nPR: ${prUrl}` : '';
+        const summaryLine = workSummary ? `\nSummary: ${workSummary.slice(0, 200)}` : '';
+        const paypalLine = PAYPAL_EMAIL ? `\nPayPal: ${PAYPAL_EMAIL}` : '';
+        await deps.sendMessage(mainJid,
+          `📤 *Bounty Submitted*\nID: ${bountyId}${prLine}${summaryLine}${paypalLine}`,
+        ).catch(err => logger.warn({ err }, 'Failed to notify bounty submission'));
+      }
+
+      if (responseFile) {
+        writeIpcResponse(responseFile, {
+          submitted: true,
+          paypal_email: PAYPAL_EMAIL || null,
+        });
+      }
+      logger.info({ groupFolder, bountyId }, 'Bounty: submit_bounty processed');
+      break;
+    }
+
+    default:
+      logger.warn({ type: data.type, groupFolder }, 'Unknown ClawWork IPC type');
+  }
 }
 
 export async function processTaskIpc(
@@ -386,6 +744,26 @@ export async function processTaskIpc(
             'Unauthorized task cancel attempt',
           );
         }
+      }
+      break;
+
+    case 'restart_service':
+      // Only main group can restart the service
+      if (isMain) {
+        logger.info(
+          { sourceGroup },
+          'Service restart requested via IPC - initiating graceful shutdown',
+        );
+        // Graceful shutdown - launchd will restart automatically if KeepAlive is enabled
+        setTimeout(() => {
+          logger.info('Exiting for restart (exit code 0)');
+          process.exit(0);
+        }, 1000);
+      } else {
+        logger.warn(
+          { sourceGroup },
+          'Unauthorized restart_service attempt blocked',
+        );
       }
       break;
 

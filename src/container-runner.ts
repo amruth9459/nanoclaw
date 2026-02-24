@@ -8,6 +8,13 @@ import os from 'os';
 import path from 'path';
 
 import {
+  CLAW_EMAIL,
+  CLAW_EMAIL_APP_PASSWORD,
+  CLAW_NAME,
+  CLAW_REDDIT_CLIENT_ID,
+  CLAW_REDDIT_CLIENT_SECRET,
+  CLAW_REDDIT_PASS,
+  CLAW_REDDIT_USER,
   CONTAINER_IMAGE,
   CONTAINER_MAX_OUTPUT_SIZE,
   CONTAINER_TIMEOUT,
@@ -52,6 +59,12 @@ export interface ContainerOutput {
   newSessionId?: string;
   error?: string;
   isPartial?: boolean;
+  usage?: {
+    inputTokens: number;
+    outputTokens: number;
+    cacheReadTokens?: number;
+    cacheWriteTokens?: number;
+  };
 }
 
 interface VolumeMount {
@@ -188,7 +201,14 @@ function buildVolumeMounts(
  * Secrets are never written to disk or mounted as files.
  */
 function readSecrets(): Record<string, string> {
-  return readEnvFile(['CLAUDE_CODE_OAUTH_TOKEN', 'ANTHROPIC_API_KEY']);
+  const fromEnvFile = readEnvFile(['CLAUDE_CODE_OAUTH_TOKEN', 'ANTHROPIC_API_KEY',
+    'CLAW_EMAIL_APP_PASSWORD', 'CLAW_REDDIT_PASS', 'CLAW_REDDIT_CLIENT_SECRET']);
+  // Also pick up runtime values (set via process.env / plist)
+  const extras: Record<string, string> = {};
+  if (CLAW_EMAIL_APP_PASSWORD) extras['CLAW_EMAIL_APP_PASSWORD'] = CLAW_EMAIL_APP_PASSWORD;
+  if (CLAW_REDDIT_PASS) extras['CLAW_REDDIT_PASS'] = CLAW_REDDIT_PASS;
+  if (CLAW_REDDIT_CLIENT_SECRET) extras['CLAW_REDDIT_CLIENT_SECRET'] = CLAW_REDDIT_CLIENT_SECRET;
+  return { ...fromEnvFile, ...extras };
 }
 
 function buildContainerArgs(
@@ -215,6 +235,12 @@ function buildContainerArgs(
     args.push('-e', 'NANOCLAW_NETWORK_RESTRICTED=1');
     logger.info({ group: group.name }, 'Container spawned on restricted network (no external internet)');
   }
+
+  // Claw identity vars (non-secret — passed as env args for easy container access)
+  if (CLAW_NAME) args.push('-e', `CLAW_NAME=${CLAW_NAME}`);
+  if (CLAW_EMAIL) args.push('-e', `CLAW_EMAIL=${CLAW_EMAIL}`);
+  if (CLAW_REDDIT_USER) args.push('-e', `CLAW_REDDIT_USER=${CLAW_REDDIT_USER}`);
+  if (CLAW_REDDIT_CLIENT_ID) args.push('-e', `CLAW_REDDIT_CLIENT_ID=${CLAW_REDDIT_CLIENT_ID}`);
 
   // Extra env vars from containerConfig
   for (const [key, value] of Object.entries(group.containerConfig?.env ?? {})) {

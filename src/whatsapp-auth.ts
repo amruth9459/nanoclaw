@@ -15,6 +15,7 @@ import readline from 'readline';
 import makeWASocket, {
   Browsers,
   DisconnectReason,
+  fetchLatestWaWebVersion,
   makeCacheableSignalKeyStore,
   useMultiFileAuthState,
 } from '@whiskeysockets/baileys';
@@ -27,7 +28,7 @@ const QR_FILE = slot ? `./store/qr-data${slot}.txt` : './store/qr-data.txt';
 const STATUS_FILE = slot ? `./store/auth-status${slot}.txt` : './store/auth-status.txt';
 
 const logger = pino({
-  level: 'warn', // Quiet logging - only show errors
+  level: 'warn',
 });
 
 // Check for --pairing-code flag and phone number
@@ -56,6 +57,9 @@ async function connectSocket(phoneNumber?: string, isReconnect = false): Promise
     process.exit(0);
   }
 
+  const { version } = await fetchLatestWaWebVersion().catch(() => ({ version: [2, 3000, 1027934701] as [number, number, number] }));
+  console.log(`Using WA version: ${version.join('.')}`);
+
   const sock = makeWASocket({
     auth: {
       creds: state.creds,
@@ -64,6 +68,7 @@ async function connectSocket(phoneNumber?: string, isReconnect = false): Promise
     printQRInTerminal: false,
     logger,
     browser: Browsers.macOS('Chrome'),
+    version,
   });
 
   if (usePairingCode && phoneNumber && !state.creds.me) {
