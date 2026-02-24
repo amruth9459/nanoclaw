@@ -2,7 +2,7 @@ import Database from 'better-sqlite3';
 import fs from 'fs';
 import path from 'path';
 
-import { ASSISTANT_NAME, DATA_DIR, STORE_DIR } from './config.js';
+import { ASSISTANT_NAME, DATA_DIR, INITIAL_BALANCE, STORE_DIR } from './config.js';
 import { NewMessage, RegisteredGroup, ScheduledTask, TaskRunLog } from './types.js';
 
 let db: Database.Database;
@@ -78,6 +78,70 @@ function createSchema(database: Database.Database): void {
       added_at TEXT NOT NULL,
       container_config TEXT,
       requires_trigger INTEGER DEFAULT 1
+    );
+
+    CREATE TABLE IF NOT EXISTS usage_logs (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      group_id TEXT NOT NULL,
+      chat_jid TEXT,
+      run_at TEXT NOT NULL,
+      input_tokens INTEGER DEFAULT 0,
+      output_tokens INTEGER DEFAULT 0,
+      cache_read_tokens INTEGER DEFAULT 0,
+      cache_write_tokens INTEGER DEFAULT 0,
+      cost_usd REAL DEFAULT 0,
+      duration_ms INTEGER,
+      is_task INTEGER DEFAULT 0
+    );
+
+    CREATE TABLE IF NOT EXISTS group_economics (
+      group_id TEXT PRIMARY KEY,
+      balance REAL NOT NULL DEFAULT 1000.0,
+      initial_balance REAL NOT NULL DEFAULT 1000.0,
+      total_earned REAL DEFAULT 0,
+      total_spent REAL DEFAULT 0,
+      last_updated TEXT NOT NULL
+    );
+
+    CREATE TABLE IF NOT EXISTS clawwork_tasks (
+      id TEXT PRIMARY KEY,
+      group_id TEXT NOT NULL,
+      occupation TEXT NOT NULL,
+      sector TEXT,
+      prompt TEXT NOT NULL,
+      max_payment REAL NOT NULL,
+      estimated_hours REAL,
+      status TEXT DEFAULT 'active',
+      assigned_at TEXT NOT NULL,
+      submitted_at TEXT,
+      evaluation_score REAL,
+      actual_payment REAL,
+      work_output TEXT,
+      artifact_paths TEXT
+    );
+
+    CREATE TABLE IF NOT EXISTS clawwork_learns (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      group_id TEXT NOT NULL,
+      topic TEXT NOT NULL,
+      knowledge TEXT NOT NULL,
+      created_at TEXT NOT NULL
+    );
+
+    CREATE TABLE IF NOT EXISTS bounty_opportunities (
+      id TEXT PRIMARY KEY,
+      group_id TEXT NOT NULL,
+      platform TEXT NOT NULL,
+      title TEXT NOT NULL,
+      url TEXT NOT NULL,
+      reward_usd REAL,
+      reward_raw TEXT,
+      description TEXT,
+      status TEXT DEFAULT 'proposed',
+      proposed_at TEXT NOT NULL,
+      approved_at TEXT,
+      submitted_at TEXT,
+      notes TEXT
     );
   `);
 
@@ -682,6 +746,312 @@ export function getAllRegisteredGroups(): Record<string, RegisteredGroup> {
     };
   }
   return result;
+}
+
+// --- Economics accessors ---
+
+export interface UsageLogEntry {
+  group_id: string;
+  chat_jid: string | null;
+  run_at: string;
+  input_tokens: number;
+  output_tokens: number;
+  cache_read_tokens: number;
+  cache_write_tokens: number;
+  cost_usd: number;
+  duration_ms: number | null;
+  is_task: number;
+}
+
+export interface GroupEconomics {
+  group_id: string;
+  balance: number;
+  initial_balance: number;
+  total_earned: number;
+  total_spent: number;
+  last_updated: string;
+}
+
+export interface ClawworkTask {
+  id: string;
+  group_id: string;
+  occupation: string;
+  sector: string | null;
+  prompt: string;
+  max_payment: number;
+  estimated_hours: number | null;
+  status: string;
+  assigned_at: string;
+  submitted_at: string | null;
+  evaluation_score: number | null;
+  actual_payment: number | null;
+  work_output: string | null;
+  artifact_paths: string | null;
+}
+
+export function logUsage(
+  groupId: string,
+  chatJid: string | null,
+  usage: { inputTokens: number; outputTokens: number; cacheReadTokens?: number; cacheWriteTokens?: number },
+  durationMs: number,
+  isTask: boolean,
+  costUsd: number,
+): void {
+  const now = new Date().toISOString();
+  db.prepare(`
+    INSERT INTO usage_logs (group_id, chat_jid, run_at, input_tokens, output_tokens, cache_read_tokens, cache_write_tokens, cost_usd, duration_ms, is_task)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+  `).run(
+    groupId,
+    chatJid,
+    now,
+    usage.inputTokens,
+    usage.outputTokens,
+    usage.cacheReadTokens ?? 0,
+    usage.cacheWriteTokens ?? 0,
+    costUsd,
+    durationMs,
+    isTask ? 1 : 0,
+  );
+}
+
+export function getOrCreateEconomics(groupId: string): GroupEconomics {
+  const existing = db.prepare('SELECT * FROM group_economics WHERE group_id = ?').get(groupId) as GroupEconomics | undefined;
+  if (existing) return existing;
+
+  const now = new Date().toISOString();
+  db.prepare(`
+    INSERT INTO group_economics (group_id, balance, initial_balance, total_earned, total_spent, last_updated)
+    VALUES (?, ?, ?, 0, 0, ?)
+  `).run(groupId, INITIAL_BALANCE, INITIAL_BALANCE, now);
+
+  return {
+    group_id: groupId,
+    balance: INITIAL_BALANCE,
+    initial_balance: INITIAL_BALANCE,
+    total_earned: 0,
+    total_spent: 0,
+    last_updated: now,
+  };
+}
+
+export function deductBalance(groupId: string, costUsd: number): void {
+  const now = new Date().toISOString();
+  // Ensure the record exists first
+  getOrCreateEconomics(groupId);
+  db.prepare(`
+    UPDATE group_economics
+    SET balance = balance - ?, total_spent = total_spent + ?, last_updated = ?
+    WHERE group_id = ?
+  `).run(costUsd, costUsd, now, groupId);
+}
+
+export function addEarnings(groupId: string, amount: number): void {
+  const now = new Date().toISOString();
+  getOrCreateEconomics(groupId);
+  db.prepare(`
+    UPDATE group_economics
+    SET balance = balance + ?, total_earned = total_earned + ?, last_updated = ?
+    WHERE group_id = ?
+  `).run(amount, amount, now, groupId);
+}
+
+export function getUsageHistory(groupId: string, limit = 20): UsageLogEntry[] {
+  return db.prepare(`
+    SELECT * FROM usage_logs WHERE group_id = ? ORDER BY run_at DESC LIMIT ?
+  `).all(groupId, limit) as UsageLogEntry[];
+}
+
+export function getEconomicsSummary(): {
+  all_earned: number;
+  all_spent: number;
+  net: number;
+  groups: GroupEconomics[];
+} {
+  const groups = db.prepare('SELECT * FROM group_economics ORDER BY group_id').all() as GroupEconomics[];
+  const all_earned = groups.reduce((s, g) => s + g.total_earned, 0);
+  const all_spent = groups.reduce((s, g) => s + g.total_spent, 0);
+  return { all_earned, all_spent, net: all_earned - all_spent, groups };
+}
+
+export function getAllUsageRecent(limit = 20): (UsageLogEntry & { id: number })[] {
+  return db.prepare(`
+    SELECT * FROM usage_logs ORDER BY run_at DESC LIMIT ?
+  `).all(limit) as (UsageLogEntry & { id: number })[];
+}
+
+export interface UsageTimePeriod {
+  total_cost: number;
+  total_tokens: number;
+  input_tokens: number;
+  output_tokens: number;
+  cache_read_tokens: number;
+  cache_write_tokens: number;
+  run_count: number;
+}
+
+export function getUsageSince(since: string): UsageTimePeriod {
+  const result = db.prepare(`
+    SELECT
+      COALESCE(SUM(cost_usd), 0) as total_cost,
+      COALESCE(SUM(input_tokens + output_tokens + cache_read_tokens + cache_write_tokens), 0) as total_tokens,
+      COALESCE(SUM(input_tokens), 0) as input_tokens,
+      COALESCE(SUM(output_tokens), 0) as output_tokens,
+      COALESCE(SUM(cache_read_tokens), 0) as cache_read_tokens,
+      COALESCE(SUM(cache_write_tokens), 0) as cache_write_tokens,
+      COUNT(*) as run_count
+    FROM usage_logs
+    WHERE run_at >= ?
+  `).get(since) as UsageTimePeriod;
+  return result;
+}
+
+export function getTotalUsage(): UsageTimePeriod {
+  const result = db.prepare(`
+    SELECT
+      COALESCE(SUM(cost_usd), 0) as total_cost,
+      COALESCE(SUM(input_tokens + output_tokens + cache_read_tokens + cache_write_tokens), 0) as total_tokens,
+      COALESCE(SUM(input_tokens), 0) as input_tokens,
+      COALESCE(SUM(output_tokens), 0) as output_tokens,
+      COALESCE(SUM(cache_read_tokens), 0) as cache_read_tokens,
+      COALESCE(SUM(cache_write_tokens), 0) as cache_write_tokens,
+      COUNT(*) as run_count
+    FROM usage_logs
+  `).get() as UsageTimePeriod;
+  return result;
+}
+
+export function createClawworkTask(task: Omit<ClawworkTask, 'status' | 'submitted_at' | 'evaluation_score' | 'actual_payment' | 'work_output' | 'artifact_paths'>): void {
+  db.prepare(`
+    INSERT INTO clawwork_tasks (id, group_id, occupation, sector, prompt, max_payment, estimated_hours, status, assigned_at)
+    VALUES (?, ?, ?, ?, ?, ?, ?, 'active', ?)
+  `).run(
+    task.id,
+    task.group_id,
+    task.occupation,
+    task.sector ?? null,
+    task.prompt,
+    task.max_payment,
+    task.estimated_hours ?? null,
+    task.assigned_at,
+  );
+}
+
+export function getActiveTask(groupId: string): ClawworkTask | undefined {
+  return db.prepare(`
+    SELECT * FROM clawwork_tasks WHERE group_id = ? AND status = 'active' ORDER BY assigned_at DESC LIMIT 1
+  `).get(groupId) as ClawworkTask | undefined;
+}
+
+export function updateTaskSubmission(taskId: string, workOutput: string, artifactPaths: string[]): void {
+  const now = new Date().toISOString();
+  db.prepare(`
+    UPDATE clawwork_tasks
+    SET status = 'submitted', submitted_at = ?, work_output = ?, artifact_paths = ?
+    WHERE id = ?
+  `).run(now, workOutput, JSON.stringify(artifactPaths), taskId);
+}
+
+export function updateTaskEvaluation(taskId: string, score: number, payment: number): void {
+  db.prepare(`
+    UPDATE clawwork_tasks
+    SET status = 'evaluated', evaluation_score = ?, actual_payment = ?
+    WHERE id = ?
+  `).run(score, payment, taskId);
+}
+
+export function saveLearn(groupId: string, topic: string, knowledge: string): void {
+  const now = new Date().toISOString();
+  db.prepare(`
+    INSERT INTO clawwork_learns (group_id, topic, knowledge, created_at)
+    VALUES (?, ?, ?, ?)
+  `).run(groupId, topic, knowledge, now);
+}
+
+export function getActiveClawworkTasks(): ClawworkTask[] {
+  return db.prepare(`
+    SELECT * FROM clawwork_tasks WHERE status IN ('active', 'submitted') ORDER BY assigned_at DESC
+  `).all() as ClawworkTask[];
+}
+
+// --- Bounty opportunity accessors ---
+
+export interface BountyOpportunity {
+  id: string;
+  group_id: string;
+  platform: string;
+  title: string;
+  url: string;
+  reward_usd: number | null;
+  reward_raw: string | null;
+  description: string | null;
+  status: string;
+  proposed_at: string;
+  approved_at: string | null;
+  submitted_at: string | null;
+  notes: string | null;
+}
+
+export function createBountyOpportunity(bounty: {
+  id: string;
+  group_id: string;
+  platform: string;
+  title: string;
+  url: string;
+  reward_usd: number | null;
+  reward_raw: string;
+  description: string;
+}): void {
+  const now = new Date().toISOString();
+  db.prepare(`
+    INSERT OR IGNORE INTO bounty_opportunities (id, group_id, platform, title, url, reward_usd, reward_raw, description, status, proposed_at)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'proposed', ?)
+  `).run(
+    bounty.id,
+    bounty.group_id,
+    bounty.platform,
+    bounty.title,
+    bounty.url,
+    bounty.reward_usd ?? null,
+    bounty.reward_raw,
+    bounty.description,
+    now,
+  );
+}
+
+export function getBountyById(id: string): BountyOpportunity | undefined {
+  return db.prepare('SELECT * FROM bounty_opportunities WHERE id = ?').get(id) as BountyOpportunity | undefined;
+}
+
+export function updateBountyStatus(id: string, status: string, notes?: string): void {
+  const now = new Date().toISOString();
+  if (status === 'approved') {
+    db.prepare(`UPDATE bounty_opportunities SET status = ?, approved_at = ?, notes = COALESCE(?, notes) WHERE id = ?`)
+      .run(status, now, notes ?? null, id);
+  } else if (status === 'submitted') {
+    db.prepare(`UPDATE bounty_opportunities SET status = ?, submitted_at = ?, notes = COALESCE(?, notes) WHERE id = ?`)
+      .run(status, now, notes ?? null, id);
+  } else {
+    db.prepare(`UPDATE bounty_opportunities SET status = ?, notes = COALESCE(?, notes) WHERE id = ?`)
+      .run(status, notes ?? null, id);
+  }
+}
+
+export function getActiveBounties(groupId?: string): BountyOpportunity[] {
+  if (groupId) {
+    return db.prepare(`
+      SELECT * FROM bounty_opportunities WHERE group_id = ? AND status IN ('approved', 'working') ORDER BY proposed_at DESC
+    `).all(groupId) as BountyOpportunity[];
+  }
+  return db.prepare(`
+    SELECT * FROM bounty_opportunities WHERE status IN ('approved', 'working') ORDER BY proposed_at DESC
+  `).all() as BountyOpportunity[];
+}
+
+export function getAllBounties(limit = 50): BountyOpportunity[] {
+  return db.prepare(`
+    SELECT * FROM bounty_opportunities ORDER BY proposed_at DESC LIMIT ?
+  `).all(limit) as BountyOpportunity[];
 }
 
 // --- JSON migration ---

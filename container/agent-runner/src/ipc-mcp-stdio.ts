@@ -63,6 +63,55 @@ server.tool(
 );
 
 server.tool(
+  'send_file',
+  `Send a file (PDF report, image, spreadsheet, etc.) to the user's WhatsApp directly.
+Use this to share reports, analysis results, drafts, or any output file you've created.
+The file must exist at the given path inside the container (e.g. /workspace/group/outputs/report.pdf).`,
+  {
+    file_path: z.string().describe('Absolute path to the file inside the container, e.g. /workspace/group/outputs/report.pdf'),
+    filename: z.string().describe('Display name for the file, e.g. "OSHA_Report_2025.pdf"'),
+    mimetype: z.string().optional().describe('MIME type, e.g. "application/pdf", "image/png". Auto-detected from extension if omitted.'),
+    caption: z.string().optional().describe('Optional caption shown with the file'),
+  },
+  async (args) => {
+    // Auto-detect mimetype from extension if not provided
+    const ext = path.extname(args.file_path).toLowerCase();
+    const mimetypeMap: Record<string, string> = {
+      '.pdf': 'application/pdf',
+      '.png': 'image/png',
+      '.jpg': 'image/jpeg',
+      '.jpeg': 'image/jpeg',
+      '.gif': 'image/gif',
+      '.webp': 'image/webp',
+      '.csv': 'text/csv',
+      '.xlsx': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      '.docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      '.zip': 'application/zip',
+      '.txt': 'text/plain',
+      '.md': 'text/markdown',
+    };
+    const mimetype = args.mimetype || mimetypeMap[ext] || 'application/octet-stream';
+
+    if (!fs.existsSync(args.file_path)) {
+      return { content: [{ type: 'text' as const, text: `Error: file not found at ${args.file_path}` }], isError: true };
+    }
+
+    writeIpcFile(MESSAGES_DIR, {
+      type: 'send_file',
+      chatJid,
+      groupFolder,
+      filePath: args.file_path,
+      filename: args.filename,
+      mimetype,
+      caption: args.caption || undefined,
+      timestamp: new Date().toISOString(),
+    });
+
+    return { content: [{ type: 'text' as const, text: `File queued for delivery: ${args.filename}` }] };
+  },
+);
+
+server.tool(
   'schedule_task',
   `Schedule a recurring or one-time task. The task will run as a full agent with access to all tools.
 
@@ -357,6 +406,291 @@ server.tool(
     return { content: [{ type: 'text' as const, text: `Indexing requested for "${args.source}". Processing in background.` }] };
   },
 );
+
+// ── ClawWork tools ─────────────────────────────────────────────────────────────
+
+function writeClawworkRequest(data: object): { requestFile: string; responseFile: string } {
+  const requestId = `clawwork-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+  const requestFile = path.join(MESSAGES_DIR, `${requestId}.json`);
+  const responseFile = path.join(MESSAGES_DIR, `${requestId}.response.json`);
+
+  const payload = { ...data, requestId, responseFile, groupFolder, timestamp: new Date().toISOString() };
+  const tmp = `${requestFile}.tmp`;
+  fs.writeFileSync(tmp, JSON.stringify(payload, null, 2));
+  fs.renameSync(tmp, requestFile);
+
+  return { requestFile, responseFile };
+}
+
+async function pollResponse(responseFile: string, timeoutMs: number): Promise<Record<string, unknown> | null> {
+  const deadline = Date.now() + timeoutMs;
+  while (Date.now() < deadline) {
+    await new Promise(r => setTimeout(r, 400));
+    if (fs.existsSync(responseFile)) {
+      try {
+        const result = JSON.parse(fs.readFileSync(responseFile, 'utf-8'));
+        fs.unlinkSync(responseFile);
+        return result;
+      } catch {
+        return null;
+      }
+    }
+  }
+  return null;
+}
+
+server.tool(
+  'clawwork_get_status',
+  'Get your current economic status: balance, earnings, spending, survival tier, and active task.',
+  {},
+  async () => {
+    const { responseFile } = writeClawworkRequest({ type: 'clawwork_get_status' });
+    const result = await pollResponse(responseFile, 10000);
+    if (!result) {
+      return { content: [{ type: 'text' as const, text: 'Error: status request timed out' }], isError: true };
+    }
+    if (result.error) {
+      return { content: [{ type: 'text' as const, text: `Error: ${result.error}` }], isError: true };
+    }
+    const text = JSON.stringify(result, null, 2);
+    return { content: [{ type: 'text' as const, text }] };
+  },
+);
+
+server.tool(
+  'clawwork_decide_activity',
+  'Declare your chosen activity: work (complete assigned tasks for payment) or learn (study to improve skills). Records your decision for the economic system.',
+  {
+    activity: z.enum(['work', 'learn']).describe('Your chosen activity mode'),
+    reasoning: z.string().describe('Why you chose this activity'),
+  },
+  async (args) => {
+    writeClawworkRequest({ type: 'clawwork_decide_activity', activity: args.activity, reasoning: args.reasoning });
+    return {
+      content: [{ type: 'text' as const, text: `Activity set to "${args.activity}". ${args.reasoning}` }],
+    };
+  },
+);
+
+server.tool(
+  'clawwork_learn',
+  'Record knowledge you have acquired. This persists to your group memory and helps you improve. Minimum 200 characters.',
+  {
+    topic: z.string().describe('Topic or subject area of the knowledge'),
+    knowledge: z.string().min(200).describe('The knowledge content to record (min 200 characters)'),
+  },
+  async (args) => {
+    const { responseFile } = writeClawworkRequest({ type: 'clawwork_learn', topic: args.topic, knowledge: args.knowledge });
+    const result = await pollResponse(responseFile, 10000);
+    if (!result) {
+      return { content: [{ type: 'text' as const, text: 'Error: learn request timed out' }], isError: true };
+    }
+    if (result.error) {
+      return { content: [{ type: 'text' as const, text: `Error: ${result.error}` }], isError: true };
+    }
+    return {
+      content: [{ type: 'text' as const, text: `Knowledge recorded: topic="${args.topic}", length=${args.knowledge.length} chars` }],
+    };
+  },
+);
+
+server.tool(
+  'clawwork_submit_work',
+  'Submit completed work for evaluation and payment. You will receive a score (0.0–1.0) and payment if score ≥ 0.6.',
+  {
+    work_output: z.string().describe('Your completed work output'),
+    artifact_file_paths: z.array(z.string()).default([]).describe('Paths to any files you created as artifacts'),
+  },
+  async (args) => {
+    const { responseFile } = writeClawworkRequest({
+      type: 'clawwork_submit_work',
+      work_output: args.work_output,
+      artifact_file_paths: args.artifact_file_paths,
+    });
+    const result = await pollResponse(responseFile, 60000);
+    if (!result) {
+      return { content: [{ type: 'text' as const, text: 'Error: work evaluation timed out (60s)' }], isError: true };
+    }
+    if (result.error) {
+      return { content: [{ type: 'text' as const, text: `Error: ${result.error}` }], isError: true };
+    }
+    const text = result.accepted
+      ? `Work accepted! Score: ${result.evaluation_score}, Payment: $${result.payment}\nFeedback: ${result.feedback}`
+      : `Work not accepted (score: ${result.evaluation_score} < 0.6). No payment.\nFeedback: ${result.feedback}`;
+    return { content: [{ type: 'text' as const, text }] };
+  },
+);
+
+// ── Bounty hunting tools ───────────────────────────────────────────────────────
+
+function writeBountyRequest(data: object): { responseFile: string } {
+  const requestId = `bounty-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+  const requestFile = path.join(MESSAGES_DIR, `${requestId}.json`);
+  const responseFile = path.join(MESSAGES_DIR, `${requestId}.response.json`);
+
+  const payload = { ...data, requestId, responseFile, groupFolder, timestamp: new Date().toISOString() };
+  const tmp = `${requestFile}.tmp`;
+  fs.writeFileSync(tmp, JSON.stringify(payload, null, 2));
+  fs.renameSync(tmp, requestFile);
+
+  return { responseFile };
+}
+
+server.tool(
+  'find_bounties',
+  `Find open bounties from Algora.io and GitHub. Returns a list of bounties sorted by reward (highest first).
+Each bounty has an id, platform, title, url, reward_usd, and repo.
+Use the id when calling propose_bounty to nominate one for approval.`,
+  {
+    limit: z.number().int().min(1).max(50).default(20).describe('Maximum number of bounties to return'),
+  },
+  async (args) => {
+    const { responseFile } = writeBountyRequest({ type: 'find_bounties', limit: args.limit ?? 20 });
+    const result = await pollResponse(responseFile, 30000);
+    if (!result) {
+      return { content: [{ type: 'text' as const, text: 'Error: find_bounties request timed out (30s)' }], isError: true };
+    }
+    if (result.error) {
+      return { content: [{ type: 'text' as const, text: `Error: ${result.error}` }], isError: true };
+    }
+    const bounties = result.bounties as Array<Record<string, unknown>>;
+    if (!bounties || bounties.length === 0) {
+      return { content: [{ type: 'text' as const, text: 'No bounties found.' }] };
+    }
+    const formatted = bounties.map((b, i) =>
+      `[${i + 1}] ${b.platform} | ${b.title}\n    Reward: ${b.reward_usd != null ? `$${b.reward_usd}` : b.reward_raw} | ID: ${b.id}\n    URL: ${b.url}${b.repo ? `\n    Repo: ${b.repo}` : ''}`
+    ).join('\n\n');
+    return { content: [{ type: 'text' as const, text: formatted }] };
+  },
+);
+
+server.tool(
+  'propose_bounty',
+  `Propose a bounty opportunity for the user to approve. The user will receive a WhatsApp message with the bounty details and approval token.
+Approval is asynchronous — the user replies "approve-bounty <token>" or "reject-bounty <token>".
+You must call find_bounties first to get valid bounty IDs.`,
+  {
+    bounty_id: z.string().describe('The bounty ID from find_bounties (e.g. "algora:12345")'),
+    reason: z.string().optional().describe('Why you recommend this bounty (skills match, reward amount, etc.)'),
+  },
+  async (args) => {
+    const { responseFile } = writeBountyRequest({
+      type: 'propose_bounty',
+      bounty_id: args.bounty_id,
+      reason: args.reason,
+    });
+    const result = await pollResponse(responseFile, 15000);
+    if (!result) {
+      return { content: [{ type: 'text' as const, text: 'Error: propose_bounty request timed out' }], isError: true };
+    }
+    if (result.error) {
+      return { content: [{ type: 'text' as const, text: `Error: ${result.error}` }], isError: true };
+    }
+    return {
+      content: [{ type: 'text' as const, text: `Bounty proposed (token: ${result.token}). Waiting for user approval via WhatsApp.` }],
+    };
+  },
+);
+
+server.tool(
+  'submit_bounty',
+  `Submit completed work for a bounty. Notifies the user and records PayPal email for payment.
+Include your work summary and any PR/patch URLs. The host will update the bounty status to "submitted".`,
+  {
+    bounty_id: z.string().describe('The bounty ID (e.g. "algora:12345")'),
+    work_summary: z.string().describe('Brief summary of the work completed'),
+    pr_url: z.string().optional().describe('URL to the pull request or patch'),
+    submission_notes: z.string().optional().describe('Any notes for the bounty provider'),
+  },
+  async (args) => {
+    const { responseFile } = writeBountyRequest({
+      type: 'submit_bounty',
+      bounty_id: args.bounty_id,
+      work_summary: args.work_summary,
+      pr_url: args.pr_url,
+      submission_notes: args.submission_notes,
+    });
+    const result = await pollResponse(responseFile, 20000);
+    if (!result) {
+      return { content: [{ type: 'text' as const, text: 'Error: submit_bounty request timed out' }], isError: true };
+    }
+    if (result.error) {
+      return { content: [{ type: 'text' as const, text: `Error: ${result.error}` }], isError: true };
+    }
+    const paypalLine = result.paypal_email ? `\nPayPal email for payment: ${result.paypal_email}` : '';
+    return {
+      content: [{ type: 'text' as const, text: `Bounty submitted successfully.${paypalLine}\nInclude your PayPal email in communications with the bounty provider.` }],
+    };
+  },
+);
+
+server.tool(
+  'remote_shell',
+  `Execute a command on the Mac host from WhatsApp. Use this when the user asks you to run something on their computer remotely.
+
+**Security**: Only main group can execute commands. All commands are audited.
+
+**Common use cases:**
+- Restart services: launchctl kickstart -k gui/$(id -u)/com.nanoclaw
+- Check logs: tail -50 logs/nanoclaw.log
+- System info: uptime, df -h, vm_stat
+- Network: tailscale ip -4, networksetup -getairportnetwork en0
+- Docker: docker ps, docker logs <container>
+
+**Presets** (use preset name instead of full command):
+- restart_nanoclaw
+- check_nanoclaw_status
+- view_recent_logs
+- get_tailscale_ip
+- check_disk_space
+- system_uptime
+
+Output is returned formatted for WhatsApp.`,
+  {
+    command: z.string().describe('Command to execute, or preset name (e.g. "restart_nanoclaw")'),
+    working_dir: z.string().optional().describe('Working directory (defaults to project root)'),
+    timeout: z.number().optional().describe('Timeout in milliseconds (default 30000, max 60000)'),
+  },
+  async (args) => {
+    if (!isMain) {
+      return {
+        content: [{ type: 'text' as const, text: 'Error: remote_shell is only available in the main group' }],
+        isError: true,
+      };
+    }
+
+    const { responseFile } = writeRemoteShellRequest({
+      type: 'remote_shell',
+      command: args.command,
+      working_dir: args.working_dir,
+      timeout: args.timeout,
+    });
+
+    const result = await pollResponse(responseFile, (args.timeout || 30000) + 5000);
+    if (!result) {
+      return { content: [{ type: 'text' as const, text: 'Error: remote_shell request timed out' }], isError: true };
+    }
+
+    if (result.error) {
+      return { content: [{ type: 'text' as const, text: `Error: ${result.error}` }], isError: true };
+    }
+
+    const formatted = String(result.formatted_output || result.output || 'Command completed with no output.');
+    return { content: [{ type: 'text' as const, text: formatted }] };
+  },
+);
+
+// Helper for remote shell IPC
+function writeRemoteShellRequest(data: {
+  type: string;
+  command: string;
+  working_dir?: string;
+  timeout?: number;
+}): { responseFile: string } {
+  const filename = writeIpcFile(MESSAGES_DIR, data);
+  const responseFile = path.join(MESSAGES_DIR, filename.replace('.json', '.response.json'));
+  return { responseFile };
+}
 
 // Start the stdio transport
 const transport = new StdioServerTransport();

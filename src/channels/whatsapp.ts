@@ -8,6 +8,7 @@ import makeWASocket, {
   WASocket,
   WAMessage,
   downloadMediaMessage,
+  fetchLatestWaWebVersion,
   makeCacheableSignalKeyStore,
   useMultiFileAuthState,
 } from '@whiskeysockets/baileys';
@@ -64,6 +65,8 @@ export class WhatsAppChannel implements Channel {
   private groupSyncTimerStarted = false;
 
   private opts: WhatsAppChannelOpts;
+  private reconnectAttempts = 0;
+  private reconnectTimer: ReturnType<typeof setTimeout> | null = null;
 
   constructor(opts: WhatsAppChannelOpts) {
     this.opts = opts;
@@ -77,6 +80,21 @@ export class WhatsAppChannel implements Channel {
     });
   }
 
+  private scheduleReconnect(): void {
+    if (this.reconnectTimer) return; // already scheduled
+    // Exponential backoff: 2s, 4s, 8s, 16s, 32s, 60s, 60s, ...
+    const delayMs = Math.min(2000 * Math.pow(2, this.reconnectAttempts), 60_000);
+    this.reconnectAttempts++;
+    logger.info({ attempt: this.reconnectAttempts, delayMs }, 'Reconnecting...');
+    this.reconnectTimer = setTimeout(() => {
+      this.reconnectTimer = null;
+      this.connectInternal().catch((err) => {
+        logger.error({ err }, 'Reconnect attempt failed');
+        this.scheduleReconnect();
+      });
+    }, delayMs);
+  }
+
   private async connectInternal(
     onFirstOpen?: () => void,
     onFirstFail?: (err: Error) => void,
@@ -86,6 +104,8 @@ export class WhatsAppChannel implements Channel {
 
     const { state, saveCreds } = await useMultiFileAuthState(authDir);
 
+    const { version } = await fetchLatestWaWebVersion().catch(() => ({ version: [2, 3000, 1027934701] as [number, number, number] }));
+
     this.sock = makeWASocket({
       auth: {
         creds: state.creds,
@@ -94,6 +114,7 @@ export class WhatsAppChannel implements Channel {
       printQRInTerminal: false,
       logger,
       browser: Browsers.macOS('Chrome'),
+      version,
     });
 
     this.sock.ev.on('connection.update', (update) => {
@@ -126,15 +147,7 @@ export class WhatsAppChannel implements Channel {
         logger.info({ reason, shouldReconnect, queuedMessages: this.outgoingQueue.length }, 'Connection closed');
 
         if (shouldReconnect) {
-          logger.info('Reconnecting...');
-          this.connectInternal().catch((err) => {
-            logger.error({ err }, 'Failed to reconnect, retrying in 5s');
-            setTimeout(() => {
-              this.connectInternal().catch((err2) => {
-                logger.error({ err: err2 }, 'Reconnection retry failed');
-              });
-            }, 5000);
-          });
+          this.scheduleReconnect();
         } else {
           logger.info({ channel: this.name }, 'Logged out. Run /setup to re-authenticate.');
           if (this.isPrimary) process.exit(0);
@@ -142,6 +155,7 @@ export class WhatsAppChannel implements Channel {
         }
       } else if (connection === 'open') {
         this.connected = true;
+        this.reconnectAttempts = 0; // reset backoff on successful connect
         logger.info('Connected to WhatsApp');
 
         // Announce availability so WhatsApp relays subsequent presence updates (typing indicators)
@@ -362,6 +376,26 @@ export class WhatsAppChannel implements Channel {
       // If send fails, queue it for retry on reconnect
       this.outgoingQueue.push({ jid, text: prefixed });
       logger.warn({ jid, err, queueSize: this.outgoingQueue.length }, 'Failed to send, message queued');
+    }
+  }
+
+  async sendFile(jid: string, buffer: Buffer, mimetype: string, filename: string, caption?: string): Promise<void> {
+    if (!this.connected) {
+      logger.warn({ jid, filename }, 'WA disconnected, cannot send file');
+      return;
+    }
+    try {
+      if (mimetype.startsWith('image/')) {
+        await this.sock.sendMessage(jid, { image: buffer, caption: caption ?? '', mimetype });
+      } else if (mimetype.startsWith('video/')) {
+        await this.sock.sendMessage(jid, { video: buffer, caption: caption ?? '', mimetype });
+      } else {
+        await this.sock.sendMessage(jid, { document: buffer, mimetype, fileName: filename, caption: caption ?? '' });
+      }
+      logger.info({ jid, filename, mimetype, bytes: buffer.length }, 'File sent');
+    } catch (err) {
+      logger.warn({ jid, filename, err }, 'Failed to send file');
+      throw err;
     }
   }
 

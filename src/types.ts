@@ -94,6 +94,8 @@ export interface Channel {
   name: string;
   connect(): Promise<void>;
   sendMessage(jid: string, text: string): Promise<void>;
+  /** Send a file (PDF, image, etc.) as a WhatsApp document/image message. */
+  sendFile?(jid: string, buffer: Buffer, mimetype: string, filename: string, caption?: string): Promise<void>;
   isConnected(): boolean;
   ownsJid(jid: string): boolean;
   disconnect(): Promise<void>;

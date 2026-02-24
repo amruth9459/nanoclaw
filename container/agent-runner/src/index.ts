@@ -35,6 +35,12 @@ interface ContainerOutput {
   newSessionId?: string;
   error?: string;
   isPartial?: boolean;
+  usage?: {
+    inputTokens: number;
+    outputTokens: number;
+    cacheReadTokens?: number;
+    cacheWriteTokens?: number;
+  };
 }
 
 interface SessionEntry {
@@ -515,6 +521,36 @@ async function runQuery(
     globalClaudeMd = fs.readFileSync(globalClaudeMdPath, 'utf-8');
   }
 
+  // Inject Claw's outreach identity if configured
+  const clawName = process.env.CLAW_NAME;
+  const clawEmail = process.env.CLAW_EMAIL;
+  const clawRedditUser = process.env.CLAW_REDDIT_USER;
+  const clawRedditClientId = process.env.CLAW_REDDIT_CLIENT_ID;
+  // Secrets come through stdin (containerInput.secrets)
+  const clawEmailAppPassword = (containerInput.secrets as Record<string, string> | undefined)?.['CLAW_EMAIL_APP_PASSWORD'] || '';
+  const clawRedditPass = (containerInput.secrets as Record<string, string> | undefined)?.['CLAW_REDDIT_PASS'] || '';
+  const clawRedditClientSecret = (containerInput.secrets as Record<string, string> | undefined)?.['CLAW_REDDIT_CLIENT_SECRET'] || '';
+  if (clawName || clawEmail || clawRedditUser) {
+    const identityLines: string[] = ['\n\n## Your Outreach Identity'];
+    identityLines.push('You have a separate human-sounding identity for all external communications.');
+    identityLines.push('Use this identity — not your own name — for Reddit posts, cold emails, and any public-facing work.');
+    if (clawName) identityLines.push(`- **Name**: ${clawName}`);
+    if (clawEmail) identityLines.push(`- **Email**: ${clawEmail}${clawEmailAppPassword ? ' (SMTP app password available — use smtplib/nodemailer to send)' : ''}`);
+    if (clawRedditUser) {
+      identityLines.push(`- **Reddit username**: u/${clawRedditUser}`);
+      if (clawRedditPass && clawRedditClientId && clawRedditClientSecret) {
+        identityLines.push(`- **Reddit API**: client_id=${clawRedditClientId} — use PRAW (Python) or snoowrap (Node) to post autonomously`);
+        identityLines.push(`  \`\`\`python`);
+        identityLines.push(`  import praw`);
+        identityLines.push(`  reddit = praw.Reddit(client_id='${clawRedditClientId}', client_secret='${clawRedditClientSecret}', username='${clawRedditUser}', password='${clawRedditPass}', user_agent='${clawName || 'Claw'}/1.0')`);
+        identityLines.push(`  \`\`\``);
+      }
+    }
+    identityLines.push('Always write as a human professional — never reveal you are an AI unless directly asked.');
+    const identityBlock = identityLines.join('\n');
+    globalClaudeMd = (globalClaudeMd || '') + identityBlock;
+  }
+
   // Prompt caching configuration
   const enableCaching = process.env.NANOCLAW_ENABLE_PROMPT_CACHING !== '0';
 
@@ -572,6 +608,9 @@ async function runQuery(
             NANOCLAW_CHAT_JID: containerInput.chatJid,
             NANOCLAW_GROUP_FOLDER: containerInput.groupFolder,
             NANOCLAW_IS_MAIN: containerInput.isMain ? '1' : '0',
+            ...(clawName ? { CLAW_NAME: clawName } : {}),
+            ...(clawEmail ? { CLAW_EMAIL: clawEmail } : {}),
+            ...(clawRedditUser ? { CLAW_REDDIT_USER: clawRedditUser } : {}),
           },
         },
       },
@@ -643,10 +682,24 @@ async function runQuery(
       resultCount++;
       const textResult = 'result' in message ? (message as { result?: string }).result : null;
       log(`Result #${resultCount}: subtype=${message.subtype}${textResult ? ` text=${textResult.slice(0, 200)}` : ''}`);
+
+      const rawUsage = (message as any).usage as {
+        input_tokens?: number;
+        output_tokens?: number;
+        cache_read_input_tokens?: number;
+        cache_creation_input_tokens?: number;
+      } | undefined;
+
       writeOutput({
         status: 'success',
         result: textResult || null,
-        newSessionId
+        newSessionId,
+        usage: rawUsage ? {
+          inputTokens: rawUsage.input_tokens ?? 0,
+          outputTokens: rawUsage.output_tokens ?? 0,
+          cacheReadTokens: rawUsage.cache_read_input_tokens ?? 0,
+          cacheWriteTokens: rawUsage.cache_creation_input_tokens ?? 0,
+        } : undefined,
       });
     }
   }
