@@ -260,6 +260,39 @@ function buildContainerArgs(
   return args;
 }
 
+// CLAUDE.md size guard: cap at 400 lines to prevent unbounded growth.
+// Keeps the first 300 lines (core instructions) and the last 80 lines (recent context).
+// Logs a warning when trimming occurs.
+const CLAUDE_MD_MAX_LINES = 400;
+const CLAUDE_MD_HEAD_KEEP = 300;
+const CLAUDE_MD_TAIL_KEEP = 80;
+
+function trimClaudeMdIfNeeded(groupFolder: string): void {
+  const claudeMdPath = path.join(GROUPS_DIR, groupFolder, 'CLAUDE.md');
+  if (!fs.existsSync(claudeMdPath)) return;
+
+  const content = fs.readFileSync(claudeMdPath, 'utf8');
+  const lines = content.split('\n');
+  if (lines.length <= CLAUDE_MD_MAX_LINES) return;
+
+  logger.warn(
+    { groupFolder, lines: lines.length, max: CLAUDE_MD_MAX_LINES },
+    'CLAUDE.md exceeded size limit — trimming to preserve core instructions',
+  );
+
+  const head = lines.slice(0, CLAUDE_MD_HEAD_KEEP);
+  const tail = lines.slice(-CLAUDE_MD_TAIL_KEEP);
+  const trimmed = [
+    ...head,
+    '',
+    `<!-- [${lines.length - CLAUDE_MD_HEAD_KEEP - CLAUDE_MD_TAIL_KEEP} lines trimmed by size guard] -->`,
+    '',
+    ...tail,
+  ].join('\n');
+
+  fs.writeFileSync(claudeMdPath, trimmed, 'utf8');
+}
+
 export async function runContainerAgent(
   group: RegisteredGroup,
   input: ContainerInput,
@@ -270,6 +303,9 @@ export async function runContainerAgent(
 
   const groupDir = path.join(GROUPS_DIR, group.folder);
   fs.mkdirSync(groupDir, { recursive: true });
+
+  // Trim CLAUDE.md if it has grown too large (prevents context overflow)
+  trimClaudeMdIfNeeded(group.folder);
 
   const mounts = buildVolumeMounts(group, input.isMain);
   const safeName = group.folder.replace(/[^a-zA-Z0-9-]/g, '-');
