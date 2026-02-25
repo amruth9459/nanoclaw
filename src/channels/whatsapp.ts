@@ -67,6 +67,8 @@ export class WhatsAppChannel implements Channel {
   private opts: WhatsAppChannelOpts;
   private reconnectAttempts = 0;
   private reconnectTimer: ReturnType<typeof setTimeout> | null = null;
+  private watchdogTimer: ReturnType<typeof setTimeout> | null = null;
+  private static readonly WATCHDOG_MS = 10 * 60 * 1000; // 10 minutes
 
   constructor(opts: WhatsAppChannelOpts) {
     this.opts = opts;
@@ -78,6 +80,16 @@ export class WhatsAppChannel implements Channel {
     return new Promise<void>((resolve, reject) => {
       this.connectInternal(resolve, reject).catch(reject);
     });
+  }
+
+  private resetWatchdog(): void {
+    if (this.watchdogTimer) clearTimeout(this.watchdogTimer);
+    this.watchdogTimer = setTimeout(() => {
+      logger.warn({ channel: this.name }, 'Watchdog: no WhatsApp activity for 10 min, forcing reconnect');
+      try { this.sock?.end(undefined); } catch {}
+      this.connected = false;
+      this.scheduleReconnect();
+    }, WhatsAppChannel.WATCHDOG_MS);
   }
 
   private scheduleReconnect(): void {
@@ -156,6 +168,7 @@ export class WhatsAppChannel implements Channel {
       } else if (connection === 'open') {
         this.connected = true;
         this.reconnectAttempts = 0; // reset backoff on successful connect
+        this.resetWatchdog();
         logger.info('Connected to WhatsApp');
 
         // Announce availability so WhatsApp relays subsequent presence updates (typing indicators)
@@ -201,6 +214,7 @@ export class WhatsAppChannel implements Channel {
     this.sock.ev.on('creds.update', saveCreds);
 
     this.sock.ev.on('messages.upsert', async ({ messages }) => {
+      this.resetWatchdog(); // any incoming traffic = connection is alive
       for (const msg of messages) {
         if (!msg.message) continue;
         const rawJid = msg.key.remoteJid;
