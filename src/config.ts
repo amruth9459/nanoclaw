@@ -128,8 +128,9 @@ export const AUTO_CLAWWORK = process.env.NANOCLAW_AUTO_CLAWWORK !== '0'; // on b
 export const PAYPAL_EMAIL = process.env.NANOCLAW_PAYPAL_EMAIL || '';
 export const GITHUB_TOKEN = process.env.NANOCLAW_GITHUB_TOKEN || '';
 
-// Earning goal: target amount in USD (default $5000 = computer fund)
-export const EARNING_GOAL = parseFloat(process.env.NANOCLAW_EARNING_GOAL || '5000');
+// Earning goal: target amount in USD
+// $5000 for Mac Studio + $250 already spent (Claude Max + extra usage) = $5250 total
+export const EARNING_GOAL = parseFloat(process.env.NANOCLAW_EARNING_GOAL || '5250');
 
 // How often the agent auto-hunts for opportunities (default: every 6 hours)
 export const BOUNTY_HUNT_INTERVAL_MS = parseInt(

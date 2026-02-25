@@ -26,7 +26,8 @@ export function getSurvivalTier(balance: number): string {
   if (balance >= 100) return 'stable';
   if (balance >= 10) return 'struggling';
   if (balance > 0) return 'critical';
-  return 'bankrupt';
+  if (balance > -50) return 'bankrupt';
+  return 'in debt'; // balance went negative — earned less than spent
 }
 
 /** Progress toward earning goal, given total earned across all groups */
