@@ -27,6 +27,7 @@ RUN apt-get update && apt-get install -y \
     imagemagick \
     tesseract-ocr \
     tesseract-ocr-all \
+    ffmpeg \
     && rm -rf /var/lib/apt/lists/*
 
 # Set Chromium path for agent-browser
@@ -54,6 +55,10 @@ RUN npm run build
 # Install OCR helper script
 COPY skills/ocr.sh /usr/local/bin/ocr
 RUN chmod +x /usr/local/bin/ocr
+
+# Install video frame extraction script
+COPY skills/extract-frame.sh /usr/local/bin/extract-frame
+RUN chmod +x /usr/local/bin/extract-frame
 
 # Create workspace directories
 RUN mkdir -p /workspace/group /workspace/global /workspace/extra /workspace/ipc/messages /workspace/ipc/tasks /workspace/ipc/input
