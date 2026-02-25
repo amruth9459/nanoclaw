@@ -1,4 +1,4 @@
-#!/usr/bin/env tsx
+#!/usr/bin/env -S npx tsx
 /**
  * Development file watcher - auto-restarts NanoClaw when dist/ changes
  *
