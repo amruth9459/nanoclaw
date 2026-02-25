@@ -18,6 +18,7 @@ import fs from 'fs';
 import path from 'path';
 import { query, HookCallback, PreCompactHookInput, PreToolUseHookInput } from '@anthropic-ai/claude-agent-sdk';
 import { fileURLToPath } from 'url';
+import { SafetyPulse } from './safety-pulse.js';
 
 interface ContainerInput {
   prompt: string;
@@ -513,6 +514,7 @@ async function runQuery(
   let lastAssistantUuid: string | undefined;
   let messageCount = 0;
   let resultCount = 0;
+  const safetyPulse = new SafetyPulse();
 
   // Load global CLAUDE.md as additional system context (shared across all groups)
   const globalClaudeMdPath = '/workspace/global/CLAUDE.md';
@@ -632,6 +634,13 @@ async function runQuery(
 
     if (message.type === 'assistant' && 'uuid' in message) {
       lastAssistantUuid = (message as { uuid: string }).uuid;
+      // Safety pulse: re-inject safety rules every 5 assistant turns to prevent
+      // context-loss-induced rule forgetting during long sessions.
+      const pulseMsg = safetyPulse.tick();
+      if (pulseMsg) {
+        log('[safety-pulse] Injecting safety reminder into stream');
+        stream.push(pulseMsg);
+      }
     }
 
     // Streaming: Detect assistant text content and emit partial results

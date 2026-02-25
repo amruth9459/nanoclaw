@@ -5,10 +5,11 @@
 
 /**
  * Environment-based security toggle
- * Set NANOCLAW_REMOTE_SHELL_ENABLED=0 to disable remote shell entirely
+ * Set NANOCLAW_REMOTE_SHELL_ENABLED=1 to enable remote shell
+ * Disabled by default — must be explicitly opted in
  */
 export const REMOTE_SHELL_ENABLED =
-  process.env.NANOCLAW_REMOTE_SHELL_ENABLED !== '0';
+  process.env.NANOCLAW_REMOTE_SHELL_ENABLED === '1';
 
 /**
  * Command whitelist mode
