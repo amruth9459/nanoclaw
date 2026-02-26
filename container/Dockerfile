@@ -28,7 +28,11 @@ RUN apt-get update && apt-get install -y \
     tesseract-ocr \
     tesseract-ocr-all \
     ffmpeg \
+    python3-pip \
     && rm -rf /var/lib/apt/lists/*
+
+# Install Python PDF generation library
+RUN pip3 install --break-system-packages weasyprint
 
 # Set Chromium path for agent-browser
 ENV AGENT_BROWSER_EXECUTABLE_PATH=/usr/bin/chromium
@@ -59,6 +63,10 @@ RUN chmod +x /usr/local/bin/ocr
 # Install video frame extraction script
 COPY skills/extract-frame.sh /usr/local/bin/extract-frame
 RUN chmod +x /usr/local/bin/extract-frame
+
+# Install PDF generation script
+COPY skills/generate-pdf.sh /usr/local/bin/generate-pdf
+RUN chmod +x /usr/local/bin/generate-pdf
 
 # Create workspace directories
 RUN mkdir -p /workspace/group /workspace/global /workspace/extra /workspace/ipc/messages /workspace/ipc/tasks /workspace/ipc/input
