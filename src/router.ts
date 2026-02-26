@@ -20,7 +20,7 @@ export function formatMessages(messages: NewMessage[]): string {
       content = content ? `${mediaInfo} ${content}` : mediaInfo;
     }
 
-    return `<message sender="${escapeXml(m.sender_name)}" time="${m.timestamp}">${content}</message>`;
+    return `<message id="${escapeXml(m.id)}" sender="${escapeXml(m.sender_name)}" sender_jid="${escapeXml(m.sender)}" time="${m.timestamp}">${content}</message>`;
   });
   return `<messages>\n${lines.join('\n')}\n</messages>`;
 }

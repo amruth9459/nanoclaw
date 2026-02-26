@@ -51,6 +51,8 @@ export interface WhatsAppChannelOpts {
   authDir?: string;
   /** If false, QR auth and logout don't crash the process. Default: true */
   primary?: boolean;
+  /** Called when connection is restored after being down for > 30s */
+  onReconnect?: (downMs: number) => void;
 }
 
 export class WhatsAppChannel implements Channel {
@@ -68,7 +70,11 @@ export class WhatsAppChannel implements Channel {
   private reconnectAttempts = 0;
   private reconnectTimer: ReturnType<typeof setTimeout> | null = null;
   private watchdogTimer: ReturnType<typeof setTimeout> | null = null;
-  private static readonly WATCHDOG_MS = 10 * 60 * 1000; // 10 minutes
+  private static readonly WATCHDOG_MS = 3 * 60 * 1000; // 3 minutes — catch silent dead connections faster
+  // Stored so reconnect attempts can still resolve the original connect() Promise
+  private connectResolve?: () => void;
+  // Track when connection dropped to report downtime on reconnect
+  private disconnectedAt: number | null = null;
 
   constructor(opts: WhatsAppChannelOpts) {
     this.opts = opts;
@@ -78,6 +84,7 @@ export class WhatsAppChannel implements Channel {
 
   async connect(): Promise<void> {
     return new Promise<void>((resolve, reject) => {
+      this.connectResolve = resolve;
       this.connectInternal(resolve, reject).catch(reject);
     });
   }
@@ -116,7 +123,10 @@ export class WhatsAppChannel implements Channel {
 
     const { state, saveCreds } = await useMultiFileAuthState(authDir);
 
-    const { version } = await fetchLatestWaWebVersion().catch(() => ({ version: [2, 3000, 1027934701] as [number, number, number] }));
+    const { version } = await Promise.race([
+      fetchLatestWaWebVersion(),
+      new Promise<never>((_, reject) => setTimeout(() => reject(new Error('fetchLatestWaWebVersion timeout')), 5000)),
+    ]).catch(() => ({ version: [2, 3000, 1027934701] as [number, number, number] }));
 
     this.sock = makeWASocket({
       auth: {
@@ -127,6 +137,7 @@ export class WhatsAppChannel implements Channel {
       logger,
       browser: Browsers.macOS('Chrome'),
       version,
+      keepAliveIntervalMs: 15_000, // ping every 15s (default ~30s) — keeps NAT mappings alive
     });
 
     this.sock.ev.on('connection.update', (update) => {
@@ -154,6 +165,7 @@ export class WhatsAppChannel implements Channel {
 
       if (connection === 'close') {
         this.connected = false;
+        if (this.disconnectedAt === null) this.disconnectedAt = Date.now();
         const reason = (lastDisconnect?.error as any)?.output?.statusCode;
         const shouldReconnect = reason !== DisconnectReason.loggedOut;
         logger.info({ reason, shouldReconnect, queuedMessages: this.outgoingQueue.length }, 'Connection closed');
@@ -203,10 +215,23 @@ export class WhatsAppChannel implements Channel {
           }, GROUP_SYNC_INTERVAL_MS);
         }
 
-        // Signal first connection to caller
-        if (onFirstOpen) {
-          onFirstOpen();
+        // Signal first connection to caller.
+        // Use stored connectResolve so reconnect attempts (which don't receive onFirstOpen)
+        // can still resolve the original connect() Promise.
+        const resolver = onFirstOpen ?? this.connectResolve;
+        if (resolver) {
+          resolver();
+          this.connectResolve = undefined;
           onFirstOpen = undefined;
+        }
+
+        // Notify caller if connection was restored after a meaningful outage
+        if (this.disconnectedAt !== null) {
+          const downMs = Date.now() - this.disconnectedAt;
+          this.disconnectedAt = null;
+          if (downMs > 30_000 && this.opts.onReconnect) {
+            this.opts.onReconnect(downMs);
+          }
         }
       }
     });
@@ -338,7 +363,11 @@ export class WhatsAppChannel implements Channel {
           // Skip protocol messages with no content of any kind
           if (!fullContent && !effectiveMedia) continue;
 
-          const sender = msg.key.participant || msg.key.remoteJid || '';
+          const rawSender = msg.key.participant || msg.key.remoteJid || '';
+          // Translate LID participant JID to phone JID so reactions work correctly
+          const sender = rawSender.endsWith('@lid')
+            ? await this.translateJid(rawSender)
+            : rawSender;
           const senderName = msg.pushName || sender.split('@')[0];
 
           const fromMe = msg.key.fromMe || false;
@@ -425,6 +454,12 @@ export class WhatsAppChannel implements Channel {
     return chatChannel === this.name;
   }
 
+  ownPhoneJid(): string | undefined {
+    if (!this.sock?.user?.id) return undefined;
+    const phone = this.sock.user.id.split(':')[0];
+    return `${phone}@s.whatsapp.net`;
+  }
+
   async disconnect(): Promise<void> {
     this.connected = false;
     this.sock?.end(undefined);
@@ -433,29 +468,34 @@ export class WhatsAppChannel implements Channel {
   async setTyping(jid: string, isTyping: boolean): Promise<void> {
     try {
       const status = isTyping ? 'composing' : 'paused';
-      logger.debug({ jid, status }, 'Sending presence update');
+      logger.info({ jid, status, channel: this.name }, 'Sending presence update');
       await this.sock.sendPresenceUpdate(status, jid);
     } catch (err) {
-      logger.debug({ jid, err }, 'Failed to update typing status');
+      logger.warn({ jid, err }, 'Failed to update typing status');
     }
   }
 
   async sendReaction(jid: string, messageId: string, senderJid: string, emoji: string): Promise<void> {
     try {
+      // Translate LID sender JID before using in reaction key
+      const resolvedSender = senderJid.endsWith('@lid')
+        ? await this.translateJid(senderJid)
+        : senderJid;
+      logger.info({ jid, messageId, emoji, senderJid, resolvedSender, channel: this.name }, 'Sending reaction');
       await this.sock.sendMessage(jid, {
         react: {
           text: emoji,
           key: {
             id: messageId,
             remoteJid: jid,
-            participant: senderJid,
+            participant: resolvedSender || undefined,
             fromMe: false,
           },
         },
       });
-      logger.debug({ jid, messageId, emoji }, 'Reaction sent');
+      logger.info({ jid, messageId, emoji }, 'Reaction sent');
     } catch (err) {
-      logger.debug({ jid, messageId, err }, 'Failed to send reaction');
+      logger.warn({ jid, messageId, senderJid, err }, 'Failed to send reaction');
     }
   }
 

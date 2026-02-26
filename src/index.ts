@@ -52,7 +52,7 @@ import {
 } from './db.js';
 import { classifyTask, computeMaxPayment } from './clawwork.js';
 import { calculateCost, formatCostFooter } from './economics.js';
-import { startDashboard } from './dashboard.js';
+import { listGroupFiles, startDashboard } from './dashboard.js';
 import { BountyGate } from './bounty-gate.js';
 import { GroupQueue } from './group-queue.js';
 import { HitlGate } from './hitl.js';
@@ -200,6 +200,25 @@ function isSubstantiveMessage(content: string): boolean {
 }
 
 /**
+ * Find the best channel to send ack reactions/typing indicators from.
+ * Prefers the connected WA channel whose own number differs from the sender's,
+ * so the indicator is always visible (you can't see your own typing/reactions).
+ */
+function findAckChannel(senderJid: string): Channel | undefined {
+  const senderPhone = senderJid.split(':')[0].split('@')[0];
+  const other = channels.find(
+    (c) => c.isConnected() && c.ownPhoneJid && c.ownPhoneJid()?.split('@')[0] !== senderPhone,
+  );
+  const chosen = other ?? channels.find((c) => c.isConnected());
+  logger.debug({
+    senderPhone,
+    candidates: channels.map((c) => ({ name: c.name, connected: c.isConnected(), own: c.ownPhoneJid?.() })),
+    chosen: chosen?.name,
+  }, 'findAckChannel');
+  return chosen;
+}
+
+/**
  * Process all pending messages for a group.
  * Called by the GroupQueue when it's this group's turn.
  */
@@ -229,6 +248,50 @@ async function processGroupMessages(chatJid: string): Promise<boolean> {
       triggerMultiline.test(m.content.trim()),
     );
     if (!hasTrigger) return true;
+  }
+
+  // Handle /files and /file <name> commands — respond directly, skip agent
+  const lastMsgForCmd = missedMessages[missedMessages.length - 1];
+  const rawCmd = lastMsgForCmd.content.replace(TRIGGER_PATTERN, '').trim();
+  if (rawCmd === '/files' || rawCmd.startsWith('/files ')) {
+    const files = listGroupFiles(group.folder).slice(0, 20);
+    if (files.length === 0) {
+      await channel.sendMessage(chatJid, '📁 No files found.');
+    } else {
+      const lines = files.map((f, i) => {
+        const kb = f.size < 1024 ? f.size + 'B' : Math.round(f.size / 1024) + 'KB';
+        const date = new Date(f.mtime).toLocaleDateString();
+        return `${i + 1}. ${f.path} (${kb}, ${date})`;
+      });
+      await channel.sendMessage(chatJid, `📁 *Recent files in groups/${group.folder}/*\n\n${lines.join('\n')}\n\nUse: /file <name>`);
+    }
+    lastAgentTimestamp[chatJid] = lastMsgForCmd.timestamp;
+    saveState();
+    return true;
+  }
+  const fileMatch = rawCmd.match(/^\/file\s+(.+)/);
+  if (fileMatch) {
+    const requested = fileMatch[1].trim();
+    const files = listGroupFiles(group.folder);
+    // Allow partial match: find first file whose path includes the requested string
+    const match = files.find(f => f.path === requested) || files.find(f => f.path.includes(requested));
+    if (!match) {
+      await channel.sendMessage(chatJid, `❌ File not found: ${requested}\n\nTry /files to list available files.`);
+    } else {
+      try {
+        const fullPath = path.join(GROUPS_DIR, group.folder, match.path);
+        const content = fs.readFileSync(fullPath, 'utf-8');
+        const MAX_CHARS = 8000;
+        const truncated = content.length > MAX_CHARS;
+        const body = truncated ? content.slice(0, MAX_CHARS) + `\n\n… [truncated, ${content.length - MAX_CHARS} chars omitted — view full at DashClaw]` : content;
+        await channel.sendMessage(chatJid, `📄 *${match.path}*\n\n${body}`);
+      } catch {
+        await channel.sendMessage(chatJid, `❌ Could not read file: ${match.path}`);
+      }
+    }
+    lastAgentTimestamp[chatJid] = lastMsgForCmd.timestamp;
+    saveState();
+    return true;
   }
 
   // Detect /clawwork command in the last message
@@ -309,17 +372,16 @@ async function processGroupMessages(chatJid: string): Promise<boolean> {
   }
 
   // INSTANT FEEDBACK: React to the last user message with 👀
-  // Using sendReaction (emoji on the message) rather than a standalone text
-  // message — reactions are visible even when bot and user share a phone number.
+  // Use whichever channel is NOT the sender's number so the ack is always visible.
+  const ackChannel = findAckChannel(lastMsg.sender) ?? channel;
   if (INSTANT_ACK) {
-    const lastMsg = missedMessages[missedMessages.length - 1];
-    if (channel.sendReaction) {
-      await channel.sendReaction(chatJid, lastMsg.id, lastMsg.sender, '👀').catch(() => {});
+    if (ackChannel.sendReaction) {
+      await ackChannel.sendReaction(chatJid, lastMsg.id, lastMsg.sender, '👀').catch(() => {});
     } else {
       await channel.sendMessage(chatJid, '👀').catch(() => {});
     }
   }
-  await channel.setTyping?.(chatJid, true);
+  await ackChannel.setTyping?.(chatJid, true);
 
   // Track idle timer for closing stdin when agent is idle
   let idleTimer: ReturnType<typeof setTimeout> | null = null;
@@ -386,7 +448,7 @@ async function processGroupMessages(chatJid: string): Promise<boolean> {
     }
   });
 
-  await channel.setTyping?.(chatJid, false);
+  await ackChannel.setTyping?.(chatJid, false);
   if (idleTimer) clearTimeout(idleTimer);
 
   // Log usage and send cost footer
@@ -612,13 +674,18 @@ async function startMessageLoop(): Promise<void> {
             // ACK the message and show typing indicator
             if (INSTANT_ACK) {
               const lastMsg = messagesToSend[messagesToSend.length - 1];
-              if (channel.sendReaction) {
-                channel.sendReaction(chatJid, lastMsg.id, lastMsg.sender, '👀').catch(() => {});
+              const ackCh = findAckChannel(lastMsg.sender) ?? channel;
+              if (ackCh.sendReaction) {
+                ackCh.sendReaction(chatJid, lastMsg.id, lastMsg.sender, '👀').catch(() => {});
               }
+              ackCh.setTyping?.(chatJid, true)?.catch((err) =>
+                logger.warn({ chatJid, err }, 'Failed to set typing indicator'),
+              );
+            } else {
+              channel.setTyping?.(chatJid, true)?.catch((err) =>
+                logger.warn({ chatJid, err }, 'Failed to set typing indicator'),
+              );
             }
-            channel.setTyping?.(chatJid, true)?.catch((err) =>
-              logger.warn({ chatJid, err }, 'Failed to set typing indicator'),
-            );
           } else {
             // No active container — enqueue for a new one
             queue.enqueueMessageCheck(chatJid);
@@ -662,11 +729,12 @@ async function startMessageLoop(): Promise<void> {
             'Open mention — queuing guest agent',
           );
 
-          // ACK with 👀 so the user knows we saw it
+          // ACK with 👀 — use the channel whose number ≠ sender so it's visible to them
           const channel = findChannel(channels, chatJid);
-          if (channel && INSTANT_ACK) {
+          if (INSTANT_ACK) {
             const last = msgs[msgs.length - 1];
-            channel.sendReaction?.(chatJid, last.id, last.sender, '👀').catch(() => {});
+            const ackCh = findAckChannel(last.sender) ?? channel;
+            ackCh?.sendReaction?.(chatJid, last.id, last.sender, '👀').catch(() => {});
           }
 
           queue.enqueueMessageCheck(chatJid);
@@ -926,7 +994,20 @@ async function main(): Promise<void> {
   };
 
   // Create and connect channels
-  whatsapp = new WhatsAppChannel(channelOpts);
+  whatsapp = new WhatsAppChannel({
+    ...channelOpts,
+    onReconnect: (downMs: number) => {
+      const secs = Math.round(downMs / 1000);
+      const mins = Math.floor(secs / 60);
+      const duration = mins > 0 ? `${mins}m ${secs % 60}s` : `${secs}s`;
+      const mainJid = Object.entries(registeredGroups)
+        .find(([, g]) => g.folder === MAIN_GROUP_FOLDER)?.[0];
+      if (mainJid) {
+        clawSend(mainJid, `📶 Back online (was unreachable for ${duration})`).catch(() => {});
+      }
+      logger.warn({ downMs }, 'WhatsApp reconnected after outage');
+    },
+  });
   channels.push(whatsapp);
   await whatsapp.connect();
 
@@ -954,7 +1035,7 @@ async function main(): Promise<void> {
   }
 
   // Start subsystems (independently of connection handler)
-  startDashboard(queue);
+  startDashboard(queue, (jid, text) => clawSend(jid, text));
   startSchedulerLoop({
     registeredGroups: () => registeredGroups,
     getSessions: () => sessions,
@@ -996,6 +1077,11 @@ async function main(): Promise<void> {
 
   startIpcWatcher({
     sendMessage: clawSend,
+    sendReaction: (jid, msgId, senderJid, emoji) => {
+      const ch = findWa2() ?? whatsapp;
+      if (!ch?.sendReaction) return Promise.resolve();
+      return ch.sendReaction(jid, msgId, senderJid, emoji);
+    },
     sendFile: clawSendFile,
     registeredGroups: () => registeredGroups,
     registerGroup,
@@ -1012,6 +1098,25 @@ async function main(): Promise<void> {
   queue.setProcessMessagesFn(processGroupMessages);
   recoverPendingMessages();
   ensureBountyHunterTask();
+
+  // Announce DashClaw tunnel URL to main group on startup (cloudflared quick tunnel)
+  setTimeout(async () => {
+    try {
+      const logPath = path.join(process.cwd(), 'logs', 'cloudflared.log');
+      const logContent = fs.readFileSync(logPath, 'utf-8');
+      // Find all tunnel URLs in the log; take the last (most recent) one
+      const matches = [...logContent.matchAll(/https:\/\/[a-z0-9-]+\.trycloudflare\.com/g)];
+      if (matches.length > 0) {
+        const tunnelUrl = matches[matches.length - 1][0];
+        const mainJid = Object.entries(registeredGroups).find(
+          ([, g]) => g.folder === MAIN_GROUP_FOLDER,
+        )?.[0];
+        if (mainJid) {
+          await clawSend(mainJid, `🌐 DashClaw: ${tunnelUrl}`);
+        }
+      }
+    } catch { /* cloudflared not running or log not found */ }
+  }, 15000);
 
   // Pre-warm containers for registered groups after a short delay to let
   // WhatsApp finish its initial sync. Warmup is best-effort and non-blocking.

@@ -63,6 +63,29 @@ server.tool(
 );
 
 server.tool(
+  'react',
+  "React to a specific message with an emoji. Use this to acknowledge messages positively (👍), show agreement, or give non-verbal feedback without sending a full reply.",
+  {
+    message_id: z.string().describe('The ID of the message to react to (from the conversation context)'),
+    sender_jid: z.string().optional().describe('The JID of the message sender (from the conversation context)'),
+    emoji: z.string().default('👍').describe('The emoji to react with, e.g. "👍", "❤️", "😂", "🎉"'),
+  },
+  async (args) => {
+    writeIpcFile(MESSAGES_DIR, {
+      type: 'react',
+      chatJid,
+      messageId: args.message_id,
+      senderJid: args.sender_jid || '',
+      emoji: args.emoji || '👍',
+      groupFolder,
+      timestamp: new Date().toISOString(),
+    });
+
+    return { content: [{ type: 'text' as const, text: `Reacted with ${args.emoji || '👍'}` }] };
+  },
+);
+
+server.tool(
   'send_file',
   `Send a file (PDF report, image, spreadsheet, etc.) to the user's WhatsApp directly.
 Use this to share reports, analysis results, drafts, or any output file you've created.

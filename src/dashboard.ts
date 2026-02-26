@@ -61,6 +61,42 @@ function readMemoryFile(groupFolder: string, filename: string): string {
   try { return fs.readFileSync(p, 'utf-8'); } catch { return ''; }
 }
 
+export function listGroupFiles(groupFolder: string): Array<{ path: string; size: number; mtime: string }> {
+  const groupDir = path.join(GROUPS_DIR, groupFolder);
+  const results: Array<{ path: string; size: number; mtime: string }> = [];
+  const SKIP_DIRS = new Set(['logs', 'conversations', '.git', 'node_modules', 'ipc', 'ggml', 'gguf']);
+  const TEXT_EXTS = new Set([
+    '.md', '.txt', '.json', '.js', '.ts', '.sh', '.csv',
+    '.html', '.yaml', '.yml', '.py', '.toml', '.sql', '.xml',
+    '.log', '.env', '.email', '.mjs', '.cjs',
+  ]);
+
+  function scan(dir: string, prefix: string) {
+    try {
+      const entries = fs.readdirSync(dir, { withFileTypes: true });
+      for (const entry of entries) {
+        if (entry.name.startsWith('.')) continue;
+        const rel = prefix ? `${prefix}/${entry.name}` : entry.name;
+        const full = path.join(dir, entry.name);
+        if (entry.isDirectory()) {
+          if (SKIP_DIRS.has(entry.name)) continue;
+          scan(full, rel);
+        } else if (entry.isFile()) {
+          const ext = path.extname(entry.name).toLowerCase();
+          if (!TEXT_EXTS.has(ext)) continue;
+          try {
+            const stat = fs.statSync(full);
+            results.push({ path: rel, size: stat.size, mtime: stat.mtime.toISOString() });
+          } catch { /* skip */ }
+        }
+      }
+    } catch { /* skip */ }
+  }
+  scan(groupDir, '');
+  results.sort((a, b) => b.mtime.localeCompare(a.mtime));
+  return results;
+}
+
 function getGroupLogs(groupFolder: string): string[] {
   const logsDir = path.join(GROUPS_DIR, groupFolder, 'logs');
   try {
@@ -209,10 +245,10 @@ const HTML = `<!DOCTYPE html>
   .pill.yellow { background: #451a03; color: var(--yellow); border: 1px solid #92400e; }
   .refresh { margin-left: auto; font-size: 0.8rem; color: var(--muted); }
   main { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; padding: 1rem 1.5rem; max-width: 1400px; }
-  @media (max-width: 900px) { main { grid-template-columns: 1fr; } }
+  @media (max-width: 900px) { main { grid-template-columns: 1fr; padding: 0.75rem; } }
   .card { background: var(--surface); border: 1px solid var(--border); border-radius: 0.75rem; padding: 1rem; }
   .card.full { grid-column: 1 / -1; }
-  .card h2 { font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.5rem; }
+  .card h2 { font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
   table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
   th { text-align: left; padding: 0.4rem 0.5rem; color: var(--muted); font-weight: 500; font-size: 0.75rem; border-bottom: 1px solid var(--border); }
   td { padding: 0.4rem 0.5rem; border-bottom: 1px solid #0d0d14; vertical-align: top; }
@@ -226,13 +262,26 @@ const HTML = `<!DOCTYPE html>
   .event-row td:first-child { color: var(--yellow); }
   .event-row.hitl td:first-child { color: var(--accent2); }
   .event-row.block td:first-child { color: var(--red); }
-  .memory-tabs { display: flex; gap: 0.5rem; margin-bottom: 0.75rem; flex-wrap: wrap; }
-  .tab { padding: 0.3rem 0.75rem; border-radius: 0.375rem; font-size: 0.78rem; cursor: pointer; background: var(--bg); border: 1px solid var(--border); color: var(--muted); }
+  .memory-tabs { display: flex; gap: 0.5rem; margin-bottom: 0.75rem; flex-wrap: wrap; align-items: center; }
+  .tab { padding: 0.3rem 0.75rem; border-radius: 0.375rem; font-size: 0.78rem; cursor: pointer; background: var(--bg); border: 1px solid var(--border); color: var(--muted); white-space: nowrap; }
   .tab.active { background: var(--accent); color: white; border-color: var(--accent); }
   .memory-content { background: #07070d; border: 1px solid var(--border); border-radius: 0.5rem; padding: 0.75rem; font-family: var(--mono); font-size: 0.75rem; color: #94a3b8; max-height: 320px; overflow-y: auto; white-space: pre-wrap; }
   .empty { color: var(--muted); font-size: 0.82rem; padding: 0.5rem 0; }
   #live-dot { animation: pulse 2s infinite; }
   @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+  /* Files tab: side-by-side on desktop, stacked on mobile */
+  #files-layout { display: grid; grid-template-columns: 280px 1fr; gap: 1rem; }
+  @media (max-width: 700px) {
+    #files-layout { grid-template-columns: 1fr; }
+    #file-list { max-height: 35vh !important; }
+    #file-viewer { max-height: none !important; min-height: 55vh !important; }
+    header h1 { font-size: 1rem; }
+    header { padding: 0.75rem 1rem; }
+    .tab { padding: 0.25rem 0.5rem; font-size: 0.72rem; }
+    td, th { padding: 0.3rem 0.3rem; font-size: 0.75rem; }
+    .card { padding: 0.75rem; }
+    .log-box { max-height: 180px; }
+  }
 </style>
 </head>
 <body>
@@ -247,7 +296,7 @@ const HTML = `<!DOCTYPE html>
 
 <script>
 let memTab = 'global/MEMORY.md';
-let dashTab = 'overview'; // 'overview' | 'economics' | 'bounties'
+let dashTab = 'overview'; // 'overview' | 'economics' | 'bounties' | 'files'
 
 function fmt(iso) {
   if (!iso) return '—';
@@ -275,6 +324,7 @@ async function refreshBounties() {
           <span class="tab" onclick="dashTab='overview';refresh()">Overview</span>
           <span class="tab" onclick="dashTab='economics';refresh()">Economics</span>
           <span class="tab active">Bounties</span>
+          <span class="tab" onclick="dashTab='files';refresh()">Files</span>
         </div>
       </div>
       <div class="card full">
@@ -313,6 +363,7 @@ async function refreshEconomics() {
           <span class="tab" onclick="dashTab='overview';refresh()">Overview</span>
           <span class="tab active">Economics</span>
           <span class="tab" onclick="dashTab='bounties';refresh()">Bounties</span>
+          <span class="tab" onclick="dashTab='files';refresh()">Files</span>
         </div>
       </div>
       <!-- Computer Fund Goal -->
@@ -429,9 +480,179 @@ async function refreshEconomics() {
   }
 }
 
+function fmtSize(bytes) {
+  if (bytes < 1024) return bytes + 'B';
+  if (bytes < 1048576) return (bytes / 1024).toFixed(1) + 'KB';
+  return (bytes / 1048576).toFixed(1) + 'MB';
+}
+
+function escHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function fileTypeInfo(filePath) {
+  const ext = filePath.split('.').pop().toLowerCase();
+  if (ext === 'md') return { label: 'MD', color: '#7c3aed', group: 0 };
+  if (ext === 'txt') return { label: 'TXT', color: '#6b7280', group: 0 };
+  if (ext === 'py') return { label: 'PY', color: '#16a34a', group: 1 };
+  if (ext === 'js' || ext === 'mjs' || ext === 'cjs') return { label: 'JS', color: '#d97706', group: 1 };
+  if (ext === 'sh') return { label: 'SH', color: '#b45309', group: 1 };
+  if (ext === 'ts') return { label: 'TS', color: '#0284c7', group: 1 };
+  if (ext === 'json') return { label: 'JSON', color: '#0369a1', group: 2 };
+  if (ext === 'csv') return { label: 'CSV', color: '#0369a1', group: 2 };
+  if (ext === 'html') return { label: 'HTML', color: '#dc2626', group: 1 };
+  if (ext === 'sql') return { label: 'SQL', color: '#0891b2', group: 2 };
+  return { label: ext.toUpperCase(), color: '#6b7280', group: 3 };
+}
+
+function renderFileSection(label, sectionFiles) {
+  if (sectionFiles.length === 0) return '';
+  // Note: use \\ before ' inside template-literal-embedded JS so TS emits \' in browser JS
+  const items = sectionFiles.map(function(f) {
+    const parts = f.path.split('/');
+    const basename = parts[parts.length - 1];
+    const dir = parts.length > 1 ? parts.slice(0, -1).join('/') + '/' : '';
+    const t = fileTypeInfo(f.path);
+    // data-path holds the raw path; onclick reads it back via this.dataset.path (browser decodes HTML entities)
+    return '<div class="file-entry" data-path="' + escHtml(f.path) + '" onclick="openGroupFile(\\'main\\', this.dataset.path)" style="display:flex;align-items:flex-start;gap:0.5rem;padding:0.4rem 0.5rem;border-radius:0.25rem;cursor:pointer;border-bottom:1px solid #0d0d14" onmouseover="this.style.background=\\'#1e1e2e\\'" onmouseout="this.style.background=\\'\\'">'+
+      '<span style="flex-shrink:0;font-size:0.6rem;font-weight:700;padding:0.1rem 0.3rem;border-radius:3px;background:' + t.color + '22;color:' + t.color + ';margin-top:0.15rem">' + t.label + '</span>' +
+      '<div style="min-width:0;flex:1">' +
+        '<div style="font-size:0.77rem;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="' + escHtml(f.path) + '">' + escHtml(basename) + '</div>' +
+        (dir ? '<div style="font-size:0.64rem;color:var(--muted)">' + escHtml(dir) + '</div>' : '') +
+      '</div>' +
+      '<div style="flex-shrink:0;font-size:0.63rem;color:var(--muted);white-space:nowrap">' + fmtSize(f.size) + '</div>' +
+    '</div>';
+  }).join('');
+  return '<div style="padding:0.3rem 0.5rem;font-size:0.68rem;color:var(--muted);font-weight:700;letter-spacing:0.06em;text-transform:uppercase;margin-top:0.5rem;border-bottom:1px solid #1a1a2e">' + label + ' <span style="font-weight:400;opacity:0.7">(' + sectionFiles.length + ')</span></div>' + items;
+}
+
+function renderMd(raw) {
+  // Line-by-line renderer: avoids regex escape sequences that break in TS template literals
+  const lines = raw.split('\\n');
+  const out = [];
+  for (let i = 0; i < lines.length; i++) {
+    let s = escHtml(lines[i]);
+    if (s.startsWith('### ')) { out.push('<h3 style="font-size:0.9rem;color:var(--accent2);margin:0.5rem 0 0.2rem">' + s.slice(4) + '</h3>'); continue; }
+    if (s.startsWith('## ')) { out.push('<h2 style="font-size:1rem;color:var(--accent);margin:0.7rem 0 0.3rem">' + s.slice(3) + '</h2>'); continue; }
+    if (s.startsWith('# ')) { out.push('<h1 style="font-size:1.15rem;font-weight:700;margin:0.9rem 0 0.4rem">' + s.slice(2) + '</h1>'); continue; }
+    if (s === '---' || s === '----' || s === '-----') { out.push('<hr style="border-color:var(--border);margin:0.6rem 0">'); continue; }
+    if (s.startsWith('- ') || s.startsWith('* ')) { out.push('<li style="margin-left:1.5rem;margin-bottom:0.15rem">' + bolden(s.slice(2)) + '</li>'); continue; }
+    if (!s) { out.push('<div style="height:0.4rem"></div>'); continue; }
+    out.push('<p style="margin:0.2rem 0 0.3rem">' + bolden(s) + '</p>');
+  }
+  return out.join('');
+}
+function bolden(s) {
+  // Replace **text** with bold using indexOf (no regex needed)
+  let r = '';
+  while (true) {
+    const a = s.indexOf('**');
+    if (a === -1) { r += s; break; }
+    const b = s.indexOf('**', a + 2);
+    if (b === -1) { r += s; break; }
+    r += s.slice(0, a) + '<strong>' + s.slice(a + 2, b) + '</strong>';
+    s = s.slice(b + 2);
+  }
+  return r;
+}
+
+async function openGroupFile(group, filePath) {
+  const viewer = document.getElementById('file-viewer');
+  if (!viewer) return;
+  viewer.innerHTML = '<p class="empty" style="padding:0.5rem">Loading...</p>';
+  document.querySelectorAll('.file-entry').forEach(function(el) { el.style.background = ''; });
+  const entry = document.querySelector('.file-entry[data-path="' + filePath + '"]');
+  if (entry) entry.style.background = '#1a1a2e';
+  try {
+    const resp = await fetch('/api/file?group=' + group + '&path=' + encodeURIComponent(filePath));
+    if (!resp.ok) throw new Error('HTTP ' + resp.status);
+    const content = await resp.text();
+    const ext = filePath.split('.').pop().toLowerCase();
+    const header = '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.75rem;padding-bottom:0.5rem;border-bottom:1px solid var(--border)">' +
+      '<span style="font-size:0.75rem;color:var(--muted);font-family:var(--mono)">' + escHtml(filePath) + '</span>' +
+      '<span style="font-size:0.68rem;color:var(--muted)">' + fmtSize(content.length) + '</span>' +
+      '</div>';
+    if (ext === 'md') {
+      viewer.innerHTML = header + '<div style="line-height:1.65">' + renderMd(content) + '</div>';
+    } else {
+      viewer.innerHTML = header + '<pre style="white-space:pre-wrap;word-break:break-word;font-family:var(--mono);font-size:0.75rem;color:#94a3b8">' + escHtml(content) + '</pre>';
+    }
+  } catch(err) {
+    viewer.innerHTML = '<p style="color:var(--red);padding:0.5rem">Error: ' + escHtml(err.message) + '</p>';
+  }
+}
+
+function filterFileList(query) {
+  const q = query.toLowerCase();
+  document.querySelectorAll('.file-entry').forEach(function(el) {
+    el.style.display = (el.dataset.path || '').toLowerCase().includes(q) ? '' : 'none';
+  });
+}
+
+async function refreshFiles() {
+  try {
+    const filesData = await fetch('/api/files?group=main').then(r => r.json());
+    const files = filesData.files || [];
+    document.getElementById('main').innerHTML = \`
+      <div class="card full" style="margin-bottom:0.5rem">
+        <div class="memory-tabs">
+          <span class="tab" onclick="dashTab='overview';refresh()">Overview</span>
+          <span class="tab" onclick="dashTab='economics';refresh()">Economics</span>
+          <span class="tab" onclick="dashTab='bounties';refresh()">Bounties</span>
+          <span class="tab active">Files</span>
+        </div>
+      </div>
+      <div class="card full" style="padding:0.75rem">
+        <div id="files-layout" style="align-items:start">
+          <div>
+            <input id="file-search" type="text" placeholder="Filter files…"
+              style="width:100%;box-sizing:border-box;background:#07070d;border:1px solid var(--border);border-radius:0.375rem;padding:0.35rem 0.6rem;color:var(--text);font-size:0.78rem;outline:none;margin-bottom:0.4rem"
+              oninput="filterFileList(this.value)">
+            <div id="file-list" style="max-height:calc(100vh - 240px);overflow-y:auto;border:1px solid var(--border);border-radius:0.4rem">
+              \${files.length === 0 ? '<p class="empty">No files found in groups/main/</p>' : (function() {
+                const docs = files.filter(f => { const e = f.path.split('.').pop().toLowerCase(); return e === 'md' || e === 'txt'; });
+                const scripts = files.filter(f => { const e = f.path.split('.').pop().toLowerCase(); return ['py','js','mjs','cjs','sh','ts','html'].includes(e); });
+                const data = files.filter(f => { const e = f.path.split('.').pop().toLowerCase(); return ['json','csv','sql','xml','yaml','yml'].includes(e); });
+                const other = files.filter(f => { const e = f.path.split('.').pop().toLowerCase(); return !['md','txt','py','js','mjs','cjs','sh','ts','html','json','csv','sql','xml','yaml','yml'].includes(e); });
+                return renderFileSection('📝 Documents', docs) + renderFileSection('🔧 Scripts', scripts) + renderFileSection('📊 Data', data) + renderFileSection('📁 Other', other);
+              })()}
+            </div>
+          </div>
+          <div id="file-viewer" style="background:#07070d;border:1px solid var(--border);border-radius:0.5rem;padding:1rem;min-height:300px;max-height:calc(100vh - 180px);overflow-y:auto;font-size:0.82rem;line-height:1.6">
+            <p class="empty" style="padding:2rem;text-align:center">Select a file to view its contents</p>
+          </div>
+        </div>
+      </div>
+    \`;
+  } catch(e) {
+    console.error('Files refresh failed', e);
+  }
+}
+
 async function refresh() {
   if (dashTab === 'economics') { await refreshEconomics(); return; }
   if (dashTab === 'bounties') { await refreshBounties(); return; }
+  if (dashTab === 'files') {
+    // If a file is currently open (viewer has content), only refresh the file list
+    // sidebar without re-rendering the whole tab — avoids losing scroll position
+    const viewer = document.getElementById('file-viewer');
+    const fileOpen = viewer && !viewer.querySelector('.empty');
+    if (fileOpen) {
+      try {
+        const filesData = await fetch('/api/files?group=main').then(function(r) { return r.json(); });
+        const files = filesData.files || [];
+        const docs = files.filter(function(f) { var e = f.path.split('.').pop().toLowerCase(); return e === 'md' || e === 'txt'; });
+        const scripts = files.filter(function(f) { var e = f.path.split('.').pop().toLowerCase(); return ['py','js','mjs','cjs','sh','ts','html'].includes(e); });
+        const data = files.filter(function(f) { var e = f.path.split('.').pop().toLowerCase(); return ['json','csv','sql','xml','yaml','yml'].includes(e); });
+        const other = files.filter(function(f) { var e = f.path.split('.').pop().toLowerCase(); return !['md','txt','py','js','mjs','cjs','sh','ts','html','json','csv','sql','xml','yaml','yml'].includes(e); });
+        const list = document.getElementById('file-list');
+        if (list) list.innerHTML = renderFileSection('📝 Documents', docs) + renderFileSection('🔧 Scripts', scripts) + renderFileSection('📊 Data', data) + renderFileSection('📁 Other', other);
+      } catch(e) { /* silent */ }
+      return;
+    }
+    await refreshFiles();
+    return;
+  }
   try {
     const [status, memory, econ] = await Promise.all([
       fetch('/api/status').then(r => r.json()),
@@ -451,6 +672,7 @@ async function refresh() {
           <span class="tab active">Overview</span>
           <span class="tab" onclick="dashTab='economics';refresh()">Economics</span>
           <span class="tab" onclick="dashTab='bounties';refresh()">Bounties</span>
+          <span class="tab" onclick="dashTab='files';refresh()">Files</span>
           <span class="pill yellow" style="margin-left:auto">🖥️ $\${goal.earned.toFixed(2)}/$\${goal.target} (\${goal.pct.toFixed(1)}%)</span>
         </div>
       </div>
@@ -559,7 +781,7 @@ setInterval(refresh, 10000);
 
 // ── HTTP server ────────────────────────────────────────────────────────────────
 
-export function startDashboard(queue: GroupQueue): void {
+export function startDashboard(queue: GroupQueue, sendFn?: (jid: string, text: string) => Promise<void>): void {
   const server = http.createServer((req, res) => {
     const url = new URL(req.url || '/', `http://localhost:${PORT}`);
 
@@ -625,6 +847,57 @@ export function startDashboard(queue: GroupQueue): void {
       );
       res.writeHead(200, { 'Content-Type': 'text/plain; charset=utf-8' });
       res.end(content);
+      return;
+    }
+
+    if (url.pathname === '/api/files') {
+      const group = url.searchParams.get('group') || 'main';
+      if (!group.match(/^[a-zA-Z0-9_-]+$/)) { res.writeHead(400); res.end('Invalid group'); return; }
+      try {
+        const files = listGroupFiles(group);
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ files }));
+      } catch (err) {
+        res.writeHead(500);
+        res.end(JSON.stringify({ error: String(err) }));
+      }
+      return;
+    }
+
+    if (url.pathname === '/api/file') {
+      const group = url.searchParams.get('group') || 'main';
+      const filePath = url.searchParams.get('path') || '';
+      if (!group.match(/^[a-zA-Z0-9_-]+$/) || !filePath || filePath.includes('..') || filePath.startsWith('/')) {
+        res.writeHead(400); res.end('Invalid path'); return;
+      }
+      const resolved = path.resolve(GROUPS_DIR, group, filePath);
+      const groupRoot = path.resolve(GROUPS_DIR, group);
+      if (!resolved.startsWith(groupRoot + path.sep) && resolved !== groupRoot) {
+        res.writeHead(403); res.end('Forbidden'); return;
+      }
+      try {
+        const content = fs.readFileSync(resolved, 'utf-8');
+        res.writeHead(200, { 'Content-Type': 'text/plain; charset=utf-8' });
+        res.end(content);
+      } catch {
+        res.writeHead(404);
+        res.end('Not found');
+      }
+      return;
+    }
+
+    if (url.pathname === '/api/send' && req.method === 'POST') {
+      let body = '';
+      req.on('data', (chunk) => { body += chunk; });
+      req.on('end', async () => {
+        try {
+          const { jid, message } = JSON.parse(body);
+          if (!jid || !message || !sendFn) { res.writeHead(400); res.end(JSON.stringify({ error: 'missing jid/message or sendFn not configured' })); return; }
+          await sendFn(jid, message);
+          res.writeHead(200, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ ok: true }));
+        } catch (err) { res.writeHead(500); res.end(JSON.stringify({ error: String(err) })); }
+      });
       return;
     }
 
