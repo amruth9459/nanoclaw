@@ -46,8 +46,10 @@ export interface EvaluationResult {
 function getAnthropicClient(): Anthropic {
   const env = readEnvFile(['ANTHROPIC_API_KEY', 'CLAUDE_CODE_OAUTH_TOKEN']);
   const apiKey = process.env.ANTHROPIC_API_KEY || env.ANTHROPIC_API_KEY;
-  if (!apiKey) throw new Error('ANTHROPIC_API_KEY not configured');
-  return new Anthropic({ apiKey });
+  if (apiKey) return new Anthropic({ apiKey });
+  const oauthToken = process.env.CLAUDE_CODE_OAUTH_TOKEN || env.CLAUDE_CODE_OAUTH_TOKEN;
+  if (oauthToken) return new Anthropic({ authToken: oauthToken });
+  throw new Error('No API credentials configured (ANTHROPIC_API_KEY or CLAUDE_CODE_OAUTH_TOKEN)');
 }
 
 const FALLBACK_CLASSIFY: ClassifyResult = {
