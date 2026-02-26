@@ -105,6 +105,8 @@ export interface Channel {
   // Optional: react to a specific message with an emoji.
   // More reliable than typing indicators for shared-number setups.
   sendReaction?(jid: string, messageId: string, senderJid: string, emoji: string): Promise<void>;
+  /** The channel's own phone JID (e.g. "17405711584@s.whatsapp.net"), if known. */
+  ownPhoneJid?(): string | undefined;
 }
 
 // Callback type that channels use to deliver inbound messages

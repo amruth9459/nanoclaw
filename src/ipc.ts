@@ -39,6 +39,7 @@ import { RegisteredGroup } from './types.js';
 
 export interface IpcDeps {
   sendMessage: (jid: string, text: string) => Promise<void>;
+  sendReaction?: (jid: string, messageId: string, senderJid: string, emoji: string) => Promise<void>;
   sendFile?: (jid: string, buffer: Buffer, mimetype: string, filename: string, caption?: string) => Promise<void>;
   registeredGroups: () => Record<string, RegisteredGroup>;
   registerGroup: (jid: string, group: RegisteredGroup) => void;
@@ -204,6 +205,22 @@ export function startIpcWatcher(deps: IpcDeps): void {
                     const targetJid = (data.chatJid as string);
                     await deps.sendFile(targetJid, buffer, mimetype, filename, caption);
                     logger.info({ targetJid, filename, bytes: buffer.length, sourceGroup }, 'File sent via IPC');
+                  }
+                  fs.unlinkSync(filePath);
+                  continue;
+                }
+
+                if (data.type === 'react' && data.chatJid && data.messageId && data.emoji) {
+                  if (deps.sendReaction) {
+                    await deps.sendReaction(
+                      data.chatJid as string,
+                      data.messageId as string,
+                      data.senderJid as string || '',
+                      data.emoji as string,
+                    ).catch((err) => logger.warn({ err }, 'IPC react failed'));
+                    logger.info({ chatJid: data.chatJid, emoji: data.emoji, sourceGroup }, 'IPC reaction sent');
+                  } else {
+                    logger.warn({ sourceGroup }, 'react: channel does not support reactions');
                   }
                   fs.unlinkSync(filePath);
                   continue;
