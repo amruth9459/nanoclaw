@@ -107,6 +107,8 @@ export interface Channel {
   sendReaction?(jid: string, messageId: string, senderJid: string, emoji: string): Promise<void>;
   /** The channel's own phone JID (e.g. "17405711584@s.whatsapp.net"), if known. */
   ownPhoneJid?(): string | undefined;
+  /** Update a WhatsApp group's description text. */
+  updateGroupDescription?(jid: string, description: string): Promise<void>;
 }
 
 // Callback type that channels use to deliver inbound messages

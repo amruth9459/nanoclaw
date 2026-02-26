@@ -1099,7 +1099,7 @@ async function main(): Promise<void> {
   recoverPendingMessages();
   ensureBountyHunterTask();
 
-  // Announce DashClaw tunnel URL to main group on startup (cloudflared quick tunnel)
+  // Update group description with DashClaw tunnel URL on startup (cloudflared quick tunnel)
   setTimeout(async () => {
     try {
       const logPath = path.join(process.cwd(), 'logs', 'cloudflared.log');
@@ -1112,7 +1112,19 @@ async function main(): Promise<void> {
           ([, g]) => g.folder === MAIN_GROUP_FOLDER,
         )?.[0];
         if (mainJid) {
-          await clawSend(mainJid, `🌐 DashClaw: ${tunnelUrl}`);
+          const econ = getOrCreateEconomics(MAIN_GROUP_FOLDER);
+          const description = [
+            '🤖 NanoClaw',
+            `📊 DashClaw: ${tunnelUrl}`,
+            `💰 Balance: $${econ.balance.toFixed(2)} | Goal: $${EARNING_GOAL}`,
+          ].join('\n');
+          // Try to update group description; fall back to sending a message
+          const waChannel = channels.find((c) => c.updateGroupDescription);
+          if (waChannel?.updateGroupDescription) {
+            await waChannel.updateGroupDescription(mainJid, description);
+          } else {
+            await clawSend(mainJid, `🌐 DashClaw: ${tunnelUrl}`);
+          }
         }
       }
     } catch { /* cloudflared not running or log not found */ }

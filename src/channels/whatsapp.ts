@@ -500,6 +500,23 @@ export class WhatsAppChannel implements Channel {
   }
 
   /**
+   * Update WhatsApp group description.
+   * Used to post DashClaw URL and status info into the group info pane.
+   */
+  async updateGroupDescription(jid: string, description: string): Promise<void> {
+    if (!this.connected) {
+      logger.warn({ jid }, 'Cannot update group description: not connected');
+      return;
+    }
+    try {
+      await this.sock.groupUpdateDescription(jid, description);
+      logger.info({ jid }, 'Updated group description');
+    } catch (err) {
+      logger.error({ err, jid }, 'Failed to update group description');
+    }
+  }
+
+  /**
    * Sync group metadata from WhatsApp.
    * Fetches all participating groups and stores their names in the database.
    * Called on startup, daily, and on-demand via IPC.

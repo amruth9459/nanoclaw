@@ -69,6 +69,7 @@ export function listGroupFiles(groupFolder: string): Array<{ path: string; size:
     '.md', '.txt', '.json', '.js', '.ts', '.sh', '.csv',
     '.html', '.yaml', '.yml', '.py', '.toml', '.sql', '.xml',
     '.log', '.env', '.email', '.mjs', '.cjs',
+    '.pdf',
   ]);
 
   function scan(dir: string, prefix: string) {
@@ -559,26 +560,33 @@ function bolden(s) {
 async function openGroupFile(group, filePath) {
   const viewer = document.getElementById('file-viewer');
   if (!viewer) return;
-  viewer.innerHTML = '<p class="empty" style="padding:0.5rem">Loading...</p>';
   document.querySelectorAll('.file-entry').forEach(function(el) { el.style.background = ''; });
   const entry = document.querySelector('.file-entry[data-path="' + filePath + '"]');
   if (entry) entry.style.background = '#1a1a2e';
+  const ext = filePath.split('.').pop().toLowerCase();
+  const viewUrl = '/files/view?group=' + group + '&path=' + encodeURIComponent(filePath);
+  const header = '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.5rem;padding-bottom:0.5rem;border-bottom:1px solid var(--border)">' +
+    '<span style="font-size:0.75rem;color:var(--muted);font-family:var(--mono)">' + escHtml(filePath) + '</span>' +
+    '<a href="' + viewUrl + '" target="_blank" style="font-size:0.7rem;color:var(--accent2);text-decoration:none;flex-shrink:0">↗ Open in tab</a>' +
+    '</div>';
+  // PDF and HTML: render inline via iframe
+  if (ext === 'pdf' || ext === 'html' || ext === 'htm') {
+    viewer.innerHTML = header +
+      '<iframe src="' + viewUrl + '" style="width:100%;height:calc(100vh - 280px);min-height:400px;border:1px solid var(--border);border-radius:0.375rem;background:white"></iframe>';
+    return;
+  }
+  viewer.innerHTML = header + '<p class="empty" style="padding:0.5rem">Loading...</p>';
   try {
     const resp = await fetch('/api/file?group=' + group + '&path=' + encodeURIComponent(filePath));
     if (!resp.ok) throw new Error('HTTP ' + resp.status);
     const content = await resp.text();
-    const ext = filePath.split('.').pop().toLowerCase();
-    const header = '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.75rem;padding-bottom:0.5rem;border-bottom:1px solid var(--border)">' +
-      '<span style="font-size:0.75rem;color:var(--muted);font-family:var(--mono)">' + escHtml(filePath) + '</span>' +
-      '<span style="font-size:0.68rem;color:var(--muted)">' + fmtSize(content.length) + '</span>' +
-      '</div>';
     if (ext === 'md') {
       viewer.innerHTML = header + '<div style="line-height:1.65">' + renderMd(content) + '</div>';
     } else {
       viewer.innerHTML = header + '<pre style="white-space:pre-wrap;word-break:break-word;font-family:var(--mono);font-size:0.75rem;color:#94a3b8">' + escHtml(content) + '</pre>';
     }
   } catch(err) {
-    viewer.innerHTML = '<p style="color:var(--red);padding:0.5rem">Error: ' + escHtml(err.message) + '</p>';
+    viewer.innerHTML = header + '<p style="color:var(--red);padding:0.5rem">Error: ' + escHtml(err.message) + '</p>';
   }
 }
 
@@ -610,11 +618,13 @@ async function refreshFiles() {
               oninput="filterFileList(this.value)">
             <div id="file-list" style="max-height:calc(100vh - 240px);overflow-y:auto;border:1px solid var(--border);border-radius:0.4rem">
               \${files.length === 0 ? '<p class="empty">No files found in groups/main/</p>' : (function() {
+                const pdfs = files.filter(f => f.path.split('.').pop().toLowerCase() === 'pdf');
                 const docs = files.filter(f => { const e = f.path.split('.').pop().toLowerCase(); return e === 'md' || e === 'txt'; });
-                const scripts = files.filter(f => { const e = f.path.split('.').pop().toLowerCase(); return ['py','js','mjs','cjs','sh','ts','html'].includes(e); });
+                const web = files.filter(f => { const e = f.path.split('.').pop().toLowerCase(); return e === 'html' || e === 'htm'; });
+                const scripts = files.filter(f => { const e = f.path.split('.').pop().toLowerCase(); return ['py','js','mjs','cjs','sh','ts'].includes(e); });
                 const data = files.filter(f => { const e = f.path.split('.').pop().toLowerCase(); return ['json','csv','sql','xml','yaml','yml'].includes(e); });
-                const other = files.filter(f => { const e = f.path.split('.').pop().toLowerCase(); return !['md','txt','py','js','mjs','cjs','sh','ts','html','json','csv','sql','xml','yaml','yml'].includes(e); });
-                return renderFileSection('📝 Documents', docs) + renderFileSection('🔧 Scripts', scripts) + renderFileSection('📊 Data', data) + renderFileSection('📁 Other', other);
+                const other = files.filter(f => { const e = f.path.split('.').pop().toLowerCase(); return !['pdf','md','txt','html','htm','py','js','mjs','cjs','sh','ts','json','csv','sql','xml','yaml','yml'].includes(e); });
+                return renderFileSection('📄 PDFs', pdfs) + renderFileSection('🌐 Web', web) + renderFileSection('📝 Documents', docs) + renderFileSection('🔧 Scripts', scripts) + renderFileSection('📊 Data', data) + renderFileSection('📁 Other', other);
               })()}
             </div>
           </div>
@@ -882,6 +892,39 @@ export function startDashboard(queue: GroupQueue, sendFn?: (jid: string, text: s
       } catch {
         res.writeHead(404);
         res.end('Not found');
+      }
+      return;
+    }
+
+    if (url.pathname === '/files/view') {
+      const group = url.searchParams.get('group') || 'main';
+      const filePath = url.searchParams.get('path') || '';
+      if (!group.match(/^[a-zA-Z0-9_-]+$/) || !filePath || filePath.includes('..') || filePath.startsWith('/')) {
+        res.writeHead(400); res.end('Invalid path'); return;
+      }
+      const resolved = path.resolve(GROUPS_DIR, group, filePath);
+      const groupRoot = path.resolve(GROUPS_DIR, group);
+      if (!resolved.startsWith(groupRoot + path.sep) && resolved !== groupRoot) {
+        res.writeHead(403); res.end('Forbidden'); return;
+      }
+      const MIME: Record<string, string> = {
+        '.pdf': 'application/pdf',
+        '.html': 'text/html; charset=utf-8',
+        '.htm': 'text/html; charset=utf-8',
+        '.png': 'image/png',
+        '.jpg': 'image/jpeg',
+        '.jpeg': 'image/jpeg',
+        '.gif': 'image/gif',
+        '.svg': 'image/svg+xml',
+      };
+      const ext = path.extname(filePath).toLowerCase();
+      const contentType = MIME[ext] || 'application/octet-stream';
+      try {
+        const content = fs.readFileSync(resolved);
+        res.writeHead(200, { 'Content-Type': contentType, 'X-Content-Type-Options': 'nosniff' });
+        res.end(content);
+      } catch {
+        res.writeHead(404); res.end('Not found');
       }
       return;
     }
