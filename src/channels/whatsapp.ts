@@ -416,9 +416,9 @@ export class WhatsAppChannel implements Channel {
       await this.sock.sendMessage(jid, { text: prefixed });
       logger.info({ jid, length: prefixed.length }, 'Message sent');
     } catch (err) {
-      // If send fails, queue it for retry on reconnect
+      // If send fails, queue it for retry on reconnect (transient during initial sync)
       this.outgoingQueue.push({ jid, text: prefixed });
-      logger.warn({ jid, err, queueSize: this.outgoingQueue.length }, 'Failed to send, message queued');
+      logger.info({ jid, err, queueSize: this.outgoingQueue.length }, 'Failed to send, message queued for retry');
     }
   }
 
@@ -476,26 +476,38 @@ export class WhatsAppChannel implements Channel {
   }
 
   async sendReaction(jid: string, messageId: string, senderJid: string, emoji: string): Promise<void> {
-    try {
-      // Translate LID sender JID before using in reaction key
-      const resolvedSender = senderJid.endsWith('@lid')
-        ? await this.translateJid(senderJid)
-        : senderJid;
-      logger.info({ jid, messageId, emoji, senderJid, resolvedSender, channel: this.name }, 'Sending reaction');
-      await this.sock.sendMessage(jid, {
-        react: {
-          text: emoji,
-          key: {
-            id: messageId,
-            remoteJid: jid,
-            participant: resolvedSender || undefined,
-            fromMe: false,
+    const MAX_ATTEMPTS = 3;
+    const RETRY_DELAY_MS = 2000;
+
+    // Translate LID once before any attempt
+    const resolvedSender = senderJid.endsWith('@lid')
+      ? await this.translateJid(senderJid)
+      : senderJid;
+
+    for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
+      try {
+        logger.info({ jid, messageId, emoji, senderJid, resolvedSender, attempt, channel: this.name }, 'Sending reaction');
+        await this.sock.sendMessage(jid, {
+          react: {
+            text: emoji,
+            key: {
+              id: messageId,
+              remoteJid: jid,
+              participant: resolvedSender || undefined,
+              fromMe: false,
+            },
           },
-        },
-      });
-      logger.info({ jid, messageId, emoji }, 'Reaction sent');
-    } catch (err) {
-      logger.warn({ jid, messageId, senderJid, err }, 'Failed to send reaction');
+        });
+        logger.info({ jid, messageId, emoji, attempt }, 'Reaction sent');
+        return;
+      } catch (err) {
+        if (attempt < MAX_ATTEMPTS) {
+          logger.debug({ jid, messageId, emoji, attempt, err }, 'Reaction failed, retrying after delay');
+          await new Promise((r) => setTimeout(r, RETRY_DELAY_MS * attempt));
+        } else {
+          logger.warn({ jid, messageId, senderJid, err }, 'Failed to send reaction after all attempts');
+        }
+      }
     }
   }
 
