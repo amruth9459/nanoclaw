@@ -80,6 +80,10 @@ const queue = new GroupQueue();
 const hitlGate = new HitlGate();
 const bountyGate = new BountyGate();
 
+// Tracks which chatJids had a send_message IPC call during the current agent run.
+// Used to suppress the redundant final streaming output when agent already sent via send_message.
+const ipcMessageSentThisRun = new Set<string>();
+
 function loadState(): void {
   lastTimestamp = getRouterState('last_timestamp') || '';
   const agentTs = getRouterState('last_agent_timestamp');
@@ -400,6 +404,9 @@ async function processGroupMessages(chatJid: string): Promise<boolean> {
   const runStartTime = Date.now();
   let finalUsage: ContainerOutput['usage'] | undefined;
 
+  // Clear any send_message flag from a previous run for this chat
+  ipcMessageSentThisRun.delete(chatJid);
+
   const output = await runAgent(group, prompt, chatJid, async (result) => {
     // Streaming output callback — called for each agent result
 
@@ -418,9 +425,10 @@ async function processGroupMessages(chatJid: string): Promise<boolean> {
         resetIdleTimer();
       }
     }
-    // Handle final result — suppress if streaming already delivered the content
-    // (the success result text is the same accumulated response, just repeated)
-    else if (result.result && !streamingChunksSent) {
+    // Handle final result — suppress if:
+    // 1. Streaming chunks already delivered the content, OR
+    // 2. Agent used send_message IPC to deliver the content directly
+    else if (result.result && !streamingChunksSent && !ipcMessageSentThisRun.has(chatJid)) {
       const raw = typeof result.result === 'string' ? result.result : JSON.stringify(result.result);
       const text = raw.replace(/<internal>[\s\S]*?<\/internal>/g, '').trim();
       logger.info({ group: group.name }, `Agent output: ${raw.slice(0, 200)}`);
@@ -1094,6 +1102,7 @@ async function main(): Promise<void> {
       Object.entries(registeredGroups).find(
         ([, g]) => g.folder === MAIN_GROUP_FOLDER,
       )?.[0],
+    onAgentSendMessage: (chatJid) => { ipcMessageSentThisRun.add(chatJid); },
   });
   queue.setProcessMessagesFn(processGroupMessages);
   recoverPendingMessages();
