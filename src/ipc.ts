@@ -57,6 +57,11 @@ export interface IpcDeps {
   bountyGate?: BountyGate;
   /** Returns the JID of the main group (used for HITL notifications) */
   getMainGroupJid?: () => string | undefined;
+  /**
+   * Called when the agent explicitly sends a message via the send_message MCP tool.
+   * Used by the host to suppress the redundant final streaming output.
+   */
+  onAgentSendMessage?: (chatJid: string) => void;
 }
 
 let ipcWatcherRunning = false;
@@ -253,6 +258,7 @@ export function startIpcWatcher(deps: IpcDeps): void {
                     (targetGroup && targetGroup.folder === sourceGroup)
                   ) {
                     await deps.sendMessage(data.chatJid, data.text);
+                    deps.onAgentSendMessage?.(data.chatJid);
                     logger.info(
                       { chatJid: data.chatJid, sourceGroup },
                       'IPC message sent',

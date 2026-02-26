@@ -150,21 +150,50 @@ All media files are stored at `/workspace/media/` (read-only access).
 
 ## Communication
 
-Your output is sent to the user or group.
+**How messages reach the user:**
 
-You also have `mcp__nanoclaw__send_message` which sends a message immediately while you're still working.
+There are two delivery paths — use exactly ONE per run:
+
+**Path A — Final output (default):**
+Just write your answer. It's automatically sent when you finish. Use `<internal>` to suppress parts that shouldn't go out.
+
+**Path B — `send_message` for immediate delivery:**
+`mcp__nanoclaw__send_message` sends immediately, before you finish. Use it ONLY when the task is long and the user needs an early answer (e.g., "Done! Here's your report…"). If you use `send_message`, the system suppresses your final output to avoid duplicates — so put the complete answer inside the `send_message` call and wrap everything else in `<internal>`.
+
+**Rules:**
+- Do NOT use `send_message` to narrate your process step-by-step ("Searching…", "Analyzing…", "Done!")
+- Do NOT use `send_message` AND also write a final answer — pick one path
+- Do NOT send redundant summaries after already delivering the result
+
+**Wrong:**
+```
+send_message("I'll research that now...")
+send_message("Found some results, analyzing...")
+[final output] "Here's the summary: ..."
+```
+
+**Right (long task, send_message path):**
+```
+[do work silently]
+send_message("Here's what I found: ...")
+[final output: <internal>Done.</internal>]
+```
+
+**Right (short task, final output path):**
+```
+[do work silently]
+[final output] "Here's what I found: ..."
+```
 
 ### Internal thoughts
 
-If part of your output is internal reasoning rather than something for the user, wrap it in `<internal>` tags:
+Wrap internal reasoning in `<internal>` tags — it's logged but not sent:
 
 ```
 <internal>Compiled all three reports, ready to summarize.</internal>
 
 Here are the key findings from the research...
 ```
-
-Text inside `<internal>` tags is logged but not sent to the user.
 
 ### Sub-agents and teammates
 
