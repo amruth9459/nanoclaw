@@ -223,6 +223,34 @@ function findAckChannel(senderJid: string): Channel | undefined {
 }
 
 /**
+ * Pick an ack emoji based on message content.
+ */
+const EMOJI_RULES: Array<{ pattern: RegExp; emojis: string[] }> = [
+  { pattern: /\b(bug|fix|error|broke|crash|fail)/i, emojis: ['🔧', '🐛', '🩹'] },
+  { pattern: /\b(search|find|look|where|locate)/i, emojis: ['🔍', '🔎'] },
+  { pattern: /\b(think|idea|plan|strategy|decide|consider)/i, emojis: ['🤔', '💭', '🧠'] },
+  { pattern: /\b(build|create|make|implement|add|write|code)/i, emojis: ['🛠️', '⚡', '🏗️'] },
+  { pattern: /\b(money|cost|price|revenue|earn|bounty|\$)/i, emojis: ['💰', '📊'] },
+  { pattern: /\b(help|explain|what|how|why)\b/i, emojis: ['💡', '🧐'] },
+  { pattern: /\b(lexios|blueprint|construction|pdf|document)/i, emojis: ['📐', '🏛️'] },
+  { pattern: /\b(test|check|verify|validate)/i, emojis: ['🧪', '✅'] },
+  { pattern: /\b(deploy|push|ship|launch|release)/i, emojis: ['🚀'] },
+  { pattern: /\b(schedule|remind|later|timer|cron)/i, emojis: ['⏰', '📅'] },
+  { pattern: /\b(delete|remove|clean|drop)/i, emojis: ['🗑️'] },
+  { pattern: /\b(read|summary|summarize|review|analyze)/i, emojis: ['📖', '🔬'] },
+];
+const DEFAULT_EMOJIS = ['👀', '👍', '⚡', '🫡'];
+
+function pickAckEmoji(content: string): string {
+  for (const rule of EMOJI_RULES) {
+    if (rule.pattern.test(content)) {
+      return rule.emojis[Math.floor(Math.random() * rule.emojis.length)];
+    }
+  }
+  return DEFAULT_EMOJIS[Math.floor(Math.random() * DEFAULT_EMOJIS.length)];
+}
+
+/**
  * Process all pending messages for a group.
  * Called by the GroupQueue when it's this group's turn.
  */
@@ -375,14 +403,15 @@ async function processGroupMessages(chatJid: string): Promise<boolean> {
     }
   }
 
-  // INSTANT FEEDBACK: React to the last user message with 👀
+  // INSTANT FEEDBACK: React with a context-aware emoji
   // Use whichever channel is NOT the sender's number so the ack is always visible.
   const ackChannel = findAckChannel(lastMsg.sender) ?? channel;
   if (INSTANT_ACK) {
+    const ackEmoji = pickAckEmoji(lastMsg.content);
     if (ackChannel.sendReaction) {
-      await ackChannel.sendReaction(chatJid, lastMsg.id, lastMsg.sender, '👀').catch(() => {});
+      await ackChannel.sendReaction(chatJid, lastMsg.id, lastMsg.sender, ackEmoji).catch(() => {});
     } else {
-      await channel.sendMessage(chatJid, '👀').catch(() => {});
+      await channel.sendMessage(chatJid, ackEmoji).catch(() => {});
     }
   }
   await ackChannel.setTyping?.(chatJid, true);
