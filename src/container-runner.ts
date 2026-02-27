@@ -95,6 +95,16 @@ function buildVolumeMounts(
       containerPath: '/workspace/group',
       readonly: false,
     });
+
+    // Lexios repo: main can edit and push Lexios directly
+    const lexiosDir = path.join(homeDir, 'Lexios');
+    if (fs.existsSync(lexiosDir)) {
+      mounts.push({
+        hostPath: lexiosDir,
+        containerPath: '/workspace/lexios',
+        readonly: false,
+      });
+    }
   } else {
     // Other groups only get their own folder
     mounts.push({

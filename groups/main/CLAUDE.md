@@ -258,12 +258,12 @@ The CEO builds two things through you. Never confuse them.
 
 ### Where to make changes
 
-*Lexios changes:* Edit files in `/Users/amrut/Lexios/` (the Lexios repo). Source of truth lives at:
+*Lexios changes:* Edit files at `/workspace/lexios/` (mounted from the Lexios repo). Source of truth:
 - `lexios/` — Core (types.json, eval.py, prep.sh, corpus)
 - `integrations/nanoclaw/` — NanoClaw adapter (SKILL.md, TRAIN.md, test-lexios.sh)
-After changes, sync to NanoClaw: `./integrations/nanoclaw/sync.sh ~/nanoclaw`
+After changes, sync to NanoClaw: `cd /workspace/lexios && ./integrations/nanoclaw/sync.sh /workspace/project`
 
-*NanoClaw changes:* Edit files directly in `/Users/amrut/nanoclaw/`.
+*NanoClaw changes:* Edit files at `/workspace/project/`.
 
 ### Push routing
 
@@ -273,11 +273,10 @@ After changes, sync to NanoClaw: `./integrations/nanoclaw/sync.sh ~/nanoclaw`
 
 ### When the CEO says "build X for Lexios"
 
-1. Make changes in the Lexios repo (`/Users/amrut/Lexios/`)
-2. Test standalone: `cd ~/Lexios && python3 lexios/eval.py corpus`
-3. Sync: `./integrations/nanoclaw/sync.sh ~/nanoclaw`
-4. If NanoClaw container rebuild needed: `cd ~/nanoclaw && ./container/build.sh`
-5. Commit + push to Lexios repo
+1. Make changes in `/workspace/lexios/` (the Lexios repo)
+2. Test standalone: `cd /workspace/lexios && python3 lexios/eval.py corpus`
+3. Sync: `cd /workspace/lexios && ./integrations/nanoclaw/sync.sh /workspace/project`
+4. Commit + push Lexios repo: `cd /workspace/lexios && git add -A && git commit && git push origin main`
 
 ## Container Mounts
 
@@ -285,8 +284,9 @@ Main has access to the entire project:
 
 | Container Path | Host Path | Access |
 |----------------|-----------|--------|
-| `/workspace/project` | Project root | read-write |
+| `/workspace/project` | NanoClaw repo | read-write |
 | `/workspace/group` | `groups/main/` | read-write |
+| `/workspace/lexios` | Lexios repo (`~/Lexios`) | read-write |
 | `/workspace/media` | `store/media/` | read-only |
 
 Key paths inside the container:
