@@ -1,0 +1,828 @@
+{
+  "_meta": {
+    "version": 1,
+    "total_types": 101,
+    "domains": ["architectural", "structural", "mep", "schedule_admin", "site_civil"],
+    "tiers": {
+      "quick": "Core types extracted in every run (~9 types, ~$0.50)",
+      "standard": "Extended types for thorough analysis (~30 types, ~$2.00)",
+      "comprehensive": "All types for full document intelligence (~97 types, ~$5.00)"
+    }
+  },
+
+  "types": {
+    "rooms": {
+      "description": "Named rooms and spaces with dimensions and areas",
+      "fields": ["name", "dimensions", "area_sqft", "level", "function"],
+      "page_types": ["floor_plan"],
+      "tier": "quick",
+      "domain": "architectural",
+      "match_keys": [["name"]]
+    },
+    "doors": {
+      "description": "Door tags, sizes (width x height), types (single/double/sliding/pocket), swing direction",
+      "fields": ["tag", "size", "type", "swing", "location", "hardware"],
+      "page_types": ["floor_plan", "detail", "schedule"],
+      "tier": "quick",
+      "domain": "architectural",
+      "match_keys": [["location"], ["tag"], ["type"]]
+    },
+    "windows": {
+      "description": "Window tags, sizes, types (casement/double-hung/fixed/awning), sill height",
+      "fields": ["tag", "size", "type", "sill_height", "location"],
+      "page_types": ["floor_plan", "elevation", "schedule"],
+      "tier": "quick",
+      "domain": "architectural",
+      "match_keys": [["tag"], ["type"]]
+    },
+    "dimensions": {
+      "description": "Key dimensions: wall-to-wall, overall building, room sizes, setbacks",
+      "fields": ["description", "value", "between"],
+      "page_types": ["floor_plan", "elevation", "section", "site_plan"],
+      "tier": "quick",
+      "domain": "architectural",
+      "match_keys": [["description"], ["value"]]
+    },
+    "title_block": {
+      "description": "Project name, address, architect, date, drawing number, scale, stamp",
+      "fields": ["project_name", "address", "architect", "date", "drawing_number", "scale"],
+      "page_types": ["cover", "floor_plan", "elevation", "section", "detail", "schedule", "structural", "mep", "site_plan", "spec"],
+      "tier": "quick",
+      "domain": "schedule_admin",
+      "match_keys": [["project_name"]]
+    },
+    "notes": {
+      "description": "General notes, code references, material specs, construction notes",
+      "fields": ["text", "category", "code_reference"],
+      "page_types": ["floor_plan", "elevation", "section", "detail", "structural", "mep", "spec"],
+      "tier": "quick",
+      "domain": "architectural",
+      "match_keys": [["text"]]
+    },
+    "egress_paths": {
+      "description": "Exit locations, corridor widths, travel distances, exit signs",
+      "fields": ["location", "width", "travel_distance", "exit_type"],
+      "page_types": ["floor_plan"],
+      "tier": "quick",
+      "domain": "architectural",
+      "match_keys": [["location"]]
+    },
+    "stairs_elevators": {
+      "description": "Stair and elevator locations, widths, rise/run, capacity, type",
+      "fields": ["location", "type", "width", "rise", "run", "floors_served"],
+      "page_types": ["floor_plan", "section", "detail"],
+      "tier": "quick",
+      "domain": "architectural",
+      "match_keys": [["location"], ["type"]]
+    },
+    "equipment": {
+      "description": "HVAC units, plumbing fixtures, electrical panels, appliances on drawings",
+      "fields": ["name", "type", "location", "specs"],
+      "page_types": ["floor_plan", "mep"],
+      "tier": "quick",
+      "domain": "mep",
+      "match_keys": [["name"], ["type"], ["location"]]
+    },
+
+    "room_finishes": {
+      "description": "Floor, wall, and ceiling finishes per room (tile, carpet, paint, etc.)",
+      "fields": ["room", "floor_finish", "wall_finish", "ceiling_finish"],
+      "page_types": ["floor_plan", "schedule"],
+      "tier": "standard",
+      "domain": "architectural",
+      "match_keys": [["room"]]
+    },
+    "ceiling_heights": {
+      "description": "Ceiling heights per room or area, including soffits and bulkheads",
+      "fields": ["room", "height", "type"],
+      "page_types": ["floor_plan", "section", "detail"],
+      "tier": "standard",
+      "domain": "architectural",
+      "match_keys": [["room"]]
+    },
+    "door_hardware": {
+      "description": "Hardware sets, locksets, hinges, closers per door",
+      "fields": ["door_tag", "hardware_set", "lockset", "hinges", "closer"],
+      "page_types": ["schedule", "detail"],
+      "tier": "standard",
+      "domain": "architectural",
+      "match_keys": [["door_tag"]]
+    },
+    "door_swings": {
+      "description": "Door swing directions and clearance arcs",
+      "fields": ["door_tag", "swing_direction", "clearance", "location"],
+      "page_types": ["floor_plan"],
+      "tier": "standard",
+      "domain": "architectural",
+      "match_keys": [["door_tag"], ["location"]]
+    },
+    "wall_types": {
+      "description": "Wall construction types, thicknesses, fire ratings, materials",
+      "fields": ["type_id", "thickness", "construction", "fire_rating", "location"],
+      "page_types": ["floor_plan", "detail", "section"],
+      "tier": "standard",
+      "domain": "architectural",
+      "match_keys": [["type_id"], ["location"]]
+    },
+    "wall_openings": {
+      "description": "Non-door/window openings: pass-throughs, cased openings, arches",
+      "fields": ["type", "size", "location", "header"],
+      "page_types": ["floor_plan", "detail"],
+      "tier": "comprehensive",
+      "domain": "architectural",
+      "match_keys": [["location"], ["type"]]
+    },
+    "interior_elevations": {
+      "description": "Interior elevation details: cabinet heights, backsplash, tile layouts",
+      "fields": ["room", "wall", "features", "dimensions"],
+      "page_types": ["elevation", "detail"],
+      "tier": "comprehensive",
+      "domain": "architectural",
+      "match_keys": [["room"], ["wall"]]
+    },
+    "exterior_materials": {
+      "description": "Exterior cladding, siding, trim, roofing materials",
+      "fields": ["material", "location", "specification", "color"],
+      "page_types": ["elevation", "detail"],
+      "tier": "standard",
+      "domain": "architectural",
+      "match_keys": [["material"], ["location"]]
+    },
+    "roof_plan": {
+      "description": "Roof slopes, ridges, valleys, drainage, materials, overhangs",
+      "fields": ["slope", "material", "ridge_height", "overhang", "drainage"],
+      "page_types": ["floor_plan", "elevation", "detail"],
+      "tier": "standard",
+      "domain": "architectural",
+      "match_keys": [["slope"], ["material"]]
+    },
+    "roof_details": {
+      "description": "Fascia, soffit, flashing, gutter, ridge vent details",
+      "fields": ["detail_type", "material", "dimensions", "location"],
+      "page_types": ["detail", "section"],
+      "tier": "comprehensive",
+      "domain": "architectural",
+      "match_keys": [["detail_type"], ["location"]]
+    },
+    "insulation": {
+      "description": "Insulation types, R-values, locations (wall, ceiling, floor)",
+      "fields": ["location", "type", "r_value", "thickness"],
+      "page_types": ["section", "detail"],
+      "tier": "standard",
+      "domain": "architectural",
+      "match_keys": [["location"]]
+    },
+    "waterproofing": {
+      "description": "Waterproofing and moisture barriers: foundation, below-grade, wet areas",
+      "fields": ["location", "type", "material", "method"],
+      "page_types": ["detail", "section"],
+      "tier": "comprehensive",
+      "domain": "architectural",
+      "match_keys": [["location"]]
+    },
+    "accessibility_features": {
+      "description": "ADA features: ramps, grab bars, accessible routes, turning radius, signage",
+      "fields": ["feature", "location", "dimensions", "compliance_ref"],
+      "page_types": ["floor_plan", "detail"],
+      "tier": "standard",
+      "domain": "architectural",
+      "match_keys": [["feature"], ["location"]]
+    },
+    "closets_storage": {
+      "description": "Closets, pantries, storage rooms with shelving layouts",
+      "fields": ["name", "dimensions", "shelving", "location"],
+      "page_types": ["floor_plan"],
+      "tier": "comprehensive",
+      "domain": "architectural",
+      "match_keys": [["name"], ["location"]]
+    },
+    "countertops": {
+      "description": "Countertop materials, dimensions, edge profiles",
+      "fields": ["material", "location", "dimensions", "edge_profile"],
+      "page_types": ["floor_plan", "detail"],
+      "tier": "comprehensive",
+      "domain": "architectural",
+      "match_keys": [["location"], ["material"]]
+    },
+    "cabinetry": {
+      "description": "Cabinet types, sizes, configurations (upper/lower/tall)",
+      "fields": ["type", "size", "location", "configuration", "material"],
+      "page_types": ["floor_plan", "elevation", "detail"],
+      "tier": "comprehensive",
+      "domain": "architectural",
+      "match_keys": [["location"], ["type"]]
+    },
+    "millwork": {
+      "description": "Trim, molding, wainscoting, built-ins, custom woodwork",
+      "fields": ["type", "profile", "material", "location", "dimensions"],
+      "page_types": ["detail", "elevation"],
+      "tier": "comprehensive",
+      "domain": "architectural",
+      "match_keys": [["type"], ["location"]]
+    },
+    "flooring": {
+      "description": "Flooring materials, patterns, transitions between areas",
+      "fields": ["material", "location", "pattern", "transition_type"],
+      "page_types": ["floor_plan", "detail"],
+      "tier": "comprehensive",
+      "domain": "architectural",
+      "match_keys": [["location"], ["material"]]
+    },
+    "railings_guards": {
+      "description": "Railing types, heights, baluster spacing, materials",
+      "fields": ["type", "height", "material", "location", "baluster_spacing"],
+      "page_types": ["elevation", "detail", "section"],
+      "tier": "comprehensive",
+      "domain": "architectural",
+      "match_keys": [["location"], ["type"]]
+    },
+    "fireplaces": {
+      "description": "Fireplace types, dimensions, flue details, hearth specs",
+      "fields": ["type", "location", "dimensions", "flue_size", "hearth"],
+      "page_types": ["floor_plan", "section", "detail"],
+      "tier": "comprehensive",
+      "domain": "architectural",
+      "match_keys": [["location"], ["type"]]
+    },
+
+    "beams": {
+      "description": "Beam sizes, spans, materials (steel/LVL/glulam), connections",
+      "fields": ["tag", "size", "material", "span", "location", "connection"],
+      "page_types": ["structural", "detail", "section"],
+      "tier": "standard",
+      "domain": "structural",
+      "match_keys": [["tag"], ["location"], ["size"]]
+    },
+    "columns": {
+      "description": "Column sizes, materials, locations, base/cap details",
+      "fields": ["tag", "size", "material", "location", "base_detail"],
+      "page_types": ["structural", "floor_plan"],
+      "tier": "standard",
+      "domain": "structural",
+      "match_keys": [["tag"], ["location"]]
+    },
+    "joists": {
+      "description": "Floor/ceiling joist sizes, spacing, spans, bridging",
+      "fields": ["type", "size", "spacing", "span", "location", "bridging"],
+      "page_types": ["structural", "section", "detail"],
+      "tier": "standard",
+      "domain": "structural",
+      "match_keys": [["type"], ["location"], ["size"]]
+    },
+    "rafters": {
+      "description": "Roof rafter sizes, spacing, slope, collar ties, ridge board",
+      "fields": ["size", "spacing", "slope", "span", "collar_ties"],
+      "page_types": ["structural", "section"],
+      "tier": "standard",
+      "domain": "structural",
+      "match_keys": [["size"], ["slope"]]
+    },
+    "trusses": {
+      "description": "Truss types, spans, spacing, bearing points, bracing",
+      "fields": ["type", "span", "spacing", "bearing_points", "bracing"],
+      "page_types": ["structural", "section"],
+      "tier": "standard",
+      "domain": "structural",
+      "match_keys": [["type"], ["span"]]
+    },
+    "slabs": {
+      "description": "Concrete slab thickness, reinforcement, vapor barrier, joints",
+      "fields": ["thickness", "reinforcement", "vapor_barrier", "location", "joints"],
+      "page_types": ["structural", "detail"],
+      "tier": "standard",
+      "domain": "structural",
+      "match_keys": [["location"], ["thickness"]]
+    },
+    "foundations": {
+      "description": "Foundation types (spread footing/strip/mat), dimensions, rebar, depth",
+      "fields": ["type", "dimensions", "reinforcement", "depth", "location"],
+      "page_types": ["structural", "detail", "section"],
+      "tier": "standard",
+      "domain": "structural",
+      "match_keys": [["type"], ["location"]]
+    },
+    "retaining_walls": {
+      "description": "Retaining wall types, heights, reinforcement, drainage",
+      "fields": ["type", "height", "thickness", "reinforcement", "drainage", "location"],
+      "page_types": ["structural", "detail", "site_plan"],
+      "tier": "comprehensive",
+      "domain": "structural",
+      "match_keys": [["location"], ["type"]]
+    },
+    "shear_walls": {
+      "description": "Shear wall locations, sheathing, nailing patterns, hold-downs",
+      "fields": ["location", "sheathing", "nailing_pattern", "hold_down", "length"],
+      "page_types": ["structural", "floor_plan"],
+      "tier": "standard",
+      "domain": "structural",
+      "match_keys": [["location"]]
+    },
+    "load_paths": {
+      "description": "Gravity and lateral load paths, load-bearing wall indicators",
+      "fields": ["type", "path_description", "members_involved"],
+      "page_types": ["structural", "section"],
+      "tier": "comprehensive",
+      "domain": "structural",
+      "match_keys": [["type"]]
+    },
+    "structural_connections": {
+      "description": "Steel connections, Simpson ties, anchor bolts, joist hangers",
+      "fields": ["type", "product", "location", "capacity"],
+      "page_types": ["structural", "detail"],
+      "tier": "standard",
+      "domain": "structural",
+      "match_keys": [["type"], ["location"], ["product"]]
+    },
+    "structural_loads": {
+      "description": "Design loads: dead, live, snow, wind, seismic per code",
+      "fields": ["load_type", "value", "unit", "location", "code_reference"],
+      "page_types": ["structural", "spec"],
+      "tier": "standard",
+      "domain": "structural",
+      "match_keys": [["load_type"]]
+    },
+    "structural_spans": {
+      "description": "Clear spans for beams, joists, rafters with sizes",
+      "fields": ["member", "span", "size", "location"],
+      "page_types": ["structural", "section"],
+      "tier": "comprehensive",
+      "domain": "structural",
+      "match_keys": [["member"], ["location"]]
+    },
+    "concrete_specs": {
+      "description": "Concrete mix design, strength, slump, admixtures",
+      "fields": ["strength_psi", "slump", "location", "admixtures", "curing"],
+      "page_types": ["structural", "spec"],
+      "tier": "comprehensive",
+      "domain": "structural",
+      "match_keys": [["location"], ["strength_psi"]]
+    },
+    "steel_specs": {
+      "description": "Steel grades, weld types, bolt grades, coatings",
+      "fields": ["grade", "member_type", "weld_type", "bolt_grade", "coating"],
+      "page_types": ["structural", "spec"],
+      "tier": "comprehensive",
+      "domain": "structural",
+      "match_keys": [["grade"], ["member_type"]]
+    },
+    "wood_framing": {
+      "description": "Wood species/grade, treatment, framing methods (platform/balloon)",
+      "fields": ["species", "grade", "treatment", "framing_method", "location"],
+      "page_types": ["structural", "spec"],
+      "tier": "comprehensive",
+      "domain": "structural",
+      "match_keys": [["species"], ["location"]]
+    },
+    "lateral_bracing": {
+      "description": "Lateral bracing systems, let-in bracing, metal straps",
+      "fields": ["type", "location", "material", "spacing"],
+      "page_types": ["structural"],
+      "tier": "comprehensive",
+      "domain": "structural",
+      "match_keys": [["type"], ["location"]]
+    },
+
+    "hvac_equipment": {
+      "description": "Furnaces, condensers, air handlers, heat pumps with specs",
+      "fields": ["type", "model", "capacity_tons", "location", "efficiency"],
+      "page_types": ["mep", "floor_plan"],
+      "tier": "standard",
+      "domain": "mep",
+      "match_keys": [["type"], ["location"]]
+    },
+    "ductwork": {
+      "description": "Duct sizes, types (rectangular/round/flex), routing, registers",
+      "fields": ["type", "size", "location", "cfm", "material"],
+      "page_types": ["mep"],
+      "tier": "standard",
+      "domain": "mep",
+      "match_keys": [["location"], ["type"], ["size"]]
+    },
+    "diffusers_registers": {
+      "description": "Supply/return diffusers and registers: sizes, types, CFM ratings",
+      "fields": ["type", "size", "cfm", "location", "room"],
+      "page_types": ["mep", "floor_plan"],
+      "tier": "comprehensive",
+      "domain": "mep",
+      "match_keys": [["location"], ["room"]]
+    },
+    "thermostats": {
+      "description": "Thermostat locations and zones",
+      "fields": ["location", "zone", "type"],
+      "page_types": ["mep", "floor_plan"],
+      "tier": "comprehensive",
+      "domain": "mep",
+      "match_keys": [["location"]]
+    },
+    "exhaust_fans": {
+      "description": "Bathroom, kitchen, and utility exhaust fans with CFM ratings",
+      "fields": ["location", "cfm", "type", "duct_size"],
+      "page_types": ["mep", "floor_plan"],
+      "tier": "standard",
+      "domain": "mep",
+      "match_keys": [["location"]]
+    },
+    "plumbing_fixtures": {
+      "description": "Sinks, toilets, tubs, showers, laundry connections",
+      "fields": ["type", "location", "model", "connection_size"],
+      "page_types": ["mep", "floor_plan"],
+      "tier": "standard",
+      "domain": "mep",
+      "match_keys": [["type"], ["location"]]
+    },
+    "plumbing_piping": {
+      "description": "Water supply and drain pipe sizes, materials, routing",
+      "fields": ["type", "size", "material", "location", "slope"],
+      "page_types": ["mep"],
+      "tier": "comprehensive",
+      "domain": "mep",
+      "match_keys": [["type"], ["location"], ["size"]]
+    },
+    "water_heater": {
+      "description": "Water heater type, capacity, fuel source, location",
+      "fields": ["type", "capacity_gallons", "fuel", "location", "efficiency"],
+      "page_types": ["mep", "floor_plan"],
+      "tier": "standard",
+      "domain": "mep",
+      "match_keys": [["location"], ["type"]]
+    },
+    "gas_piping": {
+      "description": "Gas pipe sizes, routing, BTU loads, shutoff locations",
+      "fields": ["size", "location", "btu_load", "material"],
+      "page_types": ["mep"],
+      "tier": "comprehensive",
+      "domain": "mep",
+      "match_keys": [["location"], ["size"]]
+    },
+    "electrical_panels": {
+      "description": "Main and sub panels: amperage, location, circuit count",
+      "fields": ["type", "amperage", "location", "circuits", "voltage"],
+      "page_types": ["mep", "floor_plan"],
+      "tier": "standard",
+      "domain": "mep",
+      "match_keys": [["location"], ["type"]]
+    },
+    "electrical_circuits": {
+      "description": "Circuit assignments, wire sizes, breaker sizes",
+      "fields": ["circuit_number", "load", "wire_size", "breaker_size", "location"],
+      "page_types": ["mep", "schedule"],
+      "tier": "comprehensive",
+      "domain": "mep",
+      "match_keys": [["circuit_number"], ["location"]]
+    },
+    "receptacles": {
+      "description": "Electrical outlets: types (standard/GFCI/AFCI/240V), locations, heights",
+      "fields": ["type", "location", "height", "circuit"],
+      "page_types": ["mep", "floor_plan"],
+      "tier": "comprehensive",
+      "domain": "mep",
+      "match_keys": [["location"], ["type"]]
+    },
+    "switches": {
+      "description": "Light switches: types (single/3-way/dimmer), locations, controlled fixtures",
+      "fields": ["type", "location", "controls"],
+      "page_types": ["mep", "floor_plan"],
+      "tier": "comprehensive",
+      "domain": "mep",
+      "match_keys": [["location"], ["type"]]
+    },
+    "lighting_fixtures": {
+      "description": "Light fixture types, locations, wattage, mounting type",
+      "fields": ["type", "location", "wattage", "mounting", "tag"],
+      "page_types": ["mep", "floor_plan"],
+      "tier": "standard",
+      "domain": "mep",
+      "match_keys": [["tag"], ["location"], ["type"]]
+    },
+    "smoke_detectors": {
+      "description": "Smoke and CO detector locations, types (hardwired/battery)",
+      "fields": ["type", "location", "power_source"],
+      "page_types": ["mep", "floor_plan"],
+      "tier": "standard",
+      "domain": "mep",
+      "match_keys": [["location"]]
+    },
+    "sprinklers": {
+      "description": "Fire sprinkler heads: types, locations, coverage, pipe sizes",
+      "fields": ["type", "location", "coverage_sqft", "pipe_size"],
+      "page_types": ["mep", "floor_plan"],
+      "tier": "standard",
+      "domain": "mep",
+      "match_keys": [["location"], ["type"]]
+    },
+    "fire_alarm": {
+      "description": "Fire alarm devices: pull stations, horns, strobes, FACP location",
+      "fields": ["type", "location", "zone"],
+      "page_types": ["mep", "floor_plan"],
+      "tier": "comprehensive",
+      "domain": "mep",
+      "match_keys": [["type"], ["location"]]
+    },
+    "low_voltage": {
+      "description": "Data/telecom outlets, cable TV, security, intercom, audio",
+      "fields": ["type", "location", "system"],
+      "page_types": ["mep", "floor_plan"],
+      "tier": "comprehensive",
+      "domain": "mep",
+      "match_keys": [["type"], ["location"]]
+    },
+    "solar_pv": {
+      "description": "Solar panel layout, inverter location, capacity, wiring",
+      "fields": ["panel_count", "capacity_kw", "inverter_location", "array_layout"],
+      "page_types": ["mep", "site_plan", "elevation"],
+      "tier": "comprehensive",
+      "domain": "mep",
+      "match_keys": [["capacity_kw"]]
+    },
+    "ev_charging": {
+      "description": "EV charger locations, amperage, circuit requirements",
+      "fields": ["location", "amperage", "type", "circuit"],
+      "page_types": ["mep", "site_plan"],
+      "tier": "comprehensive",
+      "domain": "mep",
+      "match_keys": [["location"]]
+    },
+
+    "door_schedule": {
+      "description": "Tabular door schedule: tag, size, type, material, hardware, fire rating",
+      "fields": ["tag", "size", "type", "material", "hardware_set", "fire_rating", "remarks"],
+      "page_types": ["schedule"],
+      "tier": "standard",
+      "domain": "schedule_admin",
+      "match_keys": [["tag"]]
+    },
+    "window_schedule": {
+      "description": "Tabular window schedule: tag, size, type, glazing, U-factor, SHGC",
+      "fields": ["tag", "size", "type", "glazing", "u_factor", "shgc", "remarks"],
+      "page_types": ["schedule"],
+      "tier": "standard",
+      "domain": "schedule_admin",
+      "match_keys": [["tag"]]
+    },
+    "finish_schedule": {
+      "description": "Room finish schedule: room name, floor/wall/ceiling/base finishes",
+      "fields": ["room", "floor", "wall", "ceiling", "base", "remarks"],
+      "page_types": ["schedule"],
+      "tier": "standard",
+      "domain": "schedule_admin",
+      "match_keys": [["room"]]
+    },
+    "equipment_schedule": {
+      "description": "Mechanical/plumbing equipment schedule: tag, type, capacity, manufacturer",
+      "fields": ["tag", "type", "capacity", "manufacturer", "model", "remarks"],
+      "page_types": ["schedule"],
+      "tier": "standard",
+      "domain": "schedule_admin",
+      "match_keys": [["tag"]]
+    },
+    "lighting_schedule": {
+      "description": "Lighting fixture schedule: tag, type, lamp, wattage, voltage, mounting",
+      "fields": ["tag", "type", "lamp", "wattage", "voltage", "mounting"],
+      "page_types": ["schedule"],
+      "tier": "comprehensive",
+      "domain": "schedule_admin",
+      "match_keys": [["tag"]]
+    },
+    "panel_schedule": {
+      "description": "Electrical panel schedule: circuit, breaker, load description, amperage",
+      "fields": ["circuit", "breaker_size", "load_description", "amperage", "phase"],
+      "page_types": ["schedule", "mep"],
+      "tier": "comprehensive",
+      "domain": "schedule_admin",
+      "match_keys": [["circuit"]]
+    },
+    "plumbing_fixture_schedule": {
+      "description": "Plumbing fixture schedule: tag, type, manufacturer, connection sizes",
+      "fields": ["tag", "type", "manufacturer", "hot_size", "cold_size", "drain_size"],
+      "page_types": ["schedule"],
+      "tier": "comprehensive",
+      "domain": "schedule_admin",
+      "match_keys": [["tag"]]
+    },
+    "sheet_index": {
+      "description": "Drawing sheet index: sheet number, title, discipline, revision",
+      "fields": ["sheet_number", "title", "discipline", "revision"],
+      "page_types": ["cover", "schedule"],
+      "tier": "standard",
+      "domain": "schedule_admin",
+      "match_keys": [["sheet_number"]]
+    },
+    "revision_history": {
+      "description": "Revision blocks: number, date, description, by whom",
+      "fields": ["revision_number", "date", "description", "by"],
+      "page_types": ["cover", "schedule"],
+      "tier": "comprehensive",
+      "domain": "schedule_admin",
+      "match_keys": [["revision_number"]]
+    },
+    "abbreviations": {
+      "description": "Drawing abbreviations and their meanings",
+      "fields": ["abbreviation", "meaning"],
+      "page_types": ["cover", "spec"],
+      "tier": "comprehensive",
+      "domain": "schedule_admin",
+      "match_keys": [["abbreviation"]]
+    },
+    "symbols_legend": {
+      "description": "Drawing symbols legend: symbol, meaning, discipline",
+      "fields": ["symbol", "meaning", "discipline"],
+      "page_types": ["cover", "spec"],
+      "tier": "comprehensive",
+      "domain": "schedule_admin",
+      "match_keys": [["symbol"]]
+    },
+    "code_summary": {
+      "description": "Code analysis summary: occupancy type, construction type, sprinklered, code year",
+      "fields": ["occupancy_type", "construction_type", "sprinklered", "code_year", "jurisdiction"],
+      "page_types": ["cover", "spec"],
+      "tier": "standard",
+      "domain": "schedule_admin",
+      "match_keys": [["occupancy_type"]]
+    },
+    "occupancy_info": {
+      "description": "Occupancy classification, load factors, max occupant counts per room",
+      "fields": ["classification", "load_factor", "room", "max_occupants"],
+      "page_types": ["cover", "spec", "floor_plan"],
+      "tier": "standard",
+      "domain": "schedule_admin",
+      "match_keys": [["classification"], ["room"]]
+    },
+    "area_calculations": {
+      "description": "Gross/net area calculations, FAR, lot coverage, per-floor areas",
+      "fields": ["type", "area_sqft", "level", "notes"],
+      "page_types": ["cover", "floor_plan", "site_plan"],
+      "tier": "standard",
+      "domain": "schedule_admin",
+      "match_keys": [["type"], ["level"]]
+    },
+    "permit_info": {
+      "description": "Permit number, application date, approval stamps, conditions",
+      "fields": ["permit_number", "date", "status", "conditions"],
+      "page_types": ["cover"],
+      "tier": "comprehensive",
+      "domain": "schedule_admin",
+      "match_keys": [["permit_number"]]
+    },
+    "spec_sections": {
+      "description": "Specification section references (CSI format), materials, methods",
+      "fields": ["section_number", "title", "key_requirements"],
+      "page_types": ["spec"],
+      "tier": "comprehensive",
+      "domain": "schedule_admin",
+      "match_keys": [["section_number"]]
+    },
+
+    "site_boundary": {
+      "description": "Property lines, lot dimensions, bearings, monuments, easements",
+      "fields": ["dimension", "bearing", "type", "notes"],
+      "page_types": ["site_plan"],
+      "tier": "standard",
+      "domain": "site_civil",
+      "match_keys": [["type"], ["dimension"]]
+    },
+    "setbacks": {
+      "description": "Required setbacks from property lines: front, rear, side",
+      "fields": ["side", "required", "actual"],
+      "page_types": ["site_plan"],
+      "tier": "standard",
+      "domain": "site_civil",
+      "match_keys": [["side"]]
+    },
+    "topography": {
+      "description": "Existing and proposed contours, spot elevations, slopes",
+      "fields": ["type", "elevation", "location", "interval"],
+      "page_types": ["site_plan"],
+      "tier": "standard",
+      "domain": "site_civil",
+      "match_keys": [["type"], ["location"]]
+    },
+    "grading": {
+      "description": "Finish grades, cut/fill volumes, slope percentages, drainage direction",
+      "fields": ["location", "grade", "slope_pct", "drainage_direction"],
+      "page_types": ["site_plan"],
+      "tier": "standard",
+      "domain": "site_civil",
+      "match_keys": [["location"]]
+    },
+    "drainage": {
+      "description": "Storm drainage: catch basins, pipes, swales, retention, flow directions",
+      "fields": ["type", "size", "location", "flow_direction", "capacity"],
+      "page_types": ["site_plan"],
+      "tier": "comprehensive",
+      "domain": "site_civil",
+      "match_keys": [["type"], ["location"]]
+    },
+    "parking": {
+      "description": "Parking spaces: count, dimensions, ADA stalls, drive aisles",
+      "fields": ["total_spaces", "ada_spaces", "space_dimensions", "aisle_width", "location"],
+      "page_types": ["site_plan"],
+      "tier": "standard",
+      "domain": "site_civil",
+      "match_keys": [["location"]]
+    },
+    "driveways": {
+      "description": "Driveway locations, widths, materials, curb cuts",
+      "fields": ["width", "material", "location", "curb_cut"],
+      "page_types": ["site_plan"],
+      "tier": "comprehensive",
+      "domain": "site_civil",
+      "match_keys": [["location"]]
+    },
+    "sidewalks_paths": {
+      "description": "Sidewalk and path locations, widths, materials, ADA compliance",
+      "fields": ["width", "material", "location", "ada_compliant"],
+      "page_types": ["site_plan"],
+      "tier": "comprehensive",
+      "domain": "site_civil",
+      "match_keys": [["location"]]
+    },
+    "landscaping": {
+      "description": "Landscape features: trees, shrubs, plantings, hardscape areas",
+      "fields": ["type", "species", "quantity", "location", "size"],
+      "page_types": ["site_plan"],
+      "tier": "comprehensive",
+      "domain": "site_civil",
+      "match_keys": [["type"], ["location"]]
+    },
+    "site_utilities": {
+      "description": "Underground utilities: water, sewer, gas, electric, telecom routing",
+      "fields": ["utility", "size", "material", "depth", "location"],
+      "page_types": ["site_plan"],
+      "tier": "standard",
+      "domain": "site_civil",
+      "match_keys": [["utility"], ["location"]]
+    },
+    "utility_connections": {
+      "description": "Points of connection to public utilities: water main, sewer, electric service",
+      "fields": ["utility", "connection_point", "size", "meter_location"],
+      "page_types": ["site_plan"],
+      "tier": "comprehensive",
+      "domain": "site_civil",
+      "match_keys": [["utility"]]
+    },
+    "septic_system": {
+      "description": "Septic tank, leach field, distribution box locations and sizes",
+      "fields": ["component", "size", "location", "setback"],
+      "page_types": ["site_plan"],
+      "tier": "comprehensive",
+      "domain": "site_civil",
+      "match_keys": [["component"], ["location"]]
+    },
+    "well": {
+      "description": "Well location, depth, casing, setbacks from septic",
+      "fields": ["location", "depth", "casing_size", "setback_from_septic"],
+      "page_types": ["site_plan"],
+      "tier": "comprehensive",
+      "domain": "site_civil",
+      "match_keys": [["location"]]
+    },
+    "fencing": {
+      "description": "Fence types, heights, locations, gate locations",
+      "fields": ["type", "height", "material", "location", "gate_location"],
+      "page_types": ["site_plan"],
+      "tier": "comprehensive",
+      "domain": "site_civil",
+      "match_keys": [["location"], ["type"]]
+    },
+    "retaining_site": {
+      "description": "Site retaining walls (non-structural): type, height, material, location",
+      "fields": ["type", "height", "material", "location"],
+      "page_types": ["site_plan"],
+      "tier": "comprehensive",
+      "domain": "site_civil",
+      "match_keys": [["location"], ["type"]]
+    },
+    "erosion_control": {
+      "description": "Erosion control measures: silt fence, straw wattle, inlet protection",
+      "fields": ["type", "location", "notes"],
+      "page_types": ["site_plan"],
+      "tier": "comprehensive",
+      "domain": "site_civil",
+      "match_keys": [["type"], ["location"]]
+    },
+    "stormwater_management": {
+      "description": "Stormwater BMPs: bioswales, rain gardens, detention, permeable pavers",
+      "fields": ["type", "size", "location", "capacity"],
+      "page_types": ["site_plan"],
+      "tier": "comprehensive",
+      "domain": "site_civil",
+      "match_keys": [["type"], ["location"]]
+    },
+    "site_lighting": {
+      "description": "Exterior lighting: pole lights, bollards, wall packs, locations",
+      "fields": ["type", "height", "wattage", "location"],
+      "page_types": ["site_plan"],
+      "tier": "comprehensive",
+      "domain": "site_civil",
+      "match_keys": [["type"], ["location"]]
+    },
+    "fire_access": {
+      "description": "Fire department access roads, hydrant locations, FDC, turning radius",
+      "fields": ["type", "location", "width", "turning_radius"],
+      "page_types": ["site_plan"],
+      "tier": "standard",
+      "domain": "site_civil",
+      "match_keys": [["type"], ["location"]]
+    }
+  }
+}
