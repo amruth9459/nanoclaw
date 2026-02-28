@@ -311,7 +311,7 @@ function tierBadge(tier) {
 
 function renderEvent(e) {
   const cls = e.event === 'HITL' ? 'hitl' : e.event === 'Security Block' ? 'block' : '';
-  return \`<tr class="event-row \${cls}"><td>\${e.event}</td><td class="mono">\${e.time ? new Date(e.time).toLocaleTimeString() : ''}</td><td>\${e.detail.slice(0,80)}</td></tr>\`;
+  return \`<tr class="event-row \${cls}"><td>\${e.event}</td><td class="mono">\${e.time ? new Date(e.time).toLocaleString(undefined, {month:'short',day:'numeric',hour:'numeric',minute:'2-digit'}) : ''}</td><td>\${e.detail.slice(0,80)}</td></tr>\`;
 }
 
 async function refreshBounties() {
@@ -745,7 +745,7 @@ async function refresh() {
       <div class="card">
         <h2>⚠️ Recent Errors <span class="pill \${status.recentErrors.length > 0 ? 'red' : 'green'}">\${status.recentErrors.length}</span></h2>
         \${status.recentErrors.length === 0 ? '<p class="empty">No errors</p>' :
-          status.recentErrors.map(e => \`<div class="log-box" style="max-height:60px;margin-bottom:4px">\${e.time ? new Date(e.time).toLocaleTimeString() : '?'} \${e.msg}</div>\`).join('')
+          status.recentErrors.map(e => \`<div class="log-box" style="max-height:60px;margin-bottom:4px">\${e.time ? new Date(e.time).toLocaleString(undefined, {month:'short',day:'numeric',hour:'numeric',minute:'2-digit'}) : '?'} \${e.msg}</div>\`).join('')
         }
       </div>
 
@@ -764,7 +764,7 @@ async function refresh() {
       <div class="card full">
         <h2>📋 Log Tail</h2>
         <div class="log-box" id="log">\${status.logLines.map(l => {
-          try { const o = JSON.parse(l); return (o.time?new Date(o.time).toLocaleTimeString():'') + ' ' + (o.msg||l); } catch { return l; }
+          try { const o = JSON.parse(l); return (o.time?new Date(o.time).toLocaleString(undefined, {month:'short',day:'numeric',hour:'numeric',minute:'2-digit'}):'') + ' ' + (o.msg||l); } catch { return l; }
         }).join('\\n')}</div>
       </div>
     \`;
