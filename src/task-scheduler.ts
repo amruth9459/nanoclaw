@@ -104,6 +104,10 @@ async function runTask(
     }, TASK_CLOSE_DELAY_MS);
   };
 
+  // Set spawn reason for dashboard
+  const taskPreview = task.prompt.slice(0, 120) + (task.prompt.length > 120 ? '…' : '');
+  deps.queue.setSpawnReason(task.chat_jid, taskPreview, true);
+
   try {
     const output = await runContainerAgent(
       group,

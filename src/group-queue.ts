@@ -25,6 +25,10 @@ interface GroupState {
   containerName: string | null;
   groupFolder: string | null;
   retryCount: number;
+  spawnReason: string | null;   // why the current container was spawned (message preview or task description)
+  taskSpawnReason: string | null; // why the current task container was spawned
+  startedAt: number | null;     // when the message container started (epoch ms)
+  taskStartedAt: number | null; // when the task container started (epoch ms)
 }
 
 export class GroupQueue {
@@ -49,6 +53,10 @@ export class GroupQueue {
         containerName: null,
         groupFolder: null,
         retryCount: 0,
+        spawnReason: null,
+        taskSpawnReason: null,
+        startedAt: null,
+        taskStartedAt: null,
       };
       this.groups.set(groupJid, state);
     }
@@ -115,6 +123,8 @@ export class GroupQueue {
     state.idleWaiting = false;
     state.isWarmupContainer = true;
     state.pendingMessages = false;
+    state.spawnReason = 'Warming up';
+    state.startedAt = Date.now();
     this.activeCount++;
 
     fn()
@@ -125,6 +135,8 @@ export class GroupQueue {
         state.process = null;
         state.containerName = null;
         state.groupFolder = null;
+        state.spawnReason = null;
+        state.startedAt = null;
         this.activeCount--;
         this.drainMessages(groupJid);
         this.drainWaiting();
@@ -172,6 +184,16 @@ export class GroupQueue {
     state.process = proc;
     state.containerName = containerName;
     if (groupFolder) state.groupFolder = groupFolder;
+  }
+
+  /** Set a human-readable reason for why the current container was spawned. */
+  setSpawnReason(groupJid: string, reason: string, isTask = false): void {
+    const state = this.getGroup(groupJid);
+    if (isTask) {
+      state.taskSpawnReason = reason;
+    } else {
+      state.spawnReason = reason;
+    }
   }
 
   /**
@@ -234,6 +256,7 @@ export class GroupQueue {
     state.idleWaiting = false;
     state.isWarmupContainer = false;
     state.pendingMessages = false;
+    state.startedAt = Date.now();
     this.activeCount++;
 
     logger.debug(
@@ -258,6 +281,8 @@ export class GroupQueue {
       state.process = null;
       state.containerName = null;
       state.groupFolder = null;
+      state.spawnReason = null;
+      state.startedAt = null;
       this.activeCount--;
       this.drainMessages(groupJid);
       this.drainWaiting();
@@ -267,6 +292,7 @@ export class GroupQueue {
   private async runTask(groupJid: string, task: QueuedTask): Promise<void> {
     const state = this.getGroup(groupJid);
     state.activeTask = true;
+    state.taskStartedAt = Date.now();
     this.activeCount++;
 
     logger.debug(
@@ -280,6 +306,8 @@ export class GroupQueue {
       logger.error({ groupJid, taskId: task.id, err }, 'Error running task');
     } finally {
       state.activeTask = false;
+      state.taskSpawnReason = null;
+      state.taskStartedAt = null;
       this.activeCount--;
       this.drainTasks(groupJid);
       this.drainWaiting();
@@ -351,6 +379,41 @@ export class GroupQueue {
         );
       }
     }
+  }
+
+  /** Returns detailed per-group state for the dashboard. */
+  getDetailedStatus(): Array<{
+    jid: string;
+    active: boolean;
+    activeTask: boolean;
+    containerName: string | null;
+    groupFolder: string | null;
+    isWarmup: boolean;
+    pendingMessages: boolean;
+    pendingTaskCount: number;
+    spawnReason: string | null;
+    taskSpawnReason: string | null;
+    startedAt: number | null;
+    taskStartedAt: number | null;
+  }> {
+    const result: ReturnType<GroupQueue['getDetailedStatus']> = [];
+    for (const [jid, state] of this.groups) {
+      result.push({
+        jid,
+        active: state.active,
+        activeTask: state.activeTask,
+        containerName: state.containerName,
+        groupFolder: state.groupFolder,
+        isWarmup: state.isWarmupContainer,
+        pendingMessages: state.pendingMessages,
+        pendingTaskCount: state.pendingTasks.length,
+        spawnReason: state.spawnReason,
+        taskSpawnReason: state.taskSpawnReason,
+        startedAt: state.startedAt,
+        taskStartedAt: state.taskStartedAt,
+      });
+    }
+    return result;
   }
 
   async shutdown(_gracePeriodMs: number): Promise<void> {

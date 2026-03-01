@@ -357,6 +357,10 @@ async function processGroupMessages(chatJid: string): Promise<boolean> {
     'Processing messages',
   );
 
+  // Set spawn reason for dashboard — show last message preview
+  const lastMsgPreview = lastMsg.content.slice(0, 120) + (lastMsg.content.length > 120 ? '…' : '');
+  queue.setSpawnReason(chatJid, lastMsgPreview);
+
   // Handle /clawwork task assignment
   if (clawworkPrompt) {
     try {
@@ -1266,35 +1270,40 @@ async function main(): Promise<void> {
   recoverPendingMessages();
   ensureBountyHunterTask();
 
-  // Update group description with DashClaw tunnel URL on startup (cloudflared quick tunnel)
+  // Update group description with DashClaw URLs on startup
   setTimeout(async () => {
     try {
-      const logPath = path.join(process.cwd(), 'logs', 'cloudflared.log');
-      const logContent = fs.readFileSync(logPath, 'utf-8');
-      // Find all tunnel URLs in the log; take the last (most recent) one
-      const matches = [...logContent.matchAll(/https:\/\/[a-z0-9-]+\.trycloudflare\.com/g)];
-      if (matches.length > 0) {
-        const tunnelUrl = matches[matches.length - 1][0];
-        const mainJid = Object.entries(registeredGroups).find(
-          ([, g]) => g.folder === MAIN_GROUP_FOLDER,
-        )?.[0];
-        if (mainJid) {
-          const econ = getOrCreateEconomics(MAIN_GROUP_FOLDER);
-          const description = [
-            '🤖 NanoClaw',
-            `📊 DashClaw: ${tunnelUrl}`,
-            `💰 Balance: $${econ.balance.toFixed(2)} | Goal: $${EARNING_GOAL}`,
-          ].join('\n');
-          // Try to update group description; fall back to sending a message
-          const waChannel = channels.find((c) => c.updateGroupDescription);
-          if (waChannel?.updateGroupDescription) {
-            await waChannel.updateGroupDescription(mainJid, description);
-          } else {
-            await clawSend(mainJid, `🌐 DashClaw: ${tunnelUrl}`);
-          }
+      const mainJid = Object.entries(registeredGroups).find(
+        ([, g]) => g.folder === MAIN_GROUP_FOLDER,
+      )?.[0];
+      if (!mainJid) return;
+
+      const econ = getOrCreateEconomics(MAIN_GROUP_FOLDER);
+      const descLines = ['🤖 NanoClaw'];
+
+      // Tailscale URL (stable private network)
+      descLines.push('📊 DashClaw (Tailscale): http://100.116.199.120:8080');
+
+      // Cloudflare tunnel URL (public, changes on restart)
+      try {
+        const logPath = path.join(process.cwd(), 'logs', 'cloudflared.log');
+        const logContent = fs.readFileSync(logPath, 'utf-8');
+        const matches = [...logContent.matchAll(/https:\/\/[a-z0-9-]+\.trycloudflare\.com/g)];
+        if (matches.length > 0) {
+          descLines.push(`📊 DashClaw (Public): ${matches[matches.length - 1][0]}`);
         }
+      } catch { /* cloudflared not running */ }
+
+      descLines.push(`💰 Balance: $${econ.balance.toFixed(2)} | Goal: $${EARNING_GOAL}`);
+
+      const description = descLines.join('\n');
+      const waChannel = channels.find((c) => c.updateGroupDescription);
+      if (waChannel?.updateGroupDescription) {
+        await waChannel.updateGroupDescription(mainJid, description);
+      } else {
+        await clawSend(mainJid, description);
       }
-    } catch { /* cloudflared not running or log not found */ }
+    } catch { /* ignore errors */ }
   }, 15000);
 
   // Pre-warm containers for registered groups after a short delay to let

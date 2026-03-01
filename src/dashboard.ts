@@ -123,12 +123,28 @@ function apiStatus(queue: GroupQueue) {
   const logLines = readLogTail(500);
   const secEvents = parseSecurityEvents(logLines);
 
-  const activeContainers = Object.entries(groups).map(([jid, g]) => ({
-    jid,
-    name: g.name,
-    folder: g.folder,
-    hasActiveContainer: queue.isActive(jid),
-  }));
+  const detailedStatus = queue.getDetailedStatus();
+  const statusMap = new Map(detailedStatus.map(s => [s.jid, s]));
+
+  const activeContainers = Object.entries(groups).map(([jid, g]) => {
+    const qs = statusMap.get(jid);
+    return {
+      jid,
+      name: g.name,
+      folder: g.folder,
+      hasActiveContainer: queue.isActive(jid),
+      active: qs?.active ?? false,
+      activeTask: qs?.activeTask ?? false,
+      isWarmup: qs?.isWarmup ?? false,
+      containerName: qs?.containerName ?? null,
+      pendingMessages: qs?.pendingMessages ?? false,
+      pendingTaskCount: qs?.pendingTaskCount ?? 0,
+      spawnReason: qs?.spawnReason ?? null,
+      taskSpawnReason: qs?.taskSpawnReason ?? null,
+      startedAt: qs?.startedAt ?? null,
+      taskStartedAt: qs?.taskStartedAt ?? null,
+    };
+  });
 
   const recentErrors = logLines
     .filter(l => { try { const o = JSON.parse(l); return o.level >= 50; } catch { return false; } })
@@ -320,6 +336,52 @@ function renderEvent(e) {
   return \`<tr class="event-row \${cls}"><td>\${e.event}</td><td class="mono">\${e.time ? new Date(e.time).toLocaleString(undefined, {month:'short',day:'numeric',hour:'numeric',minute:'2-digit'}) : ''}</td><td>\${e.detail.slice(0,80)}</td></tr>\`;
 }
 
+function agentStatus(g) {
+  var parts = [];
+  if (g.isWarmup) parts.push('<span class="dot yellow"></span> Warmup');
+  else if (g.active) parts.push('<span class="dot green"></span> Message');
+  if (g.activeTask) parts.push('<span class="dot" style="background:#60a5fa"></span> Task');
+  if (parts.length === 0) parts.push('<span class="dot red"></span> Idle');
+  return parts.join(' + ');
+}
+
+function agentQueue(g) {
+  var parts = [];
+  if (g.pendingMessages) parts.push('msgs');
+  if (g.pendingTaskCount > 0) parts.push(g.pendingTaskCount + ' task' + (g.pendingTaskCount > 1 ? 's' : ''));
+  return parts.length ? parts.join(', ') : '—';
+}
+
+function elapsed(startMs) {
+  if (!startMs) return '';
+  var sec = Math.floor((Date.now() - startMs) / 1000);
+  if (sec < 60) return sec + 's';
+  var min = Math.floor(sec / 60);
+  sec = sec % 60;
+  return min + 'm ' + sec + 's';
+}
+
+function agentReason(g) {
+  var parts = [];
+  if (g.spawnReason) {
+    var t = elapsed(g.startedAt);
+    parts.push((g.spawnReason.length > 80 ? g.spawnReason.slice(0, 80) + '…' : g.spawnReason) + (t ? ' <span class="mono" style="color:var(--muted);font-size:0.7rem">(' + t + ')</span>' : ''));
+  }
+  if (g.taskSpawnReason) {
+    var t2 = elapsed(g.taskStartedAt);
+    parts.push('<span style="color:#60a5fa">⏰</span> ' + (g.taskSpawnReason.length > 80 ? g.taskSpawnReason.slice(0, 80) + '…' : g.taskSpawnReason) + (t2 ? ' <span class="mono" style="color:var(--muted);font-size:0.7rem">(' + t2 + ')</span>' : ''));
+  }
+  return parts.length ? parts.join('<br>') : '—';
+}
+
+function tabBar() {
+  var tabs = ['overview', 'economics', 'bounties', 'files', 'lexios'];
+  var labels = { overview: 'Overview', economics: 'Economics', bounties: 'Bounties', files: 'Files', lexios: 'Lexios' };
+  return tabs.map(function(t) {
+    return '<span class="tab' + (dashTab === t ? ' active' : '') + '" onclick="dashTab=\\'' + t + '\\';refresh()">' + labels[t] + '</span>';
+  }).join('');
+}
+
 async function refreshBounties() {
   try {
     const data = await fetch('/api/bounties').then(r => r.json());
@@ -327,13 +389,7 @@ async function refreshBounties() {
     const statusColors = { proposed: 'yellow', approved: 'green', rejected: 'red', working: 'green', submitted: 'green' };
     document.getElementById('main').innerHTML = \`
       <div class="card full" style="margin-bottom:0.5rem">
-        <div class="memory-tabs">
-          <span class="tab" onclick="dashTab='overview';refresh()">Overview</span>
-          <span class="tab" onclick="dashTab='economics';refresh()">Economics</span>
-          <span class="tab active">Bounties</span>
-          <span class="tab" onclick="dashTab='files';refresh()">Files</span>
-          <span class="tab" onclick="dashTab='lexios';refresh()">Lexios</span>
-        </div>
+        <div class="memory-tabs">\${tabBar()}</div>
       </div>
       <div class="card full">
         <h2>💰 Bounty Opportunities <span class="pill yellow">\${bounties.length}</span></h2>
@@ -367,13 +423,7 @@ async function refreshEconomics() {
     const usage = econ.claudeUsage || { total: {}, today: {}, week: {}, month: {} };
     document.getElementById('main').innerHTML = \`
       <div class="card full" style="margin-bottom:0.5rem">
-        <div class="memory-tabs">
-          <span class="tab" onclick="dashTab='overview';refresh()">Overview</span>
-          <span class="tab active">Economics</span>
-          <span class="tab" onclick="dashTab='bounties';refresh()">Bounties</span>
-          <span class="tab" onclick="dashTab='files';refresh()">Files</span>
-          <span class="tab" onclick="dashTab='lexios';refresh()">Lexios</span>
-        </div>
+        <div class="memory-tabs">\${tabBar()}</div>
       </div>
       <!-- Computer Fund Goal -->
       <div class="card full" style="border-color:var(--accent);background:linear-gradient(135deg,#12121a,#1a1228)">
@@ -611,13 +661,7 @@ async function refreshFiles() {
     const files = filesData.files || [];
     document.getElementById('main').innerHTML = \`
       <div class="card full" style="margin-bottom:0.5rem">
-        <div class="memory-tabs">
-          <span class="tab" onclick="dashTab='overview';refresh()">Overview</span>
-          <span class="tab" onclick="dashTab='economics';refresh()">Economics</span>
-          <span class="tab" onclick="dashTab='bounties';refresh()">Bounties</span>
-          <span class="tab active">Files</span>
-          <span class="tab" onclick="dashTab='lexios';refresh()">Lexios</span>
-        </div>
+        <div class="memory-tabs">\${tabBar()}</div>
       </div>
       <div class="card full" style="padding:0.75rem">
         <div id="files-layout" style="align-items:start">
@@ -685,13 +729,7 @@ async function refreshLexios() {
 
     document.getElementById('main').innerHTML = \`
       <div class="card full" style="margin-bottom:0.5rem">
-        <div class="memory-tabs">
-          <span class="tab" onclick="dashTab='overview';refresh()">Overview</span>
-          <span class="tab" onclick="dashTab='economics';refresh()">Economics</span>
-          <span class="tab" onclick="dashTab='bounties';refresh()">Bounties</span>
-          <span class="tab" onclick="dashTab='files';refresh()">Files</span>
-          <span class="tab active">Lexios</span>
-        </div>
+        <div class="memory-tabs">\${tabBar()}</div>
       </div>
       <div class="grid">
         <div class="card"><h3>\${bs.total_buildings}</h3><p class="label">Buildings</p></div>
@@ -780,11 +818,7 @@ async function refresh() {
     document.getElementById('main').innerHTML = \`
       <div class="card full" style="margin-bottom:0.5rem">
         <div class="memory-tabs">
-          <span class="tab active">Overview</span>
-          <span class="tab" onclick="dashTab='economics';refresh()">Economics</span>
-          <span class="tab" onclick="dashTab='bounties';refresh()">Bounties</span>
-          <span class="tab" onclick="dashTab='files';refresh()">Files</span>
-          <span class="tab" onclick="dashTab='lexios';refresh()">Lexios</span>
+          \${tabBar()}
           <span class="pill yellow" style="margin-left:auto">🖥️ $\${goal.earned.toFixed(2)}/$\${goal.target} (\${goal.pct.toFixed(1)}%)</span>
         </div>
       </div>
@@ -793,12 +827,13 @@ async function refresh() {
         <h2>🤖 Agents <span class="pill \${activeGroups > 0 ? 'green' : 'yellow'}">\${activeGroups} active</span></h2>
         \${status.groups.length === 0 ? '<p class="empty">No groups registered</p>' : \`
         <table>
-          <thead><tr><th>Group</th><th>Status</th><th>Folder</th></tr></thead>
+          <thead><tr><th>Group</th><th>Status</th><th>Reason</th><th>Queue</th></tr></thead>
           <tbody>\${status.groups.map(g => \`
             <tr>
               <td>\${g.name}</td>
-              <td><span class="dot \${g.hasActiveContainer ? 'green' : 'red'}"></span> \${g.hasActiveContainer ? 'Running' : 'Idle'}</td>
-              <td class="mono">\${g.folder}</td>
+              <td>\${agentStatus(g)}</td>
+              <td style="font-size:0.78rem;max-width:400px;word-break:break-word">\${agentReason(g)}</td>
+              <td class="mono">\${agentQueue(g)}</td>
             </tr>
           \`).join('')}</tbody>
         </table>\`}
