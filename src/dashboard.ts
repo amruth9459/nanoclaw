@@ -28,6 +28,8 @@ import {
 import { getSurvivalTier } from './economics.js';
 import { logger } from './logger.js';
 import { GroupQueue } from './group-queue.js';
+import { ResourceOrchestrator } from './resource-orchestrator.js';
+import type { UniversalRouter } from './router/index.js';
 import { getIndexStats } from './semantic-index.js';
 
 const PORT = parseInt(process.env.DASHCLAW_PORT || '8080', 10);
@@ -319,7 +321,7 @@ const HTML = `<!DOCTYPE html>
 
 <script>
 let memTab = 'global/MEMORY.md';
-let dashTab = 'overview'; // 'overview' | 'economics' | 'bounties' | 'files' | 'lexios'
+let dashTab = 'overview'; // 'overview' | 'economics' | 'bounties' | 'files' | 'lexios' | 'router'
 
 function fmt(iso) {
   if (!iso) return '—';
@@ -375,8 +377,8 @@ function agentReason(g) {
 }
 
 function tabBar() {
-  var tabs = ['overview', 'economics', 'bounties', 'files', 'lexios'];
-  var labels = { overview: 'Overview', economics: 'Economics', bounties: 'Bounties', files: 'Files', lexios: 'Lexios' };
+  var tabs = ['overview', 'economics', 'bounties', 'files', 'lexios', 'router'];
+  var labels = { overview: 'Overview', economics: 'Economics', bounties: 'Bounties', files: 'Files', lexios: 'Lexios', router: 'Router' };
   return tabs.map(function(t) {
     return '<span class="tab' + (dashTab === t ? ' active' : '') + '" onclick="dashTab=\\'' + t + '\\';refresh()">' + labels[t] + '</span>';
   }).join('');
@@ -777,10 +779,47 @@ async function refreshLexios() {
   }
 }
 
+async function refreshRouter() {
+  try {
+    var data = await fetch('/api/router').then(function(r) { return r.json(); });
+    var el = document.getElementById('content');
+    if (!el) return;
+
+    var metrics = data.metrics;
+    var topModels = data.topModels || [];
+    var efficiency = data.efficiency;
+
+    if (!metrics) {
+      el.innerHTML = '<div class="card"><h2>Router</h2><p style="color:var(--muted)">Router not initialized — no metrics yet.</p></div>';
+      return;
+    }
+
+    var modelsHtml = topModels.length ? topModels.map(function(m) {
+      return '<tr><td>' + (m.modelId || m.model || '—') + '</td><td>' + (m.requests || m.count || 0) + '</td><td>' + (m.avgLatencyMs ? Math.round(m.avgLatencyMs) + 'ms' : '—') + '</td></tr>';
+    }).join('') : '<tr><td colspan="3" style="color:var(--muted)">No routing data yet</td></tr>';
+
+    el.innerHTML = '<div class="card"><h2>Router Metrics (24h)</h2>' +
+      '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:0.75rem;margin-bottom:1rem">' +
+      '<div class="stat"><div class="stat-value">' + (metrics.totalRequests || 0) + '</div><div class="stat-label">Total Requests</div></div>' +
+      '<div class="stat"><div class="stat-value">' + (metrics.avgLatencyMs ? Math.round(metrics.avgLatencyMs) + 'ms' : '—') + '</div><div class="stat-label">Avg Latency</div></div>' +
+      '<div class="stat"><div class="stat-value">' + (metrics.cacheHitRate ? (metrics.cacheHitRate * 100).toFixed(1) + '%' : '—') + '</div><div class="stat-label">Cache Hit</div></div>' +
+      '</div>' +
+      '<h3>Top Models</h3><table class="tbl"><thead><tr><th>Model</th><th>Requests</th><th>Avg Latency</th></tr></thead><tbody>' + modelsHtml + '</tbody></table>' +
+      (efficiency ? '<h3>Efficiency</h3><div style="color:var(--muted);font-size:0.85rem">' +
+        '<p>Estimated cost savings: $' + (efficiency.costSavings || 0).toFixed(4) + '</p>' +
+        '<p>Local routing rate: ' + (efficiency.localRoutingRate ? (efficiency.localRoutingRate * 100).toFixed(1) + '%' : 'N/A') + '</p>' +
+      '</div>' : '') +
+    '</div>';
+  } catch(e) {
+    console.error('Router refresh failed', e);
+  }
+}
+
 async function refresh() {
   if (dashTab === 'economics') { await refreshEconomics(); return; }
   if (dashTab === 'bounties') { await refreshBounties(); return; }
   if (dashTab === 'lexios') { await refreshLexios(); return; }
+  if (dashTab === 'router') { await refreshRouter(); return; }
   if (dashTab === 'files') {
     // If a file is currently open (viewer has content), only refresh the file list
     // sidebar without re-rendering the whole tab — avoids losing scroll position
@@ -803,10 +842,11 @@ async function refresh() {
     return;
   }
   try {
-    const [status, memory, econ] = await Promise.all([
+    const [status, memory, econ, resources] = await Promise.all([
       fetch('/api/status').then(r => r.json()),
       fetch('/api/memory?file=' + encodeURIComponent(memTab)).then(r => r.text()),
       fetch('/api/economics').then(r => r.json()),
+      fetch('/api/resources').then(r => r.json()),
     ]);
 
     const totalGroups = status.groups.length;
@@ -822,6 +862,35 @@ async function refresh() {
           <span class="pill yellow" style="margin-left:auto">🖥️ $\${goal.earned.toFixed(2)}/$\${goal.target} (\${goal.pct.toFixed(1)}%)</span>
         </div>
       </div>
+      <!-- Resources -->
+      \${resources.status ? (function() {
+        var rs = resources.status;
+        var ramPct = rs.usedPercent.toFixed(1);
+        var ramColor = rs.usedPercent < 70 ? 'var(--green)' : rs.usedPercent < 85 ? 'var(--yellow)' : '#ef4444';
+        var typeEntries = Object.entries(rs.agentsByType || {});
+        return '<div class="card full" style="border-color:' + ramColor + '">' +
+          '<h2>💻 System Resources</h2>' +
+          '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;margin-top:0.75rem">' +
+            '<div>' +
+              '<div style="font-size:0.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.05em">RAM Usage</div>' +
+              '<div style="font-size:1.3rem;font-weight:700;color:' + ramColor + ';margin:0.25rem 0">' + rs.usedRamGB.toFixed(1) + ' / ' + rs.totalRamGB.toFixed(0) + ' GB</div>' +
+              '<div style="background:#1e1e2e;border-radius:4px;height:12px;overflow:hidden;margin-top:0.3rem">' +
+                '<div style="background:' + ramColor + ';height:100%;width:' + ramPct + '%;transition:width 0.5s;border-radius:4px"></div>' +
+              '</div>' +
+              '<div style="font-size:0.7rem;color:var(--muted);margin-top:0.25rem">' + ramPct + '% used — ' + rs.availableRamGB.toFixed(1) + ' GB free</div>' +
+            '</div>' +
+            '<div>' +
+              '<div style="font-size:0.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.05em">Active Agents</div>' +
+              '<div style="font-size:1.3rem;font-weight:700;color:var(--accent);margin:0.25rem 0">' + rs.activeAgents + '</div>' +
+              (typeEntries.length > 0 ? '<div style="font-size:0.7rem;color:var(--muted)">' + typeEntries.map(function(e) { return e[0] + ': ' + e[1]; }).join(', ') + '</div>' : '') +
+            '</div>' +
+            '<div>' +
+              '<div style="font-size:0.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.05em">Queue</div>' +
+              '<div style="font-size:1.3rem;font-weight:700;color:' + (rs.queuedAgents > 0 ? 'var(--yellow)' : 'var(--green)') + ';margin:0.25rem 0">' + rs.queuedAgents + ' waiting</div>' +
+            '</div>' +
+          '</div>' +
+        '</div>';
+      })() : ''}
       <!-- Groups -->
       <div class="card">
         <h2>🤖 Agents <span class="pill \${activeGroups > 0 ? 'green' : 'yellow'}">\${activeGroups} active</span></h2>
@@ -928,8 +997,8 @@ setInterval(refresh, 10000);
 
 // ── HTTP server ────────────────────────────────────────────────────────────────
 
-export function startDashboard(queue: GroupQueue, sendFn?: (jid: string, text: string) => Promise<void>): void {
-  const server = http.createServer((req, res) => {
+export function startDashboard(queue: GroupQueue, sendFn?: (jid: string, text: string) => Promise<void>, resourceOrchestrator?: ResourceOrchestrator, universalRouter?: UniversalRouter): void {
+  const server = http.createServer(async (req, res) => {
     const url = new URL(req.url || '/', `http://localhost:${PORT}`);
 
     // Only accept connections from localhost or Tailscale network
@@ -987,6 +1056,43 @@ export function startDashboard(queue: GroupQueue, sendFn?: (jid: string, text: s
         const buildings = getLexiosBuildingSummary();
         res.writeHead(200, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ summary, customers, cost, buildings }));
+      } catch (err) {
+        res.writeHead(500);
+        res.end(JSON.stringify({ error: String(err) }));
+      }
+      return;
+    }
+
+    if (url.pathname === '/api/resources') {
+      if (!resourceOrchestrator) {
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ status: null, queue: [] }));
+        return;
+      }
+      try {
+        const status = await resourceOrchestrator.getStatus();
+        const queue = resourceOrchestrator.getQueue();
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ status, queue }));
+      } catch (err) {
+        res.writeHead(500);
+        res.end(JSON.stringify({ error: String(err) }));
+      }
+      return;
+    }
+
+    if (url.pathname === '/api/router') {
+      if (!universalRouter) {
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ metrics: null, topModels: [], efficiency: null }));
+        return;
+      }
+      try {
+        const metrics = universalRouter.getMetrics('24h');
+        const topModels = universalRouter.getTopModels(5);
+        const efficiency = universalRouter.getEfficiencyReport();
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ metrics, topModels, efficiency }));
       } catch (err) {
         res.writeHead(500);
         res.end(JSON.stringify({ error: String(err) }));

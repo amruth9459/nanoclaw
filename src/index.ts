@@ -57,7 +57,15 @@ import { classifyTask, computeMaxPayment } from './clawwork.js';
 // Local routing disabled while Max subscription is active
 // import { routeWithOpus, executeLocal } from './opus-router.js';
 import { calculateCost, formatCostFooter } from './economics.js';
+// Dead code clusters — wired as enrichment/monitoring layers (non-blocking)
+import { contextManager, setSystemFact, setCapability } from './context/index.js';
+import { RouterFactory, type UniversalRouter } from './router/index.js';
+import type { RoutingContext, RoutingDecision } from './router/types.js';
+import { classifyGoalHeuristic, extractGoalDetails } from './goal-classifier.js';
+import { ResponseTimeManager } from './response-time-manager.js';
+import { NanoClawOrchestrator } from './nanoclaw-orchestrator.js';
 import { listGroupFiles, startDashboard } from './dashboard.js';
+import { ResourceOrchestrator, AgentPriority } from './resource-orchestrator.js';
 import { BountyGate } from './bounty-gate.js';
 import { GroupQueue } from './group-queue.js';
 import { HitlGate } from './hitl.js';
@@ -88,6 +96,10 @@ const channels: Channel[] = [];
 const queue = new GroupQueue();
 const hitlGate = new HitlGate();
 const bountyGate = new BountyGate();
+let orchestrator: ResourceOrchestrator;
+let router: UniversalRouter;
+let responseTimeManager: ResponseTimeManager;
+let nanoClawOrchestrator: NanoClawOrchestrator | undefined;
 
 // Tracks which chatJids had a send_message IPC call during the current agent run.
 // Used to suppress the redundant final streaming output when agent already sent via send_message.
@@ -343,7 +355,76 @@ async function processGroupMessages(chatJid: string): Promise<boolean> {
     clawworkPrompt = clawworkMatch[1].trim();
   }
 
-  const prompt = formatMessages(missedMessages);
+  let prompt = formatMessages(missedMessages);
+
+  // --- Enrichment layers (all non-blocking) ---
+
+  // Context enrichment: prepend codified facts to prompt
+  let contextBlock = '';
+  try {
+    contextBlock = await contextManager.getPromptContext();
+    if (contextBlock) {
+      prompt = `<context>\n${contextBlock}\n</context>\n\n${prompt}`;
+    }
+  } catch (err) {
+    logger.warn({ err }, 'Context enrichment failed');
+  }
+
+  // Route decision: log which model the router would pick (monitoring-only)
+  let routingDecision: RoutingDecision | undefined;
+  try {
+    const strippedContent = lastMsg.content.replace(TRIGGER_PATTERN, '').trim();
+    const routingCtx: RoutingContext = {
+      taskType: 'conversation',
+      userTier: 'internal',
+      costBudget: 'unlimited',
+      qualityNeeds: 'best',
+      latencyNeeds: 'fast',
+      source: chatChannelSource.get(chatJid) === 'lexios' ? 'lexios' : 'whatsapp',
+      hasMedia: false,
+      contentSample: strippedContent.slice(0, 500),
+    };
+    routingDecision = await router.route(routingCtx);
+    logger.info(
+      { model: routingDecision.modelId, tier: routingDecision.modelTier, confidence: routingDecision.confidence, reasoning: routingDecision.reasoning },
+      'Routing decision (monitoring-only)',
+    );
+  } catch (err) {
+    logger.warn({ err }, 'Router decision failed');
+  }
+
+  // Goal classification: tag message complexity
+  let goalComplexity = '';
+  try {
+    const strippedContent = lastMsg.content.replace(TRIGGER_PATTERN, '').trim();
+    const goalClass = classifyGoalHeuristic(strippedContent);
+    goalComplexity = goalClass.estimatedComplexity;
+    logger.info(
+      { shouldUseTeams: goalClass.shouldUseTeams, complexity: goalClass.estimatedComplexity, goalType: goalClass.detectedGoalType, confidence: goalClass.confidence },
+      'Goal classification',
+    );
+
+    // Multi-agent path (no-op until decomposition engine has real model calls)
+    if (goalClass.shouldUseTeams && goalClass.confidence === 'high' && nanoClawOrchestrator) {
+      try {
+        const goalDetails = extractGoalDetails(strippedContent);
+        const result = await nanoClawOrchestrator.processGoal({
+          description: goalDetails.goal,
+          priority: goalDetails.priority,
+          targetValue: goalDetails.targetValue,
+          source: 'user',
+        });
+        logger.info(
+          { goalId: result.goalId, teamsFormed: result.teamsFormed, tasksCreated: result.tasksCreated },
+          'NanoClawOrchestrator processed goal',
+        );
+      } catch (err) {
+        logger.warn({ err }, 'NanoClawOrchestrator processGoal failed');
+      }
+    }
+  } catch (err) {
+    logger.warn({ err }, 'Goal classification failed');
+  }
 
   // Advance cursor so the piping path in startMessageLoop won't re-fetch
   // these messages. Save the old cursor so we can roll back on error.
@@ -357,9 +438,10 @@ async function processGroupMessages(chatJid: string): Promise<boolean> {
     'Processing messages',
   );
 
-  // Set spawn reason for dashboard — show last message preview
+  // Set spawn reason for dashboard — show last message preview with complexity tag
   const lastMsgPreview = lastMsg.content.slice(0, 120) + (lastMsg.content.length > 120 ? '…' : '');
-  queue.setSpawnReason(chatJid, lastMsgPreview);
+  const spawnReason = goalComplexity ? `[${goalComplexity}] ${lastMsgPreview}` : lastMsgPreview;
+  queue.setSpawnReason(chatJid, spawnReason);
 
   // Handle /clawwork task assignment
   if (clawworkPrompt) {
@@ -429,6 +511,18 @@ async function processGroupMessages(chatJid: string): Promise<boolean> {
   }
   await ackChannel.setTyping?.(chatJid, true);
 
+  // Response time manager: track progress for long-running tasks
+  const rtmTaskId = `msg-${chatJid}-${Date.now()}`;
+  try {
+    await responseTimeManager.startTask(
+      rtmTaskId,
+      lastMsgPreview,
+      (msg) => channel.sendMessage(chatJid, msg),
+    );
+  } catch (err) {
+    logger.warn({ err }, 'ResponseTimeManager startTask failed');
+  }
+
   // LOCAL ROUTING DISABLED — sending everything to cloud while Max subscription is active.
   // To re-enable local routing, uncomment the block in this section.
   // See src/opus-router.ts for the routing logic (uses Ollama for classification).
@@ -455,6 +549,7 @@ async function processGroupMessages(chatJid: string): Promise<boolean> {
 
   const output = await runAgent(group, prompt, chatJid, async (result) => {
     // Streaming output callback — called for each agent result
+    // (routingDecision passed through as 5th arg for container metadata)
 
     // Handle streaming chunks (partial results)
     if (result.status === 'streaming' && result.isPartial && result.result) {
@@ -500,10 +595,20 @@ async function processGroupMessages(chatJid: string): Promise<boolean> {
     if (result.status === 'error') {
       hadError = true;
     }
-  });
+  }, routingDecision);
 
   await ackChannel.setTyping?.(chatJid, false);
   if (idleTimer) clearTimeout(idleTimer);
+
+  // Complete response time tracking
+  try { responseTimeManager.completeTask(); } catch { /* non-blocking */ }
+
+  // Record conversation turn for context system (fire-and-forget)
+  contextManager.recordConversationTurn(
+    `turn-${chatJid}-${Date.now()}`,
+    lastMsg.content,
+    outputSentToUser ? 'responded' : 'no-output',
+  ).catch(() => {});
 
   // Log usage and send cost footer
   if (finalUsage) {
@@ -541,6 +646,7 @@ async function runAgent(
   prompt: string,
   chatJid: string,
   onOutput?: (output: ContainerOutput) => Promise<void>,
+  routingDecisionHint?: RoutingDecision,
 ): Promise<'success' | 'error'> {
   const isMain = group.folder === MAIN_GROUP_FOLDER;
   const sessionId = sessions[group.folder];
@@ -581,6 +687,15 @@ async function runAgent(
       }
     : undefined;
 
+  // Track agent lifecycle in orchestrator (monitoring-only — always proceed)
+  const agentId = `nanoclaw-${group.folder}-${Date.now()}`;
+  await orchestrator.requestAgent({
+    id: agentId,
+    type: 'nanoclaw',
+    priority: AgentPriority.HIGH,
+    estimatedRamGB: 2,
+  });
+
   try {
     const output = await runContainerAgent(
       group,
@@ -590,6 +705,12 @@ async function runAgent(
         groupFolder: group.folder,
         chatJid,
         isMain,
+        routingHint: routingDecisionHint ? {
+          suggestedModel: routingDecisionHint.modelId,
+          tier: routingDecisionHint.modelTier,
+          confidence: routingDecisionHint.confidence,
+          reasoning: routingDecisionHint.reasoning,
+        } : undefined,
       },
       (proc, containerName) => queue.registerProcess(chatJid, proc, containerName, group.folder),
       wrappedOnOutput,
@@ -605,12 +726,15 @@ async function runAgent(
         { group: group.name, error: output.error },
         'Container agent error',
       );
+      await orchestrator.releaseAgent(agentId, 'error');
       return 'error';
     }
 
+    await orchestrator.releaseAgent(agentId, 'completed');
     return 'success';
   } catch (err) {
     logger.error({ group: group.name, err }, 'Agent error');
+    await orchestrator.releaseAgent(agentId, 'error');
     return 'error';
   }
 }
@@ -1120,11 +1244,62 @@ async function main(): Promise<void> {
   ensureContainerSystemRunning();
   initDatabase();
   logger.info('Database initialized');
+  orchestrator = new ResourceOrchestrator(path.join(STORE_DIR, 'resources.db'));
+  logger.info('ResourceOrchestrator initialized');
   loadState();
+
+  // Initialize enrichment/monitoring layers (non-blocking)
+  try {
+    router = RouterFactory.createProduction();
+    logger.info('UniversalRouter initialized');
+  } catch (err) {
+    logger.warn({ err }, 'UniversalRouter init failed, creating fallback');
+    router = RouterFactory.create();
+  }
+
+  try {
+    responseTimeManager = new ResponseTimeManager({
+      enableAcknowledgment: !INSTANT_ACK,
+      progressIntervalMs: 120000,
+      minTaskDurationForProgress: 60000,
+    });
+    logger.info('ResponseTimeManager initialized');
+  } catch (err) {
+    logger.warn({ err }, 'ResponseTimeManager init failed');
+    responseTimeManager = new ResponseTimeManager();
+  }
+
+  try {
+    nanoClawOrchestrator = new NanoClawOrchestrator({
+      dbPath: path.join(STORE_DIR, 'nanoclaw.db'),
+      enableProgressUpdates: true,
+      maxConcurrentTeams: 4,
+      resourceOrchestrator: orchestrator,
+      router,
+    });
+    logger.info('NanoClawOrchestrator initialized');
+  } catch (err) {
+    logger.warn({ err }, 'NanoClawOrchestrator init failed — multi-agent disabled');
+  }
+
+  // Seed context system with system facts
+  try {
+    setSystemFact('assistant_name', ASSISTANT_NAME);
+    setSystemFact('group_count', String(Object.keys(registeredGroups).length));
+    setCapability('whatsapp', 'connected');
+    setCapability('container_agents', 'enabled');
+    setCapability('clawwork', 'enabled');
+    logger.info('Context system seeded');
+  } catch (err) {
+    logger.warn({ err }, 'Context system seeding failed');
+  }
 
   // Graceful shutdown handlers
   const shutdown = async (signal: string) => {
     logger.info({ signal }, 'Shutdown signal received');
+    orchestrator.destroy();
+    try { nanoClawOrchestrator?.destroy(); } catch { /* non-blocking */ }
+    try { await contextManager.persist(); } catch { /* non-blocking */ }
     await queue.shutdown(10000);
     for (const ch of channels) await ch.disconnect();
     process.exit(0);
@@ -1205,11 +1380,12 @@ async function main(): Promise<void> {
   }
 
   // Start subsystems (independently of connection handler)
-  startDashboard(queue, (jid, text) => clawSend(jid, text));
+  startDashboard(queue, (jid, text) => clawSend(jid, text), orchestrator, router);
   startSchedulerLoop({
     registeredGroups: () => registeredGroups,
     getSessions: () => sessions,
     queue,
+    orchestrator,
     onProcess: (groupJid, proc, containerName, groupFolder) => queue.registerProcess(groupJid, proc, containerName, groupFolder),
     sendMessage: async (jid, rawText) => {
       const text = formatOutbound(rawText);
@@ -1269,6 +1445,21 @@ async function main(): Promise<void> {
   queue.setProcessMessagesFn(processGroupMessages);
   recoverPendingMessages();
   ensureBountyHunterTask();
+
+  // Omi Integration — dynamic import with availability check
+  // Uses dynamic import() so NanoClaw starts even if Omi deps are missing
+  try {
+    const { OmiIntegration } = await import('./integrations/omi-integration.js');
+    const omi = new OmiIntegration();
+    const available = await omi.isAvailable();
+    if (available) {
+      logger.info('Omi integration available (Qdrant healthy)');
+    } else {
+      logger.info('Omi integration not available (Qdrant not reachable) — skipping');
+    }
+  } catch (err) {
+    logger.info({ err }, 'Omi integration not loaded (deps missing or import failed) — skipping');
+  }
 
   // Update group description with DashClaw URLs on startup
   setTimeout(async () => {

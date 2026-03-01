@@ -51,6 +51,12 @@ export interface ContainerInput {
   isMain: boolean;
   isScheduledTask?: boolean;
   secrets?: Record<string, string>;
+  routingHint?: {
+    suggestedModel: string;
+    tier: string;
+    confidence: number;
+    reasoning: string;
+  };
 }
 
 export interface ContainerOutput {
