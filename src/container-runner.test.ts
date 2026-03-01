@@ -14,6 +14,14 @@ vi.mock('./config.js', () => ({
   DATA_DIR: '/tmp/nanoclaw-test-data',
   GROUPS_DIR: '/tmp/nanoclaw-test-groups',
   IDLE_TIMEOUT: 1800000, // 30min
+  STORE_DIR: '/tmp/nanoclaw-test-store',
+  CLAW_NAME: '',
+  CLAW_EMAIL: '',
+  CLAW_EMAIL_APP_PASSWORD: '',
+  CLAW_REDDIT_USER: '',
+  CLAW_REDDIT_CLIENT_ID: '',
+  CLAW_REDDIT_CLIENT_SECRET: '',
+  CLAW_REDDIT_PASS: '',
 }));
 
 // Mock logger
@@ -47,6 +55,18 @@ vi.mock('fs', async () => {
 // Mock mount-security
 vi.mock('./mount-security.js', () => ({
   validateAdditionalMounts: vi.fn(() => []),
+}));
+
+// Mock env
+vi.mock('./env.js', () => ({
+  readEnvFile: vi.fn(() => ({})),
+}));
+
+// Mock container-runtime
+vi.mock('./container-runtime.js', () => ({
+  CONTAINER_RUNTIME_BIN: 'docker',
+  readonlyMountArgs: vi.fn((hostPath: string, containerPath: string) => ['-v', `${hostPath}:${containerPath}:ro`]),
+  stopContainer: vi.fn((name: string) => `docker stop ${name}`),
 }));
 
 // Create a controllable fake ChildProcess

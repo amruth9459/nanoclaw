@@ -8,6 +8,9 @@ vi.mock('../config.js', () => ({
   STORE_DIR: '/tmp/nanoclaw-test-store',
   ASSISTANT_NAME: 'Andy',
   ASSISTANT_HAS_OWN_NUMBER: false,
+  OPEN_MENTIONS: false,
+  MEDIA_DIR: '/tmp/nanoclaw-test-media',
+  MAX_MEDIA_SIZE_MB: 25,
 }));
 
 // Mock logger
@@ -22,6 +25,7 @@ vi.mock('../logger.js', () => ({
 
 // Mock db
 vi.mock('../db.js', () => ({
+  getChatChannel: vi.fn(() => null),
   getLastGroupSync: vi.fn(() => null),
   setLastGroupSync: vi.fn(),
   updateChatName: vi.fn(),
@@ -84,6 +88,7 @@ vi.mock('@whiskeysockets/baileys', () => {
       timedOut: 408,
       restartRequired: 515,
     },
+    fetchLatestWaWebVersion: vi.fn().mockResolvedValue({ version: [2, 3000, 1027934701] }),
     makeCacheableSignalKeyStore: vi.fn((keys: unknown) => keys),
     useMultiFileAuthState: vi.fn().mockResolvedValue({
       state: {
@@ -332,6 +337,7 @@ describe('WhatsAppChannel', () => {
           sender_name: 'Alice',
           is_from_me: false,
         }),
+        'whatsapp',
       );
     });
 
@@ -433,6 +439,7 @@ describe('WhatsAppChannel', () => {
       expect(opts.onMessage).toHaveBeenCalledWith(
         'registered@g.us',
         expect.objectContaining({ content: 'A reply message' }),
+        'whatsapp',
       );
     });
 
@@ -461,6 +468,7 @@ describe('WhatsAppChannel', () => {
       expect(opts.onMessage).toHaveBeenCalledWith(
         'registered@g.us',
         expect.objectContaining({ content: 'Check this photo' }),
+        'whatsapp',
       );
     });
 
@@ -489,6 +497,7 @@ describe('WhatsAppChannel', () => {
       expect(opts.onMessage).toHaveBeenCalledWith(
         'registered@g.us',
         expect.objectContaining({ content: 'Watch this' }),
+        'whatsapp',
       );
     });
 
@@ -541,6 +550,7 @@ describe('WhatsAppChannel', () => {
       expect(opts.onMessage).toHaveBeenCalledWith(
         'registered@g.us',
         expect.objectContaining({ sender_name: '5551234' }),
+        'whatsapp',
       );
     });
   });

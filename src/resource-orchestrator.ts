@@ -19,11 +19,14 @@ import { execSync } from 'child_process';
 import Database from 'better-sqlite3';
 import { logger } from './logger.js';
 
-// Resource configuration for Mac Studio 64GB
+// Auto-detect total RAM (adapts to Mac Mini, Mac Studio, etc.)
+const TOTAL_RAM_GB = os.totalmem() / 1024 / 1024 / 1024;
+
+// Resource configuration - adapts to current system
 const RESOURCE_CONFIG = {
-  TOTAL_RAM_GB: 64,
-  MAX_RAM_USAGE_PERCENT: 85, // Use max 85% of RAM (54.4GB)
-  MIN_FREE_RAM_GB: 8, // Always keep 8GB free
+  TOTAL_RAM_GB,
+  MAX_RAM_USAGE_PERCENT: 85, // Use max 85% of RAM
+  MIN_FREE_RAM_GB: Math.max(4, TOTAL_RAM_GB * 0.1), // Keep 10% or 4GB free, whichever is larger
   CRITICAL_RAM_PERCENT: 90, // Emergency threshold
 
   // Per-agent RAM estimates (GB) - defaults
@@ -33,10 +36,10 @@ const RESOURCE_CONFIG = {
   LOCAL_MODEL_SLM_RAM: 4,
   LOCAL_MODEL_LLM_RAM: 40,
 
-  // Concurrent limits
-  MAX_TOTAL_AGENTS: 16,
-  MAX_AGENTS_PER_TYPE: 8, // Max agents per product/type
-  MAX_LOCAL_MODELS: 2, // Max 2 local models running simultaneously
+  // Concurrent limits (scale with RAM)
+  MAX_TOTAL_AGENTS: Math.min(16, Math.floor(TOTAL_RAM_GB / 4)), // 1 agent per 4GB
+  MAX_AGENTS_PER_TYPE: Math.min(8, Math.floor(TOTAL_RAM_GB / 8)), // Max agents per product/type
+  MAX_LOCAL_MODELS: TOTAL_RAM_GB >= 64 ? 2 : (TOTAL_RAM_GB >= 32 ? 1 : 0), // Require 32GB+ for local models
 };
 
 export enum AgentPriority {
@@ -361,8 +364,9 @@ export class ResourceOrchestrator {
   async getStatus(): Promise<ResourceStatus> {
     const totalRamGB = os.totalmem() / 1024 / 1024 / 1024;
     // os.freemem() on macOS only reports truly free pages, excluding
-    // cached/purgeable memory that is instantly reclaimable. Use vm_stat
-    // to get the real available memory (free + purgeable + speculative).
+    // cached/purgeable/inactive memory that macOS reclaims under pressure.
+    // Use vm_stat to match Activity Monitor's view of available memory:
+    // free + inactive (file cache) + purgeable + speculative.
     let freeRamGB = os.freemem() / 1024 / 1024 / 1024;
     if (process.platform === 'darwin') {
       try {
@@ -373,9 +377,10 @@ export class ResourceOrchestrator {
           return m ? parseInt(m[1], 10) : 0;
         };
         const freePages = pages('Pages free');
+        const inactivePages = pages('Pages inactive');
         const purgeablePages = pages('Pages purgeable');
         const speculativePages = pages('Pages speculative');
-        const reclaimableBytes = (freePages + purgeablePages + speculativePages) * pageSize;
+        const reclaimableBytes = (freePages + inactivePages + purgeablePages + speculativePages) * pageSize;
         freeRamGB = reclaimableBytes / 1024 / 1024 / 1024;
       } catch { /* fallback to os.freemem() */ }
     }

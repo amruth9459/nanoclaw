@@ -13,7 +13,7 @@ import makeWASocket, {
   useMultiFileAuthState,
 } from '@whiskeysockets/baileys';
 
-import { ASSISTANT_HAS_OWN_NUMBER, ASSISTANT_NAME, OPEN_MENTIONS, STORE_DIR, MEDIA_DIR, MAX_MEDIA_SIZE_MB } from '../config.js';
+import { ASSISTANT_HAS_OWN_NUMBER, ASSISTANT_NAME, OPEN_MENTIONS, STORE_DIR, MEDIA_DIR, MAX_MEDIA_SIZE_MB, LEXIOS_MAX_MEDIA_SIZE_MB } from '../config.js';
 import {
   getChatChannel,
   getLastGroupSync,
@@ -392,7 +392,7 @@ export class WhatsAppChannel implements Channel {
             media_path: effectiveMedia?.path ?? null,
             media_mimetype: effectiveMedia?.mimetype ?? null,
             media_size: effectiveMedia?.size ?? null,
-          });
+          }, this.name);
         }
       }
     });
@@ -631,15 +631,16 @@ export class WhatsAppChannel implements Channel {
         return null; // No media to download
       }
 
-      // Check file size limit
-      const maxSizeBytes = MAX_MEDIA_SIZE_MB * 1024 * 1024;
+      // Check file size limit — Lexios channel allows larger files for construction PDFs
+      const effectiveMaxMB = this.name === 'lexios' ? LEXIOS_MAX_MEDIA_SIZE_MB : MAX_MEDIA_SIZE_MB;
+      const maxSizeBytes = effectiveMaxMB * 1024 * 1024;
       if (fileSize > maxSizeBytes) {
         logger.warn({
           messageId: msg.key.id,
           fileSize,
           maxSize: maxSizeBytes,
           fileSizeMB: (fileSize / 1024 / 1024).toFixed(2),
-          maxSizeMB: MAX_MEDIA_SIZE_MB
+          maxSizeMB: effectiveMaxMB
         }, 'Media file exceeds size limit, skipping download');
         return null;
       }
