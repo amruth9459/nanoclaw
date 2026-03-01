@@ -11,10 +11,12 @@
 import { codedContext, CodedFact, setSystemFact, learnFact } from './codified-context.js';
 import { semanticSearch, SearchResult, indexConversationTurn } from './semantic-search.js';
 import { perplexity, PerplexityResult } from './perplexity-integration.js';
+import { MAIN_GROUP_FOLDER } from '../config.js';
 
 export interface ContextQuery {
   query: string;
   category?: CodedFact['category']; // For tier 1 filtering
+  groupFolder?: string; // Scope search to a group
   preferRecent?: boolean; // Prioritize recent information
   allowWebSearch?: boolean; // Whether to use tier 3 (default true)
   minConfidence?: number; // Filter threshold for facts (default 0.7)
@@ -63,7 +65,7 @@ export class ContextManager {
     }
 
     // TIER 2: Semantic search over conversation history and memory
-    const tier2Results = await this.queryTier2(options.query);
+    const tier2Results = await this.queryTier2(options.query, options.groupFolder);
 
     if (tier2Results.results.length > 0 && tier2Results.confidence >= minConfidence) {
       // Optionally promote to tier 1 if confidence is high
@@ -149,10 +151,11 @@ export class ContextManager {
   /**
    * TIER 2: Semantic search (warm retrieval)
    */
-  private async queryTier2(query: string): Promise<{ results: SearchResult[]; confidence: number }> {
+  private async queryTier2(query: string, groupFolder?: string): Promise<{ results: SearchResult[]; confidence: number }> {
     const results = await semanticSearch.search({
       query,
       topK: 5,
+      groupFolder: groupFolder || MAIN_GROUP_FOLDER,
       minRelevance: 0.6,
     });
 
@@ -199,7 +202,7 @@ export class ContextManager {
    */
   private async indexPerplexityResult(query: string, result: PerplexityResult): Promise<void> {
     const content = `${query}\n\n${result.answer}\n\nSources: ${result.sources.map(s => s.url).join(', ')}`;
-    await semanticSearch.indexDocument(`perplexity:${Date.now()}`, content);
+    await semanticSearch.indexDocument(`perplexity:${Date.now()}`, content, MAIN_GROUP_FOLDER);
   }
 
   /**
@@ -258,9 +261,9 @@ export class ContextManager {
   /**
    * Record a conversation turn for future retrieval
    */
-  async recordConversationTurn(turnId: string, userMessage: string, assistantResponse: string): Promise<void> {
+  async recordConversationTurn(turnId: string, userMessage: string, assistantResponse: string, groupFolder?: string): Promise<void> {
     const content = `User: ${userMessage}\n\nAssistant: ${assistantResponse}`;
-    await indexConversationTurn(turnId, content);
+    await indexConversationTurn(turnId, content, groupFolder || MAIN_GROUP_FOLDER);
   }
 
   /**

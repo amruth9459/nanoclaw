@@ -1361,7 +1361,13 @@ async function main(): Promise<void> {
   }
 
   // Optional third WhatsApp number for Lexios (enable with NANOCLAW_WA3_LEXIOS=1)
-  if (WA3_LEXIOS_ENABLED) {
+  // Skip if auth3 has no credentials — avoids QR timeout loop spam in logs
+  const auth3Dir = path.join(STORE_DIR, 'auth3');
+  const auth3HasCreds = fs.existsSync(path.join(auth3Dir, 'creds.json'));
+  if (WA3_LEXIOS_ENABLED && !auth3HasCreds) {
+    logger.info('WA3 Lexios enabled but auth3/creds.json missing — skipping. Run: npm run auth -- --slot 3');
+  }
+  if (WA3_LEXIOS_ENABLED && auth3HasCreds) {
     const wa3 = new WhatsAppChannel({
       ...channelOpts,
       name: 'lexios',
