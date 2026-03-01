@@ -170,6 +170,18 @@ export function startIpcWatcher(deps: IpcDeps): void {
                   continue;
                 }
 
+                // ── Streaming Messages (from integration layer) ────────────
+                if (data.type === 'streaming_message' && data.chatJid && data.text) {
+                  try {
+                    await deps.sendMessage(data.chatJid as string, data.text as string);
+                    logger.debug({ chatJid: data.chatJid, preview: (data.text as string).slice(0, 50) }, 'Sent streaming message');
+                  } catch (err) {
+                    logger.error({ err, chatJid: data.chatJid }, 'Failed to send streaming message');
+                  }
+                  fs.unlinkSync(filePath);
+                  continue;
+                }
+
                 if (data.type === 'remote_shell' && data.command) {
                   // Only main group can execute remote shell commands
                   if (!isMain) {
@@ -182,14 +194,16 @@ export function startIpcWatcher(deps: IpcDeps): void {
 
                   const { executeRemoteCommand, formatRemoteShellResult, PRESET_COMMANDS } = await import('./remote-shell.js');
 
-                  // Resolve preset commands
-                  const command = (PRESET_COMMANDS as Record<string, string>)[data.command as string] || (data.command as string);
+                  // Resolve preset commands — expand key name to actual command
+                  const presetMap = PRESET_COMMANDS as Record<string, string>;
+                  const command = presetMap[data.command as string] || (data.command as string);
 
                   const result = await executeRemoteCommand({
                     command,
                     workingDir: data.working_dir as string | undefined,
                     timeout: data.timeout as number | undefined,
                     requester: sourceGroup,
+                    isPreset: (data.command as string) in presetMap,
                   });
 
                   const formatted = formatRemoteShellResult({ command, requester: sourceGroup }, result);
