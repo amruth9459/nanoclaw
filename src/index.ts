@@ -1462,6 +1462,25 @@ async function main(): Promise<void> {
     logger.info({ err }, 'Omi integration not loaded (deps missing or import failed) — skipping');
   }
 
+  // Check if this startup was triggered by an agent deploy — notify user
+  setTimeout(async () => {
+    try {
+      const breadcrumbPath = path.join(DATA_DIR, 'restart-reason.json');
+      if (fs.existsSync(breadcrumbPath)) {
+        const breadcrumb = JSON.parse(fs.readFileSync(breadcrumbPath, 'utf-8'));
+        fs.unlinkSync(breadcrumbPath); // consume it
+        if (breadcrumb.reason === 'agent_deploy') {
+          const mainJid = Object.entries(registeredGroups).find(
+            ([, g]) => g.folder === MAIN_GROUP_FOLDER,
+          )?.[0];
+          if (mainJid) {
+            await clawSend(mainJid, `🔄 *Restarted* — ${breadcrumb.summary || 'Agent deployed code changes'}`);
+          }
+        }
+      }
+    } catch { /* best-effort */ }
+  }, 10000); // 10s after startup — WhatsApp needs to be connected first
+
   // Update group description with DashClaw URLs on startup
   setTimeout(async () => {
     try {
