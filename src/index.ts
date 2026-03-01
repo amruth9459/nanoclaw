@@ -59,6 +59,7 @@ import { classifyTask, computeMaxPayment } from './clawwork.js';
 import { calculateCost, formatCostFooter } from './economics.js';
 // Dead code clusters — wired as enrichment/monitoring layers (non-blocking)
 import { contextManager, setSystemFact, setCapability } from './context/index.js';
+import { pruneOldChunks } from './semantic-index.js';
 import { RouterFactory, type UniversalRouter } from './router/index.js';
 import type { RoutingContext, RoutingDecision } from './router/types.js';
 import { classifyGoalHeuristic, extractGoalDetails } from './goal-classifier.js';
@@ -1295,6 +1296,9 @@ async function main(): Promise<void> {
   } catch (err) {
     logger.warn({ err }, 'Context system seeding failed');
   }
+
+  // Prune semantic index chunks older than 6 months (non-blocking)
+  try { pruneOldChunks(); } catch { /* non-blocking */ }
 
   // Graceful shutdown handlers
   const shutdown = async (signal: string) => {

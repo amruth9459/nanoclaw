@@ -251,6 +251,39 @@ export async function indexGroupFiles(groupFolder: string): Promise<void> {
 /**
  * Return indexing stats.
  */
+/**
+ * Delete chunks older than maxAgeMs (default 6 months).
+ * Removes both the chunk rows and their vector embeddings.
+ */
+export function pruneOldChunks(maxAgeMs = 6 * 30 * 24 * 60 * 60 * 1000): { deleted: number } {
+  try {
+    const db = openVecDb();
+    const cutoff = new Date(Date.now() - maxAgeMs).toISOString();
+
+    const oldIds = db.prepare(
+      'SELECT id FROM semantic_chunks WHERE indexed_at < ?',
+    ).all(cutoff) as { id: number }[];
+
+    if (oldIds.length === 0) {
+      db.close();
+      return { deleted: 0 };
+    }
+
+    const ids = oldIds.map(r => r.id);
+    const placeholders = ids.map(() => '?').join(',');
+
+    db.prepare(`DELETE FROM semantic_vec WHERE chunk_id IN (${placeholders})`).run(...ids);
+    db.prepare(`DELETE FROM semantic_chunks WHERE id IN (${placeholders})`).run(...ids);
+
+    db.close();
+    logger.info({ deleted: ids.length, cutoff }, 'Pruned old semantic chunks');
+    return { deleted: ids.length };
+  } catch (err) {
+    logger.warn({ err }, 'Failed to prune old semantic chunks');
+    return { deleted: 0 };
+  }
+}
+
 export function getIndexStats(): { totalChunks: number; sources: number; groups: string[] } {
   try {
     const db = openVecDb();
