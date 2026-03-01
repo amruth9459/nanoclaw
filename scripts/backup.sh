@@ -126,7 +126,18 @@ if [ -d "$LEXIOS_DIR/backend/database/" ]; then
         2>> "$LOG_FILE" && log "synced lexios database/" || log "WARN: lexios database/ sync failed"
 fi
 
-# ---------- Step 4: Log completion ----------
+# ---------- Step 4: Generate + upload contingency doc to Google Drive ----------
+
+CONTINGENCY_DOC="${NANOCLAW_DIR}/data/contingency.md"
+if [ -x "${NANOCLAW_DIR}/scripts/generate-contingency.sh" ]; then
+    "${NANOCLAW_DIR}/scripts/generate-contingency.sh" "$CONTINGENCY_DOC" >> "$LOG_FILE" 2>&1
+    if command -v rclone &>/dev/null && rclone listremotes 2>/dev/null | grep -q '^gdrive:'; then
+        rclone copyto "$CONTINGENCY_DOC" "gdrive:NanoClaw-Contingency.md" \
+            --quiet 2>> "$LOG_FILE" && log "uploaded contingency doc to Google Drive" || log "WARN: Google Drive upload failed"
+    fi
+fi
+
+# ---------- Step 5: Log completion ----------
 
 R2_SIZE=$(rclone size "${R2_REMOTE}:${R2_BUCKET}" --json 2>/dev/null | grep -o '"bytes":[0-9]*' | cut -d: -f2 || echo "unknown")
 if [ "$R2_SIZE" != "unknown" ] && [ -n "$R2_SIZE" ]; then

@@ -1260,6 +1260,7 @@ async function main(): Promise<void> {
   try {
     responseTimeManager = new ResponseTimeManager({
       enableAcknowledgment: !INSTANT_ACK,
+      enableProgressUpdates: false,
       progressIntervalMs: 120000,
       minTaskDurationForProgress: 60000,
     });
