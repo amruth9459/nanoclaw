@@ -6,6 +6,10 @@
  * vs embedding full conversation history in every prompt.
  */
 
+import fs from 'fs';
+import path from 'path';
+import { logger } from '../logger.js';
+
 export interface CodedFact {
   id: string;
   category: 'system' | 'user_preference' | 'learned_fact' | 'active_project' | 'capability';
@@ -24,6 +28,8 @@ export interface ContextSnapshot {
   generatedAt: number;
 }
 
+const SECTION_HEADER = '## Codified Context (Hot Cache)';
+
 /**
  * Codified Context Manager
  * Maintains hot cache of structured facts for instant retrieval
@@ -31,11 +37,15 @@ export interface ContextSnapshot {
 export class CodedContext {
   private facts: Map<string, CodedFact> = new Map();
   private readonly MAX_FACTS = 500; // Keep hot cache bounded
-  private readonly CLAUDE_MD_PATH = '/workspace/group/CLAUDE.md';
-  private readonly MEMORY_MD_PATH = '/workspace/group/MEMORY.md';
+  private readonly groupFolder: string;
 
-  constructor() {
+  constructor(groupFolder = 'main') {
+    this.groupFolder = groupFolder;
     this.loadFromFiles();
+  }
+
+  private get memoryMdPath(): string {
+    return path.join(process.cwd(), 'groups', this.groupFolder, 'MEMORY.md');
   }
 
   /**
@@ -131,7 +141,7 @@ export class CodedContext {
    * Format snapshot as markdown for CLAUDE.md injection
    */
   toMarkdown(snapshot: ContextSnapshot): string {
-    let md = '# Codified Context (Hot Cache)\n\n';
+    let md = `${SECTION_HEADER}\n\n`;
     md += `*Generated: ${new Date(snapshot.generatedAt).toISOString()}*\n`;
     md += `*Total Facts: ${snapshot.facts.length} (~${snapshot.totalTokens} tokens)*\n\n`;
 
@@ -146,7 +156,7 @@ export class CodedContext {
 
     // Output each category
     for (const [category, facts] of Object.entries(byCategory)) {
-      md += `## ${category.replace(/_/g, ' ').toUpperCase()}\n\n`;
+      md += `### ${category.replace(/_/g, ' ').toUpperCase()}\n\n`;
 
       for (const fact of facts) {
         const confidence = fact.confidence < 1.0 ? ` (${Math.round(fact.confidence * 100)}% confident)` : '';
@@ -159,11 +169,142 @@ export class CodedContext {
   }
 
   /**
-   * Load existing facts from MEMORY.md and CLAUDE.md
+   * Load existing facts from MEMORY.md
+   * Parses the Codified Context section, User Preferences, and Learned Facts
    */
   private loadFromFiles(): void {
-    // TODO: Parse existing markdown files to extract facts
-    // For now, start with empty cache
+    const memPath = this.memoryMdPath;
+
+    if (!fs.existsSync(memPath)) return;
+
+    try {
+      const content = fs.readFileSync(memPath, 'utf-8');
+      let loaded = 0;
+
+      // Parse ## Codified Context (Hot Cache) section
+      loaded += this.parseCodifiedSection(content);
+
+      // Parse ## User Preferences section
+      loaded += this.parseSimpleSection(content, '## User Preferences', 'user_preference');
+
+      // Parse ## Learned Facts section
+      loaded += this.parseSimpleSection(content, '## Learned Facts', 'learned_fact');
+
+      // Parse ## Active Projects section
+      loaded += this.parseSimpleSection(content, '## Active Projects', 'active_project');
+
+      if (loaded > 0) {
+        logger.info({ groupFolder: this.groupFolder, factsLoaded: loaded }, 'Loaded facts from MEMORY.md');
+      }
+    } catch (err) {
+      logger.warn({ err, path: memPath }, 'Failed to load facts from MEMORY.md');
+    }
+  }
+
+  /**
+   * Parse the structured Codified Context section
+   * Format: - **key:** value (XX% confident)
+   * Subsections: ### CATEGORY_NAME
+   */
+  private parseCodifiedSection(content: string): number {
+    const sectionStart = content.indexOf(SECTION_HEADER);
+    if (sectionStart === -1) return 0;
+
+    // Find next ## heading (end of this section)
+    const afterHeader = content.indexOf('\n', sectionStart);
+    const nextSection = content.indexOf('\n## ', afterHeader);
+    const sectionContent = nextSection === -1
+      ? content.slice(afterHeader)
+      : content.slice(afterHeader, nextSection);
+
+    let currentCategory: CodedFact['category'] = 'learned_fact';
+    let loaded = 0;
+
+    const categoryMap: Record<string, CodedFact['category']> = {
+      'system': 'system',
+      'user preference': 'user_preference',
+      'learned fact': 'learned_fact',
+      'active project': 'active_project',
+      'capability': 'capability',
+    };
+
+    for (const line of sectionContent.split('\n')) {
+      // Detect ### subsection (category)
+      const subMatch = line.match(/^### (.+)$/);
+      if (subMatch) {
+        const catName = subMatch[1].trim().toLowerCase();
+        currentCategory = categoryMap[catName] || 'learned_fact';
+        continue;
+      }
+
+      // Parse fact lines: - **key:** value (XX% confident)
+      const factMatch = line.match(/^- \*\*(.+?):\*\*\s*(.+?)(?:\s*\((\d+)% confident\))?\s*$/);
+      if (factMatch) {
+        const [, key, value, confStr] = factMatch;
+        const confidence = confStr ? parseInt(confStr, 10) / 100 : 1.0;
+        this.set(currentCategory, key.trim(), value.trim(), confidence, 'memory.md');
+        loaded++;
+      }
+    }
+
+    return loaded;
+  }
+
+  /**
+   * Parse simple markdown sections (## User Preferences, ## Learned Facts, etc.)
+   * Format: - key: value  OR  - **key:** value  OR  - description text
+   */
+  private parseSimpleSection(content: string, heading: string, category: CodedFact['category']): number {
+    const sectionStart = content.indexOf(heading);
+    if (sectionStart === -1) return 0;
+
+    const afterHeader = content.indexOf('\n', sectionStart);
+    const nextSection = content.indexOf('\n## ', afterHeader);
+    const sectionContent = nextSection === -1
+      ? content.slice(afterHeader)
+      : content.slice(afterHeader, nextSection);
+
+    let loaded = 0;
+
+    for (const line of sectionContent.split('\n')) {
+      // Skip empty lines and sub-headings
+      if (!line.startsWith('- ')) continue;
+
+      const text = line.slice(2).trim();
+
+      // Try **key:** value format
+      const boldMatch = text.match(/^\*\*(.+?):\*\*\s*(.+?)(?:\s*\((\d+)% confident\))?\s*$/);
+      if (boldMatch) {
+        const [, key, value, confStr] = boldMatch;
+        const confidence = confStr ? parseInt(confStr, 10) / 100 : 0.9;
+        this.set(category, key.trim(), value.trim(), confidence, 'memory.md');
+        loaded++;
+        continue;
+      }
+
+      // Try key: value format (without bold)
+      const kvMatch = text.match(/^(.+?):\s+(.+)$/);
+      if (kvMatch) {
+        const [, key, value] = kvMatch;
+        // Skip if key is too long (probably a sentence, not a fact)
+        if (key.length <= 60) {
+          this.set(category, key.trim(), value.trim(), 0.85, 'memory.md');
+          loaded++;
+          continue;
+        }
+      }
+
+      // Plain list item — use the whole text as both key and value
+      if (text.length > 5 && text.length <= 200) {
+        const shortKey = text.slice(0, 60).replace(/[^a-zA-Z0-9_ -]/g, '').trim();
+        if (shortKey) {
+          this.set(category, shortKey, text, 0.8, 'memory.md');
+          loaded++;
+        }
+      }
+    }
+
+    return loaded;
   }
 
   /**
@@ -199,20 +340,68 @@ export class CodedContext {
 
   /**
    * Persist facts to MEMORY.md
+   * Replaces the Codified Context section, preserving everything else
    */
   async persist(): Promise<void> {
     const snapshot = this.snapshot();
-    const md = this.toMarkdown(snapshot);
+    if (snapshot.facts.length === 0) return;
 
-    // Write to MEMORY.md (append or replace section)
-    // TODO: Implement file writing
+    const md = this.toMarkdown(snapshot);
+    const memPath = this.memoryMdPath;
+
+    try {
+      // Ensure directory exists
+      const dir = path.dirname(memPath);
+      if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir, { recursive: true });
+      }
+
+      let existing = '';
+      if (fs.existsSync(memPath)) {
+        existing = fs.readFileSync(memPath, 'utf-8');
+      }
+
+      let updated: string;
+      const sectionStart = existing.indexOf(SECTION_HEADER);
+
+      if (sectionStart !== -1) {
+        // Find the end of the section (next ## heading or end of file)
+        const afterHeader = existing.indexOf('\n', sectionStart);
+        let sectionEnd = existing.indexOf('\n## ', afterHeader);
+        if (sectionEnd === -1) {
+          sectionEnd = existing.length;
+        }
+        // Replace existing section
+        updated = existing.slice(0, sectionStart) + md + existing.slice(sectionEnd);
+      } else {
+        // Append at end
+        updated = existing.trimEnd() + '\n\n' + md;
+      }
+
+      // Atomic write: write to .tmp, rename over original
+      const tmpPath = memPath + '.tmp';
+      fs.writeFileSync(tmpPath, updated, 'utf-8');
+      fs.renameSync(tmpPath, memPath);
+
+      logger.info({ groupFolder: this.groupFolder, facts: snapshot.facts.length }, 'Persisted codified context to MEMORY.md');
+    } catch (err) {
+      logger.warn({ err }, 'Failed to persist codified context');
+    }
   }
 }
 
 /**
- * Singleton instance
+ * Singleton instance — initialized with default group folder.
+ * Use createCodedContext() for other groups.
  */
 export const codedContext = new CodedContext();
+
+/**
+ * Factory for non-default groups
+ */
+export function createCodedContext(groupFolder: string): CodedContext {
+  return new CodedContext(groupFolder);
+}
 
 /**
  * Helper functions for common operations
