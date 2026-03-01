@@ -29,10 +29,11 @@ RUN apt-get update && apt-get install -y \
     tesseract-ocr-all \
     ffmpeg \
     python3-pip \
+    sqlite3 \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Python PDF generation library
-RUN pip3 install --break-system-packages weasyprint
+# Install Python libraries: PDF generation + DWG/DXF parsing + rendering
+RUN pip3 install --break-system-packages weasyprint ezdxf matplotlib
 
 # Set Chromium path for agent-browser
 ENV AGENT_BROWSER_EXECUTABLE_PATH=/usr/bin/chromium
@@ -67,6 +68,18 @@ RUN chmod +x /usr/local/bin/extract-frame
 # Install PDF generation script
 COPY skills/generate-pdf.sh /usr/local/bin/generate-pdf
 RUN chmod +x /usr/local/bin/generate-pdf
+
+# Install Lexios document preparation (PDF → PNG for construction doc analysis)
+COPY skills/lexios-prep.sh /usr/local/bin/lexios-prep
+RUN chmod +x /usr/local/bin/lexios-prep
+
+# Install Lexios DXF/DWG extraction (structured data + layer rendering)
+COPY skills/lexios-dxf.py /usr/local/bin/lexios-dxf
+RUN chmod +x /usr/local/bin/lexios-dxf
+
+# Install Lexios query classifier (fast keyword-based routing)
+COPY skills/lexios/query-classifier.py /usr/local/bin/lexios-classify
+RUN chmod +x /usr/local/bin/lexios-classify
 
 # Create workspace directories
 RUN mkdir -p /workspace/group /workspace/global /workspace/extra /workspace/ipc/messages /workspace/ipc/tasks /workspace/ipc/input

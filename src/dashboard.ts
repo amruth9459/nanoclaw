@@ -16,6 +16,12 @@ import {
   getEconomicsSummary,
   getAllUsageRecent,
   getActiveClawworkTasks,
+  getLexiosBuildingSummary,
+  getLexiosCustomerStats,
+  getLexiosCustomerSummary,
+  getLexiosCostSummary,
+  getBuildingMembers,
+  getLexiosBuildingDocuments,
   getTotalUsage,
   getUsageSince,
 } from './db.js';
@@ -297,7 +303,7 @@ const HTML = `<!DOCTYPE html>
 
 <script>
 let memTab = 'global/MEMORY.md';
-let dashTab = 'overview'; // 'overview' | 'economics' | 'bounties' | 'files'
+let dashTab = 'overview'; // 'overview' | 'economics' | 'bounties' | 'files' | 'lexios'
 
 function fmt(iso) {
   if (!iso) return '—';
@@ -326,6 +332,7 @@ async function refreshBounties() {
           <span class="tab" onclick="dashTab='economics';refresh()">Economics</span>
           <span class="tab active">Bounties</span>
           <span class="tab" onclick="dashTab='files';refresh()">Files</span>
+          <span class="tab" onclick="dashTab='lexios';refresh()">Lexios</span>
         </div>
       </div>
       <div class="card full">
@@ -365,6 +372,7 @@ async function refreshEconomics() {
           <span class="tab active">Economics</span>
           <span class="tab" onclick="dashTab='bounties';refresh()">Bounties</span>
           <span class="tab" onclick="dashTab='files';refresh()">Files</span>
+          <span class="tab" onclick="dashTab='lexios';refresh()">Lexios</span>
         </div>
       </div>
       <!-- Computer Fund Goal -->
@@ -608,6 +616,7 @@ async function refreshFiles() {
           <span class="tab" onclick="dashTab='economics';refresh()">Economics</span>
           <span class="tab" onclick="dashTab='bounties';refresh()">Bounties</span>
           <span class="tab active">Files</span>
+          <span class="tab" onclick="dashTab='lexios';refresh()">Lexios</span>
         </div>
       </div>
       <div class="card full" style="padding:0.75rem">
@@ -639,9 +648,101 @@ async function refreshFiles() {
   }
 }
 
+async function refreshLexios() {
+  try {
+    var lex = await fetch('/api/lexios').then(function(r) { return r.json(); });
+    var bs = lex.buildings || { total_buildings: 0, total_documents: 0, total_queries: 0, active_buildings: 0, buildings: [] };
+    var s = lex.summary || { total_customers: 0, total_documents: 0, total_pages: 0, active_customers: 0 };
+    var cost = lex.cost || { total_cost: 0, total_runs: 0 };
+    var buildings = bs.buildings || [];
+    var customers = lex.customers || [];
+
+    var buildingRows = buildings.length === 0
+      ? '<tr><td colspan="7" style="text-align:center;opacity:0.5">No buildings yet</td></tr>'
+      : buildings.map(function(b) {
+          return '<tr>' +
+            '<td>' + (b.name || 'Unnamed') + '</td>' +
+            '<td>' + (b.address || '-') + '</td>' +
+            '<td class="mono">' + b.owner_phone + '</td>' +
+            '<td class="mono">' + b.documents_count + '</td>' +
+            '<td class="mono">' + b.queries_count + '</td>' +
+            '<td><span class="badge ' + (b.status === 'active' ? 'green' : 'gray') + '">' + b.status + '</span></td>' +
+            '<td>' + (b.last_activity ? fmt(b.last_activity) : '-') + '</td>' +
+            '</tr>';
+        }).join('');
+
+    var customerRows = customers.length === 0
+      ? ''
+      : customers.map(function(c) {
+          return '<tr>' +
+            '<td>' + (c.name || c.phone) + '</td>' +
+            '<td class="mono">' + c.phone + '</td>' +
+            '<td class="mono">' + c.documents_analyzed + '</td>' +
+            '<td class="mono">' + c.pages_processed + '</td>' +
+            '<td>' + (c.last_contact ? fmt(c.last_contact) : '-') + '</td>' +
+            '</tr>';
+        }).join('');
+
+    document.getElementById('main').innerHTML = \`
+      <div class="card full" style="margin-bottom:0.5rem">
+        <div class="memory-tabs">
+          <span class="tab" onclick="dashTab='overview';refresh()">Overview</span>
+          <span class="tab" onclick="dashTab='economics';refresh()">Economics</span>
+          <span class="tab" onclick="dashTab='bounties';refresh()">Bounties</span>
+          <span class="tab" onclick="dashTab='files';refresh()">Files</span>
+          <span class="tab active">Lexios</span>
+        </div>
+      </div>
+      <div class="grid">
+        <div class="card"><h3>\${bs.total_buildings}</h3><p class="label">Buildings</p></div>
+        <div class="card"><h3>\${bs.active_buildings}</h3><p class="label">Active</p></div>
+        <div class="card"><h3>\${bs.total_documents}</h3><p class="label">Documents</p></div>
+        <div class="card"><h3>\${bs.total_queries}</h3><p class="label">Queries</p></div>
+      </div>
+      <div class="grid">
+        <div class="card"><h3>$\${cost.total_cost.toFixed(2)}</h3><p class="label">Total API Cost</p></div>
+        <div class="card"><h3>\${cost.total_runs}</h3><p class="label">Agent Runs</p></div>
+        <div class="card"><h3>\${s.total_customers}</h3><p class="label">DM Customers</p></div>
+        <div class="card"><h3>\${s.total_pages}</h3><p class="label">Pages (DM)</p></div>
+      </div>
+      <div class="card full">
+        <h2>Buildings</h2>
+        <table>
+          <thead><tr>
+            <th>Name</th>
+            <th>Address</th>
+            <th>Owner</th>
+            <th>Docs</th>
+            <th>Queries</th>
+            <th>Status</th>
+            <th>Last Activity</th>
+          </tr></thead>
+          <tbody>\${buildingRows}</tbody>
+        </table>
+      </div>
+      \${customers.length > 0 ? \`<div class="card full">
+        <h2>DM Customers (Legacy)</h2>
+        <table>
+          <thead><tr>
+            <th>Name</th>
+            <th>Phone</th>
+            <th>Documents</th>
+            <th>Pages</th>
+            <th>Last Contact</th>
+          </tr></thead>
+          <tbody>\${customerRows}</tbody>
+        </table>
+      </div>\` : ''}
+    \`;
+  } catch(e) {
+    console.error('Lexios refresh failed', e);
+  }
+}
+
 async function refresh() {
   if (dashTab === 'economics') { await refreshEconomics(); return; }
   if (dashTab === 'bounties') { await refreshBounties(); return; }
+  if (dashTab === 'lexios') { await refreshLexios(); return; }
   if (dashTab === 'files') {
     // If a file is currently open (viewer has content), only refresh the file list
     // sidebar without re-rendering the whole tab — avoids losing scroll position
@@ -683,6 +784,7 @@ async function refresh() {
           <span class="tab" onclick="dashTab='economics';refresh()">Economics</span>
           <span class="tab" onclick="dashTab='bounties';refresh()">Bounties</span>
           <span class="tab" onclick="dashTab='files';refresh()">Files</span>
+          <span class="tab" onclick="dashTab='lexios';refresh()">Lexios</span>
           <span class="pill yellow" style="margin-left:auto">🖥️ $\${goal.earned.toFixed(2)}/$\${goal.target} (\${goal.pct.toFixed(1)}%)</span>
         </div>
       </div>
@@ -835,6 +937,21 @@ export function startDashboard(queue: GroupQueue, sendFn?: (jid: string, text: s
         const data = apiBounties();
         res.writeHead(200, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify(data));
+      } catch (err) {
+        res.writeHead(500);
+        res.end(JSON.stringify({ error: String(err) }));
+      }
+      return;
+    }
+
+    if (url.pathname === '/api/lexios') {
+      try {
+        const summary = getLexiosCustomerSummary();
+        const customers = getLexiosCustomerStats();
+        const cost = getLexiosCostSummary();
+        const buildings = getLexiosBuildingSummary();
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ summary, customers, cost, buildings }));
       } catch (err) {
         res.writeHead(500);
         res.end(JSON.stringify({ error: String(err) }));

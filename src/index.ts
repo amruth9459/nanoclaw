@@ -17,6 +17,7 @@ import {
   STORE_DIR,
   TRIGGER_PATTERN,
   WA2_ENABLED,
+  WA3_LEXIOS_ENABLED,
   WARMUP_ON_START,
 } from './config.js';
 import { WhatsAppChannel } from './channels/whatsapp.js';
@@ -37,6 +38,8 @@ import {
   getChatName,
   getEconomicsSummary,
   getMessagesSince,
+  getNewLexiosDMs,
+  getNewLexiosGroupMessages,
   getNewMentions,
   getNewMessages,
   getOrCreateEconomics,
@@ -51,12 +54,16 @@ import {
   createClawworkTask,
 } from './db.js';
 import { classifyTask, computeMaxPayment } from './clawwork.js';
+// Local routing disabled while Max subscription is active
+// import { routeWithOpus, executeLocal } from './opus-router.js';
 import { calculateCost, formatCostFooter } from './economics.js';
 import { listGroupFiles, startDashboard } from './dashboard.js';
 import { BountyGate } from './bounty-gate.js';
 import { GroupQueue } from './group-queue.js';
 import { HitlGate } from './hitl.js';
 import { startIpcWatcher } from './ipc.js';
+import { getOrCreateLexiosBuilding, getOrCreateLexiosCustomer } from './lexios-customer.js';
+import { validateQuery } from './lexios-security.js';
 import { findChannel, formatMessages, formatOutbound } from './router.js';
 import { startSchedulerLoop } from './task-scheduler.js';
 import { Channel, NewMessage, RegisteredGroup } from './types.js';
@@ -71,6 +78,8 @@ let registeredGroups: Record<string, RegisteredGroup> = {};
 // In-memory guest groups created on first @-mention from unregistered chats.
 // Ephemeral: cleared on restart. Guests get isolated agent sessions.
 const guestGroups = new Map<string, RegisteredGroup>();
+// Tracks which channel name a chatJid's most recent message came from (e.g. 'lexios', 'whatsapp')
+const chatChannelSource = new Map<string, string>();
 let lastAgentTimestamp: Record<string, string> = {};
 let messageLoopRunning = false;
 
@@ -415,6 +424,10 @@ async function processGroupMessages(chatJid: string): Promise<boolean> {
     }
   }
   await ackChannel.setTyping?.(chatJid, true);
+
+  // LOCAL ROUTING DISABLED — sending everything to cloud while Max subscription is active.
+  // To re-enable local routing, uncomment the block in this section.
+  // See src/opus-router.ts for the routing logic (uses Ollama for classification).
 
   // Track idle timer for closing stdin when agent is idle
   let idleTimer: ReturnType<typeof setTimeout> | null = null;
@@ -777,6 +790,99 @@ async function startMessageLoop(): Promise<void> {
           queue.enqueueMessageCheck(chatJid);
         }
       }
+
+      // --- Lexios DMs: auto-register customers from the Lexios WhatsApp channel ---
+      if (WA3_LEXIOS_ENABLED) {
+        const lexiosDms = getNewLexiosDMs(oldTimestamp, jids, ASSISTANT_NAME);
+        if (lexiosDms.length > 0) {
+          // Advance global cursor to cover Lexios DM timestamps
+          const maxLexiosTs = lexiosDms[lexiosDms.length - 1].timestamp;
+          if (maxLexiosTs > lastTimestamp) {
+            lastTimestamp = maxLexiosTs;
+            saveState();
+          }
+
+          // Group by chat
+          const lexiosByChat = new Map<string, NewMessage[]>();
+          for (const msg of lexiosDms) {
+            const existing = lexiosByChat.get(msg.chat_jid);
+            if (existing) existing.push(msg);
+            else lexiosByChat.set(msg.chat_jid, [msg]);
+          }
+
+          for (const [chatJid, msgs] of lexiosByChat) {
+            const group = getOrCreateLexiosCustomer(chatJid, registeredGroups, registerGroup);
+
+            if (!lastAgentTimestamp[chatJid]) {
+              const firstMsgTs = new Date(new Date(msgs[0].timestamp).getTime() - 1).toISOString();
+              lastAgentTimestamp[chatJid] = firstMsgTs;
+              saveState();
+            }
+
+            logger.info(
+              { chatJid, name: group.name, count: msgs.length },
+              'Lexios DM — queuing customer agent',
+            );
+
+            const channel = findChannel(channels, chatJid);
+            if (INSTANT_ACK) {
+              const last = msgs[msgs.length - 1];
+              const ackCh = findAckChannel(last.sender) ?? channel;
+              ackCh?.sendReaction?.(chatJid, last.id, last.sender, '📐').catch(() => {});
+            }
+
+            queue.enqueueMessageCheck(chatJid);
+          }
+        }
+
+        // --- Lexios Groups: auto-register building groups from the Lexios WhatsApp channel ---
+        const lexiosGroupMsgs = getNewLexiosGroupMessages(oldTimestamp, jids, ASSISTANT_NAME);
+        if (lexiosGroupMsgs.length > 0) {
+          const maxLexiosGTs = lexiosGroupMsgs[lexiosGroupMsgs.length - 1].timestamp;
+          if (maxLexiosGTs > lastTimestamp) {
+            lastTimestamp = maxLexiosGTs;
+            saveState();
+          }
+
+          const lexiosGroupByChat = new Map<string, NewMessage[]>();
+          for (const msg of lexiosGroupMsgs) {
+            // Security: validate Lexios group messages
+            const validation = validateQuery(msg.content || '');
+            if (!validation.safe) {
+              logger.warn({ chatJid: msg.chat_jid, reason: validation.reason }, 'Lexios security: blocked message');
+              continue;
+            }
+            const existing = lexiosGroupByChat.get(msg.chat_jid);
+            if (existing) existing.push(msg);
+            else lexiosGroupByChat.set(msg.chat_jid, [msg]);
+          }
+
+          for (const [chatJid, msgs] of lexiosGroupByChat) {
+            const senderPhone = msgs[0].sender?.split('@')[0] || '';
+            const group = getOrCreateLexiosBuilding(chatJid, senderPhone, registeredGroups, registerGroup);
+
+            if (!lastAgentTimestamp[chatJid]) {
+              const firstMsgTs = new Date(new Date(msgs[0].timestamp).getTime() - 1).toISOString();
+              lastAgentTimestamp[chatJid] = firstMsgTs;
+              saveState();
+            }
+
+            logger.info(
+              { chatJid, name: group.name, count: msgs.length },
+              'Lexios Group — queuing building agent',
+            );
+
+            const channel = findChannel(channels, chatJid);
+            if (INSTANT_ACK) {
+              const last = msgs[msgs.length - 1];
+              const ackCh = findAckChannel(last.sender) ?? channel;
+              ackCh?.sendReaction?.(chatJid, last.id, last.sender, '📐').catch(() => {});
+            }
+
+            queue.enqueueMessageCheck(chatJid);
+          }
+        }
+      }
     } catch (err) {
       logger.error({ err }, 'Error in message loop');
     }
@@ -1024,7 +1130,10 @@ async function main(): Promise<void> {
 
   // Channel callbacks (shared by all channels)
   const channelOpts = {
-    onMessage: (_chatJid: string, msg: NewMessage) => storeMessage(msg),
+    onMessage: (_chatJid: string, msg: NewMessage, channelName?: string) => {
+      storeMessage(msg);
+      if (channelName) chatChannelSource.set(msg.chat_jid, channelName);
+    },
     onChatMetadata: (chatJid: string, timestamp: string, name?: string, channel?: string, isGroup?: boolean) =>
       storeChatMetadata(chatJid, timestamp, name, channel, isGroup),
     registeredGroups: () => registeredGroups,
@@ -1068,6 +1177,26 @@ async function main(): Promise<void> {
     ]).catch((err: Error) => {
       logger.warn({ err: err.message }, 'Second WhatsApp channel not connected — authenticate first: npm run auth -- --slot 2');
       channels.splice(channels.indexOf(wa2), 1);
+    });
+  }
+
+  // Optional third WhatsApp number for Lexios (enable with NANOCLAW_WA3_LEXIOS=1)
+  if (WA3_LEXIOS_ENABLED) {
+    const wa3 = new WhatsAppChannel({
+      ...channelOpts,
+      name: 'lexios',
+      authDir: path.join(STORE_DIR, 'auth3'),
+      primary: false,
+    });
+    channels.push(wa3);
+    await Promise.race([
+      wa3.connect(),
+      new Promise<void>((_, reject) =>
+        setTimeout(() => reject(new Error('WA3 Lexios connect timeout after 30s')), 30000),
+      ),
+    ]).catch((err: Error) => {
+      logger.warn({ err: err.message }, 'Lexios WhatsApp channel not connected — authenticate first: npm run auth -- --slot 3');
+      channels.splice(channels.indexOf(wa3), 1);
     });
   }
 
