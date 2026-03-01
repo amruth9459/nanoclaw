@@ -3,43 +3,56 @@
  * Centralized security policies and controls
  */
 
+import { readEnvFile } from './env.js';
+
+// Read security-related env vars from .env file (they aren't in process.env
+// because readEnvFile intentionally doesn't pollute process.env).
+const secEnv = readEnvFile([
+  'NANOCLAW_REMOTE_SHELL_ENABLED',
+  'NANOCLAW_REMOTE_SHELL_WHITELIST_ONLY',
+  'NANOCLAW_REMOTE_SHELL_REQUIRE_APPROVAL',
+  'NANOCLAW_REMOTE_SHELL_RATE_LIMIT',
+  'NANOCLAW_SECURITY_ALERTS',
+  'NANOCLAW_PARANOID_MODE',
+]);
+
+function secVal(key: string): string {
+  return process.env[key] || secEnv[key] || '';
+}
+
 /**
  * Environment-based security toggle
  * Set NANOCLAW_REMOTE_SHELL_ENABLED=1 to enable remote shell
  * Disabled by default — must be explicitly opted in
  */
-export const REMOTE_SHELL_ENABLED =
-  process.env.NANOCLAW_REMOTE_SHELL_ENABLED === '1';
+export const REMOTE_SHELL_ENABLED = secVal('NANOCLAW_REMOTE_SHELL_ENABLED') === '1';
 
 /**
  * Command whitelist mode
  * When true, only preset commands are allowed (no custom commands)
  * Set NANOCLAW_REMOTE_SHELL_WHITELIST_ONLY=1 for maximum security
  */
-export const REMOTE_SHELL_WHITELIST_ONLY =
-  process.env.NANOCLAW_REMOTE_SHELL_WHITELIST_ONLY === '1';
+export const REMOTE_SHELL_WHITELIST_ONLY = secVal('NANOCLAW_REMOTE_SHELL_WHITELIST_ONLY') === '1';
 
 /**
  * Require approval for remote shell commands
  * When true, all remote shell commands go through HITL approval
  * Set NANOCLAW_REMOTE_SHELL_REQUIRE_APPROVAL=1 for extra safety
  */
-export const REMOTE_SHELL_REQUIRE_APPROVAL =
-  process.env.NANOCLAW_REMOTE_SHELL_REQUIRE_APPROVAL === '1';
+export const REMOTE_SHELL_REQUIRE_APPROVAL = secVal('NANOCLAW_REMOTE_SHELL_REQUIRE_APPROVAL') === '1';
 
 /**
  * Maximum commands per minute (rate limit)
  * Set NANOCLAW_REMOTE_SHELL_RATE_LIMIT=5 to tighten
  */
 export const REMOTE_SHELL_RATE_LIMIT =
-  parseInt(process.env.NANOCLAW_REMOTE_SHELL_RATE_LIMIT || '10', 10);
+  parseInt(secVal('NANOCLAW_REMOTE_SHELL_RATE_LIMIT') || '10', 10);
 
 /**
  * Alert on suspicious patterns
  * Set NANOCLAW_SECURITY_ALERTS=1 to enable WhatsApp security alerts
  */
-export const SECURITY_ALERTS_ENABLED =
-  process.env.NANOCLAW_SECURITY_ALERTS === '1';
+export const SECURITY_ALERTS_ENABLED = secVal('NANOCLAW_SECURITY_ALERTS') === '1';
 
 /**
  * Allowed working directories (whitelist)
@@ -81,8 +94,7 @@ export const SESSION_TIMEOUT =
  * - Lower rate limits
  * - Extra logging
  */
-export const PARANOID_MODE =
-  process.env.NANOCLAW_PARANOID_MODE === '1';
+export const PARANOID_MODE = secVal('NANOCLAW_PARANOID_MODE') === '1';
 
 if (PARANOID_MODE) {
   console.warn('⚠️  PARANOID MODE ENABLED - Strict security policies active');
