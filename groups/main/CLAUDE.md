@@ -348,35 +348,43 @@ Or from the host, you can use database functions in `src/db.ts`.
 
 ---
 
-## Auto-QA After Code Changes
+## Auto-Deploy After Code Changes
 
-After modifying project source code, automatically run a QA audit by spawning a sub-agent:
+After modifying NanoClaw project source code (`.ts` files in `src/` or `container/agent-runner/src/`), follow this pipeline:
 
+### Step 1: Build
+```bash
+cd /workspace/project && npm run build
 ```
-You are a QA engineer. Review these changes to the NanoClaw project:
-[describe the changes]
-Run: npm run build, check for TypeScript errors, review security, check for hardcoded secrets.
-Report findings in WhatsApp format (no ## headings).
+If the build fails, fix the errors and rebuild. Do NOT proceed to deploy with a broken build.
+
+### Step 2: Container rebuild (only if you changed `container/agent-runner/src/`)
+```bash
+cd /workspace/project && ./container/build.sh
 ```
 
-### When NOT to Run QA
-
-Skip QA for documentation changes, comment-only changes, non-code files, or read-only analysis.
-
-### Severity Levels
-
-- 🚨 CRITICAL: Build failures, critical security vulnerabilities, hardcoded secrets
-- ⚠️ HIGH: Missing error handling, unvalidated user input
-- 📝 MEDIUM: TODOs in new code, missing tests
-- ℹ️ LOW: Code style, minor optimizations
-
-### QA Result Format
-
+### Step 3: Deploy
+After a successful build, restart the service so your changes take effect:
+```bash
+echo '{"type":"restart_service","summary":"Brief description of what changed"}' > /workspace/ipc/tasks/restart_$(date +%s).json
 ```
-🔍 *QA Complete*
+The host will gracefully shut down and launchd restarts it automatically within seconds. A WhatsApp notification with your summary will be sent on startup so the user knows a deploy happened.
 
-*Build:* ✅ Success
-*Security:* No issues
+**IMPORTANT:** After writing the restart IPC file, your container will be terminated. Make sure you have already sent any results/messages to the user BEFORE triggering the restart. This should be the very last thing you do.
 
-*Verdict:* Ready to deploy!
-```
+### When NOT to Auto-Deploy
+
+Skip deploy for:
+- Documentation changes (CLAUDE.md, MEMORY.md, markdown files)
+- Comment-only changes
+- Non-code files (JSON data, prompts, templates)
+- Read-only analysis
+- Changes the user asked you NOT to deploy
+
+### QA Checklist (mental, no sub-agent needed)
+
+Before deploying, verify:
+- Build succeeded with zero errors
+- No hardcoded secrets or API keys in the diff
+- No obvious security issues (command injection, unvalidated input)
+- Changes are scoped to what was requested (no unrelated modifications)

@@ -805,6 +805,8 @@ export async function processTaskIpc(
     priority?: 'critical' | 'high' | 'medium' | 'low';
     targetValue?: number;
     deadline?: string;
+    // For restart_service
+    summary?: string;
   },
   sourceGroup: string, // Verified identity from IPC directory
   isMain: boolean, // Verified from directory path
@@ -966,6 +968,19 @@ export async function processTaskIpc(
           { sourceGroup },
           'Service restart requested via IPC - initiating graceful shutdown',
         );
+        // Write breadcrumb so next startup can notify the user
+        try {
+          const breadcrumb = {
+            reason: 'agent_deploy',
+            sourceGroup,
+            timestamp: new Date().toISOString(),
+            summary: data.summary || 'Code changes deployed',
+          };
+          fs.writeFileSync(
+            path.join(DATA_DIR, 'restart-reason.json'),
+            JSON.stringify(breadcrumb),
+          );
+        } catch { /* best-effort */ }
         // Graceful shutdown - launchd will restart automatically if KeepAlive is enabled
         setTimeout(() => {
           logger.info('Exiting for restart (exit code 0)');
