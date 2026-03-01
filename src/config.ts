@@ -98,6 +98,11 @@ export const OPEN_MENTIONS =
 export const WA2_ENABLED =
   process.env.NANOCLAW_WA2 === '1'; // Default: disabled
 
+// When enabled, connect a third WhatsApp account dedicated to Lexios (auth stored in store/auth3/).
+// Authenticate it first with: npm run auth -- --slot 3
+export const WA3_LEXIOS_ENABLED =
+  process.env.NANOCLAW_WA3_LEXIOS === '1'; // Default: disabled
+
 // Timezone for scheduled tasks (cron expressions, etc.)
 // Uses system timezone by default
 export const TIMEZONE =
@@ -108,6 +113,10 @@ export const MAX_MEDIA_SIZE_MB = parseInt(
   process.env.NANOCLAW_MAX_MEDIA_SIZE_MB || '50',
   10,
 ); // 50MB default
+export const LEXIOS_MAX_MEDIA_SIZE_MB = parseInt(
+  process.env.NANOCLAW_LEXIOS_MAX_MEDIA_SIZE_MB || '100',
+  10,
+); // 100MB for large construction PDFs
 export const MEDIA_RETENTION_DAYS = parseInt(
   process.env.NANOCLAW_MEDIA_RETENTION_DAYS || '30',
   10,

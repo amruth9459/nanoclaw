@@ -21,12 +21,14 @@ import {
 import { cleanupOldMedia } from './media-cleanup.js';
 import { GroupQueue } from './group-queue.js';
 import { logger } from './logger.js';
+import { AgentPriority, ResourceOrchestrator } from './resource-orchestrator.js';
 import { RegisteredGroup, ScheduledTask } from './types.js';
 
 export interface SchedulerDependencies {
   registeredGroups: () => Record<string, RegisteredGroup>;
   getSessions: () => Record<string, string>;
   queue: GroupQueue;
+  orchestrator?: ResourceOrchestrator;
   onProcess: (groupJid: string, proc: ChildProcess, containerName: string, groupFolder: string) => void;
   sendMessage: (jid: string, text: string) => Promise<void>;
 }
@@ -84,6 +86,16 @@ async function runTask(
 
   let result: string | null = null;
   let error: string | null = null;
+
+  // Track task agent lifecycle in orchestrator
+  const agentId = `nanoclaw-task-${task.group_folder}-${Date.now()}`;
+  await deps.orchestrator?.requestAgent({
+    id: agentId,
+    type: 'nanoclaw',
+    priority: AgentPriority.MEDIUM,
+    estimatedRamGB: 2,
+    taskId: String(task.id),
+  });
 
   // For group context mode, use the group's current session
   const sessions = deps.getSessions();
@@ -154,6 +166,9 @@ async function runTask(
     error = err instanceof Error ? err.message : String(err);
     logger.error({ taskId: task.id, error }, 'Task failed');
   }
+
+  // Release orchestrator tracking
+  await deps.orchestrator?.releaseAgent(agentId, error ? 'error' : 'completed');
 
   const durationMs = Date.now() - startTime;
 

@@ -98,9 +98,9 @@ describe('GroupQueue', () => {
     expect(processMessages).toHaveBeenCalledTimes(3);
   });
 
-  // --- Tasks prioritized over messages ---
+  // --- Tasks run independently from messages (separate slots) ---
 
-  it('drains tasks before messages for same group', async () => {
+  it('runs tasks in parallel with messages for same group', async () => {
     const executionOrder: string[] = [];
     let resolveFirst: () => void;
 
@@ -117,25 +117,29 @@ describe('GroupQueue', () => {
 
     queue.setProcessMessagesFn(processMessages);
 
-    // Start processing messages (takes the active slot)
+    // Start processing messages (takes the active message slot)
     queue.enqueueMessageCheck('group1@g.us');
     await vi.advanceTimersByTimeAsync(10);
 
-    // While active, enqueue both a task and pending messages
+    // While message container is active, enqueue a task and pending messages
     const taskFn = vi.fn(async () => {
       executionOrder.push('task');
     });
     queue.enqueueTask('group1@g.us', 'task-1', taskFn);
     queue.enqueueMessageCheck('group1@g.us');
 
-    // Release the first processing
+    // Task runs immediately in its own slot (independent of message container)
+    await vi.advanceTimersByTimeAsync(10);
+
+    // Task completes instantly while first message container is still blocked
+    expect(executionOrder[0]).toBe('task');
+
+    // Release the first message processing
     resolveFirst!();
     await vi.advanceTimersByTimeAsync(10);
 
-    // Task should have run before the second message check
-    expect(executionOrder[0]).toBe('messages'); // first call
-    expect(executionOrder[1]).toBe('task'); // task runs first in drain
-    // Messages would run after task completes
+    // Messages drain after first container finishes
+    expect(executionOrder).toContain('messages');
   });
 
   // --- Retry with backoff on failure ---
@@ -280,7 +284,7 @@ describe('GroupQueue', () => {
     await vi.advanceTimersByTimeAsync(10);
   });
 
-  it('preempts idle container when task is enqueued', async () => {
+  it('does NOT preempt idle message container when task is enqueued (independent slots)', async () => {
     const fs = await import('fs');
     let resolveProcess: () => void;
 
@@ -308,11 +312,16 @@ describe('GroupQueue', () => {
     const taskFn = vi.fn(async () => {});
     queue.enqueueTask('group1@g.us', 'task-1', taskFn);
 
-    // _close SHOULD have been written (container is idle)
+    // _close should NOT be written — tasks use a separate slot and don't need
+    // to preempt the idle message container
     const closeWrites = writeFileSync.mock.calls.filter(
       (call) => typeof call[0] === 'string' && call[0].endsWith('_close'),
     );
-    expect(closeWrites).toHaveLength(1);
+    expect(closeWrites).toHaveLength(0);
+
+    // Task should have started immediately in its own slot
+    await vi.advanceTimersByTimeAsync(10);
+    expect(taskFn).toHaveBeenCalled();
 
     resolveProcess!();
     await vi.advanceTimersByTimeAsync(10);
@@ -378,7 +387,7 @@ describe('GroupQueue', () => {
     await vi.advanceTimersByTimeAsync(10);
   });
 
-  it('preempts when idle arrives with pending tasks', async () => {
+  it('does NOT preempt when idle arrives with pending tasks (independent slots)', async () => {
     const fs = await import('fs');
     let resolveProcess: () => void;
 
@@ -395,7 +404,7 @@ describe('GroupQueue', () => {
     queue.enqueueMessageCheck('group1@g.us');
     await vi.advanceTimersByTimeAsync(10);
 
-    // Register process and enqueue a task (no idle yet — no preemption)
+    // Register process and enqueue a task — task runs immediately in its own slot
     queue.registerProcess('group1@g.us', {} as any, 'container-1', 'test-group');
 
     const writeFileSync = vi.mocked(fs.default.writeFileSync);
@@ -404,19 +413,21 @@ describe('GroupQueue', () => {
     const taskFn = vi.fn(async () => {});
     queue.enqueueTask('group1@g.us', 'task-1', taskFn);
 
+    // Task runs in parallel, no _close needed
     let closeWrites = writeFileSync.mock.calls.filter(
       (call) => typeof call[0] === 'string' && call[0].endsWith('_close'),
     );
     expect(closeWrites).toHaveLength(0);
 
-    // Now container becomes idle — should preempt because task is pending
+    // Container becomes idle — notifyIdle only checks pendingMessages, not tasks
     writeFileSync.mockClear();
     queue.notifyIdle('group1@g.us');
 
     closeWrites = writeFileSync.mock.calls.filter(
       (call) => typeof call[0] === 'string' && call[0].endsWith('_close'),
     );
-    expect(closeWrites).toHaveLength(1);
+    // No preemption — tasks don't cause idle message containers to close
+    expect(closeWrites).toHaveLength(0);
 
     resolveProcess!();
     await vi.advanceTimersByTimeAsync(10);

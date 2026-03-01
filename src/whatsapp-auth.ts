@@ -20,9 +20,9 @@ import makeWASocket, {
   useMultiFileAuthState,
 } from '@whiskeysockets/baileys';
 
-// Support --slot 2 for authenticating a second WhatsApp number
+// Support --slot 2 or --slot 3 for authenticating additional WhatsApp numbers
 const slotArg = process.argv.find((_, i, arr) => arr[i - 1] === '--slot');
-const slot = slotArg === '2' ? '2' : '';
+const slot = slotArg === '2' ? '2' : slotArg === '3' ? '3' : '';
 const AUTH_DIR = slot ? `./store/auth${slot}` : './store/auth';
 const QR_FILE = slot ? `./store/qr-data${slot}.txt` : './store/qr-data.txt';
 const STATUS_FILE = slot ? `./store/auth-status${slot}.txt` : './store/auth-status.txt';

@@ -11,12 +11,13 @@ Waymo-style evaluation for construction document analysis:
 - Corpus management (add, list, stats)
 
 Usage:
-  python3 scripts/lexios-eval.py score <doc_id>          # Score one document's latest output
-  python3 scripts/lexios-eval.py regression              # Run full regression suite
-  python3 scripts/lexios-eval.py history [doc_id]        # Show score history
-  python3 scripts/lexios-eval.py corpus                  # Show corpus stats
-  python3 scripts/lexios-eval.py failures [--category X] # Show failure patterns
-  python3 scripts/lexios-eval.py report                  # Full evaluation report
+  python3 lexios/eval.py score <doc_id>              # Score one document's latest output
+  python3 lexios/eval.py score <doc_id> --work-dir /path/to/work  # Custom work dir
+  python3 lexios/eval.py regression                  # Run full regression suite
+  python3 lexios/eval.py history [doc_id]            # Show score history
+  python3 lexios/eval.py corpus                      # Show corpus stats
+  python3 lexios/eval.py failures [--category X]     # Show failure patterns
+  python3 lexios/eval.py report                      # Full evaluation report
 """
 
 import json
@@ -29,12 +30,33 @@ from datetime import datetime
 from pathlib import Path
 from typing import Optional
 
-PROJECT_ROOT = Path(__file__).resolve().parent.parent
-CORPUS_DIR = PROJECT_ROOT / "scripts" / "lexios-tests" / "corpus"
-WORK_DIR = PROJECT_ROOT / "groups" / "main" / "lexios-work"
-SKILL_PATH = PROJECT_ROOT / "container" / "skills" / "lexios" / "SKILL.md"
-TYPES_PATH = PROJECT_ROOT / "container" / "skills" / "lexios" / "types.json"
-DB_PATH = PROJECT_ROOT / "scripts" / "lexios-tests" / "eval.db"
+# ── Path Resolution ────────────────────────────────────────────────────────
+# Auto-detect context: standalone Lexios (lexios/ directory) vs NanoClaw integration
+
+SCRIPT_DIR = Path(__file__).resolve().parent
+
+if (SCRIPT_DIR / "types.json").exists():
+    # In Lexios core (lexios/ directory)
+    _TYPES = SCRIPT_DIR / "types.json"
+    _CORPUS = SCRIPT_DIR / "corpus"
+    _DB = SCRIPT_DIR / "eval.db"
+    _WORK = SCRIPT_DIR / "work"
+    _SKILL = SCRIPT_DIR.parent / "integrations" / "nanoclaw" / "SKILL.md"
+else:
+    # In NanoClaw (scripts/ directory) — legacy compat
+    _ROOT = SCRIPT_DIR.parent
+    _TYPES = _ROOT / "container" / "skills" / "lexios" / "types.json"
+    _CORPUS = _ROOT / "scripts" / "lexios-tests" / "corpus"
+    _DB = _ROOT / "scripts" / "lexios-tests" / "eval.db"
+    _WORK = _ROOT / "groups" / "main" / "lexios-work"
+    _SKILL = _ROOT / "container" / "skills" / "lexios" / "SKILL.md"
+
+# Env vars always override
+TYPES_PATH = Path(os.environ.get("LEXIOS_TYPES", _TYPES))
+CORPUS_DIR = Path(os.environ.get("LEXIOS_CORPUS", _CORPUS))
+DB_PATH = Path(os.environ.get("LEXIOS_DB", _DB))
+WORK_DIR = Path(os.environ.get("LEXIOS_WORK_DIR", _WORK))
+SKILL_PATH = Path(os.environ.get("LEXIOS_SKILL", _SKILL))
 
 # ── Types Registry ─────────────────────────────────────────────────────────
 
@@ -79,6 +101,7 @@ def get_domain(category: str) -> str:
 # ── Database ────────────────────────────────────────────────────────────────
 
 def init_db():
+    DB_PATH.parent.mkdir(parents=True, exist_ok=True)
     db = sqlite3.connect(str(DB_PATH))
     db.execute("PRAGMA journal_mode=WAL")
     db.executescript("""
@@ -492,22 +515,23 @@ def save_run(db: sqlite3.Connection, results: dict, duration_s: float = 0):
 
 # ── Commands ────────────────────────────────────────────────────────────────
 
-def cmd_score(doc_id: str):
+def cmd_score(doc_id: str, work_dir: Optional[Path] = None):
     """Score a specific document's latest extraction output."""
+    work = work_dir or WORK_DIR
+
     # Find ground truth
     gt_files = list(CORPUS_DIR.glob(f"{doc_id}/*.ground-truth.json"))
     if not gt_files:
-        gt_files = list((PROJECT_ROOT / "scripts" / "lexios-tests").glob(
-            f"*{doc_id}*.ground-truth.json"))
+        gt_files = list(CORPUS_DIR.glob(f"*{doc_id}*.ground-truth.json"))
     if not gt_files:
         print(f"No ground truth found for '{doc_id}'")
         print(f"Expected: {CORPUS_DIR}/{doc_id}/<name>.ground-truth.json")
         return 1
 
     gt_path = gt_files[0]
-    ext_path = WORK_DIR / "extraction.json"
+    ext_path = work / "extraction.json"
     if not ext_path.exists():
-        print("No extraction.json found. Run Lexios first.")
+        print(f"No extraction.json found at {ext_path}. Run Lexios first.")
         return 1
 
     results = score_document(doc_id, gt_path, ext_path)
@@ -623,26 +647,9 @@ def cmd_corpus():
                 "categories": categories,
             })
 
-    # Also check legacy location
-    for f in sorted((PROJECT_ROOT / "scripts" / "lexios-tests").glob("*.ground-truth.json")):
-        gt = json.loads(f.read_text())
-        doc_id_val = f.stem.replace(".ground-truth", "")
-        if not any(d["id"] == doc_id_val for d in docs):
-            elems = gt.get("elements", {})
-            categories = [k for k, v in elems.items() if isinstance(v, list) and v]
-            docs.append({
-                "id": doc_id_val,
-                "type": gt.get("doc_type", gt.get("_meta", {}).get("description", "unknown")[:30]),
-                "difficulty": gt.get("difficulty", "medium"),
-                "pages": gt.get("pages", {}).get("total", "?"),
-                "has_pdf": True,
-                "elements": sum(len(v) for v in elems.values() if isinstance(v, list)),
-                "categories": categories,
-            })
-
     print(f"\nLexios Test Corpus: {len(docs)} documents\n")
     if not docs:
-        print("  No documents yet. Add ground truths to scripts/lexios-tests/corpus/")
+        print(f"  No documents yet. Add ground truths to {CORPUS_DIR}/")
         return
 
     types = {}
@@ -753,7 +760,7 @@ def cmd_report():
     """).fetchall()
 
     if not latest_runs:
-        print("No evaluation data. Run: python3 scripts/lexios-eval.py score <doc_id>")
+        print("No evaluation data. Run: python3 lexios/eval.py score <doc_id>")
         return
 
     print(f"\n{'='*70}")
@@ -933,9 +940,15 @@ def main():
 
     if cmd == "score":
         if len(sys.argv) < 3:
-            print("Usage: lexios-eval.py score <doc_id>")
+            print("Usage: eval.py score <doc_id> [--work-dir /path/to/dir]")
             return 1
-        return cmd_score(sys.argv[2])
+        doc_id = sys.argv[2]
+        work_dir = None
+        if "--work-dir" in sys.argv:
+            idx = sys.argv.index("--work-dir")
+            if idx + 1 < len(sys.argv):
+                work_dir = Path(sys.argv[idx + 1])
+        return cmd_score(doc_id, work_dir)
 
     elif cmd == "regression":
         results_dir = sys.argv[2] if len(sys.argv) > 2 else None

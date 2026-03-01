@@ -1,9 +1,8 @@
-import Anthropic from '@anthropic-ai/sdk';
 import { readFileSync } from 'fs';
 import path from 'path';
 import { DATA_DIR } from './config.js';
-import { readEnvFile } from './env.js';
 import { logger } from './logger.js';
+import { MLXBackendFactory } from './router/index.js';
 
 // Load BLS wages map at startup
 let blsWages: Record<string, number> = {};
@@ -43,15 +42,6 @@ export interface EvaluationResult {
   feedback: string;
 }
 
-function getAnthropicClient(): Anthropic {
-  const env = readEnvFile(['ANTHROPIC_API_KEY', 'CLAUDE_CODE_OAUTH_TOKEN']);
-  const apiKey = process.env.ANTHROPIC_API_KEY || env.ANTHROPIC_API_KEY;
-  if (apiKey) return new Anthropic({ apiKey });
-  const oauthToken = process.env.CLAUDE_CODE_OAUTH_TOKEN || env.CLAUDE_CODE_OAUTH_TOKEN;
-  if (oauthToken) return new Anthropic({ authToken: oauthToken });
-  throw new Error('No API credentials configured (ANTHROPIC_API_KEY or CLAUDE_CODE_OAUTH_TOKEN)');
-}
-
 const FALLBACK_CLASSIFY: ClassifyResult = {
   occupation: 'General and Operations Managers',
   hours: 2,
@@ -62,7 +52,12 @@ export async function classifyTask(description: string): Promise<ClassifyResult>
   if (occupationList.length === 0) return FALLBACK_CLASSIFY;
 
   try {
-    const client = getAnthropicClient();
+    const ollama = MLXBackendFactory.create();
+    if (!(await ollama.isAvailable())) {
+      logger.warn('Ollama not available for classifyTask, using fallback');
+      return FALLBACK_CLASSIFY;
+    }
+
     const prompt = `Given this task: ${description}
 
 Classify into one of these occupations:
@@ -71,14 +66,15 @@ ${occupationList.join('\n')}
 Estimate hours to complete (0.25–40).
 Return JSON only: {"occupation": "...", "hours": 2.0, "sector": "..."}`;
 
-    const msg = await client.messages.create({
-      model: 'claude-haiku-4-5-20251001',
-      max_tokens: 256,
-      messages: [{ role: 'user', content: prompt }],
+    const response = await ollama.inference({
+      modelId: 'qwen2.5-coder',
+      prompt,
+      maxTokens: 256,
+      temperature: 0.1,
     });
 
-    const text = msg.content[0].type === 'text' ? msg.content[0].text : '';
-    const jsonMatch = text.match(/\{[\s\S]*\}/);
+    logger.info({ latencyMs: response.latencyMs }, 'classifyTask via Ollama');
+    const jsonMatch = response.text.match(/\{[\s\S]*\}/);
     if (!jsonMatch) return FALLBACK_CLASSIFY;
 
     const parsed = JSON.parse(jsonMatch[0]);
@@ -102,28 +98,35 @@ export async function evaluateWork(
   workOutput: string,
   artifactPaths: string[],
 ): Promise<EvaluationResult> {
-  try {
-    const client = getAnthropicClient();
-    const artifactNote = artifactPaths.length > 0
-      ? `\nArtifacts: ${artifactPaths.join(', ')}`
-      : '';
+  const artifactNote = artifactPaths.length > 0
+    ? `\nArtifacts: ${artifactPaths.join(', ')}`
+    : '';
 
-    const prompt = `You are evaluating work for a ${task.occupation}.
+  const prompt = `You are evaluating work for a ${task.occupation}.
 Task: ${task.prompt}
 Submitted work: ${workOutput.slice(0, 3000)}${artifactNote}
 
 Score 0.0–1.0 on: accuracy, completeness, professionalism, relevance.
 Return JSON only: {"score": 0.85, "feedback": "..."}`;
 
-    const msg = await client.messages.create({
-      model: 'claude-haiku-4-5-20251001',
-      max_tokens: 512,
-      messages: [{ role: 'user', content: prompt }],
-    });
+  try {
+    const ollama = MLXBackendFactory.create();
+    if (!(await ollama.isAvailable())) {
+      return { score: 0.5, feedback: 'Ollama unavailable — default score assigned' };
+    }
 
-    const text = msg.content[0].type === 'text' ? msg.content[0].text : '';
-    const jsonMatch = text.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) return { score: 0, feedback: 'Evaluation failed: could not parse response' };
+    const response = await ollama.inference({
+      modelId: 'qwen2.5-coder',
+      prompt,
+      maxTokens: 200,
+      temperature: 0.1,
+    });
+    logger.info({ latencyMs: response.latencyMs }, 'evaluateWork via Ollama');
+
+    const jsonMatch = response.text.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) {
+      return { score: 0.5, feedback: 'Evaluation returned non-JSON — default score assigned' };
+    }
 
     const parsed = JSON.parse(jsonMatch[0]);
     return {

@@ -1,0 +1,89 @@
+{
+  "_meta": {
+    "pdf": "sample-blueprint.pdf",
+    "source": "https://permitsonoma.org/Microsites/Permit%20Sonoma/Documents/Instructions%20and%20Forms/_BPC%20Building%20Plan%20Check/BPC-022-Sample-House-Plans.pdf",
+    "description": "Permit Sonoma BPC-022 Sample House Plans. 4-page single-family residential dwelling.",
+    "verified_by": "human + visual inspection of page-1.png",
+    "last_updated": "2026-02-27"
+  },
+
+  "pages": {
+    "total": 4,
+    "classifications": {
+      "1": "floor_plan",
+      "2": "elevation",
+      "3": "structural",
+      "4": "detail"
+    }
+  },
+
+  "title_block": {
+    "project_name": "SAMPLE HOUSE PLANS",
+    "drawing_number": "BPC-022",
+    "organization": "County of Sonoma",
+    "scale": "1/4\" = 1'-0\""
+  },
+
+  "rooms": {
+    "required": [
+      "Bedroom #1",
+      "Bedroom #2",
+      "Living Room",
+      "Kitchen",
+      "Entry",
+      "Garage",
+      "Deck"
+    ],
+    "optional": [
+      "Walk-in Closet",
+      "Bathroom",
+      "Hall"
+    ],
+    "min_count": 7,
+    "max_count": 12
+  },
+
+  "key_dimensions": {
+    "overall_width": "48'-0\"",
+    "house_area_sqft": 1130,
+    "notes": "HOUSE AREA is stated on the drawing as 1,130 sq ft. Garage area separate."
+  },
+
+  "windows": {
+    "types_in_legend": ["2040", "4040", "4043T", "6043T"],
+    "min_count": 4
+  },
+
+  "doors": {
+    "min_count": 4,
+    "must_include_types": ["interior", "exterior"],
+    "notes": "No formal door schedule on drawing. Garage has fire-rated door."
+  },
+
+  "compliance_expected": {
+    "should_flag": [
+      "missing door dimensions/schedule",
+      "egress window requirements for bedrooms"
+    ],
+    "should_not_flag_as_critical": [
+      "rafter vs joist size difference (these are different members)"
+    ]
+  },
+
+  "conflicts_expected": {
+    "known_real_issues": [
+      "dimension segments may not add up perfectly",
+      "no formal door schedule to cross-reference"
+    ],
+    "known_false_positives": [
+      "2x6 floor joists vs 2x8 roof rafters flagged as same-member conflict"
+    ]
+  },
+
+  "quantities_expected": {
+    "rooms_min": 7,
+    "doors_min": 4,
+    "windows_min": 4,
+    "building_area_sqft_range": [1000, 1300]
+  }
+}

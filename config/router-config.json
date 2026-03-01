@@ -1,0 +1,114 @@
+{
+  "version": "1.0.0",
+  "defaultTier": "local-slm",
+  "costOptimization": true,
+  "fallbackEnabled": true,
+
+  "models": {
+    "local": {
+      "slm": {
+        "vision": "qwen2.5-vl-7b",
+        "text": "qwen2.5-7b"
+      },
+      "llm": {
+        "vision": "qwen2.5-vl-72b",
+        "reasoning": "llama-3.3-70b",
+        "code": "llama-3.3-70b"
+      }
+    },
+    "cloud": {
+      "reasoning": "claude-opus-4.6",
+      "code": "claude-sonnet-4.6",
+      "vision": "gemini-3-flash",
+      "fallback": "gpt-4o"
+    }
+  },
+
+  "routingRules": {
+    "conversation": {
+      "simple": "local-slm",
+      "complex": "local-llm",
+      "critical": "cloud"
+    },
+    "vision": {
+      "simple": "local-slm",
+      "complex": "local-llm",
+      "critical": "cloud"
+    },
+    "code": {
+      "simple": "local-llm",
+      "complex": "cloud"
+    },
+    "reasoning": {
+      "simple": "local-llm",
+      "complex": "cloud"
+    },
+    "data": {
+      "simple": "local-slm",
+      "complex": "local-llm"
+    },
+    "web": {
+      "simple": "local-llm",
+      "complex": "cloud"
+    }
+  },
+
+  "fallbackStrategy": {
+    "maxRetries": 3,
+    "retryDelayMs": 1000,
+    "enableTierEscalation": true,
+    "fallbackOnError": true,
+    "fallbackOnTimeout": true,
+    "fallbackOnLowConfidence": true,
+    "lowConfidenceThreshold": 0.5
+  },
+
+  "performance": {
+    "enableAnalysisBasedRouting": false,
+    "analysisTimeoutMs": 500,
+    "metricsEnabled": true,
+    "metricsRetentionDays": 30
+  },
+
+  "domains": {
+    "lexios": {
+      "enabled": true,
+      "defaultModel": "qwen2.5-vl-72b",
+      "paidCustomerModel": "claude-sonnet-4.6",
+      "complianceModel": "claude-opus-4.6",
+      "batchThreshold": 10
+    },
+    "osha": {
+      "enabled": true,
+      "defaultModel": "claude-opus-4.6",
+      "requiresHighAccuracy": true
+    }
+  },
+
+  "costTargets": {
+    "maxDailyCostUsd": 50.0,
+    "targetLocalPercentage": 70.0,
+    "alertThresholdUsd": 10.0
+  },
+
+  "latencyTargets": {
+    "instant": {
+      "maxMs": 100,
+      "allowedTiers": ["local-slm"]
+    },
+    "fast": {
+      "maxMs": 2000,
+      "allowedTiers": ["local-slm", "local-llm"]
+    },
+    "batch": {
+      "maxMs": 30000,
+      "allowedTiers": ["local-slm", "local-llm", "cloud"]
+    }
+  },
+
+  "ollama": {
+    "enabled": true,
+    "serverUrl": "http://127.0.0.1:11434",
+    "models": ["qwen2.5-coder", "deepseek-coder-v2", "llama3"]
+  }
+}

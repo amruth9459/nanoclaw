@@ -1,0 +1,68 @@
+{
+  "doc_id": "permit-sonoma-bpc022",
+  "pdf": "sample-blueprint.pdf",
+  "source": "https://permitsonoma.org/Microsites/Permit%20Sonoma/Documents/Instructions%20and%20Forms/_BPC%20Building%20Plan%20Check/BPC-022-Sample-House-Plans.pdf",
+  "doc_type": "residential",
+  "difficulty": "easy",
+  "description": "Permit Sonoma BPC-022 Sample House Plans. 4-page single-family residential dwelling.",
+  "gt_is_minimum": true,
+
+  "pages": {
+    "total": 4,
+    "classifications": {
+      "1": "floor_plan",
+      "2": "elevation",
+      "3": "structural",
+      "4": "detail"
+    }
+  },
+
+  "elements": {
+    "rooms": [
+      {"name": "Bedroom #1", "page": 1, "dimensions": "12'-0\" x 13'-0\""},
+      {"name": "Bedroom #2", "page": 1, "dimensions": "12'-0\" x 12'-0\""},
+      {"name": "Living Room", "page": 1},
+      {"name": "Kitchen", "page": 1},
+      {"name": "Entry", "page": 1},
+      {"name": "Garage", "page": 1},
+      {"name": "Deck", "page": 1}
+    ],
+
+    "doors": [
+      {"type": "egress", "tag": "4030", "page": 1, "location": "Bedroom #2 to Deck"},
+      {"type": "single", "tag": "3040", "page": 1, "location": "Entry and Bedroom"},
+      {"type": "sliding", "page": 1, "location": "Living Room to Deck"},
+      {"type": "sliding", "page": 1, "location": "Deck access"},
+      {"type": "garage door", "page": 1, "location": "Garage"}
+    ],
+
+    "windows": [
+      {"tag": "2040", "type": "standard", "page": 1},
+      {"tag": "2040T", "type": "standard", "page": 1},
+      {"tag": "4040", "type": "standard", "page": 1},
+      {"tag": "6043T", "type": "standard", "page": 1}
+    ],
+
+    "dimensions": [
+      {"description": "Overall building width", "value": "48'-0\"", "page": 1},
+      {"description": "Overall building depth", "value": "36'-0\"", "page": 1}
+    ],
+
+    "key_notes": [
+      {"text": "HOUSE AREA 1,130 SQ FT", "page": 1},
+      {"text": "GARAGE AREA", "page": 1},
+      {"text": "fire-rated", "page": 1},
+      {"text": "egress", "page": 1}
+    ]
+  },
+
+  "compliance_flags": [
+    "missing door dimensions/schedule",
+    "egress window requirements for bedrooms"
+  ],
+
+  "false_positive_patterns": [
+    "rafter vs joist size difference (these are different members)",
+    "2x6 floor joists vs 2x8 roof rafters flagged as same-member conflict"
+  ]
+}
