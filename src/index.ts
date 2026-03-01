@@ -360,15 +360,18 @@ async function processGroupMessages(chatJid: string): Promise<boolean> {
 
   // --- Enrichment layers (all non-blocking) ---
 
-  // Context enrichment: prepend codified facts to prompt
+  // Context enrichment: prepend codified facts to prompt (main group only —
+  // guest sessions must not see personal facts from the main group)
   let contextBlock = '';
-  try {
-    contextBlock = await contextManager.getPromptContext();
-    if (contextBlock) {
-      prompt = `<context>\n${contextBlock}\n</context>\n\n${prompt}`;
+  if (isMainGroup) {
+    try {
+      contextBlock = await contextManager.getPromptContext();
+      if (contextBlock) {
+        prompt = `<context>\n${contextBlock}\n</context>\n\n${prompt}`;
+      }
+    } catch (err) {
+      logger.warn({ err }, 'Context enrichment failed');
     }
-  } catch (err) {
-    logger.warn({ err }, 'Context enrichment failed');
   }
 
   // Route decision: log which model the router would pick (monitoring-only)
