@@ -608,6 +608,7 @@ async function processGroupMessages(chatJid: string): Promise<boolean> {
     `turn-${chatJid}-${Date.now()}`,
     lastMsg.content,
     outputSentToUser ? 'responded' : 'no-output',
+    group.folder,
   ).catch(() => {});
 
   // Log usage and send cost footer
