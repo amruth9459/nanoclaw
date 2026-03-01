@@ -163,6 +163,7 @@ export function startIpcWatcher(deps: IpcDeps): void {
                 const LEXIOS_TYPES = new Set([
                   'lexios_track_analysis', 'lexios_track_document', 'lexios_add_member',
                   'lexios_get_members', 'lexios_check_permission', 'lexios_track_query',
+                  'lexios_save_extraction',
                 ]);
                 if (data.type && LEXIOS_TYPES.has(data.type as string)) {
                   await processLexiosMessage(data, sourceGroup, deps);
@@ -703,6 +704,27 @@ async function processLexiosMessage(
         answer_text: data.answer_preview as string | undefined,
       });
       // Fire-and-forget, no response needed
+      break;
+    }
+
+    case 'lexios_save_extraction': {
+      const { saveLexiosExtraction } = await import('./db.js');
+      const extractionData = data.extraction_data as string;
+      const documentFilename = data.document_filename as string;
+
+      if (!extractionData || !documentFilename) {
+        if (responseFile) writeIpcResponse(responseFile, { error: 'Missing extraction_data or document_filename' });
+        break;
+      }
+
+      try {
+        const extractionPath = saveLexiosExtraction(chatJid, groupFolder, documentFilename, extractionData);
+        if (responseFile) writeIpcResponse(responseFile, { success: true, extraction_path: extractionPath });
+        logger.info({ groupFolder, documentFilename, extractionPath }, 'Lexios: extraction saved');
+      } catch (err) {
+        logger.error({ err, groupFolder, documentFilename }, 'Lexios: failed to save extraction');
+        if (responseFile) writeIpcResponse(responseFile, { error: `Failed to save extraction: ${(err as Error).message}` });
+      }
       break;
     }
 

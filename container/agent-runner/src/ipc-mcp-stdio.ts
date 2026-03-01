@@ -960,6 +960,31 @@ server.tool(
   },
 );
 
+server.tool(
+  'lexios_save_extraction',
+  'Save extraction results so follow-up queries can access them without re-running the extraction pipeline. Call this after completing document analysis.',
+  {
+    extraction_data: z.string().describe('The full extraction JSON as a string'),
+    document_filename: z.string().describe('Original document filename (e.g. "floor-plan.pdf")'),
+  },
+  async (args) => {
+    if (!groupFolder.startsWith('lexios-')) {
+      return { content: [{ type: 'text' as const, text: 'This tool is only available in Lexios sessions.' }], isError: true };
+    }
+
+    const { responseFile } = writeLexiosRequest({
+      type: 'lexios_save_extraction',
+      extraction_data: args.extraction_data,
+      document_filename: args.document_filename,
+    });
+
+    const result = await pollResponse(responseFile, 10000);
+    if (!result) return { content: [{ type: 'text' as const, text: 'Save extraction request timed out.' }], isError: true };
+    if (result.error) return { content: [{ type: 'text' as const, text: `Error: ${result.error}` }], isError: true };
+    return { content: [{ type: 'text' as const, text: `Extraction saved (${args.document_filename}). Follow-up queries will use cached results.` }] };
+  },
+);
+
 // Start the stdio transport
 const transport = new StdioServerTransport();
 await server.connect(transport);
