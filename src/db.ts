@@ -145,6 +145,115 @@ function createSchema(database: Database.Database): void {
     );
   `);
 
+  // Lexios customer tracking (legacy DM model)
+  database.exec(`
+    CREATE TABLE IF NOT EXISTS lexios_customers (
+      jid TEXT PRIMARY KEY,
+      phone TEXT NOT NULL,
+      name TEXT,
+      documents_analyzed INTEGER DEFAULT 0,
+      pages_processed INTEGER DEFAULT 0,
+      first_contact TEXT NOT NULL,
+      last_contact TEXT,
+      status TEXT DEFAULT 'active'
+    );
+  `);
+
+  // Lexios per-building group model
+  database.exec(`
+    CREATE TABLE IF NOT EXISTS lexios_buildings (
+      jid TEXT PRIMARY KEY,
+      name TEXT,
+      address TEXT,
+      owner_phone TEXT NOT NULL,
+      building_type TEXT,
+      status TEXT DEFAULT 'active',
+      subscription_tier TEXT DEFAULT 'beta',
+      monthly_rate REAL DEFAULT 0,
+      documents_count INTEGER DEFAULT 0,
+      queries_count INTEGER DEFAULT 0,
+      created_at TEXT NOT NULL,
+      last_activity TEXT
+    );
+
+    CREATE TABLE IF NOT EXISTS lexios_building_members (
+      building_jid TEXT NOT NULL,
+      phone TEXT NOT NULL,
+      name TEXT,
+      role TEXT DEFAULT 'viewer',
+      can_upload INTEGER DEFAULT 0,
+      can_query INTEGER DEFAULT 1,
+      can_invite INTEGER DEFAULT 0,
+      query_limit_daily INTEGER,
+      queries_today INTEGER DEFAULT 0,
+      status TEXT DEFAULT 'active',
+      joined_at TEXT NOT NULL,
+      last_active TEXT,
+      PRIMARY KEY (building_jid, phone)
+    );
+
+    CREATE TABLE IF NOT EXISTS lexios_documents (
+      id TEXT PRIMARY KEY,
+      building_jid TEXT NOT NULL,
+      filename TEXT NOT NULL,
+      file_type TEXT NOT NULL,
+      file_size INTEGER,
+      discipline TEXT,
+      sheet_number TEXT,
+      revision TEXT DEFAULT 'R1',
+      is_latest INTEGER DEFAULT 1,
+      replaces_id TEXT,
+      uploaded_by TEXT,
+      media_path TEXT,
+      extraction_path TEXT,
+      spatial_data_path TEXT,
+      status TEXT DEFAULT 'active',
+      uploaded_at TEXT NOT NULL
+    );
+
+    CREATE TABLE IF NOT EXISTS lexios_queries (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      building_jid TEXT NOT NULL,
+      phone TEXT NOT NULL,
+      query_text TEXT NOT NULL,
+      category TEXT,
+      complexity TEXT,
+      route TEXT,
+      answer_text TEXT,
+      response_time_ms INTEGER,
+      cost_usd REAL DEFAULT 0,
+      was_helpful INTEGER,
+      asked_at TEXT NOT NULL
+    );
+
+    CREATE TABLE IF NOT EXISTS lexios_security_log (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      building_jid TEXT,
+      phone TEXT,
+      input_text TEXT NOT NULL,
+      threat_type TEXT NOT NULL,
+      pattern_name TEXT NOT NULL,
+      blocked INTEGER DEFAULT 1,
+      logged_at TEXT NOT NULL
+    );
+  `);
+
+  // Routing decision logs for model evaluation
+  database.exec(`
+    CREATE TABLE IF NOT EXISTS routing_logs (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      routed_at TEXT NOT NULL,
+      route_type TEXT NOT NULL,
+      model TEXT,
+      reasoning TEXT,
+      routing_latency_ms INTEGER,
+      execution_latency_ms INTEGER,
+      tokens_generated INTEGER,
+      user_message_preview TEXT,
+      success INTEGER DEFAULT 1
+    );
+  `);
+
   // Add context_mode column if it doesn't exist (migration for existing DBs)
   try {
     database.exec(
@@ -445,6 +554,35 @@ export function getNewMentions(
   `,
     )
     .all(lastTimestamp, ...registeredJids, likePattern) as NewMessage[];
+}
+
+/**
+ * Get new DMs from chats whose channel is 'lexios' and are NOT already in registeredJids.
+ * Used to pick up Lexios customer messages that haven't been registered yet.
+ */
+export function getNewLexiosDMs(
+  lastTimestamp: string,
+  registeredJids: string[],
+  botPrefix: string,
+): NewMessage[] {
+  const excludePlaceholders = registeredJids.length > 0
+    ? `AND m.chat_jid NOT IN (${registeredJids.map(() => '?').join(',')})`
+    : '';
+  const sql = `
+    SELECT m.id, m.chat_jid, m.sender, m.sender_name, m.content, m.timestamp,
+           m.media_type, m.media_path, m.media_mimetype, m.media_size
+    FROM messages m
+    JOIN chats c ON c.jid = m.chat_jid
+    WHERE m.timestamp > ?
+      AND c.channel = 'lexios'
+      AND c.is_group = 0
+      AND m.is_bot_message = 0
+      AND m.content NOT LIKE ?
+      ${excludePlaceholders}
+    ORDER BY m.timestamp
+  `;
+  const params: unknown[] = [lastTimestamp, `${botPrefix}:%`, ...registeredJids];
+  return db.prepare(sql).all(...params) as NewMessage[];
 }
 
 export function getNewMessages(
@@ -815,6 +953,72 @@ export function logUsage(
   );
 }
 
+export function logRouting(
+  routeType: 'local' | 'cloud',
+  model: string | null,
+  reasoning: string,
+  routingLatencyMs: number,
+  executionLatencyMs: number | null,
+  tokensGenerated: number | null,
+  userMessagePreview: string,
+  success: boolean,
+): void {
+  db.prepare(`
+    INSERT INTO routing_logs (routed_at, route_type, model, reasoning, routing_latency_ms, execution_latency_ms, tokens_generated, user_message_preview, success)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+  `).run(
+    new Date().toISOString(),
+    routeType,
+    model,
+    reasoning,
+    routingLatencyMs,
+    executionLatencyMs,
+    tokensGenerated,
+    userMessagePreview.slice(0, 200),
+    success ? 1 : 0,
+  );
+}
+
+export interface RoutingStats {
+  total: number;
+  local: number;
+  cloud: number;
+  byModel: Record<string, { count: number; avgLatencyMs: number; avgTokens: number; failures: number }>;
+}
+
+export function getRoutingStats(days: number = 10): RoutingStats {
+  const since = new Date(Date.now() - days * 86400000).toISOString();
+  const rows = db.prepare('SELECT * FROM routing_logs WHERE routed_at >= ?').all(since) as Array<{
+    route_type: string; model: string | null; execution_latency_ms: number | null;
+    tokens_generated: number | null; success: number;
+  }>;
+
+  const stats: RoutingStats = { total: rows.length, local: 0, cloud: 0, byModel: {} };
+
+  for (const row of rows) {
+    if (row.route_type === 'local') stats.local++;
+    else stats.cloud++;
+
+    const key = row.model || 'cloud';
+    if (!stats.byModel[key]) stats.byModel[key] = { count: 0, avgLatencyMs: 0, avgTokens: 0, failures: 0 };
+    const m = stats.byModel[key];
+    m.count++;
+    if (row.execution_latency_ms) m.avgLatencyMs += row.execution_latency_ms;
+    if (row.tokens_generated) m.avgTokens += row.tokens_generated;
+    if (!row.success) m.failures++;
+  }
+
+  // Convert sums to averages
+  for (const m of Object.values(stats.byModel)) {
+    if (m.count > 0) {
+      m.avgLatencyMs = Math.round(m.avgLatencyMs / m.count);
+      m.avgTokens = Math.round(m.avgTokens / m.count);
+    }
+  }
+
+  return stats;
+}
+
 export function getOrCreateEconomics(groupId: string): GroupEconomics {
   const existing = db.prepare('SELECT * FROM group_economics WHERE group_id = ?').get(groupId) as GroupEconomics | undefined;
   if (existing) return existing;
@@ -1107,4 +1311,325 @@ function migrateJsonState(): void {
       setRegisteredGroup(jid, group);
     }
   }
+}
+
+// ── Lexios customer tracking ──────────────────────────────────────────
+
+export function registerLexiosCustomer(jid: string, phone: string, name?: string): void {
+  db.prepare(`
+    INSERT INTO lexios_customers (jid, phone, name, first_contact, last_contact)
+    VALUES (?, ?, ?, ?, ?)
+    ON CONFLICT(jid) DO UPDATE SET
+      last_contact = excluded.last_contact,
+      name = COALESCE(excluded.name, lexios_customers.name)
+  `).run(jid, phone, name || null, new Date().toISOString(), new Date().toISOString());
+}
+
+export function trackDocumentAnalysis(jid: string, pages: number): void {
+  db.prepare(`
+    UPDATE lexios_customers
+    SET documents_analyzed = documents_analyzed + 1,
+        pages_processed = pages_processed + ?,
+        last_contact = ?
+    WHERE jid = ?
+  `).run(pages, new Date().toISOString(), jid);
+}
+
+export interface LexiosCustomerStats {
+  jid: string;
+  phone: string;
+  name: string | null;
+  documents_analyzed: number;
+  pages_processed: number;
+  first_contact: string;
+  last_contact: string | null;
+  status: string;
+}
+
+export function getLexiosCustomerStats(): LexiosCustomerStats[] {
+  return db.prepare(`
+    SELECT * FROM lexios_customers ORDER BY last_contact DESC
+  `).all() as LexiosCustomerStats[];
+}
+
+export function getLexiosCustomerSummary(): {
+  total_customers: number;
+  total_documents: number;
+  total_pages: number;
+  active_customers: number;
+} {
+  const row = db.prepare(`
+    SELECT
+      COUNT(*) as total_customers,
+      COALESCE(SUM(documents_analyzed), 0) as total_documents,
+      COALESCE(SUM(pages_processed), 0) as total_pages,
+      COUNT(CASE WHEN status = 'active' THEN 1 END) as active_customers
+    FROM lexios_customers
+  `).get() as { total_customers: number; total_documents: number; total_pages: number; active_customers: number };
+  return row;
+}
+
+export function getLexiosCostSummary(): { total_cost: number; total_runs: number } {
+  const row = db.prepare(`
+    SELECT COALESCE(SUM(cost_usd), 0) as total_cost, COUNT(*) as total_runs
+    FROM usage_logs
+    WHERE group_id LIKE 'lexios-%'
+  `).get() as { total_cost: number; total_runs: number };
+  return row;
+}
+
+// ── Lexios per-building group model ────────────────────────────────────
+
+export interface LexiosBuilding {
+  jid: string;
+  name: string | null;
+  address: string | null;
+  owner_phone: string;
+  building_type: string | null;
+  status: string;
+  subscription_tier: string;
+  monthly_rate: number;
+  documents_count: number;
+  queries_count: number;
+  created_at: string;
+  last_activity: string | null;
+}
+
+export interface LexiosBuildingMember {
+  building_jid: string;
+  phone: string;
+  name: string | null;
+  role: string;
+  can_upload: number;
+  can_query: number;
+  can_invite: number;
+  query_limit_daily: number | null;
+  queries_today: number;
+  status: string;
+  joined_at: string;
+  last_active: string | null;
+}
+
+export interface LexiosDocument {
+  id: string;
+  building_jid: string;
+  filename: string;
+  file_type: string;
+  file_size: number | null;
+  discipline: string | null;
+  sheet_number: string | null;
+  revision: string;
+  is_latest: number;
+  replaces_id: string | null;
+  uploaded_by: string | null;
+  media_path: string | null;
+  extraction_path: string | null;
+  spatial_data_path: string | null;
+  status: string;
+  uploaded_at: string;
+}
+
+export interface LexiosQuery {
+  id: number;
+  building_jid: string;
+  phone: string;
+  query_text: string;
+  category: string | null;
+  complexity: string | null;
+  route: string | null;
+  answer_text: string | null;
+  response_time_ms: number | null;
+  cost_usd: number;
+  was_helpful: number | null;
+  asked_at: string;
+}
+
+export function registerLexiosBuilding(jid: string, ownerPhone: string, name?: string): void {
+  const now = new Date().toISOString();
+  db.prepare(`
+    INSERT INTO lexios_buildings (jid, name, owner_phone, created_at, last_activity)
+    VALUES (?, ?, ?, ?, ?)
+    ON CONFLICT(jid) DO UPDATE SET
+      last_activity = excluded.last_activity,
+      name = COALESCE(excluded.name, lexios_buildings.name)
+  `).run(jid, name || null, ownerPhone, now, now);
+
+  // Auto-register owner as owner role
+  addBuildingMember(jid, ownerPhone, 'owner');
+}
+
+export function getLexiosBuilding(jid: string): LexiosBuilding | undefined {
+  return db.prepare('SELECT * FROM lexios_buildings WHERE jid = ?').get(jid) as LexiosBuilding | undefined;
+}
+
+export function updateLexiosBuilding(jid: string, updates: Partial<Pick<LexiosBuilding, 'name' | 'address' | 'building_type' | 'status'>>): void {
+  const fields: string[] = [];
+  const values: unknown[] = [];
+  if (updates.name !== undefined) { fields.push('name = ?'); values.push(updates.name); }
+  if (updates.address !== undefined) { fields.push('address = ?'); values.push(updates.address); }
+  if (updates.building_type !== undefined) { fields.push('building_type = ?'); values.push(updates.building_type); }
+  if (updates.status !== undefined) { fields.push('status = ?'); values.push(updates.status); }
+  if (fields.length === 0) return;
+  fields.push('last_activity = ?');
+  values.push(new Date().toISOString());
+  values.push(jid);
+  db.prepare(`UPDATE lexios_buildings SET ${fields.join(', ')} WHERE jid = ?`).run(...values);
+}
+
+export function addBuildingMember(buildingJid: string, phone: string, role: string): void {
+  const ROLE_PERMISSIONS: Record<string, { upload: number; query: number; invite: number }> = {
+    owner:    { upload: 1, query: 1, invite: 1 },
+    admin:    { upload: 1, query: 1, invite: 1 },
+    uploader: { upload: 1, query: 1, invite: 0 },
+    viewer:   { upload: 0, query: 1, invite: 0 },
+  };
+  const perms = ROLE_PERMISSIONS[role] || ROLE_PERMISSIONS.viewer;
+  const now = new Date().toISOString();
+  db.prepare(`
+    INSERT INTO lexios_building_members (building_jid, phone, role, can_upload, can_query, can_invite, joined_at, last_active)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    ON CONFLICT(building_jid, phone) DO UPDATE SET
+      role = excluded.role,
+      can_upload = excluded.can_upload,
+      can_query = excluded.can_query,
+      can_invite = excluded.can_invite,
+      last_active = excluded.last_active
+  `).run(buildingJid, phone, role, perms.upload, perms.query, perms.invite, now, now);
+}
+
+export function getBuildingMembers(buildingJid: string): LexiosBuildingMember[] {
+  return db.prepare('SELECT * FROM lexios_building_members WHERE building_jid = ? AND status = ?').all(buildingJid, 'active') as LexiosBuildingMember[];
+}
+
+export function checkBuildingPermission(buildingJid: string, phone: string, action: 'upload' | 'query' | 'invite' | 'remove' | 'billing'): boolean {
+  const member = db.prepare('SELECT * FROM lexios_building_members WHERE building_jid = ? AND phone = ?').get(buildingJid, phone) as LexiosBuildingMember | undefined;
+  if (!member || member.status !== 'active') return false;
+  switch (action) {
+    case 'upload': return member.can_upload === 1;
+    case 'query': return member.can_query === 1;
+    case 'invite': return member.can_invite === 1;
+    case 'remove': return member.role === 'owner' || member.role === 'admin';
+    case 'billing': return member.role === 'owner';
+    default: return false;
+  }
+}
+
+export function trackLexiosDocument(doc: {
+  id: string;
+  building_jid: string;
+  filename: string;
+  file_type: string;
+  file_size?: number;
+  discipline?: string;
+  sheet_number?: string;
+  revision?: string;
+  replaces_id?: string;
+  uploaded_by?: string;
+  media_path?: string;
+}): void {
+  const now = new Date().toISOString();
+  db.prepare(`
+    INSERT INTO lexios_documents (id, building_jid, filename, file_type, file_size, discipline, sheet_number, revision, replaces_id, uploaded_by, media_path, uploaded_at)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+  `).run(
+    doc.id, doc.building_jid, doc.filename, doc.file_type,
+    doc.file_size ?? null, doc.discipline ?? null, doc.sheet_number ?? null,
+    doc.revision || 'R1', doc.replaces_id ?? null, doc.uploaded_by ?? null,
+    doc.media_path ?? null, now,
+  );
+  // Update building document count
+  db.prepare('UPDATE lexios_buildings SET documents_count = documents_count + 1, last_activity = ? WHERE jid = ?').run(now, doc.building_jid);
+}
+
+export function getLexiosBuildingDocuments(buildingJid: string): LexiosDocument[] {
+  return db.prepare('SELECT * FROM lexios_documents WHERE building_jid = ? ORDER BY uploaded_at DESC').all(buildingJid) as LexiosDocument[];
+}
+
+export function updateDocumentRevision(oldId: string, newId: string): void {
+  db.prepare('UPDATE lexios_documents SET is_latest = 0, status = ? WHERE id = ?').run('superseded', oldId);
+}
+
+export function trackLexiosQuery(query: {
+  building_jid: string;
+  phone: string;
+  query_text: string;
+  category?: string;
+  complexity?: string;
+  route?: string;
+  answer_text?: string;
+  response_time_ms?: number;
+  cost_usd?: number;
+}): void {
+  const now = new Date().toISOString();
+  db.prepare(`
+    INSERT INTO lexios_queries (building_jid, phone, query_text, category, complexity, route, answer_text, response_time_ms, cost_usd, asked_at)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+  `).run(
+    query.building_jid, query.phone, query.query_text,
+    query.category ?? null, query.complexity ?? null, query.route ?? null,
+    query.answer_text ?? null, query.response_time_ms ?? null, query.cost_usd ?? 0, now,
+  );
+  // Update building query count
+  db.prepare('UPDATE lexios_buildings SET queries_count = queries_count + 1, last_activity = ? WHERE jid = ?').run(now, query.building_jid);
+}
+
+export function getLexiosQueryStats(buildingJid: string): { total: number; by_category: Record<string, number> } {
+  const total = (db.prepare('SELECT COUNT(*) as count FROM lexios_queries WHERE building_jid = ?').get(buildingJid) as { count: number }).count;
+  const rows = db.prepare('SELECT category, COUNT(*) as count FROM lexios_queries WHERE building_jid = ? GROUP BY category').all(buildingJid) as Array<{ category: string | null; count: number }>;
+  const by_category: Record<string, number> = {};
+  for (const row of rows) by_category[row.category || 'uncategorized'] = row.count;
+  return { total, by_category };
+}
+
+export function logSecurityEvent(buildingJid: string | null, phone: string | null, inputText: string, threatType: string, patternName: string): void {
+  db.prepare(`
+    INSERT INTO lexios_security_log (building_jid, phone, input_text, threat_type, pattern_name, logged_at)
+    VALUES (?, ?, ?, ?, ?, ?)
+  `).run(buildingJid ?? null, phone ?? null, inputText.slice(0, 500), threatType, patternName, new Date().toISOString());
+}
+
+/**
+ * Get new messages from Lexios channel groups (@g.us) that are NOT already registered.
+ * Used to detect new building groups that need auto-registration.
+ */
+export function getNewLexiosGroupMessages(
+  lastTimestamp: string,
+  registeredJids: string[],
+  botPrefix: string,
+): NewMessage[] {
+  const excludePlaceholders = registeredJids.length > 0
+    ? `AND m.chat_jid NOT IN (${registeredJids.map(() => '?').join(',')})`
+    : '';
+  const sql = `
+    SELECT m.id, m.chat_jid, m.sender, m.sender_name, m.content, m.timestamp,
+           m.media_type, m.media_path, m.media_mimetype, m.media_size
+    FROM messages m
+    JOIN chats c ON c.jid = m.chat_jid
+    WHERE m.timestamp > ?
+      AND c.channel = 'lexios'
+      AND c.is_group = 1
+      AND m.is_bot_message = 0
+      AND m.content NOT LIKE ?
+      ${excludePlaceholders}
+    ORDER BY m.timestamp
+  `;
+  const params: unknown[] = [lastTimestamp, `${botPrefix}:%`, ...registeredJids];
+  return db.prepare(sql).all(...params) as NewMessage[];
+}
+
+export function getLexiosBuildingSummary(): {
+  total_buildings: number;
+  total_documents: number;
+  total_queries: number;
+  active_buildings: number;
+  buildings: LexiosBuilding[];
+} {
+  const buildings = db.prepare('SELECT * FROM lexios_buildings ORDER BY last_activity DESC').all() as LexiosBuilding[];
+  return {
+    total_buildings: buildings.length,
+    total_documents: buildings.reduce((s, b) => s + b.documents_count, 0),
+    total_queries: buildings.reduce((s, b) => s + b.queries_count, 0),
+    active_buildings: buildings.filter(b => b.status === 'active').length,
+    buildings,
+  };
 }

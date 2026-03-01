@@ -159,6 +159,17 @@ export function startIpcWatcher(deps: IpcDeps): void {
                   continue;
                 }
 
+                // ── Lexios IPC handlers ────────────────────────────────
+                const LEXIOS_TYPES = new Set([
+                  'lexios_track_analysis', 'lexios_track_document', 'lexios_add_member',
+                  'lexios_get_members', 'lexios_check_permission', 'lexios_track_query',
+                ]);
+                if (data.type && LEXIOS_TYPES.has(data.type as string)) {
+                  await processLexiosMessage(data, sourceGroup, deps);
+                  fs.unlinkSync(filePath);
+                  continue;
+                }
+
                 if (data.type === 'remote_shell' && data.command) {
                   // Only main group can execute remote shell commands
                   if (!isMain) {
@@ -598,6 +609,94 @@ async function processClawworkMessage(
   }
 }
 
+async function processLexiosMessage(
+  data: Record<string, unknown>,
+  groupFolder: string,
+  deps: IpcDeps,
+): Promise<void> {
+  const rawResponseFile = data.responseFile as string | undefined;
+  const responseFile = rawResponseFile ? toHostIpcPath(rawResponseFile, groupFolder) : undefined;
+  const chatJid = data.chatJid as string;
+
+  switch (data.type) {
+    case 'lexios_track_analysis': {
+      const { trackDocumentAnalysis } = await import('./db.js');
+      const pages = (data.pages as number) || 0;
+      if (chatJid && pages > 0) {
+        trackDocumentAnalysis(chatJid, pages);
+        logger.info({ chatJid, pages, groupFolder }, 'Lexios: tracked document analysis');
+      }
+      if (responseFile) writeIpcResponse(responseFile, { success: true });
+      break;
+    }
+
+    case 'lexios_track_document': {
+      const { trackLexiosDocument, updateDocumentRevision } = await import('./db.js');
+      const docId = `doc-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+      trackLexiosDocument({
+        id: docId,
+        building_jid: chatJid,
+        filename: data.filename as string,
+        file_type: data.file_type as string,
+        discipline: data.discipline as string | undefined,
+        sheet_number: data.sheet_number as string | undefined,
+        revision: (data.revision as string) || 'R1',
+        replaces_id: data.replaces_id as string | undefined,
+      });
+      if (data.replaces_id) {
+        updateDocumentRevision(data.replaces_id as string, docId);
+      }
+      if (responseFile) writeIpcResponse(responseFile, { success: true, id: docId });
+      logger.info({ groupFolder, docId, filename: data.filename }, 'Lexios: document tracked');
+      break;
+    }
+
+    case 'lexios_add_member': {
+      const { addBuildingMember } = await import('./db.js');
+      const phone = data.phone as string;
+      const role = (data.role as string) || 'viewer';
+      addBuildingMember(chatJid, phone, role);
+      if (responseFile) writeIpcResponse(responseFile, { success: true, phone, role });
+      logger.info({ groupFolder, phone, role }, 'Lexios: member added');
+      break;
+    }
+
+    case 'lexios_get_members': {
+      const { getBuildingMembers } = await import('./db.js');
+      const members = getBuildingMembers(chatJid);
+      if (responseFile) writeIpcResponse(responseFile, { members });
+      break;
+    }
+
+    case 'lexios_check_permission': {
+      const { checkBuildingPermission } = await import('./db.js');
+      const phone = data.phone as string;
+      const action = data.action as 'upload' | 'query' | 'invite' | 'remove' | 'billing';
+      const allowed = checkBuildingPermission(chatJid, phone, action);
+      if (responseFile) writeIpcResponse(responseFile, { allowed, phone, action });
+      break;
+    }
+
+    case 'lexios_track_query': {
+      const { trackLexiosQuery } = await import('./db.js');
+      trackLexiosQuery({
+        building_jid: chatJid,
+        phone: data.phone as string || '',
+        query_text: data.query_text as string,
+        category: data.category as string | undefined,
+        complexity: data.complexity as string | undefined,
+        route: data.route as string | undefined,
+        answer_text: data.answer_preview as string | undefined,
+      });
+      // Fire-and-forget, no response needed
+      break;
+    }
+
+    default:
+      logger.warn({ type: data.type, groupFolder }, 'Unknown Lexios IPC type');
+  }
+}
+
 export async function processTaskIpc(
   data: {
     type: string;
@@ -616,6 +715,11 @@ export async function processTaskIpc(
     trigger?: string;
     requiresTrigger?: boolean;
     containerConfig?: RegisteredGroup['containerConfig'];
+    // For spawn_team
+    goal?: string;
+    priority?: 'critical' | 'high' | 'medium' | 'low';
+    targetValue?: number;
+    deadline?: string;
   },
   sourceGroup: string, // Verified identity from IPC directory
   isMain: boolean, // Verified from directory path
@@ -837,6 +941,49 @@ export async function processTaskIpc(
           { data },
           'Invalid register_group request - missing required fields',
         );
+      }
+      break;
+
+    case 'spawn_team':
+      // Only main group can spawn teams (requires elevated permissions)
+      if (!isMain) {
+        logger.warn(
+          { sourceGroup },
+          'Unauthorized spawn_team attempt blocked',
+        );
+        break;
+      }
+
+      if (data.goal && data.chatJid) {
+        try {
+          // Dynamically import the orchestrator (only loaded when needed)
+          const { OrchestratorFactory } = await import('./nanoclaw-orchestrator.js');
+          const orchestrator = OrchestratorFactory.create(path.join(STORE_DIR, 'nanoclaw.db'));
+
+          const result = await orchestrator.processGoal({
+            description: data.goal as string,
+            targetValue: data.targetValue as number | undefined,
+            deadline: data.deadline ? new Date(data.deadline as string) : undefined,
+            priority: (data.priority as 'critical' | 'high' | 'medium' | 'low') || 'high',
+            source: 'user',
+          });
+
+          // Send acknowledgment to user
+          await deps.sendMessage(data.chatJid, result.acknowledgment);
+
+          logger.info(
+            { goal: data.goal, teamsFormed: result.teamsFormed, tasksCreated: result.tasksCreated },
+            'Team spawned successfully',
+          );
+        } catch (err) {
+          logger.error({ err, goal: data.goal }, 'Team spawn failed');
+          await deps.sendMessage(
+            data.chatJid,
+            `❌ Team spawn failed: ${(err as Error).message}`,
+          );
+        }
+      } else {
+        logger.warn({ data }, 'Invalid spawn_team request - missing goal or chatJid');
       }
       break;
 

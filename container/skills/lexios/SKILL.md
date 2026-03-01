@@ -443,6 +443,156 @@ RESULTS
 
 Use the `send_file` MCP tool to send the JSON if the user wants the full data.
 
+---
+
+## Query vs Document routing
+
+When a user sends a **text message** (not a file), classify it before dispatching expensive analysis.
+
+### Step 1: Run the query classifier
+
+```bash
+lexios-classify "where is room 101"
+```
+
+Output: `{"complexity": "simple", "route": "cache", "category": "location"}`
+
+### Step 2: Route based on complexity
+
+| Complexity | Route | Action |
+|-----------|-------|--------|
+| **simple** | cache | Look up from cached extraction data in `/workspace/group/lexios-work/extraction.json`. No LLM call needed. |
+| **moderate** | extraction | Re-read relevant pages and answer from the extraction data. |
+| **complex** | llm | Full analysis — dispatch extraction agent if needed, then answer. |
+| **critical** | llm | Full compliance check — always dispatch Compliance Agent. |
+
+If no extraction data exists yet (no documents analyzed), tell the user to send a document first.
+
+### Step 3: Track the query
+
+After answering, call `mcp__nanoclaw__lexios_track_query` to record the query for analytics.
+
+---
+
+## DWG/DXF file support
+
+When a user sends a `.dwg` or `.dxf` file:
+
+### Step 1: Extract structured data
+
+```bash
+lexios-dxf /workspace/media/<filename>.dxf /workspace/group/lexios-work
+```
+
+This extracts:
+- **Layers**: names, colors, visibility, linetypes
+- **Text entities**: all text with XYZ positions, layer assignments
+- **Dimensions**: measurement values, overrides
+- **Block references**: names, positions, scales, rotations
+- **Lines**: start/end coordinates with layer info (first 500)
+- **Spatial bounds**: min/max XYZ for the entire drawing
+
+Output: `/workspace/group/lexios-work/dxf-extraction.json` + optional `dxf-render.png`
+
+### Step 2: Read the extraction JSON
+
+```bash
+cat /workspace/group/lexios-work/dxf-extraction.json
+```
+
+Use the layer structure and text entities to understand the drawing. DXF text entities have native XYZ coordinates — far more accurate than PDF OCR.
+
+### Step 3: If rendered PNG exists, also view it
+
+```bash
+ls /workspace/group/lexios-work/dxf-render.png
+```
+
+If the render exists, read it with the Read tool for visual analysis alongside the structured data.
+
+### Step 4: Combine with extraction pipeline
+
+Feed the DXF extraction into the same specialist pipeline as PDFs. The structured data (layers, text, dimensions) maps to extraction types in types.json. DXF data has higher confidence due to native coordinates.
+
+---
+
+## Document versioning
+
+After processing any document, track it and check for revisions:
+
+### Step 1: Track the document
+
+Call `mcp__nanoclaw__lexios_track_document` with:
+- `filename`: original filename
+- `file_type`: pdf, dwg, dxf, png, jpg
+- `discipline`: architectural, structural, mep, civil (classify from content)
+- `sheet_number`: e.g. "A1.1" (extract from title block)
+- `revision`: e.g. "R2" (extract from title block, default "R1")
+
+### Step 2: Check for superseded documents
+
+If the document has the same discipline + sheet_number as an existing document for this building, it's a revision. Set `replaces_id` to the previous document's ID and warn:
+
+> "This appears to be a revision of sheet A1.1. Previous version (R1) is now superseded by R2."
+
+---
+
+## Spatial data collection
+
+When extracting data (both PDF and DXF), also capture spatial coordinates for future 3D model generation.
+
+Include a `spatial_metadata` key in the extraction JSON:
+
+```json
+{
+  "spatial_metadata": {
+    "coordinate_system": "local",
+    "units": "feet",
+    "bounds": { "min": [0, 0, 0], "max": [120, 80, 30] },
+    "floors": [
+      { "level": 0, "name": "Ground Floor", "elevation_ft": 0, "ceiling_height_ft": 9 }
+    ],
+    "walls": [
+      { "start": [0, 0], "end": [120, 0], "thickness": 0.5, "height": 9, "type": "exterior", "layer": "A-WALL-EXT" }
+    ],
+    "openings": [
+      { "type": "door", "tag": "D1", "wall_id": 0, "position": [15, 0], "width": 3, "height": 6.67 }
+    ]
+  }
+}
+```
+
+For PDF extractions: estimate wall positions from room dimensions and door/window locations.
+For DXF extractions: use the native XYZ coordinates from line entities and text positions.
+
+---
+
+## Building access control
+
+This is a per-building WhatsApp group. Multiple participants have different roles:
+
+| Role | Upload | Query | Invite | Remove | Billing |
+|------|--------|-------|--------|--------|---------|
+| owner | yes | yes | yes | yes | yes |
+| admin | yes | yes | yes | yes | no |
+| uploader | yes | yes | no | no | no |
+| viewer | no | yes | no | no | no |
+
+### Auto-registration
+When a new participant sends their first message, auto-register them as `viewer` using `mcp__nanoclaw__lexios_add_member`.
+
+### Role management
+The building owner can promote via commands like:
+- "make +1234567890 an uploader"
+- "promote @user to admin"
+
+Parse these and call `mcp__nanoclaw__lexios_add_member` with the appropriate role.
+
+### Permission checks
+Before document uploads, call `mcp__nanoclaw__lexios_check_permission` to verify the sender has upload rights. If not, reply: "You need uploader or admin access to upload documents. Ask the building owner to grant access."
+
+---
+
 ## Important notes
 
 - **Cost awareness**: Each specialist subagent costs money (Claude API calls). Default to Quick mode. Only run additional specialists when requested.
@@ -450,3 +600,5 @@ Use the `send_file` MCP tool to send the JSON if the user wants the full data.
 - **Confidence reporting**: Always include confidence scores. Construction drawings are complex and vision extraction isn't perfect. Flag low-confidence items explicitly.
 - **No hallucinated codes**: Only cite specific code sections you know. If unsure of the exact section number, say "per IBC requirements" without a made-up section number.
 - **Iterative analysis**: If the user asks follow-up questions, you can dispatch individual specialists again without re-running the full pipeline. The extraction JSON persists in lexios-work/.
+- **DWG/DXF priority**: DXF data has native CAD coordinates — trust it over PDF OCR when both are available. Flag this in confidence scores.
+- **Versioning**: Always track documents after processing. Check for revisions by matching discipline + sheet number.

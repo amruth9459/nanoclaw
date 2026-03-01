@@ -715,6 +715,251 @@ function writeRemoteShellRequest(data: {
   return { responseFile };
 }
 
+server.tool(
+  'spawn_team',
+  `Spawn a multi-agent team to work on a complex goal. Use this for tasks that benefit from specialized agents working together.
+
+When to use:
+- Complex, multi-step goals requiring different expertise (research + development + testing)
+- Tasks that will take significant time and benefit from parallel work
+- Projects requiring specialized roles (e.g., researcher, developer, analyst)
+
+The team system will:
+1. Decompose the goal into sub-goals and tasks
+2. Form specialized agent teams based on requirements
+3. Manage resources (64GB RAM shared across all products)
+4. Provide progress updates
+5. Return results when complete`,
+  {
+    goal: z.string().describe('The high-level goal description (e.g., "Build OSHA Violation Predictor MVP")'),
+    priority: z.enum(['critical', 'high', 'medium', 'low']).default('high').describe('Task priority (critical=paying customer, high=user task, medium=scheduled, low=background)'),
+    target_value: z.number().optional().describe('Optional numeric target (e.g., 5250 for "$5,250 goal")'),
+    deadline: z.string().optional().describe('Optional deadline in ISO 8601 format (e.g., "2026-06-30T00:00:00Z")'),
+  },
+  async (args) => {
+    // Main group only - teams require elevated permissions
+    if (!isMain) {
+      return {
+        content: [{
+          type: 'text' as const,
+          text: 'Error: Team spawning is only available in the main group for security reasons.',
+        }],
+        isError: true,
+      };
+    }
+
+    const taskData: Record<string, unknown> = {
+      type: 'spawn_team',
+      chatJid,
+      groupFolder,
+      goal: args.goal,
+      priority: args.priority,
+      targetValue: args.target_value,
+      deadline: args.deadline,
+      timestamp: new Date().toISOString(),
+    };
+
+    const filename = writeIpcFile(TASKS_DIR, taskData);
+
+    return {
+      content: [{
+        type: 'text' as const,
+        text: `✅ Team spawn request queued: ${filename}\n\n` +
+              `*Goal:* ${args.goal}\n` +
+              `*Priority:* ${args.priority}\n\n` +
+              `The team orchestrator will:\n` +
+              `• Decompose into sub-goals and tasks\n` +
+              `• Form specialized agent teams\n` +
+              `• Manage 64GB RAM resources\n` +
+              `• Provide progress updates\n\n` +
+              `You'll receive updates as teams work on this.`,
+      }],
+    };
+  },
+);
+
+// ── Lexios customer tracking ──────────────────────────────────────────
+
+server.tool(
+  'lexios_report_analysis',
+  'Report a completed document analysis to track customer usage. Call this after finishing a Lexios document analysis.',
+  {
+    pages: z.number().int().min(1).describe('Number of pages analyzed'),
+  },
+  async (args) => {
+    // Only Lexios groups should call this
+    if (!groupFolder.startsWith('lexios-')) {
+      return {
+        content: [{ type: 'text' as const, text: 'This tool is only available in Lexios customer sessions.' }],
+        isError: true,
+      };
+    }
+
+    const data: Record<string, unknown> = {
+      type: 'lexios_track_analysis',
+      chatJid,
+      pages: args.pages,
+      timestamp: new Date().toISOString(),
+    };
+
+    writeIpcFile(MESSAGES_DIR, data);
+
+    return {
+      content: [{
+        type: 'text' as const,
+        text: `Analysis tracked: ${args.pages} pages processed.`,
+      }],
+    };
+  },
+);
+
+// ── Lexios building management tools ──────────────────────────────────
+
+function writeLexiosRequest(data: object): { responseFile: string } {
+  const requestId = `lexios-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+  const requestFile = path.join(MESSAGES_DIR, `${requestId}.json`);
+  const responseFile = path.join(MESSAGES_DIR, `${requestId}.response.json`);
+
+  const payload = { ...data, requestId, responseFile, groupFolder, chatJid, timestamp: new Date().toISOString() };
+  const tmp = `${requestFile}.tmp`;
+  fs.writeFileSync(tmp, JSON.stringify(payload, null, 2));
+  fs.renameSync(tmp, requestFile);
+
+  return { responseFile };
+}
+
+server.tool(
+  'lexios_track_document',
+  'Track a document upload in the Lexios building system. Call after processing a document (PDF, DWG, DXF).',
+  {
+    filename: z.string().describe('Original filename'),
+    file_type: z.string().describe('File type: pdf, dwg, dxf, png, jpg'),
+    discipline: z.string().optional().describe('Discipline: architectural, structural, mep, civil'),
+    sheet_number: z.string().optional().describe('Sheet number, e.g. "A1.1"'),
+    revision: z.string().optional().describe('Revision, e.g. "R2" (default: "R1")'),
+    replaces_id: z.string().optional().describe('ID of previous document this replaces (for revisions)'),
+  },
+  async (args) => {
+    if (!groupFolder.startsWith('lexios-')) {
+      return { content: [{ type: 'text' as const, text: 'This tool is only available in Lexios sessions.' }], isError: true };
+    }
+
+    const { responseFile } = writeLexiosRequest({
+      type: 'lexios_track_document',
+      filename: args.filename,
+      file_type: args.file_type,
+      discipline: args.discipline,
+      sheet_number: args.sheet_number,
+      revision: args.revision || 'R1',
+      replaces_id: args.replaces_id,
+    });
+
+    const result = await pollResponse(responseFile, 10000);
+    if (!result) return { content: [{ type: 'text' as const, text: 'Document tracking request timed out.' }], isError: true };
+    if (result.error) return { content: [{ type: 'text' as const, text: `Error: ${result.error}` }], isError: true };
+    return { content: [{ type: 'text' as const, text: `Document tracked: ${args.filename} (${args.file_type}, ${args.revision || 'R1'})` }] };
+  },
+);
+
+server.tool(
+  'lexios_add_member',
+  'Add or update a member in the Lexios building group. Owner/admin can set roles.',
+  {
+    phone: z.string().describe('Phone number of the member (e.g. "1234567890")'),
+    role: z.enum(['owner', 'admin', 'uploader', 'viewer']).default('viewer').describe('Role to assign'),
+  },
+  async (args) => {
+    if (!groupFolder.startsWith('lexios-')) {
+      return { content: [{ type: 'text' as const, text: 'This tool is only available in Lexios sessions.' }], isError: true };
+    }
+
+    const { responseFile } = writeLexiosRequest({
+      type: 'lexios_add_member',
+      phone: args.phone,
+      role: args.role,
+    });
+
+    const result = await pollResponse(responseFile, 10000);
+    if (!result) return { content: [{ type: 'text' as const, text: 'Add member request timed out.' }], isError: true };
+    if (result.error) return { content: [{ type: 'text' as const, text: `Error: ${result.error}` }], isError: true };
+    return { content: [{ type: 'text' as const, text: `Member ${args.phone} set to role: ${args.role}` }] };
+  },
+);
+
+server.tool(
+  'lexios_get_members',
+  'List all members of this Lexios building group with their roles and permissions.',
+  {},
+  async () => {
+    if (!groupFolder.startsWith('lexios-')) {
+      return { content: [{ type: 'text' as const, text: 'This tool is only available in Lexios sessions.' }], isError: true };
+    }
+
+    const { responseFile } = writeLexiosRequest({ type: 'lexios_get_members' });
+
+    const result = await pollResponse(responseFile, 10000);
+    if (!result) return { content: [{ type: 'text' as const, text: 'Get members request timed out.' }], isError: true };
+    if (result.error) return { content: [{ type: 'text' as const, text: `Error: ${result.error}` }], isError: true };
+    return { content: [{ type: 'text' as const, text: JSON.stringify(result.members, null, 2) }] };
+  },
+);
+
+server.tool(
+  'lexios_check_permission',
+  'Check if a phone number has permission for an action in this building.',
+  {
+    phone: z.string().describe('Phone number to check'),
+    action: z.enum(['upload', 'query', 'invite', 'remove', 'billing']).describe('Action to check'),
+  },
+  async (args) => {
+    if (!groupFolder.startsWith('lexios-')) {
+      return { content: [{ type: 'text' as const, text: 'This tool is only available in Lexios sessions.' }], isError: true };
+    }
+
+    const { responseFile } = writeLexiosRequest({
+      type: 'lexios_check_permission',
+      phone: args.phone,
+      action: args.action,
+    });
+
+    const result = await pollResponse(responseFile, 10000);
+    if (!result) return { content: [{ type: 'text' as const, text: 'Permission check timed out.' }], isError: true };
+    if (result.error) return { content: [{ type: 'text' as const, text: `Error: ${result.error}` }], isError: true };
+    return { content: [{ type: 'text' as const, text: result.allowed ? `Allowed: ${args.phone} can ${args.action}` : `Denied: ${args.phone} cannot ${args.action}` }] };
+  },
+);
+
+server.tool(
+  'lexios_track_query',
+  'Track a query in the Lexios analytics system. Call after answering a user question.',
+  {
+    query_text: z.string().describe('The user query text'),
+    category: z.string().optional().describe('Query category: location, quantity, specification, compliance, general'),
+    complexity: z.string().optional().describe('Query complexity: simple, moderate, complex, critical'),
+    route: z.string().optional().describe('How the query was answered: cache, extraction, llm'),
+    answer_preview: z.string().optional().describe('First 200 chars of the answer'),
+  },
+  async (args) => {
+    if (!groupFolder.startsWith('lexios-')) {
+      return { content: [{ type: 'text' as const, text: 'This tool is only available in Lexios sessions.' }], isError: true };
+    }
+
+    writeIpcFile(MESSAGES_DIR, {
+      type: 'lexios_track_query',
+      chatJid,
+      groupFolder,
+      query_text: args.query_text,
+      category: args.category,
+      complexity: args.complexity,
+      route: args.route,
+      answer_preview: args.answer_preview,
+      timestamp: new Date().toISOString(),
+    });
+
+    return { content: [{ type: 'text' as const, text: 'Query tracked.' }] };
+  },
+);
+
 // Start the stdio transport
 const transport = new StdioServerTransport();
 await server.connect(transport);
