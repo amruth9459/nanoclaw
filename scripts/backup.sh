@@ -103,10 +103,13 @@ if [ -d "$NANOCLAW_DIR/config/" ]; then
         2>> "$LOG_FILE" && log "synced config/" || log "WARN: config/ sync failed"
 fi
 
-# .env
+# .env — use temp dir + sync (rclone copyto has a CreateBucket bug with R2)
 if [ -f "$NANOCLAW_DIR/.env" ]; then
-    rclone copyto "$NANOCLAW_DIR/.env" "${R2_REMOTE}:${R2_BUCKET}/nanoclaw/.env" \
+    tmp_env=$(mktemp -d)
+    cp "$NANOCLAW_DIR/.env" "$tmp_env/dot-env"
+    rclone sync "$tmp_env/" "${R2_REMOTE}:${R2_BUCKET}/nanoclaw/env/" \
         --quiet 2>> "$LOG_FILE" && log "synced .env" || log "WARN: .env sync failed"
+    rm -rf "$tmp_env"
 fi
 
 # ---------- Step 3: rclone sync Lexios runtime dirs ----------

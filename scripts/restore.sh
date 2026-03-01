@@ -67,8 +67,9 @@ rclone copy "${R2_REMOTE}:${R2_BUCKET}/nanoclaw/data/" "$NANOCLAW_DIR/data/" \
 rclone copy "${R2_REMOTE}:${R2_BUCKET}/nanoclaw/config/" "$NANOCLAW_DIR/config/" \
     "${RCLONE_FLAGS[@]}"
 
-rclone copyto "${R2_REMOTE}:${R2_BUCKET}/nanoclaw/.env" "$NANOCLAW_DIR/.env" \
-    --progress 2>/dev/null || echo "WARN: no .env found in R2 (you may need to create one)"
+rclone copy "${R2_REMOTE}:${R2_BUCKET}/nanoclaw/env/" /tmp/nanoclaw-env-restore/ \
+    --progress 2>/dev/null && mv /tmp/nanoclaw-env-restore/dot-env "$NANOCLAW_DIR/.env" && rm -rf /tmp/nanoclaw-env-restore \
+    || echo "WARN: no .env found in R2 (you may need to create one)"
 
 # ---------- Step 3: Restore Lexios runtime data from R2 ----------
 
