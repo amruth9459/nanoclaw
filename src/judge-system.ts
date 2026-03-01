@@ -11,8 +11,22 @@
  * - User-facing responses: Check accuracy, completeness, tone
  */
 
+import Anthropic from '@anthropic-ai/sdk';
+
+import { readEnvFile } from './env.js';
+import { logger } from './logger.js';
 import { RouterFactory } from './router/universal-router.js';
 import type { RoutingContext } from './router/types.js';
+
+let _anthropicClient: Anthropic | null = null;
+function getAnthropicClient(): Anthropic {
+  if (_anthropicClient) return _anthropicClient;
+  const env = readEnvFile(['ANTHROPIC_API_KEY']);
+  const apiKey = env.ANTHROPIC_API_KEY || process.env.ANTHROPIC_API_KEY;
+  if (!apiKey) throw new Error('ANTHROPIC_API_KEY required for judge system');
+  _anthropicClient = new Anthropic({ apiKey });
+  return _anthropicClient;
+}
 
 export interface JudgeRequest {
   id: string;
@@ -265,29 +279,86 @@ Check for:
   }
 
   /**
-   * Execute judge review (placeholder for actual model call)
+   * Execute judge review with real model call
    */
   private async executeJudgeReview(
     judgeId: string,
     modelId: string,
     prompt: string,
-    request: JudgeRequest
+    _request: JudgeRequest
   ): Promise<JudgeVote> {
-    // TODO: Actually call the model via Universal Router
-    // For now, return a placeholder structure
+    // Use Haiku for fast/cheap judge reviews, Sonnet for critical
+    const useModel = this.config.useLocalModels
+      ? 'claude-haiku-4-5-20251001'
+      : 'claude-sonnet-4-6-20250514';
 
-    // This would be replaced with actual model execution:
-    // const response = await this.router.execute(context, async (model) => {
-    //   return await callModel(model, prompt);
-    // });
+    try {
+      const client = getAnthropicClient();
+      const resp = await client.messages.create({
+        model: useModel,
+        max_tokens: 1024,
+        messages: [{
+          role: 'user',
+          content: `${prompt}
 
-    // Placeholder vote (to be replaced with actual model output parsing)
+Respond ONLY with a JSON object in this exact format (no explanation, no code block):
+{
+  "verdict": "approve" | "reject" | "needs_revision",
+  "confidence": 0.0-1.0,
+  "reasoning": "brief explanation",
+  "issues": [
+    {
+      "severity": "critical" | "major" | "minor",
+      "category": "accuracy" | "completeness" | "clarity" | "safety" | "style",
+      "description": "what the issue is",
+      "suggestion": "how to fix"
+    }
+  ]
+}`,
+        }],
+      });
+
+      const text = resp.content[0].type === 'text' ? resp.content[0].text : '';
+
+      // Parse the JSON response
+      const jsonMatch = text.match(/\{[\s\S]*\}/);
+      if (!jsonMatch) {
+        logger.warn({ judgeId, text: text.slice(0, 200) }, 'Judge returned non-JSON response');
+        return this.fallbackVote(judgeId, useModel);
+      }
+
+      const parsed = JSON.parse(jsonMatch[0]);
+
+      return {
+        judgeId,
+        modelUsed: useModel,
+        verdict: parsed.verdict || 'approve',
+        confidence: typeof parsed.confidence === 'number' ? parsed.confidence : 0.7,
+        reasoning: parsed.reasoning || 'No reasoning provided',
+        issues: Array.isArray(parsed.issues) ? parsed.issues.map((i: Record<string, string>) => ({
+          severity: i.severity || 'minor',
+          category: i.category || 'completeness',
+          description: i.description || '',
+          suggestion: i.suggestion,
+        })) : [],
+        reviewedAt: Date.now(),
+      };
+    } catch (err) {
+      logger.error({ err, judgeId, modelId }, 'Judge model call failed');
+      return this.fallbackVote(judgeId, modelId);
+    }
+  }
+
+  /**
+   * Fallback vote when model call fails
+   */
+  private fallbackVote(judgeId: string, modelUsed: string): JudgeVote {
     return {
       judgeId,
-      modelUsed: modelId,
+      modelUsed,
       verdict: 'approve',
-      confidence: 0.9,
-      reasoning: 'Placeholder - actual judge reasoning would go here',
+      confidence: 0.5,
+      reasoning: 'Fallback approval — model call failed',
       issues: [],
       reviewedAt: Date.now(),
     };

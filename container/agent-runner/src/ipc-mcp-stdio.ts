@@ -961,6 +961,35 @@ server.tool(
 );
 
 server.tool(
+  'lexios_select_model',
+  'Ask the host to recommend the optimal model for a Lexios extraction task. Returns model ID, tier, and endpoint based on current system resources and task complexity.',
+  {
+    task_type: z.enum(['extraction', 'compliance', 'full_analysis', 'comparison', 'qa']).describe('Type of Lexios task'),
+    mode: z.enum(['quick', 'standard', 'comprehensive']).describe('Extraction mode'),
+    page_count: z.number().int().min(1).optional().describe('Number of pages to process'),
+    is_compliance: z.boolean().default(false).describe('True if checking safety-critical compliance (IBC/ADA/NFPA)'),
+  },
+  async (args) => {
+    if (!groupFolder.startsWith('lexios-')) {
+      return { content: [{ type: 'text' as const, text: 'This tool is only available in Lexios sessions.' }], isError: true };
+    }
+
+    const { responseFile } = writeLexiosRequest({
+      type: 'lexios_select_model',
+      task_type: args.task_type,
+      mode: args.mode,
+      page_count: args.page_count,
+      is_compliance: args.is_compliance,
+    });
+
+    const result = await pollResponse(responseFile, 10000);
+    if (!result) return { content: [{ type: 'text' as const, text: 'Model selection request timed out.' }], isError: true };
+    if (result.error) return { content: [{ type: 'text' as const, text: `Error: ${result.error}` }], isError: true };
+    return { content: [{ type: 'text' as const, text: JSON.stringify(result, null, 2) }] };
+  },
+);
+
+server.tool(
   'lexios_save_extraction',
   'Save extraction results so follow-up queries can access them without re-running the extraction pipeline. Call this after completing document analysis.',
   {

@@ -314,6 +314,18 @@ function createSchema(database: Database.Database): void {
   } catch {
     /* column already exists */
   }
+
+  // Add model tracking columns to lexios_queries
+  try {
+    database.exec(`ALTER TABLE lexios_queries ADD COLUMN model_used TEXT`);
+  } catch {
+    /* column already exists */
+  }
+  try {
+    database.exec(`ALTER TABLE lexios_queries ADD COLUMN model_tier TEXT`);
+  } catch {
+    /* column already exists */
+  }
 }
 
 export function initDatabase(): void {
