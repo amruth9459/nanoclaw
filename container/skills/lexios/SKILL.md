@@ -391,57 +391,106 @@ Write your complete result to /workspace/group/lexios-work/quantities.json using
 
 After all specialists complete, read their output files and compile a unified report.
 
-### WhatsApp summary format
+### Save extraction results for follow-up queries
 
-Send a concise summary to the chat:
+After merging all extraction results, save them using the MCP tool so the host can persist them and enable follow-up queries without re-extraction:
 
 ```
-📐 *Lexios Analysis Complete*
-
-*Document:* {project name from title block}
-*Pages analyzed:* {count} of {total}
-*Mode:* {Quick/Standard/Comprehensive}
-
-*Key findings:*
-• {3-5 most important findings, one line each}
-
-{If compliance was run:}
-*Compliance:* {X violations, Y warnings}
-• {Top 1-2 violations}
-
-{If conflicts were run:}
-*Conflicts:* {X issues found}
-• {Top 1-2 conflicts}
-
-{If quantities were run:}
-*Quantities:* {total area} sq ft, {door count} doors, {window count} windows
-
-Full report saved. Ask me to share specific details or the complete JSON.
+Call mcp__nanoclaw__lexios_save_extraction with:
+- extraction_data: the full merged extraction JSON (as a string)
+- document_filename: original filename from the media path
 ```
 
-### Save full results
-
-Write the complete aggregated results:
+Also write the complete aggregated results locally:
 
 ```bash
 # Create results directory
 mkdir -p /workspace/group/lexios-results
 
-# Write timestamped result file
-cat > /workspace/group/lexios-results/analysis-$(date +%Y%m%d-%H%M%S).json << 'RESULTS'
-{
-  "document": { "name": "...", "pages_total": N, "pages_analyzed": N },
-  "classification": [ ... ],
-  "extraction": { ... },
-  "compliance": { ... },
-  "conflicts": { ... },
-  "quantities": { ... },
-  "summary": "..."
-}
-RESULTS
+# Write timestamped result file with all specialist outputs
 ```
 
+Write a JSON file to `/workspace/group/lexios-results/analysis-YYYYMMDD-HHMMSS.json` containing:
+```json
+{
+  "document": { "name": "...", "pages_total": 0, "pages_analyzed": 0 },
+  "classification": [],
+  "extraction": {},
+  "compliance": {},
+  "conflicts": {},
+  "quantities": {},
+  "summary": "..."
+}
+```
+
+### WhatsApp summary format
+
+CRITICAL: Format output for WhatsApp, NOT markdown. Keep under 4000 characters per message.
+
+Send a concise summary to the chat using `mcp__nanoclaw__send_message`:
+
+📐 *Lexios Analysis Complete*
+
+*Document:* {project name from title block}
+*Pages:* {count} analyzed
+*Mode:* {Quick/Standard/Comprehensive}
+
+*Key Findings:*
+• {finding 1 — one line}
+• {finding 2}
+• {finding 3}
+
+*Rooms:* {count} found
+• {room}: {area} sq ft
+• ...
+
+*Doors:* {count}
+*Windows:* {count}
+
+{If compliance was run and issues found:}
+⚠️ *Compliance:* {X violations, Y warnings}
+• {Top violation with code reference}
+
+{If conflicts were run:}
+*Conflicts:* {X issues found}
+• {Top conflict}
+
+{If quantities were run:}
+*Quantities:* {total area} sq ft gross
+
+Ask me for details on any section, or I can send the full JSON report.
+
+*WhatsApp formatting rules — follow strictly:*
+- Use *single asterisks* for bold — NEVER **double asterisks**
+- Use • for bullets — NEVER numbered lists (1. 2. 3.)
+- No ## headings, no [links](url), no > blockquotes, no --- rules
+- If results exceed 4000 chars, split into multiple `send_message` calls
+- Offer to send full JSON via `send_file` for large datasets
+
 Use the `send_file` MCP tool to send the JSON if the user wants the full data.
+
+### Error handling
+
+If any step fails, do NOT fail silently. Send a clear message to the user:
+
+- *lexios-prep fails* (exit code != 0): Send "I couldn't process this PDF. It may be corrupted or password-protected. Please try re-exporting from your CAD software."
+- *No pages extracted*: Send "The PDF appears to be empty or contains only vector graphics without rasterizable content."
+- *No construction content found after classification*: Send "I analyzed the document but couldn't identify construction drawings. This appears to be [describe]. Please send architectural or engineering drawings."
+- *Subagent timeout or crash*: Send partial results from completed agents: "I completed {domain} extraction but {other domain} timed out. Here are the partial results: ..."
+- *lexios-dxf fails*: Send "I couldn't parse this CAD file. It may be in an unsupported format version. Try exporting as DXF R2018 or converting to PDF."
+
+Always wrap error handling around the extraction pipeline:
+
+```bash
+# Run lexios-prep with error checking
+lexios-prep /workspace/media/<file>.pdf 2>/tmp/lexios-prep-error.log
+if [ $? -ne 0 ]; then
+  # Read the error log and report to user
+  cat /tmp/lexios-prep-error.log
+fi
+```
+
+After any error, still call `lexios_track_document` and `lexios_report_analysis` (with pages=0 if no pages were processed) so the dashboard tracks the attempt.
 
 ---
 

@@ -1549,6 +1549,45 @@ export function updateDocumentRevision(oldId: string, newId: string): void {
   db.prepare('UPDATE lexios_documents SET is_latest = 0, status = ? WHERE id = ?').run('superseded', oldId);
 }
 
+/**
+ * Save extraction results to disk and update the document record with the extraction path.
+ * Returns the path where the extraction was saved.
+ */
+export function saveLexiosExtraction(
+  buildingJid: string,
+  groupFolder: string,
+  documentFilename: string,
+  extractionData: string,
+): string {
+  // Save extraction JSON to the group's lexios-results directory
+  const groupDir = path.join(process.cwd(), 'groups', groupFolder);
+  const resultsDir = path.join(groupDir, 'lexios-results');
+  fs.mkdirSync(resultsDir, { recursive: true });
+
+  const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+  const safeName = documentFilename.replace(/[^a-zA-Z0-9.-]/g, '_');
+  const extractionFilename = `extraction-${safeName}-${timestamp}.json`;
+  const extractionPath = path.join(resultsDir, extractionFilename);
+
+  fs.writeFileSync(extractionPath, extractionData);
+
+  // Also write a symlink/copy as the "latest" extraction for easy follow-up queries
+  const latestPath = path.join(groupDir, 'lexios-work', 'extraction.json');
+  fs.mkdirSync(path.join(groupDir, 'lexios-work'), { recursive: true });
+  fs.writeFileSync(latestPath, extractionData);
+
+  // Update the most recent document record for this building with the extraction path
+  const doc = db.prepare(
+    'SELECT id FROM lexios_documents WHERE building_jid = ? AND is_latest = 1 ORDER BY uploaded_at DESC LIMIT 1',
+  ).get(buildingJid) as { id: string } | undefined;
+
+  if (doc) {
+    db.prepare('UPDATE lexios_documents SET extraction_path = ? WHERE id = ?').run(extractionPath, doc.id);
+  }
+
+  return extractionPath;
+}
+
 export function trackLexiosQuery(query: {
   building_jid: string;
   phone: string;
