@@ -163,7 +163,7 @@ export function startIpcWatcher(deps: IpcDeps): void {
                 const LEXIOS_TYPES = new Set([
                   'lexios_track_analysis', 'lexios_track_document', 'lexios_add_member',
                   'lexios_get_members', 'lexios_check_permission', 'lexios_track_query',
-                  'lexios_save_extraction',
+                  'lexios_save_extraction', 'lexios_select_model',
                 ]);
                 if (data.type && LEXIOS_TYPES.has(data.type as string)) {
                   await processLexiosMessage(data, sourceGroup, deps);
@@ -704,6 +704,55 @@ async function processLexiosMessage(
         answer_text: data.answer_preview as string | undefined,
       });
       // Fire-and-forget, no response needed
+      break;
+    }
+
+    case 'lexios_select_model': {
+      try {
+        const { LexiosRouterFactory } = await import('./router/domain/lexios-router.js');
+        const router = LexiosRouterFactory.create();
+
+        const taskType = data.task_type as string;
+        const mode = data.mode as string;
+        const pageCount = data.page_count as number | undefined;
+        const isCompliance = data.is_compliance as boolean;
+
+        // Map mode to routing parameters
+        const isPaidCustomer = false; // Beta users are free tier
+        const recommendedModel = router.getRecommendedModel(
+          taskType as 'extraction' | 'compliance' | 'full_analysis' | 'comparison' | 'qa',
+          isPaidCustomer,
+        );
+
+        // Override for compliance — always use cloud
+        const modelId = isCompliance ? 'claude-sonnet-4-6' : recommendedModel;
+        const isCloud = modelId.startsWith('claude') || modelId.startsWith('gemini') || modelId.startsWith('gpt');
+
+        const response = {
+          model_id: modelId,
+          tier: isCloud ? 'cloud' : (modelId.includes('70b') || modelId.includes('72b') ? 'local-llm' : 'local-slm'),
+          mode,
+          is_cloud: isCloud,
+          cost_estimate_usd: isCloud ? (pageCount || 1) * 0.003 : 0,
+          reasoning: isCompliance
+            ? 'Compliance checks always use cloud models for maximum accuracy'
+            : `${mode} mode: ${isCloud ? 'cloud model for accuracy' : 'local model for zero cost'}`,
+        };
+
+        if (responseFile) writeIpcResponse(responseFile, response);
+        logger.info({ groupFolder, modelId, mode, taskType }, 'Lexios: model selected');
+      } catch (err) {
+        logger.error({ err, groupFolder }, 'Lexios: model selection failed');
+        // Fallback to cloud Sonnet if routing fails
+        if (responseFile) writeIpcResponse(responseFile, {
+          model_id: 'claude-sonnet-4-6',
+          tier: 'cloud',
+          mode: data.mode,
+          is_cloud: true,
+          cost_estimate_usd: 0.01,
+          reasoning: 'Fallback to cloud model (routing error)',
+        });
+      }
       break;
     }
 
