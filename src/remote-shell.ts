@@ -24,6 +24,7 @@ export interface RemoteShellCommand {
   workingDir?: string;
   timeout?: number;
   requester: string; // WhatsApp sender name for audit
+  isPreset?: boolean; // true when command was resolved from a preset key
 }
 
 export interface RemoteShellResult {
@@ -191,6 +192,7 @@ export const PRESET_COMMANDS = {
   view_recent_logs: 'tail -50 logs/nanoclaw.log',
   check_disk_space: 'df -h',
   check_memory: 'vm_stat',
+  check_ram: 'vm_stat | perl -ne \'/page size of (\\d+)/ and $size=$1; /Pages\\s+([^:]+)[^\\d]+(\\d+)/ and printf("%-16s % 16.2f MB\\n", "$1:", $2 * $size / 1048576);\'',
   list_running_containers: 'docker ps',
   get_tailscale_ip: 'tailscale ip -4',
   check_wifi: 'networksetup -getairportnetwork en0',
@@ -295,7 +297,7 @@ export function validateCommand(cmd: RemoteShellCommand): {
 
   // Whitelist-only mode: only allow preset commands
   if (REMOTE_SHELL_WHITELIST_ONLY || PARANOID_MODE) {
-    const isPreset = Object.keys(PRESET_COMMANDS).includes(cmd.command);
+    const isPreset = cmd.isPreset || Object.keys(PRESET_COMMANDS).includes(cmd.command);
     if (!isPreset) {
       logger.warn(
         { command: cmd.command, requester: cmd.requester },
