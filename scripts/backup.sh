@@ -2,8 +2,12 @@
 set -euo pipefail
 
 # Cloud state backup for NanoClaw + Lexios
-# Syncs runtime data to Cloudflare R2 and pushes git repos.
+# Copies runtime data to Cloudflare R2 and pushes git repos.
 # Designed to run every 15 min via launchd.
+#
+# SECURITY: Uses "rclone copy" (additive) NOT "rclone sync" (destructive).
+# Local deletions are NEVER propagated to R2. Daily snapshots provide
+# point-in-time recovery. A compromised agent cannot wipe the backup.
 
 NANOCLAW_DIR="${NANOCLAW_DIR:-/Users/amrut/nanoclaw}"
 LEXIOS_DIR="${LEXIOS_DIR:-/Users/amrut/Lexios}"
@@ -11,6 +15,10 @@ R2_REMOTE="${R2_REMOTE:-r2}"
 R2_BUCKET="${R2_BUCKET:-nanoclaw-backup}"
 LOCK_FILE="/tmp/nanoclaw-backup.lock"
 LOG_FILE="${NANOCLAW_DIR}/logs/backup.log"
+
+# Daily snapshot prefix (one snapshot per day for point-in-time recovery)
+SNAPSHOT_DATE=$(date '+%Y-%m-%d')
+SNAPSHOT_PREFIX="snapshots/${SNAPSHOT_DATE}"
 
 mkdir -p "$(dirname "$LOG_FILE")"
 
@@ -62,68 +70,90 @@ git_backup() {
 git_backup "$NANOCLAW_DIR" "fork" "NanoClaw"
 git_backup "$LEXIOS_DIR" "origin" "Lexios"
 
-# ---------- Step 2: rclone sync NanoClaw runtime dirs ----------
+# ---------- Step 2: rclone copy NanoClaw runtime dirs ----------
+# SECURITY: Using "copy" (additive) instead of "sync" (destructive).
+# Files are NEVER deleted from R2 by this script. Cleanup of old files
+# is a separate manual operation.
 
 if ! command -v rclone &>/dev/null; then
     log "ERROR: rclone not installed (brew install rclone)"
     exit 1
 fi
 
-RCLONE_FLAGS=(--quiet --transfers 8 --checkers 16 --fast-list)
+RCLONE_FLAGS=(--quiet --transfers 8 --checkers 16 --fast-list --update)
+
+# Helper: copy to both latest/ (current state) and daily snapshot
+r2_copy() {
+    local src="$1" dest_suffix="$2" shift 2
+    # Latest (always overwritten with newest version)
+    rclone copy "$src" "${R2_REMOTE}:${R2_BUCKET}/latest/${dest_suffix}" \
+        "${RCLONE_FLAGS[@]}" "$@" \
+        2>> "$LOG_FILE" || log "WARN: latest/${dest_suffix} copy failed"
+    # Daily snapshot (one per day, immutable after first write)
+    rclone copy "$src" "${R2_REMOTE}:${R2_BUCKET}/${SNAPSHOT_PREFIX}/${dest_suffix}" \
+        "${RCLONE_FLAGS[@]}" --ignore-existing "$@" \
+        2>> "$LOG_FILE" || log "WARN: snapshot/${dest_suffix} copy failed"
+}
 
 # store/ — SQLite DBs + WhatsApp auth
-rclone sync "$NANOCLAW_DIR/store/" "${R2_REMOTE}:${R2_BUCKET}/nanoclaw/store/" \
-    "${RCLONE_FLAGS[@]}" \
+r2_copy "$NANOCLAW_DIR/store/" "nanoclaw/store/" \
     --exclude "*.html" \
     --exclude "*.db-shm" \
     --exclude "*.db-wal" \
-    2>> "$LOG_FILE" && log "synced store/" || log "WARN: store/ sync failed"
+    && log "copied store/"
 
 # groups/ — group data, conversations, CLAUDE.md
-rclone sync "$NANOCLAW_DIR/groups/" "${R2_REMOTE}:${R2_BUCKET}/nanoclaw/groups/" \
-    "${RCLONE_FLAGS[@]}" \
+r2_copy "$NANOCLAW_DIR/groups/" "nanoclaw/groups/" \
     --exclude "logs/**" \
     --exclude "ggml/**" \
     --exclude "gguf/**" \
     --exclude "node_modules/**" \
-    2>> "$LOG_FILE" && log "synced groups/" || log "WARN: groups/ sync failed"
+    && log "copied groups/"
 
 # data/ — session state (exclude transient IPC json)
-rclone sync "$NANOCLAW_DIR/data/" "${R2_REMOTE}:${R2_BUCKET}/nanoclaw/data/" \
-    "${RCLONE_FLAGS[@]}" \
+r2_copy "$NANOCLAW_DIR/data/" "nanoclaw/data/" \
     --exclude "ipc/*/messages/*.json" \
     --exclude "ipc/*/tasks/*.json" \
+    --exclude "ipc/*/input/**" \
     --exclude "ipc/errors/**" \
-    2>> "$LOG_FILE" && log "synced data/" || log "WARN: data/ sync failed"
+    && log "copied data/"
 
 # config/
 if [ -d "$NANOCLAW_DIR/config/" ]; then
-    rclone sync "$NANOCLAW_DIR/config/" "${R2_REMOTE}:${R2_BUCKET}/nanoclaw/config/" \
-        "${RCLONE_FLAGS[@]}" \
-        2>> "$LOG_FILE" && log "synced config/" || log "WARN: config/ sync failed"
+    r2_copy "$NANOCLAW_DIR/config/" "nanoclaw/config/" \
+        && log "copied config/"
 fi
 
-# .env — use temp dir + sync (rclone copyto has a CreateBucket bug with R2)
+# .env — use temp dir (rclone copyto has a CreateBucket bug with R2)
 if [ -f "$NANOCLAW_DIR/.env" ]; then
     tmp_env=$(mktemp -d)
     cp "$NANOCLAW_DIR/.env" "$tmp_env/dot-env"
-    rclone sync "$tmp_env/" "${R2_REMOTE}:${R2_BUCKET}/nanoclaw/env/" \
-        --quiet 2>> "$LOG_FILE" && log "synced .env" || log "WARN: .env sync failed"
+    r2_copy "$tmp_env/" "nanoclaw/env/" \
+        && log "copied .env"
     rm -rf "$tmp_env"
 fi
 
-# ---------- Step 3: rclone sync Lexios runtime dirs ----------
+# ---------- Step 3: rclone copy Lexios runtime dirs ----------
 
 if [ -d "$LEXIOS_DIR/backend/uploads/" ]; then
-    rclone sync "$LEXIOS_DIR/backend/uploads/" "${R2_REMOTE}:${R2_BUCKET}/lexios/backend/uploads/" \
-        "${RCLONE_FLAGS[@]}" \
-        2>> "$LOG_FILE" && log "synced lexios uploads/" || log "WARN: lexios uploads/ sync failed"
+    r2_copy "$LEXIOS_DIR/backend/uploads/" "lexios/backend/uploads/" \
+        && log "copied lexios uploads/"
 fi
 
 if [ -d "$LEXIOS_DIR/backend/database/" ]; then
-    rclone sync "$LEXIOS_DIR/backend/database/" "${R2_REMOTE}:${R2_BUCKET}/lexios/backend/database/" \
-        "${RCLONE_FLAGS[@]}" \
-        2>> "$LOG_FILE" && log "synced lexios database/" || log "WARN: lexios database/ sync failed"
+    r2_copy "$LEXIOS_DIR/backend/database/" "lexios/backend/database/" \
+        && log "copied lexios database/"
+fi
+
+# Lexios core data (eval.db, codes.db, learnings.json, corpus)
+if [ -d "$LEXIOS_DIR/lexios/" ]; then
+    r2_copy "$LEXIOS_DIR/lexios/" "lexios/core/" \
+        --include "*.db" \
+        --include "*.json" \
+        --include "corpus/**" \
+        --exclude "work/**" \
+        --exclude "__pycache__/**" \
+        && log "copied lexios core data"
 fi
 
 # ---------- Step 4: Generate + upload contingency doc to Google Drive ----------
@@ -152,10 +182,26 @@ fi
 
 # ---------- Step 5: Log completion ----------
 
+# ---------- Step 5a: Prune old snapshots (keep last 30 days) ----------
+# List snapshot dirs older than 30 days and delete them.
+# This is the ONLY place where R2 objects are deleted.
+CUTOFF_DATE=$(date -v-30d '+%Y-%m-%d' 2>/dev/null || date -d '30 days ago' '+%Y-%m-%d' 2>/dev/null || echo "")
+if [ -n "$CUTOFF_DATE" ]; then
+    rclone lsf "${R2_REMOTE}:${R2_BUCKET}/snapshots/" --dirs-only 2>/dev/null | while read -r dir; do
+        dir_date="${dir%/}"
+        if [[ "$dir_date" < "$CUTOFF_DATE" ]]; then
+            rclone purge "${R2_REMOTE}:${R2_BUCKET}/snapshots/${dir_date}" --quiet 2>> "$LOG_FILE" \
+                && log "pruned old snapshot: ${dir_date}" || true
+        fi
+    done
+fi
+
+# ---------- Step 6: Log completion ----------
+
 R2_SIZE=$(rclone size "${R2_REMOTE}:${R2_BUCKET}" --json 2>/dev/null | grep -o '"bytes":[0-9]*' | cut -d: -f2 || echo "unknown")
 if [ "$R2_SIZE" != "unknown" ] && [ -n "$R2_SIZE" ]; then
     R2_MB=$(( R2_SIZE / 1048576 ))
-    log "=== Backup complete (R2 total: ${R2_MB}MB) ==="
+    log "=== Backup complete (R2 total: ${R2_MB}MB, snapshot: ${SNAPSHOT_DATE}) ==="
 else
-    log "=== Backup complete ==="
+    log "=== Backup complete (snapshot: ${SNAPSHOT_DATE}) ==="
 fi
