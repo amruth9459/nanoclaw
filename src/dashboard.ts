@@ -20,6 +20,7 @@ import {
   getLexiosCustomerStats,
   getLexiosCustomerSummary,
   getLexiosCostSummary,
+  getLexiosMetrics,
   getBuildingMembers,
   getLexiosBuildingDocuments,
   getTotalUsage,
@@ -696,37 +697,69 @@ async function refreshFiles() {
 
 async function refreshLexios() {
   try {
-    var lex = await fetch('/api/lexios').then(function(r) { return r.json(); });
+    var results = await Promise.all([
+      fetch('/api/lexios').then(function(r) { return r.json(); }),
+      fetch('/api/lexios-metrics').then(function(r) { return r.json(); })
+    ]);
+    var lex = results[0];
+    var m = results[1];
     var bs = lex.buildings || { total_buildings: 0, total_documents: 0, total_queries: 0, active_buildings: 0, buildings: [] };
-    var s = lex.summary || { total_customers: 0, total_documents: 0, total_pages: 0, active_customers: 0 };
     var cost = lex.cost || { total_cost: 0, total_runs: 0 };
-    var buildings = bs.buildings || [];
-    var customers = lex.customers || [];
 
-    var buildingRows = buildings.length === 0
-      ? '<tr><td colspan="7" style="text-align:center;opacity:0.5">No buildings yet</td></tr>'
-      : buildings.map(function(b) {
-          return '<tr>' +
-            '<td>' + (b.name || 'Unnamed') + '</td>' +
-            '<td>' + (b.address || '-') + '</td>' +
-            '<td class="mono">' + b.owner_phone + '</td>' +
-            '<td class="mono">' + b.documents_count + '</td>' +
-            '<td class="mono">' + b.queries_count + '</td>' +
-            '<td><span class="badge ' + (b.status === 'active' ? 'green' : 'gray') + '">' + b.status + '</span></td>' +
-            '<td>' + (b.last_activity ? fmt(b.last_activity) : '-') + '</td>' +
-            '</tr>';
+    var corpus = m.corpus || { total_docs: 0, by_type: {}, by_difficulty: {}, types_covered: 0, types_total: 101, growth: [] };
+    var modelsData = m.models || {};
+    var learnings = m.learnings || { total_tips: 0, by_category: {} };
+    var subs = m.substitution_candidates || [];
+    var recentRuns = m.recent_runs || [];
+
+    function sparkline(arr) {
+      if (!arr || arr.length === 0) return '';
+      var max = Math.max.apply(null, arr);
+      if (max === 0) return arr.map(function() { return '░'; }).join('');
+      var chars = ' ▁▂▃▄▅▆▇█';
+      return arr.map(function(v) { return chars[Math.min(Math.round(v / max * 8), 8)]; }).join('');
+    }
+
+    function pctBar(val, max) {
+      if (max === 0) return '';
+      var pct = Math.round(val / max * 100);
+      return '<div style="background:var(--border);border-radius:4px;height:8px;width:100%"><div style="background:var(--accent);border-radius:4px;height:8px;width:' + pct + '%"></div></div>';
+    }
+
+    var typeEntries = Object.entries(corpus.by_type);
+    var typeCards = typeEntries.map(function(e) { return '<span class="badge green">' + e[0] + ': ' + e[1] + '</span>'; }).join(' ');
+    var diffEntries = Object.entries(corpus.by_difficulty);
+    var diffCards = diffEntries.map(function(e) { return '<span class="badge gray">' + e[0] + ': ' + e[1] + '</span>'; }).join(' ');
+
+    var modelEntries = Object.entries(modelsData);
+    var modelRows = modelEntries.length === 0
+      ? '<tr><td colspan="5" style="text-align:center;opacity:0.5">No model data yet</td></tr>'
+      : modelEntries.sort(function(a, b) { return (b[1].avg_f1 || 0) - (a[1].avg_f1 || 0); }).map(function(e) {
+          var name = e[0];
+          var md = e[1];
+          var f1 = (md.avg_f1 || 0);
+          var bar = '';
+          for (var i = 0; i < 10; i++) bar += (i < Math.round(f1 * 10)) ? '█' : '░';
+          var isLocal = name.indexOf(':') > -1 || name.indexOf('llava') > -1 || name.indexOf('llama') > -1;
+          var costStr = isLocal ? 'free' : '$' + (md.cost_per_doc || 0).toFixed(4);
+          var subReady = subs.find(function(s) { return s.local_model === name && s.ready; });
+          var readyBadge = subReady ? ' <span class="badge green">sub-ready</span>' : '';
+          return '<tr><td>' + name + readyBadge + '</td><td class="mono">' + bar + ' ' + f1.toFixed(3) + '</td><td class="mono">' + sparkline(md.trend || []) + '</td><td class="mono">' + costStr + '</td></tr>';
         }).join('');
 
-    var customerRows = customers.length === 0
-      ? ''
-      : customers.map(function(c) {
-          return '<tr>' +
-            '<td>' + (c.name || c.phone) + '</td>' +
-            '<td class="mono">' + c.phone + '</td>' +
-            '<td class="mono">' + c.documents_analyzed + '</td>' +
-            '<td class="mono">' + c.pages_processed + '</td>' +
-            '<td>' + (c.last_contact ? fmt(c.last_contact) : '-') + '</td>' +
-            '</tr>';
+    var learningsEntries = Object.entries(learnings.by_category || {});
+    var learningsCats = learningsEntries.map(function(e) { return '<span class="badge gray">' + e[0] + ': ' + e[1] + '</span>'; }).join(' ');
+
+    var runRows = recentRuns.length === 0
+      ? '<tr><td colspan="4" style="text-align:center;opacity:0.5">No corpus builds yet</td></tr>'
+      : recentRuns.map(function(r) {
+          return '<tr><td>' + r.doc_id + '</td><td>' + r.date + '</td><td class="mono">' + r.models + '</td><td class="mono">' + (r.elements || 0) + '</td></tr>';
+        }).join('');
+
+    var buildingRows = (bs.buildings || []).length === 0
+      ? '<tr><td colspan="5" style="text-align:center;opacity:0.5">No buildings yet</td></tr>'
+      : (bs.buildings || []).map(function(b) {
+          return '<tr><td>' + (b.name || 'Unnamed') + '</td><td>' + (b.address || '-') + '</td><td class="mono">' + b.documents_count + '</td><td class="mono">' + b.queries_count + '</td><td><span class="badge ' + (b.status === 'active' ? 'green' : 'gray') + '">' + b.status + '</span></td></tr>';
         }).join('');
 
     document.getElementById('main').innerHTML = \`
@@ -734,45 +767,52 @@ async function refreshLexios() {
         <div class="memory-tabs">\${tabBar()}</div>
       </div>
       <div class="grid">
-        <div class="card"><h3>\${bs.total_buildings}</h3><p class="label">Buildings</p></div>
-        <div class="card"><h3>\${bs.active_buildings}</h3><p class="label">Active</p></div>
-        <div class="card"><h3>\${bs.total_documents}</h3><p class="label">Documents</p></div>
-        <div class="card"><h3>\${bs.total_queries}</h3><p class="label">Queries</p></div>
+        <div class="card"><h3>\${corpus.total_docs}</h3><p class="label">Corpus Docs</p></div>
+        <div class="card"><h3>\${corpus.types_covered}/\${corpus.types_total}</h3><p class="label">Types Covered</p>\${pctBar(corpus.types_covered, corpus.types_total)}</div>
+        <div class="card"><h3>\${learnings.total_tips}</h3><p class="label">Learning Tips</p></div>
+        <div class="card"><h3>$\${cost.total_cost.toFixed(2)}</h3><p class="label">API Cost</p></div>
       </div>
-      <div class="grid">
-        <div class="card"><h3>$\${cost.total_cost.toFixed(2)}</h3><p class="label">Total API Cost</p></div>
-        <div class="card"><h3>\${cost.total_runs}</h3><p class="label">Agent Runs</p></div>
-        <div class="card"><h3>\${s.total_customers}</h3><p class="label">DM Customers</p></div>
-        <div class="card"><h3>\${s.total_pages}</h3><p class="label">Pages (DM)</p></div>
+      <div class="card full">
+        <h2>Corpus Health</h2>
+        <div style="display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:0.5rem">
+          <div><strong>By Type:</strong> \${typeCards || '<span style="opacity:0.5">none</span>'}</div>
+          <div><strong>Difficulty:</strong> \${diffCards || '<span style="opacity:0.5">none</span>'}</div>
+        </div>
+      </div>
+      <div class="card full">
+        <h2>Model Performance</h2>
+        <table>
+          <thead><tr><th>Model</th><th>Avg F1</th><th>Trend</th><th>Cost/Doc</th></tr></thead>
+          <tbody>\${modelRows}</tbody>
+        </table>
+      </div>
+      <div class="card full">
+        <h2>Learning Effectiveness</h2>
+        <div style="margin-bottom:0.5rem"><strong>\${learnings.total_tips}</strong> tips across categories: \${learningsCats || '<span style="opacity:0.5">none yet</span>'}</div>
+      </div>
+      \${subs.length > 0 ? \`<div class="card full">
+        <h2>Substitution Candidates</h2>
+        <table>
+          <thead><tr><th>Category</th><th>Local Model</th><th>Local F1</th><th>Cloud F1</th><th>Status</th></tr></thead>
+          <tbody>\${subs.map(function(s) {
+            return '<tr><td>' + s.category + '</td><td>' + s.local_model + '</td><td class="mono">' + s.local_f1.toFixed(3) + '</td><td class="mono">' + s.cloud_f1.toFixed(3) + '</td><td><span class="badge ' + (s.ready ? 'green' : 'gray') + '">' + (s.ready ? 'Ready' : Math.round(s.local_f1 / (s.cloud_f1 || 1) * 100) + '%') + '</span></td></tr>';
+          }).join('')}</tbody>
+        </table>
+      </div>\` : ''}
+      <div class="card full">
+        <h2>Recent Corpus Builds</h2>
+        <table>
+          <thead><tr><th>Document</th><th>Date</th><th>Models</th><th>Elements</th></tr></thead>
+          <tbody>\${runRows}</tbody>
+        </table>
       </div>
       <div class="card full">
         <h2>Buildings</h2>
         <table>
-          <thead><tr>
-            <th>Name</th>
-            <th>Address</th>
-            <th>Owner</th>
-            <th>Docs</th>
-            <th>Queries</th>
-            <th>Status</th>
-            <th>Last Activity</th>
-          </tr></thead>
+          <thead><tr><th>Name</th><th>Address</th><th>Docs</th><th>Queries</th><th>Status</th></tr></thead>
           <tbody>\${buildingRows}</tbody>
         </table>
       </div>
-      \${customers.length > 0 ? \`<div class="card full">
-        <h2>DM Customers (Legacy)</h2>
-        <table>
-          <thead><tr>
-            <th>Name</th>
-            <th>Phone</th>
-            <th>Documents</th>
-            <th>Pages</th>
-            <th>Last Contact</th>
-          </tr></thead>
-          <tbody>\${customerRows}</tbody>
-        </table>
-      </div>\` : ''}
     \`;
   } catch(e) {
     console.error('Lexios refresh failed', e);
@@ -1056,6 +1096,18 @@ export function startDashboard(queue: GroupQueue, sendFn?: (jid: string, text: s
         const buildings = getLexiosBuildingSummary();
         res.writeHead(200, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ summary, customers, cost, buildings }));
+      } catch (err) {
+        res.writeHead(500);
+        res.end(JSON.stringify({ error: String(err) }));
+      }
+      return;
+    }
+
+    if (url.pathname === '/api/lexios-metrics') {
+      try {
+        const metrics = getLexiosMetrics();
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify(metrics || { corpus: { total_docs: 0, by_type: {}, by_difficulty: {}, types_covered: 0, types_total: 101, growth: [] }, models: {}, learnings: { total_tips: 0, by_category: {} }, substitution_candidates: [], recent_runs: [] }));
       } catch (err) {
         res.writeHead(500);
         res.end(JSON.stringify({ error: String(err) }));

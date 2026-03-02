@@ -14,6 +14,8 @@
 import Anthropic from '@anthropic-ai/sdk';
 
 import { readEnvFile } from './env.js';
+import { logUsage } from './db.js';
+import { calculateCost } from './economics.js';
 import { logger } from './logger.js';
 import { RouterFactory } from './router/universal-router.js';
 import type { RoutingContext } from './router/types.js';
@@ -317,6 +319,16 @@ Respond ONLY with a JSON object in this exact format (no explanation, no code bl
 }`,
         }],
       });
+
+      // Track judge review cost
+      if (resp.usage) {
+        const usage = {
+          inputTokens: resp.usage.input_tokens,
+          outputTokens: resp.usage.output_tokens,
+        };
+        const costUsd = calculateCost(usage);
+        logUsage('_system', '_judge_review', usage, 0, false, costUsd);
+      }
 
       const text = resp.content[0].type === 'text' ? resp.content[0].text : '';
 
