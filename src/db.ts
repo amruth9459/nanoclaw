@@ -181,6 +181,50 @@ function createSchema(database: Database.Database): void {
     CREATE INDEX IF NOT EXISTS idx_tasks_status ON tasks(status);
   `);
 
+  // Transcripts (Omi, Fieldy, etc.) storage
+  database.exec(`
+    CREATE TABLE IF NOT EXISTS transcripts (
+      id TEXT PRIMARY KEY,
+      source TEXT NOT NULL,
+      device_id TEXT,
+      start_time TEXT NOT NULL,
+      end_time TEXT NOT NULL,
+      duration_seconds INTEGER NOT NULL,
+      text TEXT NOT NULL,
+      speakers TEXT,
+      language TEXT,
+      audio_file_path TEXT,
+      metadata TEXT,
+      created_at TEXT NOT NULL,
+      indexed_at TEXT
+    );
+
+    CREATE INDEX IF NOT EXISTS idx_transcripts_source ON transcripts(source);
+    CREATE INDEX IF NOT EXISTS idx_transcripts_start_time ON transcripts(start_time);
+    CREATE INDEX IF NOT EXISTS idx_transcripts_device ON transcripts(device_id);
+    CREATE INDEX IF NOT EXISTS idx_transcripts_created ON transcripts(created_at);
+
+    CREATE VIRTUAL TABLE IF NOT EXISTS transcripts_fts USING fts5(
+      transcript_id,
+      text,
+      content='transcripts',
+      content_rowid='rowid'
+    );
+
+    CREATE TRIGGER IF NOT EXISTS transcripts_ai AFTER INSERT ON transcripts BEGIN
+      INSERT INTO transcripts_fts(rowid, transcript_id, text)
+      VALUES (new.rowid, new.id, new.text);
+    END;
+
+    CREATE TRIGGER IF NOT EXISTS transcripts_ad AFTER DELETE ON transcripts BEGIN
+      DELETE FROM transcripts_fts WHERE rowid = old.rowid;
+    END;
+
+    CREATE TRIGGER IF NOT EXISTS transcripts_au AFTER UPDATE ON transcripts BEGIN
+      UPDATE transcripts_fts SET text = new.text WHERE rowid = new.rowid;
+    END;
+  `);
+
   // Lexios customer tracking (legacy DM model)
   database.exec(`
     CREATE TABLE IF NOT EXISTS lexios_customers (
@@ -2405,5 +2449,217 @@ export function getTaskStats(): {
     inProgress: all.filter(t => t.status === 'in_progress').length,
     completed: all.filter(t => t.status === 'completed').length,
     blocked: all.filter(t => t.status === 'blocked').length,
+  };
+}
+
+// =============================================================================
+// Transcripts System (Omi, Fieldy, etc.)
+// =============================================================================
+
+export interface TranscriptRecord {
+  id: string;
+  source: 'omi' | 'fieldy' | 'other';
+  deviceId: string | null;
+  startTime: string;
+  endTime: string;
+  durationSeconds: number;
+  text: string;
+  speakers: Array<{speaker: string; start: number; end: number}> | null;
+  language: string | null;
+  audioFilePath: string | null;
+  metadata: Record<string, any> | null;
+  createdAt: string;
+  indexedAt: string | null;
+}
+
+/**
+ * Store a transcript from Omi, Fieldy, or other source
+ */
+export function storeTranscript(params: {
+  id: string;
+  source: 'omi' | 'fieldy' | 'other';
+  deviceId?: string;
+  startTime: string;
+  endTime: string;
+  durationSeconds: number;
+  text: string;
+  speakers?: Array<{speaker: string; start: number; end: number}>;
+  language?: string;
+  audioFilePath?: string;
+  metadata?: Record<string, any>;
+}): void {
+  const now = new Date().toISOString();
+
+  db.prepare(`
+    INSERT INTO transcripts (
+      id, source, device_id, start_time, end_time, duration_seconds,
+      text, speakers, language, audio_file_path, metadata,
+      created_at, indexed_at
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+  `).run(
+    params.id,
+    params.source,
+    params.deviceId || null,
+    params.startTime,
+    params.endTime,
+    params.durationSeconds,
+    params.text,
+    params.speakers ? JSON.stringify(params.speakers) : null,
+    params.language || null,
+    params.audioFilePath || null,
+    params.metadata ? JSON.stringify(params.metadata) : null,
+    now,
+    now // indexed_at is set by FTS trigger
+  );
+
+  logger.info({ transcriptId: params.id, source: params.source, duration: params.durationSeconds }, 'Transcript stored');
+}
+
+/**
+ * Get transcript by ID
+ */
+export function getTranscript(transcriptId: string): TranscriptRecord | undefined {
+  const row = db.prepare('SELECT * FROM transcripts WHERE id = ?').get(transcriptId) as any;
+  if (!row) return undefined;
+
+  return {
+    id: row.id,
+    source: row.source,
+    deviceId: row.device_id,
+    startTime: row.start_time,
+    endTime: row.end_time,
+    durationSeconds: row.duration_seconds,
+    text: row.text,
+    speakers: row.speakers ? JSON.parse(row.speakers) : null,
+    language: row.language,
+    audioFilePath: row.audio_file_path,
+    metadata: row.metadata ? JSON.parse(row.metadata) : null,
+    createdAt: row.created_at,
+    indexedAt: row.indexed_at,
+  };
+}
+
+/**
+ * Search transcripts by text (full-text search)
+ */
+export function searchTranscripts(query: string, limit: number = 10): TranscriptRecord[] {
+  const rows = db.prepare(`
+    SELECT t.*
+    FROM transcripts t
+    INNER JOIN transcripts_fts fts ON fts.transcript_id = t.id
+    WHERE transcripts_fts MATCH ?
+    ORDER BY rank
+    LIMIT ?
+  `).all(query, limit) as any[];
+
+  return rows.map(row => ({
+    id: row.id,
+    source: row.source,
+    deviceId: row.device_id,
+    startTime: row.start_time,
+    endTime: row.end_time,
+    durationSeconds: row.duration_seconds,
+    text: row.text,
+    speakers: row.speakers ? JSON.parse(row.speakers) : null,
+    language: row.language,
+    audioFilePath: row.audio_file_path,
+    metadata: row.metadata ? JSON.parse(row.metadata) : null,
+    createdAt: row.created_at,
+    indexedAt: row.indexed_at,
+  }));
+}
+
+/**
+ * Get transcripts by date range
+ */
+export function getTranscriptsByDate(startDate: string, endDate?: string): TranscriptRecord[] {
+  const query = endDate
+    ? 'SELECT * FROM transcripts WHERE start_time >= ? AND start_time <= ? ORDER BY start_time DESC'
+    : 'SELECT * FROM transcripts WHERE DATE(start_time) = DATE(?) ORDER BY start_time DESC';
+
+  const rows = endDate
+    ? db.prepare(query).all(startDate, endDate)
+    : db.prepare(query).all(startDate);
+
+  return (rows as any[]).map(row => ({
+    id: row.id,
+    source: row.source,
+    deviceId: row.device_id,
+    startTime: row.start_time,
+    endTime: row.end_time,
+    durationSeconds: row.duration_seconds,
+    text: row.text,
+    speakers: row.speakers ? JSON.parse(row.speakers) : null,
+    language: row.language,
+    audioFilePath: row.audio_file_path,
+    metadata: row.metadata ? JSON.parse(row.metadata) : null,
+    createdAt: row.created_at,
+    indexedAt: row.indexed_at,
+  }));
+}
+
+/**
+ * Get transcripts by source
+ */
+export function getTranscriptsBySource(source: 'omi' | 'fieldy' | 'other', limit: number = 50): TranscriptRecord[] {
+  const rows = db.prepare(`
+    SELECT * FROM transcripts
+    WHERE source = ?
+    ORDER BY start_time DESC
+    LIMIT ?
+  `).all(source, limit) as any[];
+
+  return rows.map(row => ({
+    id: row.id,
+    source: row.source,
+    deviceId: row.device_id,
+    startTime: row.start_time,
+    endTime: row.end_time,
+    durationSeconds: row.duration_seconds,
+    text: row.text,
+    speakers: row.speakers ? JSON.parse(row.speakers) : null,
+    language: row.language,
+    audioFilePath: row.audio_file_path,
+    metadata: row.metadata ? JSON.parse(row.metadata) : null,
+    createdAt: row.created_at,
+    indexedAt: row.indexed_at,
+  }));
+}
+
+/**
+ * Get transcript statistics
+ */
+export function getTranscriptStats(): {
+  total: number;
+  bySource: Record<string, number>;
+  totalDurationHours: number;
+  oldestTranscript: string | null;
+  newestTranscript: string | null;
+} {
+  const total = db.prepare('SELECT COUNT(*) as count FROM transcripts').get() as { count: number };
+
+  const bySourceRows = db.prepare(`
+    SELECT source, COUNT(*) as count
+    FROM transcripts
+    GROUP BY source
+  `).all() as Array<{ source: string; count: number }>;
+
+  const bySource: Record<string, number> = {};
+  for (const row of bySourceRows) {
+    bySource[row.source] = row.count;
+  }
+
+  const duration = db.prepare('SELECT SUM(duration_seconds) as total FROM transcripts').get() as { total: number | null };
+  const totalDurationHours = duration.total ? Math.round(duration.total / 3600 * 10) / 10 : 0;
+
+  const oldest = db.prepare('SELECT start_time FROM transcripts ORDER BY start_time ASC LIMIT 1').get() as { start_time: string } | undefined;
+  const newest = db.prepare('SELECT start_time FROM transcripts ORDER BY start_time DESC LIMIT 1').get() as { start_time: string } | undefined;
+
+  return {
+    total: total.count,
+    bySource,
+    totalDurationHours,
+    oldestTranscript: oldest?.start_time || null,
+    newestTranscript: newest?.start_time || null,
   };
 }
