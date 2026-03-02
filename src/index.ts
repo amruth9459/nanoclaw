@@ -52,6 +52,7 @@ import {
   storeChatMetadata,
   storeMessage,
   createClawworkTask,
+  createTaskRecord,
   getChatChannel,
 } from './db.js';
 import { classifyTask, computeMaxPayment } from './clawwork.js';
@@ -212,6 +213,29 @@ const SUBSTANTIVE_KEYWORDS = [
   'summarize', 'report', 'plan', 'review', 'compare', 'evaluate', 'explain',
   'translate', 'code', 'implement', 'develop', 'find', 'search',
 ];
+
+/**
+ * Detect if a user message is a task/request that should be auto-captured
+ * to the kanban board. Uses lightweight heuristics — no LLM call.
+ */
+const TASK_PATTERNS = [
+  /^(i want|i need|help me|set up|build|create|add|implement|fix|make|configure|link|connect|integrate|research|schedule|deploy|write|design|plan)\b/i,
+  /\b(set up|build|create|add|implement|fix|make|configure|link|connect|integrate)\b.{10,}/i,
+  /\b(can you|could you|please)\b.{10,}/i,
+  /\bi want\b.{10,}/i,
+  /\b(research|investigate|find out|look into)\b.{10,}/i,
+];
+
+function isUserTask(content: string): boolean {
+  // Strip @trigger prefix before checking
+  const cleaned = content.replace(/@\w+\s*/g, '').trim();
+  // Skip very short messages, questions without action, and quoted replies
+  if (cleaned.length < 15) return false;
+  if (cleaned.startsWith('>')) return false;
+  if (/^(what|how|why|when|where|who|is|are|do|does|did|can|could|should)\b/i.test(cleaned) &&
+      !/(set up|build|create|help|implement|fix)/i.test(cleaned)) return false;
+  return TASK_PATTERNS.some(p => p.test(cleaned));
+}
 
 /**
  * Returns true if the message content is substantive enough to warrant
@@ -526,6 +550,26 @@ async function processGroupMessages(chatJid: string): Promise<boolean> {
         logger.info({ groupFolder: group.folder, taskId, occupation: classification.occupation }, 'ClawWork auto-task created');
       } catch (err) {
         logger.warn({ err }, 'Failed to auto-create ClawWork task');
+      }
+    }
+  }
+
+  // Auto-capture user tasks to kanban board
+  // Detects imperative/request messages and creates tracked task records
+  if (!lastMsg.is_from_me) {
+    const taskContent = lastMsg.content.replace(TRIGGER_PATTERN, '').trim();
+    if (isUserTask(taskContent)) {
+      try {
+        const project = group.folder.startsWith('lexios') ? 'lexios' : 'nanoclaw';
+        createTaskRecord({
+          description: taskContent.slice(0, 200),
+          project,
+          source: 'user',
+          priority: 3,
+        });
+        logger.info({ groupFolder: group.folder, preview: taskContent.slice(0, 80) }, 'Auto-captured user task to kanban');
+      } catch (err) {
+        logger.warn({ err }, 'Failed to auto-capture user task');
       }
     }
   }

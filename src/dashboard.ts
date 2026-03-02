@@ -1486,6 +1486,35 @@ export function startDashboard(queue: GroupQueue, sendFn?: (jid: string, text: s
       return;
     }
 
+    // Fieldy webhook endpoint
+    if (url.pathname === '/webhooks/fieldy' && req.method === 'POST') {
+      let body = '';
+      req.on('data', (chunk) => { body += chunk; });
+      req.on('end', async () => {
+        try {
+          const payload = JSON.parse(body);
+          // Dynamically import Fieldy integration
+          const { fieldyIntegration } = await import('./integrations/fieldy-integration.js');
+          const result = await fieldyIntegration.handleWebhook(payload);
+
+          if (result.success) {
+            logger.info({ transcriptId: payload.id }, 'Fieldy webhook processed successfully');
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify(result));
+          } else {
+            logger.warn({ payload, result }, 'Fieldy webhook processing failed');
+            res.writeHead(400, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify(result));
+          }
+        } catch (err) {
+          logger.error({ error: err }, 'Error in Fieldy webhook handler');
+          res.writeHead(500);
+          res.end(JSON.stringify({ error: String(err) }));
+        }
+      });
+      return;
+    }
+
     if (url.pathname === '/' || url.pathname === '/index.html') {
       res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
       res.end(HTML);
