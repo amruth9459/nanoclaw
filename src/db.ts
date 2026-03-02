@@ -376,6 +376,13 @@ function createSchema(database: Database.Database): void {
   } catch {
     /* column already exists */
   }
+
+  // Add source tracking to tasks (distinguishes user-given vs agent-generated)
+  try {
+    database.exec(`ALTER TABLE tasks ADD COLUMN source TEXT DEFAULT 'agent'`);
+  } catch {
+    /* column already exists */
+  }
 }
 
 export function initDatabase(): void {
@@ -1231,6 +1238,32 @@ export interface KanbanItem {
 
 export function getKanbanItems(project: 'nanoclaw' | 'lexios'): KanbanItem[] {
   const items: KanbanItem[] = [];
+
+  // Manual tasks from the tasks table (includes user-given and agent-generated)
+  try {
+    const taskRows = db.prepare(
+      `SELECT * FROM tasks WHERE COALESCE(project, 'nanoclaw') = ? AND status != 'cancelled' ORDER BY priority DESC, created_at DESC`,
+    ).all(project) as Array<{
+      id: string; description: string; status: string; priority: number;
+      created_at: number; source: string | null; complexity: string;
+    }>;
+    for (const t of taskRows) {
+      const statusMap: Record<string, 'todo' | 'in_progress' | 'done'> = {
+        pending: 'todo', in_progress: 'in_progress', completed: 'done', blocked: 'todo',
+      };
+      const src = t.source || 'agent';
+      items.push({
+        id: t.id,
+        title: t.description.slice(0, 80) + (t.description.length > 80 ? '…' : ''),
+        status: statusMap[t.status] || 'todo',
+        source: src === 'user' ? 'user' : 'task',
+        project,
+        priority: t.priority,
+        createdAt: new Date(t.created_at).toISOString(),
+        metadata: { complexity: t.complexity, source: src },
+      });
+    }
+  } catch { /* table may not have new columns yet */ }
 
   // Scheduled tasks → kanban items
   try {
@@ -2120,6 +2153,8 @@ export interface TaskRecord {
   assignedAgent: string | null;
   createdAt: number;
   completedAt: number | null;
+  project?: string;
+  source?: string;
 }
 
 /**
@@ -2133,6 +2168,8 @@ export function createTaskRecord(params: {
   priority?: number;
   dependencies?: string[];
   assignedAgent?: string | null;
+  project?: string;
+  source?: string;
 }): TaskRecord {
   const taskId = `task_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`;
   const now = Date.now();
@@ -2149,14 +2186,16 @@ export function createTaskRecord(params: {
     assignedAgent: params.assignedAgent || null,
     createdAt: now,
     completedAt: null,
+    project: params.project || 'nanoclaw',
+    source: params.source || 'agent',
   };
 
   db.prepare(`
     INSERT INTO tasks (
       id, goal_id, description, complexity, estimated_hours,
       status, priority, dependencies, assigned_agent,
-      created_at, completed_at
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      created_at, completed_at, project, source
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `).run(
     task.id,
     task.goalId,
@@ -2168,7 +2207,9 @@ export function createTaskRecord(params: {
     JSON.stringify(task.dependencies),
     task.assignedAgent,
     task.createdAt,
-    task.completedAt
+    task.completedAt,
+    task.project,
+    task.source,
   );
 
   logger.info({ taskId, description: task.description }, 'Task created');
