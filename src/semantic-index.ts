@@ -22,6 +22,8 @@ import * as sqliteVec from 'sqlite-vec';
 
 import { STORE_DIR } from './config.js';
 import { readEnvFile } from './env.js';
+import { logUsage } from './db.js';
+import { calculateCost } from './economics.js';
 import { logger } from './logger.js';
 
 const DIMS = 128;
@@ -87,6 +89,16 @@ Text to embed:
 ${text.slice(0, 1200)}`,
     }],
   });
+
+  // Track embedding cost
+  if (resp.usage) {
+    const usage = {
+      inputTokens: resp.usage.input_tokens,
+      outputTokens: resp.usage.output_tokens,
+    };
+    const costUsd = calculateCost(usage);
+    logUsage('_system', '_semantic_index', usage, 0, false, costUsd);
+  }
 
   const raw = resp.content[0].type === 'text' ? resp.content[0].text.trim() : '';
   const match = raw.match(/\[[\s\S]+\]/);

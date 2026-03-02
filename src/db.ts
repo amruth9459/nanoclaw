@@ -4,6 +4,7 @@ import path from 'path';
 
 import { ASSISTANT_NAME, DATA_DIR, INITIAL_BALANCE, STORE_DIR } from './config.js';
 import { NewMessage, RegisteredGroup, ScheduledTask, TaskRunLog } from './types.js';
+import { logger } from './logger.js';
 
 let db: Database.Database;
 
@@ -143,6 +144,41 @@ function createSchema(database: Database.Database): void {
       submitted_at TEXT,
       notes TEXT
     );
+  `);
+
+  // Goal decomposition and task management
+  database.exec(`
+    CREATE TABLE IF NOT EXISTS goals (
+      id TEXT PRIMARY KEY,
+      description TEXT NOT NULL,
+      target_value REAL,
+      deadline INTEGER,
+      status TEXT NOT NULL,
+      priority TEXT NOT NULL,
+      created_at INTEGER NOT NULL,
+      completed_at INTEGER,
+      parent_goal_id TEXT,
+      FOREIGN KEY (parent_goal_id) REFERENCES goals(id)
+    );
+
+    CREATE TABLE IF NOT EXISTS tasks (
+      id TEXT PRIMARY KEY,
+      goal_id TEXT,
+      description TEXT NOT NULL,
+      complexity TEXT NOT NULL,
+      estimated_hours REAL,
+      status TEXT NOT NULL,
+      priority INTEGER NOT NULL,
+      dependencies TEXT,
+      assigned_agent TEXT,
+      created_at INTEGER NOT NULL,
+      completed_at INTEGER,
+      FOREIGN KEY (goal_id) REFERENCES goals(id)
+    );
+
+    CREATE INDEX IF NOT EXISTS idx_goals_status ON goals(status);
+    CREATE INDEX IF NOT EXISTS idx_tasks_goal ON tasks(goal_id);
+    CREATE INDEX IF NOT EXISTS idx_tasks_status ON tasks(status);
   `);
 
   // Lexios customer tracking (legacy DM model)
@@ -1682,5 +1718,474 @@ export function getLexiosBuildingSummary(): {
     total_queries: buildings.reduce((s, b) => s + b.queries_count, 0),
     active_buildings: buildings.filter(b => b.status === 'active').length,
     buildings,
+  };
+}
+
+
+// ── Lexios Training Metrics (reads eval.db) ────────────────────────
+
+let evalDb: Database.Database | null = null;
+
+function openEvalDb(): Database.Database | null {
+  if (evalDb) return evalDb;
+  const evalDbPath = path.join(process.env.HOME || '', 'Lexios', 'lexios', 'eval.db');
+  try {
+    if (!fs.existsSync(evalDbPath)) return null;
+    evalDb = new Database(evalDbPath, { readonly: true });
+    return evalDb;
+  } catch {
+    return null;
+  }
+}
+
+export interface LexiosMetrics {
+  corpus: {
+    total_docs: number;
+    by_type: Record<string, number>;
+    by_difficulty: Record<string, number>;
+    types_covered: number;
+    types_total: number;
+    growth: { date: string; docs: number }[];
+  };
+  models: Record<string, {
+    avg_f1: number;
+    trend: number[];
+    cost_per_doc: number;
+  }>;
+  learnings: {
+    total_tips: number;
+    by_category: Record<string, number>;
+  };
+  substitution_candidates: {
+    category: string;
+    local_model: string;
+    local_f1: number;
+    cloud_f1: number;
+    ready: boolean;
+  }[];
+  recent_runs: {
+    doc_id: string;
+    date: string;
+    models: number;
+    elements: number;
+  }[];
+}
+
+export function getLexiosMetrics(): LexiosMetrics | null {
+  const edb = openEvalDb();
+  if (!edb) return null;
+
+  try {
+    // Corpus docs
+    const docs = edb.prepare(
+      'SELECT doc_id, doc_type, difficulty, added_at FROM corpus_docs ORDER BY added_at DESC'
+    ).all() as { doc_id: string; doc_type: string; difficulty: string; added_at: string }[];
+
+    const byType: Record<string, number> = {};
+    const byDiff: Record<string, number> = {};
+    for (const d of docs) {
+      byType[d.doc_type] = (byType[d.doc_type] || 0) + 1;
+      byDiff[d.difficulty] = (byDiff[d.difficulty] || 0) + 1;
+    }
+
+    // Growth: docs added per day
+    const growthMap: Record<string, number> = {};
+    for (const d of docs) {
+      const date = d.added_at.slice(0, 10);
+      growthMap[date] = (growthMap[date] || 0) + 1;
+    }
+    let cumulative = 0;
+    const growth = Object.entries(growthMap).sort().map(([date, count]) => {
+      cumulative += count;
+      return { date, docs: cumulative };
+    });
+
+    // Type coverage from model_performance
+    let typesCovered = 0;
+    let typesTotal = 101;
+    try {
+      const covered = edb.prepare(
+        'SELECT COUNT(DISTINCT category) as c FROM model_performance'
+      ).get() as { c: number } | undefined;
+      typesCovered = covered?.c || 0;
+    } catch { /* table may not exist yet */ }
+
+    // Model performance
+    const models: Record<string, { avg_f1: number; trend: number[]; cost_per_doc: number }> = {};
+    try {
+      const modelRows = edb.prepare(`
+        SELECT model, AVG(f1) as avg_f1, AVG(cost_usd) as avg_cost
+        FROM model_performance
+        GROUP BY model
+      `).all() as { model: string; avg_f1: number; avg_cost: number }[];
+
+      for (const row of modelRows) {
+        // Get trend: F1 per run in chronological order (use _overall rows)
+        const trendRows = edb.prepare(`
+          SELECT f1 FROM model_performance
+          WHERE model = ? AND category = '_overall'
+          ORDER BY run_at
+        `).all(row.model) as { f1: number }[];
+
+        models[row.model] = {
+          avg_f1: Math.round((row.avg_f1 || 0) * 1000) / 1000,
+          trend: trendRows.map(t => Math.round((t.f1 || 0) * 1000) / 1000),
+          cost_per_doc: Math.round((row.avg_cost || 0) * 10000) / 10000,
+        };
+      }
+    } catch { /* table may not exist yet */ }
+
+    // Learnings
+    const learnings = { total_tips: 0, by_category: {} as Record<string, number> };
+    try {
+      const learningsPath = path.join(process.env.HOME || '', 'Lexios', 'lexios', 'learnings.json');
+      if (fs.existsSync(learningsPath)) {
+        const data = JSON.parse(fs.readFileSync(learningsPath, 'utf-8'));
+        for (const [cat, tips] of Object.entries(data)) {
+          if (Array.isArray(tips)) {
+            learnings.total_tips += tips.length;
+            learnings.by_category[cat] = tips.length;
+          }
+        }
+      }
+    } catch { /* learnings file may not exist */ }
+
+    // Substitution candidates
+    const substitutionCandidates: LexiosMetrics['substitution_candidates'] = [];
+    try {
+      const cloudModels = new Set(['claude', 'gpt4.1', 'gemini']);
+      const perfRows = edb.prepare(`
+        SELECT model, category, AVG(f1) as avg_f1, COUNT(DISTINCT doc_id) as docs
+        FROM model_performance
+        GROUP BY model, category
+        HAVING docs >= 3
+      `).all() as { model: string; category: string; avg_f1: number; docs: number }[];
+
+      const byCat: Record<string, Record<string, number>> = {};
+      for (const r of perfRows) {
+        if (!byCat[r.category]) byCat[r.category] = {};
+        byCat[r.category][r.model] = r.avg_f1;
+      }
+
+      for (const [cat, modelF1s] of Object.entries(byCat)) {
+        const cloudF1 = Math.max(...Object.entries(modelF1s)
+          .filter(([m]) => cloudModels.has(m))
+          .map(([, f]) => f), 0);
+        for (const [model, f1] of Object.entries(modelF1s)) {
+          if (!cloudModels.has(model) && model !== 'dxf_programmatic') {
+            substitutionCandidates.push({
+              category: cat,
+              local_model: model,
+              local_f1: Math.round(f1 * 1000) / 1000,
+              cloud_f1: Math.round(cloudF1 * 1000) / 1000,
+              ready: cloudF1 > 0 && f1 / cloudF1 >= 0.85,
+            });
+          }
+        }
+      }
+    } catch { /* table may not exist */ }
+
+    // Recent runs (from model_performance — group by doc_id + run_at date)
+    const recentRuns: LexiosMetrics['recent_runs'] = [];
+    try {
+      const runRows = edb.prepare(`
+        SELECT doc_id, DATE(run_at) as date,
+               COUNT(DISTINCT model) as models,
+               SUM(elements_found) as elements
+        FROM model_performance
+        GROUP BY doc_id, DATE(run_at)
+        ORDER BY date DESC
+        LIMIT 10
+      `).all() as { doc_id: string; date: string; models: number; elements: number }[];
+
+      for (const r of runRows) {
+        recentRuns.push({
+          doc_id: r.doc_id,
+          date: r.date,
+          models: r.models,
+          elements: r.elements || 0,
+        });
+      }
+    } catch { /* table may not exist */ }
+
+    return {
+      corpus: {
+        total_docs: docs.length,
+        by_type: byType,
+        by_difficulty: byDiff,
+        types_covered: typesCovered,
+        types_total: typesTotal,
+        growth,
+      },
+      models,
+      learnings,
+      substitution_candidates: substitutionCandidates,
+      recent_runs: recentRuns,
+    };
+  } catch {
+    return null;
+  }
+}
+
+// =============================================================================
+// Task System (evolved from TodoWrite)
+// =============================================================================
+
+export interface TaskRecord {
+  id: string;
+  goalId: string | null;
+  description: string;
+  complexity: 'trivial' | 'simple' | 'moderate' | 'complex' | 'expert';
+  estimatedHours: number | null;
+  status: 'pending' | 'in_progress' | 'completed' | 'blocked' | 'cancelled';
+  priority: number;
+  dependencies: string[];
+  assignedAgent: string | null;
+  createdAt: number;
+  completedAt: number | null;
+}
+
+/**
+ * Create a new task
+ */
+export function createTaskRecord(params: {
+  description: string;
+  goalId?: string | null;
+  complexity?: TaskRecord['complexity'];
+  estimatedHours?: number | null;
+  priority?: number;
+  dependencies?: string[];
+  assignedAgent?: string | null;
+}): TaskRecord {
+  const taskId = `task_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`;
+  const now = Date.now();
+
+  const task: TaskRecord = {
+    id: taskId,
+    goalId: params.goalId || null,
+    description: params.description,
+    complexity: params.complexity || 'moderate',
+    estimatedHours: params.estimatedHours || null,
+    status: 'pending',
+    priority: params.priority || 3,
+    dependencies: params.dependencies || [],
+    assignedAgent: params.assignedAgent || null,
+    createdAt: now,
+    completedAt: null,
+  };
+
+  db.prepare(`
+    INSERT INTO tasks (
+      id, goal_id, description, complexity, estimated_hours,
+      status, priority, dependencies, assigned_agent,
+      created_at, completed_at
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+  `).run(
+    task.id,
+    task.goalId,
+    task.description,
+    task.complexity,
+    task.estimatedHours,
+    task.status,
+    task.priority,
+    JSON.stringify(task.dependencies),
+    task.assignedAgent,
+    task.createdAt,
+    task.completedAt
+  );
+
+  logger.info({ taskId, description: task.description }, 'Task created');
+  return task;
+}
+
+/**
+ * Get a task by ID
+ */
+export function getTaskRecord(taskId: string): TaskRecord | undefined {
+  const row = db.prepare('SELECT * FROM tasks WHERE id = ?').get(taskId) as any;
+  if (!row) return undefined;
+
+  return {
+    id: row.id,
+    goalId: row.goal_id,
+    description: row.description,
+    complexity: row.complexity,
+    estimatedHours: row.estimated_hours,
+    status: row.status,
+    priority: row.priority,
+    dependencies: JSON.parse(row.dependencies || '[]'),
+    assignedAgent: row.assigned_agent,
+    createdAt: row.created_at,
+    completedAt: row.completed_at,
+  };
+}
+
+/**
+ * Get all tasks (optionally filtered)
+ */
+export function getTaskRecords(filters?: {
+  goalId?: string;
+  status?: TaskRecord['status'];
+  assignedAgent?: string;
+  priority?: number;
+}): TaskRecord[] {
+  let query = 'SELECT * FROM tasks WHERE 1=1';
+  const params: any[] = [];
+
+  if (filters?.goalId) {
+    query += ' AND goal_id = ?';
+    params.push(filters.goalId);
+  }
+
+  if (filters?.status) {
+    query += ' AND status = ?';
+    params.push(filters.status);
+  }
+
+  if (filters?.assignedAgent) {
+    query += ' AND assigned_agent = ?';
+    params.push(filters.assignedAgent);
+  }
+
+  if (filters?.priority !== undefined) {
+    query += ' AND priority = ?';
+    params.push(filters.priority);
+  }
+
+  query += ' ORDER BY priority DESC, created_at ASC';
+
+  const rows = db.prepare(query).all(...params) as any[];
+
+  return rows.map(row => ({
+    id: row.id,
+    goalId: row.goal_id,
+    description: row.description,
+    complexity: row.complexity,
+    estimatedHours: row.estimated_hours,
+    status: row.status,
+    priority: row.priority,
+    dependencies: JSON.parse(row.dependencies || '[]'),
+    assignedAgent: row.assigned_agent,
+    createdAt: row.created_at,
+    completedAt: row.completed_at,
+  }));
+}
+
+/**
+ * Update a task
+ */
+export function updateTaskRecord(taskId: string, updates: {
+  status?: TaskRecord['status'];
+  assignedAgent?: string | null;
+  priority?: number;
+  dependencies?: string[];
+}): TaskRecord | undefined {
+  const task = getTaskRecord(taskId);
+  if (!task) {
+    logger.warn({ taskId }, 'Task not found for update');
+    return undefined;
+  }
+
+  const now = Date.now();
+  const updateFields: string[] = [];
+  const updateValues: any[] = [];
+
+  if (updates.status !== undefined) {
+    updateFields.push('status = ?');
+    updateValues.push(updates.status);
+
+    if (updates.status === 'completed') {
+      updateFields.push('completed_at = ?');
+      updateValues.push(now);
+    }
+  }
+
+  if (updates.assignedAgent !== undefined) {
+    updateFields.push('assigned_agent = ?');
+    updateValues.push(updates.assignedAgent);
+  }
+
+  if (updates.priority !== undefined) {
+    updateFields.push('priority = ?');
+    updateValues.push(updates.priority);
+  }
+
+  if (updates.dependencies !== undefined) {
+    updateFields.push('dependencies = ?');
+    updateValues.push(JSON.stringify(updates.dependencies));
+  }
+
+  if (updateFields.length === 0) {
+    return task; // No updates
+  }
+
+  updateValues.push(taskId);
+
+  db.prepare(`UPDATE tasks SET ${updateFields.join(', ')} WHERE id = ?`).run(...updateValues);
+
+  logger.info({ taskId, updates }, 'Task updated');
+  return getTaskRecord(taskId);
+}
+
+/**
+ * Delete a task
+ */
+export function deleteTaskRecord(taskId: string): boolean {
+  const result = db.prepare('DELETE FROM tasks WHERE id = ?').run(taskId);
+  const deleted = result.changes > 0;
+
+  if (deleted) {
+    logger.info({ taskId }, 'Task deleted');
+  }
+
+  return deleted;
+}
+
+/**
+ * Get available tasks (dependencies met, ready to work on)
+ */
+export function getAvailableTaskRecords(agentName?: string): TaskRecord[] {
+  const allTasks = getTaskRecords({ status: 'pending' });
+  const available: TaskRecord[] = [];
+
+  for (const task of allTasks) {
+    // Skip if assigned to different agent
+    if (task.assignedAgent && agentName && task.assignedAgent !== agentName) {
+      continue;
+    }
+
+    // Check dependencies
+    if (task.dependencies.length > 0) {
+      const deps = task.dependencies.map(depId => getTaskRecord(depId)).filter(Boolean) as TaskRecord[];
+      const allComplete = deps.every(dep => dep.status === 'completed');
+
+      if (!allComplete) continue;
+    }
+
+    available.push(task);
+  }
+
+  // Sort by priority
+  return available.sort((a, b) => b.priority - a.priority);
+}
+
+/**
+ * Get task statistics
+ */
+export function getTaskStats(): {
+  total: number;
+  pending: number;
+  inProgress: number;
+  completed: number;
+  blocked: number;
+} {
+  const all = getTaskRecords();
+
+  return {
+    total: all.length,
+    pending: all.filter(t => t.status === 'pending').length,
+    inProgress: all.filter(t => t.status === 'in_progress').length,
+    completed: all.filter(t => t.status === 'completed').length,
+    blocked: all.filter(t => t.status === 'blocked').length,
   };
 }

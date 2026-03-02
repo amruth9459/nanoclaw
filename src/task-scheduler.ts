@@ -12,12 +12,16 @@ import {
 } from './config.js';
 import { ContainerOutput, runContainerAgent, writeTasksSnapshot } from './container-runner.js';
 import {
+  deductBalance,
   getAllTasks,
   getDueTasks,
+  getOrCreateEconomics,
   getTaskById,
   logTaskRun,
+  logUsage,
   updateTaskAfterRun,
 } from './db.js';
+import { calculateCost } from './economics.js';
 import { cleanupOldMedia } from './media-cleanup.js';
 import { GroupQueue } from './group-queue.js';
 import { logger } from './logger.js';
@@ -140,6 +144,14 @@ async function runTask(
           scheduleClose();
         }
         if (streamedOutput.status === 'success') {
+          // Track usage/cost for scheduled tasks (same as user messages)
+          if (streamedOutput.usage && !streamedOutput.isPartial) {
+            const costUsd = calculateCost(streamedOutput.usage);
+            const durationMs = Date.now() - startTime;
+            logUsage(task.group_folder, task.chat_jid, streamedOutput.usage, durationMs, true, costUsd);
+            deductBalance(task.group_folder, costUsd);
+            logger.info({ taskId: task.id, costUsd, usage: streamedOutput.usage }, 'Task cost tracked');
+          }
           deps.queue.notifyIdle(task.chat_jid);
         }
         if (streamedOutput.status === 'error') {

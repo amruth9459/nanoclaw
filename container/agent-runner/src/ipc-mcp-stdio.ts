@@ -1014,6 +1014,197 @@ server.tool(
   },
 );
 
+// ── Lexios Jurisdiction Builder tools ──────────────────────────────────
+
+function writeJurisdictionRequest(data: object): { responseFile: string } {
+  const requestId = `jurisdiction-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+  const requestFile = path.join(MESSAGES_DIR, `${requestId}.json`);
+  const responseFile = path.join(MESSAGES_DIR, `${requestId}.response.json`);
+
+  const payload = { ...data, requestId, responseFile, groupFolder, chatJid, timestamp: new Date().toISOString() };
+  const tmp = `${requestFile}.tmp`;
+  fs.writeFileSync(tmp, JSON.stringify(payload, null, 2));
+  fs.renameSync(tmp, requestFile);
+
+  return { responseFile };
+}
+
+server.tool(
+  'lexios_add_jurisdiction',
+  `Add a new jurisdiction to the Lexios compliance database. Each jurisdiction is a complete product unit.
+If parent_id is set, rules are inherited from the parent. Use this when researching a new county/city's building codes.
+
+Example:
+  id: "GA-cobb-county"
+  name: "Cobb County, GA"
+  state: "GA"
+  level: "county"
+  parent_id: "base-ibc-2021"
+  adopted_code: "IBC 2021 with GA State Amendments"
+  adopted_code_year: 2021`,
+  {
+    id: z.string().describe('Jurisdiction ID, e.g. "GA-cobb-county"'),
+    name: z.string().describe('Display name, e.g. "Cobb County, GA"'),
+    state: z.string().describe('State code, e.g. "GA"'),
+    level: z.enum(['state', 'county', 'city']).describe('Jurisdiction level'),
+    parent_id: z.string().optional().describe('Parent jurisdiction ID for rule inheritance (e.g. "base-ibc-2021")'),
+    adopted_code: z.string().describe('Adopted code name, e.g. "IBC 2021 with GA State Amendments"'),
+    adopted_code_year: z.number().int().describe('Year of adopted code'),
+    adopted_residential_code: z.string().optional().describe('Residential code if different from commercial'),
+    source_url: z.string().optional().describe('URL where code adoption info was found'),
+    completeness: z.number().int().min(0).max(100).default(0).describe('How complete the research is (0-100%)'),
+    notes: z.string().optional().describe('Research notes'),
+  },
+  async (args) => {
+    const { responseFile } = writeJurisdictionRequest({
+      type: 'lexios_add_jurisdiction',
+      ...args,
+    });
+
+    const result = await pollResponse(responseFile, 15000);
+    if (!result) return { content: [{ type: 'text' as const, text: 'Error: add_jurisdiction request timed out' }], isError: true };
+    if (result.error) return { content: [{ type: 'text' as const, text: `Error: ${result.error}` }], isError: true };
+
+    const inherited = result.inherited_rules ? ` (inherited ${result.inherited_rules} rules from ${args.parent_id})` : '';
+    return { content: [{ type: 'text' as const, text: `Jurisdiction added: ${args.id} — ${args.name}${inherited}` }] };
+  },
+);
+
+server.tool(
+  'lexios_add_rule',
+  `Add an effective rule to a jurisdiction. Use this when you find specific code requirements during research.
+
+check_type values: min_dimension, max_dimension, min_count, max_distance, boolean, ratio, min_area, max_area
+
+Example:
+  jurisdiction_id: "GA-douglas-county"
+  code: "IBC"
+  section: "1005.1"
+  title: "Minimum corridor width (Douglas amendment)"
+  category: "egress"
+  check_type: "min_dimension"
+  threshold_value: 48
+  threshold_unit: "inches"
+  amendment_source: "Douglas Ord. 2022-15"`,
+  {
+    jurisdiction_id: z.string().describe('Target jurisdiction ID'),
+    code: z.string().describe('Code reference: IBC, IRC, ADA, NFPA-101, NEC, etc.'),
+    section: z.string().describe('Section number, e.g. "1005.1"'),
+    title: z.string().describe('Rule title'),
+    category: z.string().describe('Category: egress, fire, structural, accessibility, plumbing, mechanical, electrical, energy, general'),
+    requirement_text: z.string().describe('Full requirement text'),
+    check_type: z.enum(['min_dimension', 'max_dimension', 'min_count', 'max_distance', 'boolean', 'ratio', 'min_area', 'max_area']).describe('Type of check'),
+    threshold_value: z.number().optional().describe('Numeric threshold (e.g. 44 for 44 inches)'),
+    threshold_unit: z.string().optional().describe('Unit: inches, feet, sqft, count, percent, hours, psf, etc.'),
+    conditions: z.record(z.string(), z.unknown()).optional().describe('Conditions as JSON (e.g. {"occupant_load_gte": 50})'),
+    severity: z.enum(['critical', 'major', 'minor']).default('major').describe('Rule severity'),
+    extraction_types: z.array(z.string()).optional().describe('Which extraction types feed this check (e.g. ["egress_paths"])'),
+    extraction_field: z.string().optional().describe('Field to check (e.g. "width")'),
+    amendment_source: z.string().optional().describe('Source of amendment (e.g. "Douglas Ord. 2022-15")'),
+  },
+  async (args) => {
+    const { responseFile } = writeJurisdictionRequest({
+      type: 'lexios_add_rule',
+      ...args,
+    });
+
+    const result = await pollResponse(responseFile, 15000);
+    if (!result) return { content: [{ type: 'text' as const, text: 'Error: add_rule request timed out' }], isError: true };
+    if (result.error) return { content: [{ type: 'text' as const, text: `Error: ${result.error}` }], isError: true };
+    return { content: [{ type: 'text' as const, text: `Rule added (#${result.rule_id}): ${args.code} ${args.section} — ${args.title}` }] };
+  },
+);
+
+server.tool(
+  'lexios_add_meta',
+  `Add metadata to a jurisdiction (fees, submission requirements, common rejections, reviewer notes, etc.).
+
+Common keys:
+  fee_residential_per_sqft, fee_commercial_per_sqft, submission_format, submission_documents,
+  common_rejection_1, common_rejection_2, reviewer_note_1, inspection_hours, plan_review_turnaround`,
+  {
+    jurisdiction_id: z.string().describe('Target jurisdiction ID'),
+    key: z.string().describe('Metadata key'),
+    value: z.string().describe('Metadata value'),
+    source_url: z.string().optional().describe('URL where this info was found'),
+  },
+  async (args) => {
+    const { responseFile } = writeJurisdictionRequest({
+      type: 'lexios_add_meta',
+      ...args,
+    });
+
+    const result = await pollResponse(responseFile, 10000);
+    if (!result) return { content: [{ type: 'text' as const, text: 'Error: add_meta request timed out' }], isError: true };
+    if (result.error) return { content: [{ type: 'text' as const, text: `Error: ${result.error}` }], isError: true };
+    return { content: [{ type: 'text' as const, text: `Metadata added: ${args.jurisdiction_id}.${args.key} = ${args.value.slice(0, 80)}` }] };
+  },
+);
+
+server.tool(
+  'lexios_get_coverage',
+  `Get jurisdiction coverage: which jurisdictions exist, how complete they are, and what to research next.
+Returns all jurisdictions with their rule counts and completeness percentages.`,
+  {},
+  async () => {
+    const { responseFile } = writeJurisdictionRequest({
+      type: 'lexios_get_coverage',
+    });
+
+    const result = await pollResponse(responseFile, 10000);
+    if (!result) return { content: [{ type: 'text' as const, text: 'Error: get_coverage request timed out' }], isError: true };
+    if (result.error) return { content: [{ type: 'text' as const, text: `Error: ${result.error}` }], isError: true };
+    return { content: [{ type: 'text' as const, text: JSON.stringify(result, null, 2) }] };
+  },
+);
+
+// Task System (evolved from TodoWrite)
+server.tool(
+  'task_tool',
+  `Manage tasks with multi-agent coordination support. Replaces TodoWrite with more powerful features.
+
+Actions:
+- create: Create a new task with description, priority, dependencies
+- update: Update task status, priority, or assigned agent
+- list: List all tasks (optionally filtered by status or agent)
+- get: Get details of a specific task
+- delete: Delete a task
+- available: List tasks available to work on (dependencies met)
+
+Tasks support:
+- Dependencies: Tasks can depend on other tasks
+- Assignment: Tasks can be assigned to specific agents
+- Priority: 1-100 scale (100 = highest)
+- Status tracking: pending → in_progress → completed
+- Complexity estimation: trivial, simple, moderate, complex, expert`,
+  {
+    action: z.enum(['create', 'update', 'list', 'get', 'delete', 'available']).describe('Action to perform'),
+    description: z.string().optional().describe('Task description (for create)'),
+    complexity: z.enum(['trivial', 'simple', 'moderate', 'complex', 'expert']).optional().describe('Task complexity'),
+    priority: z.number().min(1).max(100).optional().describe('Priority 1-100 (100=highest)'),
+    dependencies: z.array(z.string()).optional().describe('Task IDs this depends on'),
+    assignedAgent: z.string().optional().describe('Agent name to assign'),
+    estimatedHours: z.number().optional().describe('Estimated hours'),
+    taskId: z.string().optional().describe('Task ID (for update/get/delete)'),
+    status: z.enum(['pending', 'in_progress', 'completed', 'blocked', 'cancelled']).optional().describe('New status (for update)'),
+    newPriority: z.number().min(1).max(100).optional().describe('New priority (for update)'),
+    newAgent: z.string().optional().describe('New assigned agent (for update)'),
+    filterStatus: z.enum(['pending', 'in_progress', 'completed', 'blocked', 'cancelled']).optional().describe('Filter by status (for list)'),
+    filterAgent: z.string().optional().describe('Filter by agent (for list/available)'),
+  },
+  async (args) => {
+    const { responseFile } = writeRequest({
+      type: 'task_tool',
+      ...args,
+    });
+
+    const result = await pollResponse(responseFile, 10000);
+    if (!result) return { content: [{ type: 'text' as const, text: 'Error: task_tool request timed out' }], isError: true };
+    if (result.error) return { content: [{ type: 'text' as const, text: `Error: ${result.error}` }], isError: true };
+    return { content: [{ type: 'text' as const, text: result.result }] };
+  },
+);
+
 // Start the stdio transport
 const transport = new StdioServerTransport();
 await server.connect(transport);

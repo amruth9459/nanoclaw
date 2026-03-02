@@ -1,5 +1,6 @@
 import fs from 'fs';
 import path from 'path';
+import Database from 'better-sqlite3';
 
 import { CronExpressionParser } from 'cron-parser';
 
@@ -7,6 +8,7 @@ import {
   DATA_DIR,
   GROUPS_DIR,
   IPC_POLL_INTERVAL,
+  LEXIOS_CODES_DB,
   MAIN_GROUP_FOLDER,
   PAYPAL_EMAIL,
   STORE_DIR,
@@ -164,6 +166,7 @@ export function startIpcWatcher(deps: IpcDeps): void {
                   'lexios_track_analysis', 'lexios_track_document', 'lexios_add_member',
                   'lexios_get_members', 'lexios_check_permission', 'lexios_track_query',
                   'lexios_save_extraction', 'lexios_select_model',
+                  'lexios_add_jurisdiction', 'lexios_add_rule', 'lexios_add_meta', 'lexios_get_coverage',
                 ]);
                 if (data.type && LEXIOS_TYPES.has(data.type as string)) {
                   await processLexiosMessage(data, sourceGroup, deps);
@@ -619,6 +622,15 @@ async function processClawworkMessage(
       break;
     }
 
+    // ── Task System (evolved from TodoWrite) ────────────────────────
+    case 'task_tool': {
+      const { executeTaskTool } = await import('./mcp/tools/task-tool.js');
+      const result = await executeTaskTool(data as any);
+      if (responseFile) writeIpcResponse(responseFile, { result });
+      logger.debug({ groupFolder, action: data.action }, 'TaskTool processed');
+      break;
+    }
+
     default:
       logger.warn({ type: data.type, groupFolder }, 'Unknown ClawWork IPC type');
   }
@@ -777,8 +789,186 @@ async function processLexiosMessage(
       break;
     }
 
+    // ── Jurisdiction Builder tools ──────────────────────────────────
+    case 'lexios_add_jurisdiction':
+    case 'lexios_add_rule':
+    case 'lexios_add_meta':
+    case 'lexios_get_coverage': {
+      await processJurisdictionMessage(data, groupFolder, responseFile);
+      break;
+    }
+
     default:
       logger.warn({ type: data.type, groupFolder }, 'Unknown Lexios IPC type');
+  }
+}
+
+// ── Jurisdiction Builder IPC Handler ──────────────────────────────────────
+
+let _codesDb: InstanceType<typeof Database> | null = null;
+
+function getCodesDb(): InstanceType<typeof Database> {
+  if (!_codesDb) {
+    if (!fs.existsSync(LEXIOS_CODES_DB)) {
+      throw new Error(`Compliance DB not found at ${LEXIOS_CODES_DB}. Run: python3 ~/Lexios/lexios/compliance.py --seed`);
+    }
+    _codesDb = new Database(LEXIOS_CODES_DB);
+    _codesDb.pragma('journal_mode = WAL');
+    _codesDb.pragma('foreign_keys = ON');
+  }
+  return _codesDb;
+}
+
+async function processJurisdictionMessage(
+  data: Record<string, unknown>,
+  groupFolder: string,
+  responseFile: string | undefined,
+): Promise<void> {
+  try {
+    const db = getCodesDb();
+    const now = new Date().toISOString();
+
+    switch (data.type) {
+      case 'lexios_add_jurisdiction': {
+        const id = data.id as string;
+        const parentId = data.parent_id as string | undefined;
+
+        db.prepare(`
+          INSERT OR REPLACE INTO jurisdictions
+            (id, name, state, level, parent_id, adopted_code, adopted_code_year,
+             adopted_residential_code, source_url, last_verified, completeness, notes)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        `).run(
+          id, data.name, data.state, data.level,
+          parentId || null, data.adopted_code, data.adopted_code_year,
+          (data.adopted_residential_code as string) || null,
+          (data.source_url as string) || null,
+          now,
+          (data.completeness as number) || 0,
+          (data.notes as string) || null,
+        );
+
+        let inheritedRules = 0;
+        if (parentId) {
+          const parentRuleCount = db.prepare(
+            'SELECT COUNT(*) as cnt FROM effective_rules WHERE jurisdiction_id = ?'
+          ).get(parentId) as { cnt: number } | undefined;
+
+          if (parentRuleCount && parentRuleCount.cnt > 0) {
+            db.prepare(`
+              INSERT INTO effective_rules
+                (jurisdiction_id, code, section, title, category, requirement_text,
+                 check_type, threshold_value, threshold_unit, conditions, severity,
+                 extraction_types, extraction_field, amendment_source, applies_to)
+              SELECT
+                ?, code, section, title, category, requirement_text,
+                check_type, threshold_value, threshold_unit, conditions, severity,
+                extraction_types, extraction_field, amendment_source, applies_to
+              FROM effective_rules WHERE jurisdiction_id = ?
+            `).run(id, parentId);
+            inheritedRules = parentRuleCount.cnt;
+          }
+        }
+
+        if (responseFile) writeIpcResponse(responseFile, { success: true, inherited_rules: inheritedRules });
+        logger.info({ groupFolder, id, inheritedRules }, 'Jurisdiction: added');
+        break;
+      }
+
+      case 'lexios_add_rule': {
+        const ruleId = db.prepare(`
+          INSERT INTO effective_rules
+            (jurisdiction_id, code, section, title, category, requirement_text,
+             check_type, threshold_value, threshold_unit, conditions, severity,
+             extraction_types, extraction_field, amendment_source, applies_to)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        `).run(
+          data.jurisdiction_id, data.code, data.section, data.title,
+          data.category, data.requirement_text, data.check_type,
+          (data.threshold_value as number) ?? null,
+          (data.threshold_unit as string) || null,
+          data.conditions ? JSON.stringify(data.conditions) : null,
+          (data.severity as string) || 'major',
+          data.extraction_types ? JSON.stringify(data.extraction_types) : null,
+          (data.extraction_field as string) || null,
+          (data.amendment_source as string) || null,
+          data.applies_to ? JSON.stringify(data.applies_to) : null,
+        ).lastInsertRowid;
+
+        db.prepare(`
+          INSERT INTO rule_history (effective_rule_id, jurisdiction_id, action, changed_by, changed_at, details)
+          VALUES (?, ?, ?, ?, ?, ?)
+        `).run(
+          ruleId, data.jurisdiction_id, 'added', 'claw-agent', now,
+          (data.amendment_source as string) || 'agent research',
+        );
+
+        if (responseFile) writeIpcResponse(responseFile, { success: true, rule_id: Number(ruleId) });
+        logger.info({ groupFolder, jurisdictionId: data.jurisdiction_id, ruleId: Number(ruleId) }, 'Jurisdiction: rule added');
+        break;
+      }
+
+      case 'lexios_add_meta': {
+        db.prepare(`
+          INSERT OR REPLACE INTO jurisdiction_meta (jurisdiction_id, key, value, source_url)
+          VALUES (?, ?, ?, ?)
+        `).run(
+          data.jurisdiction_id, data.key, data.value,
+          (data.source_url as string) || null,
+        );
+
+        if (responseFile) writeIpcResponse(responseFile, { success: true });
+        logger.info({ groupFolder, jurisdictionId: data.jurisdiction_id, key: data.key }, 'Jurisdiction: meta added');
+        break;
+      }
+
+      case 'lexios_get_coverage': {
+        const jurisdictions = db.prepare(`
+          SELECT j.id, j.name, j.state, j.level, j.adopted_code, j.completeness,
+                 j.last_verified, COUNT(r.id) as rule_count
+          FROM jurisdictions j
+          LEFT JOIN effective_rules r ON r.jurisdiction_id = j.id
+          GROUP BY j.id
+          ORDER BY j.state, j.level, j.name
+        `).all() as Array<{
+          id: string; name: string; state: string; level: string;
+          adopted_code: string; completeness: number; last_verified: string;
+          rule_count: number;
+        }>;
+
+        const metaCounts = db.prepare(`
+          SELECT jurisdiction_id, COUNT(*) as cnt FROM jurisdiction_meta GROUP BY jurisdiction_id
+        `).all() as Array<{ jurisdiction_id: string; cnt: number }>;
+
+        const metaMap: Record<string, number> = {};
+        for (const m of metaCounts) metaMap[m.jurisdiction_id] = m.cnt;
+
+        const nextTargets = [
+          'Cobb County', 'Fulton County', 'DeKalb County', 'Gwinnett County',
+          'Clayton County', 'Henry County', 'Fayette County', 'Cherokee County',
+          'Forsyth County', 'Rockdale County',
+        ];
+        const existingNames = new Set(jurisdictions.map(j => j.name));
+        const pendingTargets = nextTargets.filter(n => !existingNames.has(`${n}, GA`));
+
+        const response = {
+          jurisdictions: jurisdictions.map(j => ({
+            ...j,
+            meta_count: metaMap[j.id] || 0,
+          })),
+          total_jurisdictions: jurisdictions.length,
+          total_rules: jurisdictions.reduce((sum, j) => sum + j.rule_count, 0),
+          next_targets: pendingTargets.map(n => `${n}, GA`),
+        };
+
+        if (responseFile) writeIpcResponse(responseFile, response);
+        logger.debug({ groupFolder, count: jurisdictions.length }, 'Jurisdiction: coverage queried');
+        break;
+      }
+    }
+  } catch (err) {
+    logger.error({ err, type: data.type, groupFolder }, 'Jurisdiction IPC error');
+    if (responseFile) writeIpcResponse(responseFile, { error: (err as Error).message });
   }
 }
 

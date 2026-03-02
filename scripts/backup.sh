@@ -134,6 +134,19 @@ if [ -x "${NANOCLAW_DIR}/scripts/generate-contingency.sh" ]; then
     if command -v rclone &>/dev/null && rclone listremotes 2>/dev/null | grep -q '^gdrive:'; then
         rclone copyto "$CONTINGENCY_DOC" "gdrive:NanoClaw-Contingency.md" \
             --quiet 2>> "$LOG_FILE" && log "uploaded contingency doc to Google Drive" || log "WARN: Google Drive upload failed"
+
+        # Upload live platform + changelog docs
+        LEXIOS_DOCS_DIR="${LEXIOS_DIR}/docs"
+        NANOCLAW_DOCS_DIR="${NANOCLAW_DIR}/docs"
+        for doc in "LEXIOS_PLATFORM.md" "LEXIOS_CHANGELOG.md"; do
+            [ -f "${LEXIOS_DOCS_DIR}/${doc}" ] && rclone copyto "${LEXIOS_DOCS_DIR}/${doc}" "gdrive:Lexios/${doc}" \
+                --quiet 2>> "$LOG_FILE" && log "uploaded ${doc} to Google Drive" || log "WARN: ${doc} upload failed"
+        done
+        for doc in "NANOCLAW_PLATFORM.md" "NANOCLAW_CHANGELOG.md"; do
+            [ -f "${NANOCLAW_DOCS_DIR}/${doc}" ] && rclone copyto "${NANOCLAW_DOCS_DIR}/${doc}" "gdrive:NanoClaw/${doc}" \
+                --quiet 2>> "$LOG_FILE" && log "uploaded ${doc} to Google Drive" || log "WARN: ${doc} upload failed"
+        done
+        log "uploaded live docs to Google Drive"
     fi
 fi
 

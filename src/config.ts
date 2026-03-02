@@ -122,6 +122,10 @@ export const MEDIA_RETENTION_DAYS = parseInt(
   10,
 ); // 30 days default
 
+// Lexios compliance DB (jurisdiction-first building codes)
+export const LEXIOS_CODES_DB = process.env.LEXIOS_CODES_DB ||
+  path.resolve(HOME_DIR, 'Lexios', 'lexios', 'codes.db');
+
 // Economics / ClawWork settings
 export const INITIAL_BALANCE = parseFloat(process.env.NANOCLAW_INITIAL_BALANCE || '1000');
 export const TOKEN_PRICE_INPUT = parseFloat(process.env.NANOCLAW_TOKEN_PRICE_INPUT || '3.0');
