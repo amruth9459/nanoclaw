@@ -5,7 +5,8 @@
       "WebFetch(domain:raw.githubusercontent.com)",
       "WebFetch(domain:api.github.com)",
       "WebFetch(domain:github.com)",
-      "Bash(git:*)"
+      "Bash(git:*)",
+      "WebSearch"
     ]
   }
 }
