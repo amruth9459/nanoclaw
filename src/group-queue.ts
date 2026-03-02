@@ -29,6 +29,8 @@ interface GroupState {
   taskSpawnReason: string | null; // why the current task container was spawned
   startedAt: number | null;     // when the message container started (epoch ms)
   taskStartedAt: number | null; // when the task container started (epoch ms)
+  designation: string | null;   // what spawned the current container (conversation, task, guest, lexios, warmup)
+  taskDesignation: string | null; // designation for the current task container
 }
 
 export class GroupQueue {
@@ -57,6 +59,8 @@ export class GroupQueue {
         taskSpawnReason: null,
         startedAt: null,
         taskStartedAt: null,
+        designation: null,
+        taskDesignation: null,
       };
       this.groups.set(groupJid, state);
     }
@@ -137,6 +141,7 @@ export class GroupQueue {
         state.groupFolder = null;
         state.spawnReason = null;
         state.startedAt = null;
+        state.designation = null;
         this.activeCount--;
         this.drainMessages(groupJid);
         this.drainWaiting();
@@ -193,6 +198,16 @@ export class GroupQueue {
       state.taskSpawnReason = reason;
     } else {
       state.spawnReason = reason;
+    }
+  }
+
+  /** Set the designation for the active container (e.g. 'conversation', 'task', 'warmup'). */
+  setDesignation(groupJid: string, designation: string, isTask = false): void {
+    const state = this.getGroup(groupJid);
+    if (isTask) {
+      state.taskDesignation = designation;
+    } else {
+      state.designation = designation;
     }
   }
 
@@ -283,6 +298,7 @@ export class GroupQueue {
       state.groupFolder = null;
       state.spawnReason = null;
       state.startedAt = null;
+      state.designation = null;
       this.activeCount--;
       this.drainMessages(groupJid);
       this.drainWaiting();
@@ -308,6 +324,7 @@ export class GroupQueue {
       state.activeTask = false;
       state.taskSpawnReason = null;
       state.taskStartedAt = null;
+      state.taskDesignation = null;
       this.activeCount--;
       this.drainTasks(groupJid);
       this.drainWaiting();
@@ -395,6 +412,8 @@ export class GroupQueue {
     taskSpawnReason: string | null;
     startedAt: number | null;
     taskStartedAt: number | null;
+    designation: string | null;
+    taskDesignation: string | null;
   }> {
     const result: ReturnType<GroupQueue['getDetailedStatus']> = [];
     for (const [jid, state] of this.groups) {
@@ -411,6 +430,8 @@ export class GroupQueue {
         taskSpawnReason: state.taskSpawnReason,
         startedAt: state.startedAt,
         taskStartedAt: state.taskStartedAt,
+        designation: state.designation,
+        taskDesignation: state.taskDesignation,
       });
     }
     return result;

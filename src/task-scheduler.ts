@@ -92,10 +92,12 @@ async function runTask(
   let error: string | null = null;
 
   // Track task agent lifecycle in orchestrator
+  const taskDesignation = task.id.includes('bounty-hunter') ? 'bounty' : 'task';
+  const orchType = task.group_folder.startsWith('lexios') ? 'lexios' : 'nanoclaw';
   const agentId = `nanoclaw-task-${task.group_folder}-${Date.now()}`;
   await deps.orchestrator?.requestAgent({
     id: agentId,
-    type: 'nanoclaw',
+    type: orchType,
     priority: AgentPriority.MEDIUM,
     estimatedRamGB: 2,
     taskId: String(task.id),
@@ -120,9 +122,10 @@ async function runTask(
     }, TASK_CLOSE_DELAY_MS);
   };
 
-  // Set spawn reason for dashboard
+  // Set spawn reason and designation for dashboard
   const taskPreview = task.prompt.slice(0, 120) + (task.prompt.length > 120 ? '…' : '');
   deps.queue.setSpawnReason(task.chat_jid, taskPreview, true);
+  deps.queue.setDesignation(task.chat_jid, taskDesignation, true);
 
   try {
     const output = await runContainerAgent(
@@ -134,6 +137,7 @@ async function runTask(
         chatJid: task.chat_jid,
         isMain,
         isScheduledTask: true,
+        designation: taskDesignation,
       },
       (proc, containerName) => deps.onProcess(task.chat_jid, proc, containerName, task.group_folder),
       async (streamedOutput: ContainerOutput) => {
@@ -148,7 +152,8 @@ async function runTask(
           if (streamedOutput.usage && !streamedOutput.isPartial) {
             const costUsd = calculateCost(streamedOutput.usage);
             const durationMs = Date.now() - startTime;
-            logUsage(task.group_folder, task.chat_jid, streamedOutput.usage, durationMs, true, costUsd);
+            const purpose = task.id.includes('bounty-hunter') ? 'bounty' : 'task';
+            logUsage(task.group_folder, task.chat_jid, streamedOutput.usage, durationMs, true, costUsd, purpose);
             deductBalance(task.group_folder, costUsd);
             logger.info({ taskId: task.id, costUsd, usage: streamedOutput.usage }, 'Task cost tracked');
           }

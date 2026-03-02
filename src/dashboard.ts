@@ -25,6 +25,8 @@ import {
   getLexiosBuildingDocuments,
   getTotalUsage,
   getUsageSince,
+  getUsageByPurpose,
+  getKanbanItems,
 } from './db.js';
 import { getSurvivalTier } from './economics.js';
 import { logger } from './logger.js';
@@ -146,6 +148,8 @@ function apiStatus(queue: GroupQueue) {
       taskSpawnReason: qs?.taskSpawnReason ?? null,
       startedAt: qs?.startedAt ?? null,
       taskStartedAt: qs?.taskStartedAt ?? null,
+      designation: qs?.designation ?? null,
+      taskDesignation: qs?.taskDesignation ?? null,
     };
   });
 
@@ -190,6 +194,9 @@ function apiEconomics() {
   const weekUsage = getUsageSince(weekStart);
   const monthUsage = getUsageSince(monthStart);
 
+  const purposeBreakdown = getUsageByPurpose();
+  const monthPurposeBreakdown = getUsageByPurpose(monthStart);
+
   return {
     groups: summary.groups.map(g => ({
       group_id: g.group_id,
@@ -205,7 +212,10 @@ function apiEconomics() {
       input_tokens: u.input_tokens,
       output_tokens: u.output_tokens,
       duration_ms: u.duration_ms,
+      purpose: u.purpose || 'conversation',
     })),
+    purposeBreakdown,
+    monthPurposeBreakdown,
     activeTasks: activeTasks.map(t => ({
       id: t.id,
       group_id: t.group_id,
@@ -322,7 +332,7 @@ const HTML = `<!DOCTYPE html>
 
 <script>
 let memTab = 'global/MEMORY.md';
-let dashTab = 'overview'; // 'overview' | 'economics' | 'bounties' | 'files' | 'lexios' | 'router'
+let dashTab = 'overview'; // 'overview' | 'economics' | 'bounties' | 'kanban' | 'lexios-board' | 'files' | 'lexios' | 'router'
 
 function fmt(iso) {
   if (!iso) return '—';
@@ -364,6 +374,13 @@ function elapsed(startMs) {
   return min + 'm ' + sec + 's';
 }
 
+function designationBadge(g) {
+  var d = g.designation || g.taskDesignation;
+  if (!d) return '<span style="color:var(--muted);font-size:0.7rem">—</span>';
+  var colors = { conversation: 'var(--green)', task: '#60a5fa', bounty: '#f59e0b', guest: '#a78bfa', lexios: 'var(--accent2)', warmup: 'var(--yellow)', indexing: '#6b7280', judge: '#ef4444' };
+  return '<span class="pill" style="background:' + (colors[d] || 'var(--muted)') + ';color:#fff;font-size:0.65rem">' + d + '</span>';
+}
+
 function agentReason(g) {
   var parts = [];
   if (g.spawnReason) {
@@ -378,8 +395,8 @@ function agentReason(g) {
 }
 
 function tabBar() {
-  var tabs = ['overview', 'economics', 'bounties', 'files', 'lexios', 'router'];
-  var labels = { overview: 'Overview', economics: 'Economics', bounties: 'Bounties', files: 'Files', lexios: 'Lexios', router: 'Router' };
+  var tabs = ['overview', 'economics', 'kanban', 'bounties', 'files', 'lexios', 'lexios-board', 'router'];
+  var labels = { overview: 'Overview', economics: 'Economics', kanban: 'Kanban', bounties: 'Bounties', files: 'Files', lexios: 'Lexios', 'lexios-board': 'Lexios Board', router: 'Router' };
   return tabs.map(function(t) {
     return '<span class="tab' + (dashTab === t ? ' active' : '') + '" onclick="dashTab=\\'' + t + '\\';refresh()">' + labels[t] + '</span>';
   }).join('');
@@ -474,6 +491,30 @@ async function refreshEconomics() {
           </div>
         </div>
       </div>
+      <!-- Cost by Purpose -->
+      <div class="card full" style="border-color:#a78bfa">
+        <h2>🎯 Cost by Purpose</h2>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:0.75rem;margin-top:0.75rem">
+          \${(econ.purposeBreakdown || []).map(p => \`
+            <div style="background:#07070d;border:1px solid var(--border);border-radius:0.5rem;padding:0.6rem;text-align:center">
+              <div style="font-size:0.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.05em">\${p.purpose}</div>
+              <div style="font-size:1.2rem;font-weight:700;color:var(--accent);margin:0.2rem 0">$\${p.total_cost.toFixed(2)}</div>
+              <div style="font-size:0.65rem;color:var(--muted)">\${p.run_count} runs</div>
+            </div>
+          \`).join('')}
+        </div>
+        \${(econ.monthPurposeBreakdown || []).length > 0 ? \`
+        <div style="margin-top:0.75rem;padding-top:0.5rem;border-top:1px solid var(--border)">
+          <div style="font-size:0.7rem;color:var(--muted);margin-bottom:0.4rem">This Month</div>
+          <div style="display:flex;flex-wrap:wrap;gap:0.5rem">
+            \${(econ.monthPurposeBreakdown || []).map(p => \`
+              <span style="font-size:0.75rem;color:var(--accent2)">
+                \${p.purpose}: $\${p.total_cost.toFixed(2)} (\${p.run_count})
+              </span>
+            \`).join('<span style="color:var(--border)">|</span>')}
+          </div>
+        </div>\` : ''}
+      </div>
       <!-- Summary -->
       <div class="card">
         <h2>💵 Economic Summary</h2>
@@ -506,11 +547,12 @@ async function refreshEconomics() {
         <h2>📊 Recent Usage (last 20 runs)</h2>
         \${econ.recentUsage.length === 0 ? '<p class="empty">No usage data yet</p>' : \`
         <table>
-          <thead><tr><th>Time</th><th>Group</th><th>Cost</th><th>Input Tok</th><th>Output Tok</th><th>Duration</th></tr></thead>
+          <thead><tr><th>Time</th><th>Group</th><th>Purpose</th><th>Cost</th><th>Input Tok</th><th>Output Tok</th><th>Duration</th></tr></thead>
           <tbody>\${econ.recentUsage.map(u => \`
             <tr>
               <td class="mono">\${fmt(u.run_at)}</td>
               <td class="mono">\${u.group_id}</td>
+              <td><span class="pill yellow" style="font-size:0.65rem">\${u.purpose || 'conversation'}</span></td>
               <td class="mono">$\${u.cost_usd.toFixed(4)}</td>
               <td class="mono">\${u.input_tokens.toLocaleString()}</td>
               <td class="mono">\${u.output_tokens.toLocaleString()}</td>
@@ -855,9 +897,88 @@ async function refreshRouter() {
   }
 }
 
+function kanbanSourceBadge(source) {
+  var colors = { scheduled: '#60a5fa', clawwork: '#a78bfa', bounty: '#f59e0b', building: '#10b981', document: '#06b6d4' };
+  return '<span class="pill" style="background:' + (colors[source] || '#6b7280') + ';color:#fff;font-size:0.65rem">' + source + '</span>';
+}
+
+function kanbanCard(item) {
+  var meta = '';
+  if (item.metadata) {
+    if (item.metadata.schedule) meta += '<div style="font-size:0.7rem;color:var(--muted)">' + item.metadata.schedule + '</div>';
+    if (item.metadata.reward) meta += '<div style="font-size:0.7rem;color:var(--green)">$' + item.metadata.reward + '</div>';
+    if (item.metadata.maxPayment) meta += '<div style="font-size:0.7rem;color:var(--green)">max $' + item.metadata.maxPayment.toFixed(2) + '</div>';
+  }
+  return '<div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:0.6rem;margin-bottom:0.5rem">' +
+    '<div style="display:flex;gap:0.4rem;align-items:center;margin-bottom:0.3rem">' + kanbanSourceBadge(item.source) + '</div>' +
+    '<div style="font-size:0.8rem;line-height:1.3">' + (item.title.length > 80 ? item.title.slice(0, 80) + '\\u2026' : item.title) + '</div>' +
+    meta +
+  '</div>';
+}
+
+async function refreshKanban() {
+  try {
+    var data = await fetch('/api/kanban?project=nanoclaw').then(function(r) { return r.json(); });
+    var items = data.items || [];
+    var todo = items.filter(function(i) { return i.status === 'todo'; });
+    var prog = items.filter(function(i) { return i.status === 'in_progress'; });
+    var done = items.filter(function(i) { return i.status === 'done'; });
+    document.getElementById('main').innerHTML =
+      '<div class="card full" style="margin-bottom:0.5rem"><div class="memory-tabs">' + tabBar() + '</div></div>' +
+      '<div class="card full"><h2>📋 NanoClaw Kanban <span class="pill yellow">' + items.length + ' items</span></h2>' +
+      '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;margin-top:0.75rem">' +
+        '<div>' +
+          '<div style="font-size:0.75rem;text-transform:uppercase;letter-spacing:0.05em;color:var(--muted);margin-bottom:0.5rem;border-bottom:2px solid #f59e0b;padding-bottom:0.3rem">Todo <span class="pill yellow">' + todo.length + '</span></div>' +
+          (todo.length === 0 ? '<p class="empty" style="font-size:0.8rem">No items</p>' : todo.map(kanbanCard).join('')) +
+        '</div>' +
+        '<div>' +
+          '<div style="font-size:0.75rem;text-transform:uppercase;letter-spacing:0.05em;color:var(--muted);margin-bottom:0.5rem;border-bottom:2px solid var(--green);padding-bottom:0.3rem">In Progress <span class="pill green">' + prog.length + '</span></div>' +
+          (prog.length === 0 ? '<p class="empty" style="font-size:0.8rem">No items</p>' : prog.map(kanbanCard).join('')) +
+        '</div>' +
+        '<div>' +
+          '<div style="font-size:0.75rem;text-transform:uppercase;letter-spacing:0.05em;color:var(--muted);margin-bottom:0.5rem;border-bottom:2px solid #6b7280;padding-bottom:0.3rem">Done <span class="pill" style="background:#374151">' + done.length + '</span></div>' +
+          (done.slice(0, 20).length === 0 ? '<p class="empty" style="font-size:0.8rem">No items</p>' : done.slice(0, 20).map(kanbanCard).join('')) +
+        '</div>' +
+      '</div></div>';
+  } catch(e) {
+    console.error('Kanban refresh failed', e);
+  }
+}
+
+async function refreshLexiosBoard() {
+  try {
+    var data = await fetch('/api/kanban?project=lexios').then(function(r) { return r.json(); });
+    var items = data.items || [];
+    var todo = items.filter(function(i) { return i.status === 'todo'; });
+    var prog = items.filter(function(i) { return i.status === 'in_progress'; });
+    var done = items.filter(function(i) { return i.status === 'done'; });
+    document.getElementById('main').innerHTML =
+      '<div class="card full" style="margin-bottom:0.5rem"><div class="memory-tabs">' + tabBar() + '</div></div>' +
+      '<div class="card full"><h2>🏛️ Lexios Board <span class="pill yellow">' + items.length + ' items</span></h2>' +
+      '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;margin-top:0.75rem">' +
+        '<div>' +
+          '<div style="font-size:0.75rem;text-transform:uppercase;letter-spacing:0.05em;color:var(--muted);margin-bottom:0.5rem;border-bottom:2px solid #f59e0b;padding-bottom:0.3rem">Todo <span class="pill yellow">' + todo.length + '</span></div>' +
+          (todo.length === 0 ? '<p class="empty" style="font-size:0.8rem">No items</p>' : todo.map(kanbanCard).join('')) +
+        '</div>' +
+        '<div>' +
+          '<div style="font-size:0.75rem;text-transform:uppercase;letter-spacing:0.05em;color:var(--muted);margin-bottom:0.5rem;border-bottom:2px solid var(--green);padding-bottom:0.3rem">In Progress <span class="pill green">' + prog.length + '</span></div>' +
+          (prog.length === 0 ? '<p class="empty" style="font-size:0.8rem">No items</p>' : prog.map(kanbanCard).join('')) +
+        '</div>' +
+        '<div>' +
+          '<div style="font-size:0.75rem;text-transform:uppercase;letter-spacing:0.05em;color:var(--muted);margin-bottom:0.5rem;border-bottom:2px solid #6b7280;padding-bottom:0.3rem">Done <span class="pill" style="background:#374151">' + done.length + '</span></div>' +
+          (done.slice(0, 20).length === 0 ? '<p class="empty" style="font-size:0.8rem">No items</p>' : done.slice(0, 20).map(kanbanCard).join('')) +
+        '</div>' +
+      '</div></div>';
+  } catch(e) {
+    console.error('Lexios board refresh failed', e);
+  }
+}
+
 async function refresh() {
   if (dashTab === 'economics') { await refreshEconomics(); return; }
   if (dashTab === 'bounties') { await refreshBounties(); return; }
+  if (dashTab === 'kanban') { await refreshKanban(); return; }
+  if (dashTab === 'lexios-board') { await refreshLexiosBoard(); return; }
   if (dashTab === 'lexios') { await refreshLexios(); return; }
   if (dashTab === 'router') { await refreshRouter(); return; }
   if (dashTab === 'files') {
@@ -936,11 +1057,12 @@ async function refresh() {
         <h2>🤖 Agents <span class="pill \${activeGroups > 0 ? 'green' : 'yellow'}">\${activeGroups} active</span></h2>
         \${status.groups.length === 0 ? '<p class="empty">No groups registered</p>' : \`
         <table>
-          <thead><tr><th>Group</th><th>Status</th><th>Reason</th><th>Queue</th></tr></thead>
+          <thead><tr><th>Group</th><th>Status</th><th>Type</th><th>Reason</th><th>Queue</th></tr></thead>
           <tbody>\${status.groups.map(g => \`
             <tr>
               <td>\${g.name}</td>
               <td>\${agentStatus(g)}</td>
+              <td>\${designationBadge(g)}</td>
               <td style="font-size:0.78rem;max-width:400px;word-break:break-word">\${agentReason(g)}</td>
               <td class="mono">\${agentQueue(g)}</td>
             </tr>
@@ -1081,6 +1203,19 @@ export function startDashboard(queue: GroupQueue, sendFn?: (jid: string, text: s
         const data = apiBounties();
         res.writeHead(200, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify(data));
+      } catch (err) {
+        res.writeHead(500);
+        res.end(JSON.stringify({ error: String(err) }));
+      }
+      return;
+    }
+
+    if (url.pathname === '/api/kanban') {
+      try {
+        const project = (url.searchParams.get('project') || 'nanoclaw') as 'nanoclaw' | 'lexios';
+        const items = getKanbanItems(project);
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ items }));
       } catch (err) {
         res.writeHead(500);
         res.end(JSON.stringify({ error: String(err) }));
