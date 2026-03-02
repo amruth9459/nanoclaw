@@ -52,6 +52,7 @@ import {
   storeChatMetadata,
   storeMessage,
   createClawworkTask,
+  getChatChannel,
 } from './db.js';
 import { classifyTask, computeMaxPayment } from './clawwork.js';
 // Local routing disabled while Max subscription is active
@@ -474,8 +475,8 @@ async function processGroupMessages(chatJid: string): Promise<boolean> {
     } catch (err) {
       logger.warn({ err }, 'Failed to create ClawWork task');
     }
-  } else if (AUTO_CLAWWORK) {
-    // Auto-task: silently create a ClawWork task for substantive messages
+  } else if (AUTO_CLAWWORK && isMainGroup) {
+    // Auto-task: silently create a ClawWork task for substantive messages (main group only)
     // (no reply — the agent discovers the task via clawwork_get_status)
     const strippedContent = lastMsg.content
       .replace(TRIGGER_PATTERN, '')
@@ -912,12 +913,20 @@ async function startMessageLoop(): Promise<void> {
             'Open mention — queuing guest agent',
           );
 
-          // ACK with 👀 — use the channel whose number ≠ sender so it's visible to them
+          // ACK with context-aware emoji + typing — mirror main group path
           const channel = findChannel(channels, chatJid);
-          if (INSTANT_ACK) {
+          if (INSTANT_ACK && channel) {
             const last = msgs[msgs.length - 1];
             const ackCh = findAckChannel(last.sender) ?? channel;
-            ackCh?.sendReaction?.(chatJid, last.id, last.sender, '👀').catch(() => {});
+            const ackEmoji = pickAckEmoji(last.content);
+            if (ackCh.sendReaction) {
+              ackCh.sendReaction(chatJid, last.id, last.sender, ackEmoji).catch(() => {});
+            } else {
+              channel.sendMessage(chatJid, ackEmoji).catch(() => {});
+            }
+            ackCh.setTyping?.(chatJid, true)?.catch(() => {});
+          } else if (channel) {
+            channel.setTyping?.(chatJid, true)?.catch(() => {});
           }
 
           queue.enqueueMessageCheck(chatJid);
@@ -1416,6 +1425,13 @@ async function main(): Promise<void> {
   // they trigger notifications — sending from the same number as the user gets
   // silenced by WhatsApp as "your own message". Falls back to WA1 if WA2 not in group.
   const clawSend = async (jid: string, text: string): Promise<void> => {
+    // Respect the channel the chat arrived on (critical for guest DMs)
+    const dbChannel = getChatChannel(jid);
+    if (dbChannel) {
+      const ch = channels.find((c) => c.name === dbChannel && c.isConnected());
+      if (ch) return ch.sendMessage(jid, text);
+    }
+    // Fallback: prefer WA2 for notifications, then any channel
     const wa2 = findWa2();
     if (wa2) {
       try { return await wa2.sendMessage(jid, text); } catch { /* WA2 not in group, fall through */ }
@@ -1426,6 +1442,13 @@ async function main(): Promise<void> {
   };
 
   const clawSendFile = async (jid: string, buffer: Buffer, mimetype: string, filename: string, caption?: string): Promise<void> => {
+    // Respect the channel the chat arrived on (critical for guest DMs)
+    const dbChannel = getChatChannel(jid);
+    if (dbChannel) {
+      const ch = channels.find((c) => c.name === dbChannel && c.isConnected());
+      if (ch?.sendFile) return ch.sendFile(jid, buffer, mimetype, filename, caption);
+    }
+    // Fallback: prefer WA2 for notifications, then any channel
     const wa2 = findWa2();
     if (wa2?.sendFile) {
       try { return await wa2.sendFile(jid, buffer, mimetype, filename, caption); } catch { /* fall through */ }
@@ -1439,7 +1462,10 @@ async function main(): Promise<void> {
   startIpcWatcher({
     sendMessage: clawSend,
     sendReaction: (jid, msgId, senderJid, emoji) => {
-      const ch = findWa2() ?? whatsapp;
+      // Respect the channel the chat arrived on (critical for guest DMs)
+      const dbChannel = getChatChannel(jid);
+      const dbCh = dbChannel ? channels.find((c) => c.name === dbChannel && c.isConnected()) : undefined;
+      const ch = dbCh ?? findWa2() ?? whatsapp;
       if (!ch?.sendReaction) return Promise.resolve();
       return ch.sendReaction(jid, msgId, senderJid, emoji);
     },
