@@ -286,6 +286,20 @@ function pickAckEmoji(content: string): string {
   return DEFAULT_EMOJIS[Math.floor(Math.random() * DEFAULT_EMOJIS.length)];
 }
 
+/** Determine the purpose of an agent run for cost tracking. */
+function determinePurpose(groupFolder: string, chatJid: string): string {
+  if (guestGroups.has(chatJid)) return 'guest';
+  if (groupFolder.startsWith('lexios')) return 'lexios';
+  return 'conversation';
+}
+
+/** Determine the designation for container/orchestrator tracking. */
+function determineDesignation(groupFolder: string, chatJid: string): string {
+  if (guestGroups.has(chatJid)) return 'guest';
+  if (groupFolder.startsWith('lexios')) return 'lexios';
+  return 'conversation';
+}
+
 /**
  * Process all pending messages for a group.
  * Called by the GroupQueue when it's this group's turn.
@@ -633,7 +647,7 @@ async function processGroupMessages(chatJid: string): Promise<boolean> {
   if (finalUsage) {
     const costUsd = calculateCost(finalUsage);
     const durationMs = Date.now() - runStartTime;
-    logUsage(group.folder, chatJid, finalUsage, durationMs, false, costUsd);
+    logUsage(group.folder, chatJid, finalUsage, durationMs, false, costUsd, determinePurpose(group.folder, chatJid));
     deductBalance(group.folder, costUsd);
     if (COST_FOOTER) {
       const econ = getOrCreateEconomics(group.folder);
