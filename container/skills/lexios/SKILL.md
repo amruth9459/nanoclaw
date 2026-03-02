@@ -565,6 +565,53 @@ Feed the DXF extraction into the same specialist pipeline as PDFs. The structure
 
 ---
 
+## IFC (BIM) file support
+
+When a user sends an `.ifc` file, you have two approaches:
+
+### Approach A: Batch extraction (full dump)
+
+```bash
+lexios-ifc /workspace/media/<filename>.ifc /workspace/group/lexios-work
+```
+
+This extracts via IfcOpenShell:
+- **Spaces/rooms**: names, areas (sqft), storey, function
+- **Walls**: types, thickness, fire ratings, external/internal
+- **Doors & windows**: tags, sizes (inches), types, fire ratings
+- **Structural**: columns, beams (with spans), slabs (with thickness)
+- **Stairs & railings**: types, locations, riser/tread counts
+- **MEP**: plumbing fixtures, HVAC equipment, ductwork, electrical panels, lighting, sprinklers, piping
+- **Storeys**: names and elevations
+- **Project info**: name, description, phase
+
+Output: `/workspace/group/lexios-work/ifc-extraction.json` + optional `ifc-render.png`
+
+IFC data is the **richest** source — elements carry semantic types (IfcWall knows it's a wall, IfcDoor carries its width). Higher confidence than DXF or PDF.
+
+### Approach B: Interactive MCP queries
+
+For targeted questions ("how many doors on the 2nd floor?", "what's the fire rating of wall W-03?"), use the IFC MCP tools instead of batch extraction:
+
+- `mcp__ifc__get_model_summary` — project info, storeys, entity counts (start here)
+- `mcp__ifc__get_entities` — list all entities of a type (e.g. "IfcDoor", "IfcWall")
+- `mcp__ifc__query_spaces` — all rooms with areas and storeys
+- `mcp__ifc__get_entity_properties` — all properties of one entity by GlobalId
+- `mcp__ifc__get_property` — specific property across multiple entities
+- `mcp__ifc__get_entities_in_spatial` — everything on a specific storey/in a space
+- `mcp__ifc__get_openings_on_wall` — doors and windows on a specific wall
+
+**When to use which:**
+- Full analysis / compliance review → Approach A (batch) then specialist pipeline
+- Specific questions / quick lookups → Approach B (MCP queries)
+- Both can be combined — batch extract first, then drill into specifics via MCP
+
+### Step: Combine with extraction pipeline
+
+Feed IFC extraction into the same specialist pipeline as PDFs and DXF. IFC data maps directly to types.json categories with the highest confidence of any format.
+
+---
+
 ## Document versioning
 
 After processing any document, track it and check for revisions:
