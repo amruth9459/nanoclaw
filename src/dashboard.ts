@@ -27,6 +27,8 @@ import {
   getUsageSince,
   getUsageByPurpose,
   getKanbanItems,
+  createTaskRecord,
+  updateTaskRecord,
 } from './db.js';
 import { getSurvivalTier } from './economics.js';
 import { logger } from './logger.js';
@@ -898,7 +900,7 @@ async function refreshRouter() {
 }
 
 function kanbanSourceBadge(source) {
-  var colors = { scheduled: '#60a5fa', clawwork: '#a78bfa', bounty: '#f59e0b', building: '#10b981', document: '#06b6d4' };
+  var colors = { scheduled: '#60a5fa', clawwork: '#a78bfa', bounty: '#f59e0b', building: '#10b981', document: '#06b6d4', user: '#ef4444', task: '#8b5cf6' };
   return '<span class="pill" style="background:' + (colors[source] || '#6b7280') + ';color:#fff;font-size:0.65rem">' + source + '</span>';
 }
 
@@ -909,10 +911,52 @@ function kanbanCard(item) {
     if (item.metadata.reward) meta += '<div style="font-size:0.7rem;color:var(--green)">$' + item.metadata.reward + '</div>';
     if (item.metadata.maxPayment) meta += '<div style="font-size:0.7rem;color:var(--green)">max $' + item.metadata.maxPayment.toFixed(2) + '</div>';
   }
-  return '<div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:0.6rem;margin-bottom:0.5rem">' +
+  // Status action buttons for user tasks
+  var actions = '';
+  if (item.source === 'user' || item.source === 'task') {
+    var nextStatus = item.status === 'todo' ? 'in_progress' : item.status === 'in_progress' ? 'completed' : '';
+    var nextLabel = item.status === 'todo' ? 'Start' : item.status === 'in_progress' ? 'Done' : '';
+    if (nextStatus) {
+      actions = '<div style="margin-top:0.4rem"><button onclick="updateKanbanTask(\\'' + item.id + '\\',\\'' + nextStatus + '\\')" style="background:var(--accent);color:#fff;border:none;border-radius:4px;padding:0.2rem 0.5rem;font-size:0.65rem;cursor:pointer">' + nextLabel + '</button></div>';
+    }
+  }
+  return '<div style="background:var(--surface);border:1px solid ' + (item.source === 'user' ? '#ef4444' : 'var(--border)') + ';border-radius:8px;padding:0.6rem;margin-bottom:0.5rem">' +
     '<div style="display:flex;gap:0.4rem;align-items:center;margin-bottom:0.3rem">' + kanbanSourceBadge(item.source) + '</div>' +
     '<div style="font-size:0.8rem;line-height:1.3">' + (item.title.length > 80 ? item.title.slice(0, 80) + '\\u2026' : item.title) + '</div>' +
-    meta +
+    meta + actions +
+  '</div>';
+}
+
+async function updateKanbanTask(id, status) {
+  try {
+    await fetch('/api/kanban/task/update', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: id, status: status }) });
+    refresh();
+  } catch(e) { console.error('Update failed', e); }
+}
+
+async function addKanbanTask(project) {
+  var input = document.getElementById('kanban-new-task');
+  var desc = input ? input.value.trim() : '';
+  if (!desc) return;
+  try {
+    await fetch('/api/kanban/task', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ description: desc, project: project || 'nanoclaw', priority: 3 }) });
+    if (input) input.value = '';
+    refresh();
+  } catch(e) { console.error('Add task failed', e); }
+}
+
+function kanbanColumn(label, color, items, maxItems) {
+  var shown = maxItems ? items.slice(0, maxItems) : items;
+  return '<div>' +
+    '<div style="font-size:0.75rem;text-transform:uppercase;letter-spacing:0.05em;color:var(--muted);margin-bottom:0.5rem;border-bottom:2px solid ' + color + ';padding-bottom:0.3rem">' + label + ' <span class="pill" style="background:' + color + ';color:#fff">' + items.length + '</span></div>' +
+    (shown.length === 0 ? '<p class="empty" style="font-size:0.8rem">No items</p>' : shown.map(kanbanCard).join('')) +
+  '</div>';
+}
+
+function kanbanAddForm(project) {
+  return '<div style="display:flex;gap:0.5rem;margin-bottom:1rem">' +
+    '<input id="kanban-new-task" type="text" placeholder="Add a task..." style="flex:1;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:0.5rem 0.75rem;color:#e2e8f0;font-size:0.85rem;outline:none" onkeydown="if(event.key===\\'Enter\\')addKanbanTask(\\'' + project + '\\')">' +
+    '<button onclick="addKanbanTask(\\'' + project + '\\')" style="background:var(--accent);color:#fff;border:none;border-radius:6px;padding:0.5rem 1rem;font-size:0.85rem;cursor:pointer;white-space:nowrap">+ Add</button>' +
   '</div>';
 }
 
@@ -920,26 +964,35 @@ async function refreshKanban() {
   try {
     var data = await fetch('/api/kanban?project=nanoclaw').then(function(r) { return r.json(); });
     var items = data.items || [];
-    var todo = items.filter(function(i) { return i.status === 'todo'; });
-    var prog = items.filter(function(i) { return i.status === 'in_progress'; });
-    var done = items.filter(function(i) { return i.status === 'done'; });
+    var userItems = items.filter(function(i) { return i.source === 'user'; });
+    var systemItems = items.filter(function(i) { return i.source !== 'user'; });
+    var userTodo = userItems.filter(function(i) { return i.status === 'todo'; });
+    var userProg = userItems.filter(function(i) { return i.status === 'in_progress'; });
+    var userDone = userItems.filter(function(i) { return i.status === 'done'; });
+    var sysTodo = systemItems.filter(function(i) { return i.status === 'todo'; });
+    var sysProg = systemItems.filter(function(i) { return i.status === 'in_progress'; });
+    var sysDone = systemItems.filter(function(i) { return i.status === 'done'; });
     document.getElementById('main').innerHTML =
       '<div class="card full" style="margin-bottom:0.5rem"><div class="memory-tabs">' + tabBar() + '</div></div>' +
-      '<div class="card full"><h2>📋 NanoClaw Kanban <span class="pill yellow">' + items.length + ' items</span></h2>' +
-      '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;margin-top:0.75rem">' +
-        '<div>' +
-          '<div style="font-size:0.75rem;text-transform:uppercase;letter-spacing:0.05em;color:var(--muted);margin-bottom:0.5rem;border-bottom:2px solid #f59e0b;padding-bottom:0.3rem">Todo <span class="pill yellow">' + todo.length + '</span></div>' +
-          (todo.length === 0 ? '<p class="empty" style="font-size:0.8rem">No items</p>' : todo.map(kanbanCard).join('')) +
+      // My Tasks section
+      '<div class="card full" style="border-color:#ef4444">' +
+        '<h2>📌 My Tasks <span class="pill" style="background:#ef4444;color:#fff">' + userItems.length + '</span></h2>' +
+        kanbanAddForm('nanoclaw') +
+        '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem">' +
+          kanbanColumn('Todo', '#f59e0b', userTodo) +
+          kanbanColumn('In Progress', 'var(--green)', userProg) +
+          kanbanColumn('Done', '#6b7280', userDone, 10) +
         '</div>' +
-        '<div>' +
-          '<div style="font-size:0.75rem;text-transform:uppercase;letter-spacing:0.05em;color:var(--muted);margin-bottom:0.5rem;border-bottom:2px solid var(--green);padding-bottom:0.3rem">In Progress <span class="pill green">' + prog.length + '</span></div>' +
-          (prog.length === 0 ? '<p class="empty" style="font-size:0.8rem">No items</p>' : prog.map(kanbanCard).join('')) +
+      '</div>' +
+      // System board
+      '<div class="card full">' +
+        '<h2>⚙️ System Tasks <span class="pill yellow">' + systemItems.length + '</span></h2>' +
+        '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;margin-top:0.75rem">' +
+          kanbanColumn('Todo', '#f59e0b', sysTodo) +
+          kanbanColumn('In Progress', 'var(--green)', sysProg) +
+          kanbanColumn('Done', '#6b7280', sysDone, 20) +
         '</div>' +
-        '<div>' +
-          '<div style="font-size:0.75rem;text-transform:uppercase;letter-spacing:0.05em;color:var(--muted);margin-bottom:0.5rem;border-bottom:2px solid #6b7280;padding-bottom:0.3rem">Done <span class="pill" style="background:#374151">' + done.length + '</span></div>' +
-          (done.slice(0, 20).length === 0 ? '<p class="empty" style="font-size:0.8rem">No items</p>' : done.slice(0, 20).map(kanbanCard).join('')) +
-        '</div>' +
-      '</div></div>';
+      '</div>';
   } catch(e) {
     console.error('Kanban refresh failed', e);
   }
@@ -949,26 +1002,35 @@ async function refreshLexiosBoard() {
   try {
     var data = await fetch('/api/kanban?project=lexios').then(function(r) { return r.json(); });
     var items = data.items || [];
-    var todo = items.filter(function(i) { return i.status === 'todo'; });
-    var prog = items.filter(function(i) { return i.status === 'in_progress'; });
-    var done = items.filter(function(i) { return i.status === 'done'; });
+    var userItems = items.filter(function(i) { return i.source === 'user'; });
+    var systemItems = items.filter(function(i) { return i.source !== 'user'; });
+    var userTodo = userItems.filter(function(i) { return i.status === 'todo'; });
+    var userProg = userItems.filter(function(i) { return i.status === 'in_progress'; });
+    var userDone = userItems.filter(function(i) { return i.status === 'done'; });
+    var sysTodo = systemItems.filter(function(i) { return i.status === 'todo'; });
+    var sysProg = systemItems.filter(function(i) { return i.status === 'in_progress'; });
+    var sysDone = systemItems.filter(function(i) { return i.status === 'done'; });
     document.getElementById('main').innerHTML =
       '<div class="card full" style="margin-bottom:0.5rem"><div class="memory-tabs">' + tabBar() + '</div></div>' +
-      '<div class="card full"><h2>🏛️ Lexios Board <span class="pill yellow">' + items.length + ' items</span></h2>' +
-      '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;margin-top:0.75rem">' +
-        '<div>' +
-          '<div style="font-size:0.75rem;text-transform:uppercase;letter-spacing:0.05em;color:var(--muted);margin-bottom:0.5rem;border-bottom:2px solid #f59e0b;padding-bottom:0.3rem">Todo <span class="pill yellow">' + todo.length + '</span></div>' +
-          (todo.length === 0 ? '<p class="empty" style="font-size:0.8rem">No items</p>' : todo.map(kanbanCard).join('')) +
+      // My Tasks section
+      '<div class="card full" style="border-color:#ef4444">' +
+        '<h2>📌 My Tasks <span class="pill" style="background:#ef4444;color:#fff">' + userItems.length + '</span></h2>' +
+        kanbanAddForm('lexios') +
+        '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem">' +
+          kanbanColumn('Todo', '#f59e0b', userTodo) +
+          kanbanColumn('In Progress', 'var(--green)', userProg) +
+          kanbanColumn('Done', '#6b7280', userDone, 10) +
         '</div>' +
-        '<div>' +
-          '<div style="font-size:0.75rem;text-transform:uppercase;letter-spacing:0.05em;color:var(--muted);margin-bottom:0.5rem;border-bottom:2px solid var(--green);padding-bottom:0.3rem">In Progress <span class="pill green">' + prog.length + '</span></div>' +
-          (prog.length === 0 ? '<p class="empty" style="font-size:0.8rem">No items</p>' : prog.map(kanbanCard).join('')) +
+      '</div>' +
+      // System board
+      '<div class="card full">' +
+        '<h2>🏛️ Lexios System <span class="pill yellow">' + systemItems.length + '</span></h2>' +
+        '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;margin-top:0.75rem">' +
+          kanbanColumn('Todo', '#f59e0b', sysTodo) +
+          kanbanColumn('In Progress', 'var(--green)', sysProg) +
+          kanbanColumn('Done', '#6b7280', sysDone, 20) +
         '</div>' +
-        '<div>' +
-          '<div style="font-size:0.75rem;text-transform:uppercase;letter-spacing:0.05em;color:var(--muted);margin-bottom:0.5rem;border-bottom:2px solid #6b7280;padding-bottom:0.3rem">Done <span class="pill" style="background:#374151">' + done.length + '</span></div>' +
-          (done.slice(0, 20).length === 0 ? '<p class="empty" style="font-size:0.8rem">No items</p>' : done.slice(0, 20).map(kanbanCard).join('')) +
-        '</div>' +
-      '</div></div>';
+      '</div>';
   } catch(e) {
     console.error('Lexios board refresh failed', e);
   }
@@ -1371,6 +1433,41 @@ export function startDashboard(queue: GroupQueue, sendFn?: (jid: string, text: s
       } catch {
         res.writeHead(404); res.end('Not found');
       }
+      return;
+    }
+
+    if (url.pathname === '/api/kanban/task' && req.method === 'POST') {
+      let body = '';
+      req.on('data', (chunk) => { body += chunk; });
+      req.on('end', () => {
+        try {
+          const { description, project, priority } = JSON.parse(body);
+          if (!description) { res.writeHead(400); res.end(JSON.stringify({ error: 'missing description' })); return; }
+          const task = createTaskRecord({
+            description,
+            project: project || 'nanoclaw',
+            source: 'user',
+            priority: priority || 3,
+          });
+          res.writeHead(200, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ ok: true, task }));
+        } catch (err) { res.writeHead(500); res.end(JSON.stringify({ error: String(err) })); }
+      });
+      return;
+    }
+
+    if (url.pathname === '/api/kanban/task/update' && req.method === 'POST') {
+      let body = '';
+      req.on('data', (chunk) => { body += chunk; });
+      req.on('end', () => {
+        try {
+          const { id, status } = JSON.parse(body);
+          if (!id || !status) { res.writeHead(400); res.end(JSON.stringify({ error: 'missing id or status' })); return; }
+          const task = updateTaskRecord(id, { status });
+          res.writeHead(200, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ ok: true, task }));
+        } catch (err) { res.writeHead(500); res.end(JSON.stringify({ error: String(err) })); }
+      });
       return;
     }
 
