@@ -362,6 +362,20 @@ function createSchema(database: Database.Database): void {
   } catch {
     /* column already exists */
   }
+
+  // Add purpose tracking to usage_logs
+  try {
+    database.exec(`ALTER TABLE usage_logs ADD COLUMN purpose TEXT DEFAULT 'conversation'`);
+  } catch {
+    /* column already exists */
+  }
+
+  // Add project tracking to tasks
+  try {
+    database.exec(`ALTER TABLE tasks ADD COLUMN project TEXT DEFAULT 'nanoclaw'`);
+  } catch {
+    /* column already exists */
+  }
 }
 
 export function initDatabase(): void {
@@ -982,11 +996,12 @@ export function logUsage(
   durationMs: number,
   isTask: boolean,
   costUsd: number,
+  purpose: string = 'conversation',
 ): void {
   const now = new Date().toISOString();
   db.prepare(`
-    INSERT INTO usage_logs (group_id, chat_jid, run_at, input_tokens, output_tokens, cache_read_tokens, cache_write_tokens, cost_usd, duration_ms, is_task)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    INSERT INTO usage_logs (group_id, chat_jid, run_at, input_tokens, output_tokens, cache_read_tokens, cache_write_tokens, cost_usd, duration_ms, is_task, purpose)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `).run(
     groupId,
     chatJid,
@@ -998,6 +1013,7 @@ export function logUsage(
     costUsd,
     durationMs,
     isTask ? 1 : 0,
+    purpose,
   );
 }
 
@@ -1171,6 +1187,166 @@ export function getTotalUsage(): UsageTimePeriod {
     FROM usage_logs
   `).get() as UsageTimePeriod;
   return result;
+}
+
+export function getUsageByPurpose(since?: string): Array<{
+  purpose: string; total_cost: number; total_tokens: number; run_count: number;
+}> {
+  if (since) {
+    return db.prepare(`
+      SELECT
+        COALESCE(purpose, 'conversation') as purpose,
+        COALESCE(SUM(cost_usd), 0) as total_cost,
+        COALESCE(SUM(input_tokens + output_tokens + cache_read_tokens + cache_write_tokens), 0) as total_tokens,
+        COUNT(*) as run_count
+      FROM usage_logs
+      WHERE run_at >= ?
+      GROUP BY purpose
+      ORDER BY total_cost DESC
+    `).all(since) as Array<{ purpose: string; total_cost: number; total_tokens: number; run_count: number }>;
+  }
+  return db.prepare(`
+    SELECT
+      COALESCE(purpose, 'conversation') as purpose,
+      COALESCE(SUM(cost_usd), 0) as total_cost,
+      COALESCE(SUM(input_tokens + output_tokens + cache_read_tokens + cache_write_tokens), 0) as total_tokens,
+      COUNT(*) as run_count
+    FROM usage_logs
+    GROUP BY purpose
+    ORDER BY total_cost DESC
+  `).all() as Array<{ purpose: string; total_cost: number; total_tokens: number; run_count: number }>;
+}
+
+export interface KanbanItem {
+  id: string;
+  title: string;
+  status: 'todo' | 'in_progress' | 'done';
+  source: string;
+  project: 'nanoclaw' | 'lexios';
+  priority: number;
+  createdAt: string;
+  metadata?: Record<string, unknown>;
+}
+
+export function getKanbanItems(project: 'nanoclaw' | 'lexios'): KanbanItem[] {
+  const items: KanbanItem[] = [];
+
+  // Scheduled tasks → kanban items
+  try {
+    const tasks = db.prepare(`SELECT * FROM scheduled_tasks WHERE status != 'deleted'`).all() as Array<{
+      id: string; group_folder: string; prompt: string; schedule_type: string;
+      schedule_value: string; status: string; next_run: string | null; created_at: string;
+    }>;
+    for (const t of tasks) {
+      const isLexios = t.group_folder.startsWith('lexios');
+      if ((project === 'lexios') !== isLexios) continue;
+      items.push({
+        id: `sched-${t.id}`,
+        title: t.prompt.slice(0, 80) + (t.prompt.length > 80 ? '…' : ''),
+        status: t.status === 'active' ? 'in_progress' : t.status === 'paused' ? 'todo' : 'done',
+        source: 'scheduled',
+        project,
+        priority: 1,
+        createdAt: t.created_at,
+        metadata: { schedule: `${t.schedule_type}: ${t.schedule_value}`, nextRun: t.next_run },
+      });
+    }
+  } catch { /* table may not exist */ }
+
+  // ClawWork tasks
+  try {
+    const cw = db.prepare(`SELECT * FROM clawwork_tasks`).all() as Array<{
+      id: string; group_id: string; occupation: string; prompt: string;
+      max_payment: number; status: string; assigned_at: string;
+    }>;
+    for (const t of cw) {
+      if (project !== 'nanoclaw') continue; // ClawWork is always nanoclaw
+      items.push({
+        id: `cw-${t.id}`,
+        title: `[${t.occupation}] ${t.prompt.slice(0, 60)}`,
+        status: t.status === 'active' ? 'in_progress' : 'done',
+        source: 'clawwork',
+        project: 'nanoclaw',
+        priority: 2,
+        createdAt: t.assigned_at,
+        metadata: { maxPayment: t.max_payment },
+      });
+    }
+  } catch { /* table may not exist */ }
+
+  // Bounty opportunities
+  try {
+    const bounties = db.prepare(`SELECT * FROM bounty_opportunities`).all() as Array<{
+      id: string; platform: string; title: string; reward_usd: number | null;
+      status: string; proposed_at: string; url: string;
+    }>;
+    for (const b of bounties) {
+      if (project !== 'nanoclaw') continue;
+      const statusMap: Record<string, 'todo' | 'in_progress' | 'done'> = {
+        proposed: 'todo', approved: 'in_progress', working: 'in_progress',
+        submitted: 'done', rejected: 'done', paid: 'done',
+      };
+      items.push({
+        id: `bounty-${b.id}`,
+        title: `[${b.platform}] ${b.title.slice(0, 60)}`,
+        status: statusMap[b.status] || 'todo',
+        source: 'bounty',
+        project: 'nanoclaw',
+        priority: 3,
+        createdAt: b.proposed_at,
+        metadata: { reward: b.reward_usd, url: b.url },
+      });
+    }
+  } catch { /* table may not exist */ }
+
+  // Lexios buildings
+  if (project === 'lexios') {
+    try {
+      const buildings = db.prepare(`SELECT * FROM lexios_buildings`).all() as Array<{
+        id: string; name: string; status: string; created_at: string;
+      }>;
+      for (const b of buildings) {
+        items.push({
+          id: `building-${b.id}`,
+          title: b.name,
+          status: b.status === 'active' ? 'in_progress' : b.status === 'completed' ? 'done' : 'todo',
+          source: 'building',
+          project: 'lexios',
+          priority: 1,
+          createdAt: b.created_at,
+        });
+      }
+    } catch { /* table may not exist */ }
+
+    // Lexios documents
+    try {
+      const docs = db.prepare(`SELECT * FROM lexios_documents ORDER BY created_at DESC LIMIT 50`).all() as Array<{
+        id: string; filename: string; status: string; created_at: string; building_id: string;
+      }>;
+      for (const d of docs) {
+        items.push({
+          id: `doc-${d.id}`,
+          title: d.filename,
+          status: d.status === 'processed' ? 'done' : d.status === 'processing' ? 'in_progress' : 'todo',
+          source: 'document',
+          project: 'lexios',
+          priority: 2,
+          createdAt: d.created_at,
+          metadata: { buildingId: d.building_id },
+        });
+      }
+    } catch { /* table may not exist */ }
+  }
+
+  // Sort: in_progress first, then todo, then done; within each, by priority then date
+  const statusOrder = { in_progress: 0, todo: 1, done: 2 };
+  items.sort((a, b) =>
+    (statusOrder[a.status] ?? 1) - (statusOrder[b.status] ?? 1) ||
+    a.priority - b.priority ||
+    b.createdAt.localeCompare(a.createdAt),
+  );
+
+  return items;
 }
 
 export function createClawworkTask(task: Omit<ClawworkTask, 'status' | 'submitted_at' | 'evaluation_score' | 'actual_payment' | 'work_output' | 'artifact_paths'>): void {
