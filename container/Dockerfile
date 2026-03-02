@@ -32,8 +32,8 @@ RUN apt-get update && apt-get install -y \
     sqlite3 \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Python libraries: PDF generation + DWG/DXF parsing + rendering
-RUN pip3 install --break-system-packages weasyprint ezdxf matplotlib
+# Install Python libraries: PDF generation + DWG/DXF parsing + IFC parsing + MCP server + rendering
+RUN pip3 install --break-system-packages weasyprint ezdxf matplotlib ifcopenshell mcp
 
 # Set Chromium path for agent-browser
 ENV AGENT_BROWSER_EXECUTABLE_PATH=/usr/bin/chromium
@@ -76,6 +76,10 @@ RUN chmod +x /usr/local/bin/lexios-prep
 # Install Lexios DXF/DWG extraction (structured data + layer rendering)
 COPY skills/lexios-dxf.py /usr/local/bin/lexios-dxf
 RUN chmod +x /usr/local/bin/lexios-dxf
+
+# Install Lexios IFC extraction (IfcOpenShell → structured JSON)
+COPY skills/lexios-ifc.py /usr/local/bin/lexios-ifc
+RUN chmod +x /usr/local/bin/lexios-ifc
 
 # Install Lexios query classifier (fast keyword-based routing)
 COPY skills/lexios/query-classifier.py /usr/local/bin/lexios-classify
