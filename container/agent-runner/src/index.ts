@@ -590,8 +590,7 @@ async function runQuery(
         'TeamCreate', 'TeamDelete', 'SendMessage',
         'TodoWrite', 'ToolSearch', 'Skill',
         'NotebookEdit',
-        'mcp__nanoclaw__*',
-        'mcp__ifc__*'
+        'mcp__nanoclaw__*'
       ],
       env: sdkEnv,
       permissionMode: 'bypassPermissions',
@@ -615,11 +614,6 @@ async function runQuery(
             ...(clawEmail ? { CLAW_EMAIL: clawEmail } : {}),
             ...(clawRedditUser ? { CLAW_REDDIT_USER: clawRedditUser } : {}),
           },
-        },
-        ifc: {
-          command: 'python3',
-          args: [path.join(__dirname, '..', 'src', 'ifc-mcp-server.py')],
-          env: {},
         },
       },
       hooks: {

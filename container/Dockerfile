@@ -32,8 +32,8 @@ RUN apt-get update && apt-get install -y \
     sqlite3 \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Python libraries: PDF generation + DWG/DXF parsing + IFC parsing + MCP server + rendering
-RUN pip3 install --break-system-packages weasyprint ezdxf matplotlib ifcopenshell mcp
+# Install Python libraries: PDF generation + DWG/DXF parsing + IFC parsing + rendering
+RUN pip3 install --break-system-packages weasyprint ezdxf matplotlib ifcopenshell
 
 # Set Chromium path for agent-browser
 ENV AGENT_BROWSER_EXECUTABLE_PATH=/usr/bin/chromium
