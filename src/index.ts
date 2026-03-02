@@ -246,6 +246,19 @@ function findAckChannel(senderJid: string): Channel | undefined {
 }
 
 /**
+ * Get the set of owner phone prefixes from connected WA channels.
+ * Used to gate guest session creation — only the owner can invoke Claw in unregistered chats.
+ */
+function getOwnerPhones(): Set<string> {
+  const phones = new Set<string>();
+  for (const c of channels) {
+    const jid = c.ownPhoneJid?.();
+    if (jid) phones.add(jid.split('@')[0]);
+  }
+  return phones;
+}
+
+/**
  * Pick an ack emoji based on message content.
  */
 const EMOJI_RULES: Array<{ pattern: RegExp; emojis: string[] }> = [
@@ -878,6 +891,9 @@ async function startMessageLoop(): Promise<void> {
       }
 
       // --- Open mentions: respond in unregistered chats ---
+      // Security: only the owner (your WA numbers) can CREATE a guest session.
+      // Once a session exists, anyone in that chat can @Claw to continue it.
+      // "@Claw done" from the owner kills the session.
       if (OPEN_MENTIONS && openMentionMsgs.length > 0) {
         // Advance the global cursor to cover mention timestamps
         const maxMentionTs = openMentionMsgs[openMentionMsgs.length - 1].timestamp;
@@ -885,6 +901,8 @@ async function startMessageLoop(): Promise<void> {
           lastTimestamp = maxMentionTs;
           saveState();
         }
+
+        const ownerPhones = getOwnerPhones();
 
         // Group mentions by chat
         const mentionsByChat = new Map<string, NewMessage[]>();
@@ -898,6 +916,32 @@ async function startMessageLoop(): Promise<void> {
         }
 
         for (const [chatJid, msgs] of mentionsByChat) {
+          const hasSession = guestGroups.has(chatJid);
+          const senderPhone = (jid: string) => jid.split(':')[0].split('@')[0];
+          const isOwnerMsg = (msg: NewMessage) => ownerPhones.has(senderPhone(msg.sender));
+
+          // Check for "@Claw done" from owner — kill the session
+          const donePattern = new RegExp(`@${ASSISTANT_NAME}\\s+done\\b`, 'i');
+          const doneMsg = msgs.find((m) => isOwnerMsg(m) && donePattern.test(m.content));
+          if (doneMsg && hasSession) {
+            guestGroups.delete(chatJid);
+            delete lastAgentTimestamp[chatJid];
+            saveState();
+            logger.info({ chatJid }, 'Guest session ended by owner');
+            const channel = findChannel(channels, chatJid);
+            channel?.sendMessage(chatJid, `Session ended.`).catch(() => {});
+            continue;
+          }
+
+          // Gate: only owner can create new sessions
+          if (!hasSession) {
+            const ownerInitiated = msgs.some(isOwnerMsg);
+            if (!ownerInitiated) {
+              logger.debug({ chatJid }, 'Guest mention ignored — not owner-initiated');
+              continue;
+            }
+          }
+
           const group = getOrCreateGuestGroup(chatJid);
 
           // Set cursor just before the first mention so processGroupMessages
@@ -1470,7 +1514,12 @@ async function main(): Promise<void> {
       return ch.sendReaction(jid, msgId, senderJid, emoji);
     },
     sendFile: clawSendFile,
-    registeredGroups: () => registeredGroups,
+    registeredGroups: () => {
+      // Merge guest groups so IPC auth allows guest agents to reply to their own chat
+      const merged = { ...registeredGroups };
+      for (const [jid, group] of guestGroups) merged[jid] = group;
+      return merged;
+    },
     registerGroup,
     syncGroupMetadata: (force) => whatsapp?.syncGroupMetadata(force) ?? Promise.resolve(),
     getAvailableGroups,
