@@ -50,6 +50,7 @@ export interface ContainerInput {
   chatJid: string;
   isMain: boolean;
   isScheduledTask?: boolean;
+  designation?: string;  // e.g. 'conversation', 'task', 'guest', 'lexios', 'bounty', 'warmup'
   secrets?: Record<string, string>;
   routingHint?: {
     suggestedModel: string;
@@ -325,7 +326,8 @@ export async function runContainerAgent(
 
   const mounts = buildVolumeMounts(group, input.isMain);
   const safeName = group.folder.replace(/[^a-zA-Z0-9-]/g, '-');
-  const containerName = `nanoclaw-${safeName}-${Date.now()}`;
+  const designation = input.designation || 'agent';
+  const containerName = `nanoclaw-${safeName}-${designation}-${Date.now()}`;
   const containerArgs = buildContainerArgs(mounts, containerName, group);
 
   logger.debug(

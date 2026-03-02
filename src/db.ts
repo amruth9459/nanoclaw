@@ -961,6 +961,7 @@ export interface UsageLogEntry {
   cost_usd: number;
   duration_ms: number | null;
   is_task: number;
+  purpose?: string;
 }
 
 export interface GroupEconomics {

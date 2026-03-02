@@ -327,7 +327,7 @@ Respond ONLY with a JSON object in this exact format (no explanation, no code bl
           outputTokens: resp.usage.output_tokens,
         };
         const costUsd = calculateCost(usage);
-        logUsage('_system', '_judge_review', usage, 0, false, costUsd);
+        logUsage('_system', '_judge_review', usage, 0, false, costUsd, 'judge');
       }
 
       const text = resp.content[0].type === 'text' ? resp.content[0].text : '';

@@ -97,7 +97,7 @@ ${text.slice(0, 1200)}`,
       outputTokens: resp.usage.output_tokens,
     };
     const costUsd = calculateCost(usage);
-    logUsage('_system', '_semantic_index', usage, 0, false, costUsd);
+    logUsage('_system', '_semantic_index', usage, 0, false, costUsd, 'indexing');
   }
 
   const raw = resp.content[0].type === 'text' ? resp.content[0].text.trim() : '';

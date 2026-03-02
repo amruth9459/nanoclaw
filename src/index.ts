@@ -680,6 +680,7 @@ async function runAgent(
   chatJid: string,
   onOutput?: (output: ContainerOutput) => Promise<void>,
   routingDecisionHint?: RoutingDecision,
+  designationOverride?: string,
 ): Promise<'success' | 'error'> {
   const isMain = group.folder === MAIN_GROUP_FOLDER;
   const sessionId = sessions[group.folder];
@@ -721,10 +722,12 @@ async function runAgent(
     : undefined;
 
   // Track agent lifecycle in orchestrator (monitoring-only — always proceed)
+  const designation = designationOverride || determineDesignation(group.folder, chatJid);
+  const orchType = designation === 'lexios' ? 'lexios' : 'nanoclaw';
   const agentId = `nanoclaw-${group.folder}-${Date.now()}`;
   await orchestrator.requestAgent({
     id: agentId,
-    type: 'nanoclaw',
+    type: orchType,
     priority: AgentPriority.HIGH,
     estimatedRamGB: 2,
   });
@@ -738,6 +741,7 @@ async function runAgent(
         groupFolder: group.folder,
         chatJid,
         isMain,
+        designation,
         routingHint: routingDecisionHint ? {
           suggestedModel: routingDecisionHint.modelId,
           tier: routingDecisionHint.modelTier,
@@ -745,7 +749,10 @@ async function runAgent(
           reasoning: routingDecisionHint.reasoning,
         } : undefined,
       },
-      (proc, containerName) => queue.registerProcess(chatJid, proc, containerName, group.folder),
+      (proc, containerName) => {
+        queue.registerProcess(chatJid, proc, containerName, group.folder);
+        queue.setDesignation(chatJid, designation);
+      },
       wrappedOnOutput,
     );
 
@@ -1129,7 +1136,7 @@ async function warmupGroupContainer(chatJid: string): Promise<boolean> {
     if (result.status === 'error') {
       logger.warn({ group: group.name }, 'Warmup run errored (non-fatal)');
     }
-  });
+  }, undefined, 'warmup');
 
   return true;
 }
