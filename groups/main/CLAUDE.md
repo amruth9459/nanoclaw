@@ -298,44 +298,9 @@ Just write your answer. It's automatically sent when you finish. Use `<internal>
 
 **Rules:**
 - Do NOT use `send_message` to narrate your process step-by-step ("Searching…", "Analyzing…", "Done!")
-- Do NOT use `send_message` AND also write a final answer — pick one path
-- Do NOT send redundant summaries after already delivering the result
 
-**Wrong:**
-```
-send_message("I'll research that now...")
-send_message("Found some results, analyzing...")
-[final output] "Here's the summary: ..."
-```
+<!-- [38 lines trimmed by size guard] -->
 
-**Right (long task, send_message path):**
-```
-[do work silently]
-send_message("Here's what I found: ...")
-[final output: <internal>Done.</internal>]
-```
-
-**Right (short task, final output path):**
-```
-[do work silently]
-[final output] "Here's what I found: ..."
-```
-
-### Internal thoughts
-
-Wrap internal reasoning in `<internal>` tags — it's logged but not sent:
-
-
-<!-- [88 lines trimmed by size guard] -->
-
-  ],
-  "lastSync": "2026-01-31T12:00:00.000Z"
-}
-```
-
-Groups are ordered by most recent activity. The list is synced from WhatsApp daily.
-
-If a group the user mentions isn't in the list, request a fresh sync:
 
 ```bash
 echo '{"type": "refresh_groups"}' > /workspace/ipc/tasks/refresh_$(date +%s).json
