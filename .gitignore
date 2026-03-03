@@ -28,6 +28,13 @@ src/integrations/lexios/
 *.keys.json
 .env
 
+# Python
+__pycache__/
+*.pyc
+
+# Test corpus data (large binary files)
+scripts/lexios-tests/corpus/
+
 # OS
 .DS_Store
 
