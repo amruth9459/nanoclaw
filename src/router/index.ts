@@ -64,16 +64,6 @@ export type {
   MLXBackendConfig,
 } from './backends/mlx-backend.js';
 
-// Domain-Specific Routers
-export {
-  LexiosRouter,
-  LexiosRouterFactory,
-} from './domain/lexios-router.js';
-export type {
-  LexiosTaskType,
-  LexiosRoutingContext,
-} from './domain/lexios-router.js';
-
 // Types
 export type {
   TaskType,

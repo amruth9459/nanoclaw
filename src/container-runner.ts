@@ -27,6 +27,7 @@ import { readEnvFile } from './env.js';
 import { logger } from './logger.js';
 import { CONTAINER_RUNTIME_BIN, readonlyMountArgs, stopContainer } from './container-runtime.js';
 import { validateAdditionalMounts } from './mount-security.js';
+import { getIntegrations } from './integration-loader.js';
 import { RegisteredGroup } from './types.js';
 
 // Sentinel markers for robust output parsing (must match agent-runner)
@@ -89,11 +90,14 @@ function buildVolumeMounts(
   const projectRoot = process.cwd();
 
   if (isMain) {
-    // Main gets the entire project root mounted
+    // Main gets the project root mounted READ-ONLY for visibility.
+    // SECURITY: Read-only prevents agent from modifying source code,
+    // .env secrets, backup scripts, or package.json. This is the
+    // single most important security control in the system.
     mounts.push({
       hostPath: projectRoot,
       containerPath: '/workspace/project',
-      readonly: false,
+      readonly: true,
     });
 
     // Main also gets its group folder as the working directory
@@ -103,14 +107,14 @@ function buildVolumeMounts(
       readonly: false,
     });
 
-    // Lexios repo: main can edit and push Lexios directly
-    const lexiosDir = path.join(homeDir, 'Lexios');
-    if (fs.existsSync(lexiosDir)) {
-      mounts.push({
-        hostPath: lexiosDir,
-        containerPath: '/workspace/lexios',
-        readonly: false,
-      });
+    // Integration-provided container mounts
+    for (const integration of getIntegrations()) {
+      if (integration.getContainerMounts) {
+        const integrationMounts = integration.getContainerMounts(isMain, homeDir);
+        for (const m of integrationMounts) {
+          mounts.push(m);
+        }
+      }
     }
   } else {
     // Other groups only get their own folder
@@ -218,7 +222,10 @@ function buildVolumeMounts(
  * Secrets are never written to disk or mounted as files.
  */
 function readSecrets(): Record<string, string> {
-  const fromEnvFile = readEnvFile(['CLAUDE_CODE_OAUTH_TOKEN', 'ANTHROPIC_API_KEY',
+  // NOTE: ANTHROPIC_API_KEY intentionally NOT passed to containers — use OAuth only
+  // so container sessions are covered by the Pro subscription (no API billing).
+  // API key is still used host-side by judge-system.ts and semantic-index.ts.
+  const fromEnvFile = readEnvFile(['CLAUDE_CODE_OAUTH_TOKEN',
     'CLAW_EMAIL_APP_PASSWORD', 'CLAW_REDDIT_PASS', 'CLAW_REDDIT_CLIENT_SECRET']);
   // Also pick up runtime values (set via process.env / plist)
   const extras: Record<string, string> = {};

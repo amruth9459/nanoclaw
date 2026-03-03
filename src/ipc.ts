@@ -8,12 +8,12 @@ import {
   DATA_DIR,
   GROUPS_DIR,
   IPC_POLL_INTERVAL,
-  LEXIOS_CODES_DB,
   MAIN_GROUP_FOLDER,
   PAYPAL_EMAIL,
   STORE_DIR,
   TIMEZONE,
 } from './config.js';
+import { getIntegrations } from './integration-loader.js';
 import { AvailableGroup } from './container-runner.js';
 import {
   addEarnings,
@@ -161,15 +161,105 @@ export function startIpcWatcher(deps: IpcDeps): void {
                   continue;
                 }
 
-                // ── Lexios IPC handlers ────────────────────────────────
-                const LEXIOS_TYPES = new Set([
-                  'lexios_track_analysis', 'lexios_track_document', 'lexios_add_member',
-                  'lexios_get_members', 'lexios_check_permission', 'lexios_track_query',
-                  'lexios_save_extraction', 'lexios_select_model',
-                  'lexios_add_jurisdiction', 'lexios_add_rule', 'lexios_add_meta', 'lexios_get_coverage',
-                ]);
-                if (data.type && LEXIOS_TYPES.has(data.type as string)) {
-                  await processLexiosMessage(data, sourceGroup, deps);
+                // ── Integration IPC handlers ──────────────────────────────
+                let handledByIntegration = false;
+                for (const integration of getIntegrations()) {
+                  if (integration.ipcMessageTypes?.has(data.type as string) && integration.handleIpcMessage) {
+                    await integration.handleIpcMessage(data, sourceGroup, {
+                      sendMessage: deps.sendMessage,
+                      registeredGroups: deps.registeredGroups,
+                      registerGroup: deps.registerGroup,
+                    });
+                    handledByIntegration = true;
+                    break;
+                  }
+                }
+                if (handledByIntegration) {
+                  fs.unlinkSync(filePath);
+                  continue;
+                }
+
+                // ── Desktop Claude Code remote control ────────────────────
+                if (data.type === 'desktop_claude' && (isMain || sourceGroup === 'claw-lexios')) {
+                  const rawResponseFile = data.responseFile as string | undefined;
+                  const responseFile = rawResponseFile ? toHostIpcPath(rawResponseFile, sourceGroup) : undefined;
+                  // Spawn in background so IPC loop isn't blocked
+                  (async () => {
+                    try {
+                      const { execFile } = await import('child_process');
+                      const { promisify } = await import('util');
+                      const execFileAsync = promisify(execFile);
+                      const prompt = data.prompt as string;
+                      const defaultWorkdir = sourceGroup === 'claw-lexios'
+                        ? path.join(process.env.HOME || '/Users/amrut', 'Lexios')
+                        : path.join(process.env.HOME || '/Users/amrut', 'nanoclaw');
+                      const workdir = (data.workdir as string) || defaultWorkdir;
+                      const maxBudget = (data.max_budget_usd as number) || 1.0;
+
+                      // ── Safety: lock workdir to nanoclaw repo only ──
+                      const home = process.env.HOME || '/Users/amrut';
+                      const allowedRoots = [
+                        path.join(home, 'nanoclaw'),
+                        path.join(home, 'Lexios'),
+                      ];
+                      const resolved = path.resolve(workdir);
+                      if (!allowedRoots.some(r => resolved === r || resolved.startsWith(r + '/'))) {
+                        throw new Error(`Workdir "${workdir}" outside allowed roots: ${allowedRoots.join(', ')}`);
+                      }
+
+                      // ── Safety: cap budget at $5 ──
+                      const cappedBudget = Math.min(maxBudget, 5.0);
+
+                      logger.info({ prompt: prompt.slice(0, 200), workdir: resolved, maxBudget: cappedBudget }, 'Spawning desktop Claude Code');
+                      const { stdout, stderr } = await execFileAsync(
+                        'claude',
+                        [
+                          '-p', prompt,
+                          '--output-format', 'text',
+                          '--max-budget-usd', String(cappedBudget),
+                          // Scoped permissions: only allow code editing tools, no arbitrary bash
+                          '--allowedTools', 'Read', 'Write', 'Edit', 'Glob', 'Grep',
+                            'Bash(npm run build)', 'Bash(npm run dev)', 'Bash(npm test)',
+                            'Bash(git:*)',
+                        ],
+                        {
+                          cwd: resolved,
+                          timeout: 270000, // 4.5 min (under container's 5 min poll)
+                          maxBuffer: 1024 * 1024, // 1 MB
+                          env: { ...process.env, CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC: '1' },
+                        },
+                      );
+                      const output = stdout || stderr || 'Completed with no output.';
+                      logger.info({ outputLen: output.length }, 'Desktop Claude Code completed');
+
+                      // ── Notify user via WhatsApp if git push detected ──
+                      if (/git\s+push|pushed\s+to|->/.test(output)) {
+                        const mainJid = deps.getMainGroupJid?.();
+                        if (mainJid) {
+                          const { getNotifyJid } = await import('./notify.js');
+                          const notifyTopic = sourceGroup === 'claw-lexios' ? 'lexios' as const : 'desktop' as const;
+                          const summary = prompt.slice(0, 100) + (prompt.length > 100 ? '...' : '');
+                          await deps.sendMessage(getNotifyJid(notifyTopic, mainJid), `🖥️ Desktop Claude pushed code.\nTask: ${summary}`);
+                        }
+                      }
+
+                      if (responseFile) {
+                        writeIpcResponse(responseFile, { output });
+                      }
+                    } catch (err: unknown) {
+                      const msg = err instanceof Error ? err.message : String(err);
+                      logger.error({ err: msg }, 'Desktop Claude Code failed');
+                      const mainJid = deps.getMainGroupJid?.();
+                      if (mainJid) {
+                        const { getNotifyJid } = await import('./notify.js');
+                        const notifyTopic = sourceGroup === 'claw-lexios' ? 'lexios' as const : 'desktop' as const;
+                        await deps.sendMessage(getNotifyJid(notifyTopic, mainJid), `🖥️ Desktop Claude failed: ${msg.slice(0, 200)}`);
+                      }
+                      if (responseFile) {
+                        writeIpcResponse(responseFile, { error: msg });
+                      }
+                    }
+                  })();
                   fs.unlinkSync(filePath);
                   continue;
                 }
@@ -368,7 +458,7 @@ export function startIpcWatcher(deps: IpcDeps): void {
  * Container sees: /workspace/ipc/messages/foo.json
  * Host maps to:   data/ipc/{groupFolder}/messages/foo.json
  */
-function toHostIpcPath(containerPath: string, groupFolder: string): string {
+export function toHostIpcPath(containerPath: string, groupFolder: string): string {
   const containerPrefix = '/workspace/ipc/';
   if (containerPath.startsWith(containerPrefix)) {
     return path.join(DATA_DIR, 'ipc', groupFolder, containerPath.slice(containerPrefix.length));
@@ -400,7 +490,7 @@ function toHostWorkspacePath(containerPath: string, groupFolder: string): string
   return containerPath;
 }
 
-function writeIpcResponse(responseFile: string, data: object): void {
+export function writeIpcResponse(responseFile: string, data: object): void {
   const tmp = `${responseFile}.tmp`;
   fs.mkdirSync(path.dirname(responseFile), { recursive: true });
   fs.writeFileSync(tmp, JSON.stringify(data));
@@ -627,348 +717,17 @@ async function processClawworkMessage(
       const { executeTaskTool } = await import('./mcp/tools/task-tool.js');
       const result = await executeTaskTool(data as any);
       if (responseFile) writeIpcResponse(responseFile, { result });
+      // Sync kanban file after any task mutation
+      if (['create', 'update', 'delete'].includes(data.action as string)) {
+        const { syncKanbanFile } = await import('./db.js');
+        syncKanbanFile();
+      }
       logger.debug({ groupFolder, action: data.action }, 'TaskTool processed');
       break;
     }
 
     default:
       logger.warn({ type: data.type, groupFolder }, 'Unknown ClawWork IPC type');
-  }
-}
-
-async function processLexiosMessage(
-  data: Record<string, unknown>,
-  groupFolder: string,
-  deps: IpcDeps,
-): Promise<void> {
-  const rawResponseFile = data.responseFile as string | undefined;
-  const responseFile = rawResponseFile ? toHostIpcPath(rawResponseFile, groupFolder) : undefined;
-  const chatJid = data.chatJid as string;
-
-  switch (data.type) {
-    case 'lexios_track_analysis': {
-      const { trackDocumentAnalysis } = await import('./db.js');
-      const pages = (data.pages as number) || 0;
-      if (chatJid && pages > 0) {
-        trackDocumentAnalysis(chatJid, pages);
-        logger.info({ chatJid, pages, groupFolder }, 'Lexios: tracked document analysis');
-      }
-      if (responseFile) writeIpcResponse(responseFile, { success: true });
-      break;
-    }
-
-    case 'lexios_track_document': {
-      const { trackLexiosDocument, updateDocumentRevision } = await import('./db.js');
-      const docId = `doc-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
-      trackLexiosDocument({
-        id: docId,
-        building_jid: chatJid,
-        filename: data.filename as string,
-        file_type: data.file_type as string,
-        discipline: data.discipline as string | undefined,
-        sheet_number: data.sheet_number as string | undefined,
-        revision: (data.revision as string) || 'R1',
-        replaces_id: data.replaces_id as string | undefined,
-      });
-      if (data.replaces_id) {
-        updateDocumentRevision(data.replaces_id as string, docId);
-      }
-      if (responseFile) writeIpcResponse(responseFile, { success: true, id: docId });
-      logger.info({ groupFolder, docId, filename: data.filename }, 'Lexios: document tracked');
-      break;
-    }
-
-    case 'lexios_add_member': {
-      const { addBuildingMember } = await import('./db.js');
-      const phone = data.phone as string;
-      const role = (data.role as string) || 'viewer';
-      addBuildingMember(chatJid, phone, role);
-      if (responseFile) writeIpcResponse(responseFile, { success: true, phone, role });
-      logger.info({ groupFolder, phone, role }, 'Lexios: member added');
-      break;
-    }
-
-    case 'lexios_get_members': {
-      const { getBuildingMembers } = await import('./db.js');
-      const members = getBuildingMembers(chatJid);
-      if (responseFile) writeIpcResponse(responseFile, { members });
-      break;
-    }
-
-    case 'lexios_check_permission': {
-      const { checkBuildingPermission } = await import('./db.js');
-      const phone = data.phone as string;
-      const action = data.action as 'upload' | 'query' | 'invite' | 'remove' | 'billing';
-      const allowed = checkBuildingPermission(chatJid, phone, action);
-      if (responseFile) writeIpcResponse(responseFile, { allowed, phone, action });
-      break;
-    }
-
-    case 'lexios_track_query': {
-      const { trackLexiosQuery } = await import('./db.js');
-      trackLexiosQuery({
-        building_jid: chatJid,
-        phone: data.phone as string || '',
-        query_text: data.query_text as string,
-        category: data.category as string | undefined,
-        complexity: data.complexity as string | undefined,
-        route: data.route as string | undefined,
-        answer_text: data.answer_preview as string | undefined,
-      });
-      // Fire-and-forget, no response needed
-      break;
-    }
-
-    case 'lexios_select_model': {
-      try {
-        const { LexiosRouterFactory } = await import('./router/domain/lexios-router.js');
-        const router = LexiosRouterFactory.create();
-
-        const taskType = data.task_type as string;
-        const mode = data.mode as string;
-        const pageCount = data.page_count as number | undefined;
-        const isCompliance = data.is_compliance as boolean;
-
-        // Map mode to routing parameters
-        const isPaidCustomer = false; // Beta users are free tier
-        const recommendedModel = router.getRecommendedModel(
-          taskType as 'extraction' | 'compliance' | 'full_analysis' | 'comparison' | 'qa',
-          isPaidCustomer,
-        );
-
-        // Override for compliance — always use cloud
-        const modelId = isCompliance ? 'claude-sonnet-4-6' : recommendedModel;
-        const isCloud = modelId.startsWith('claude') || modelId.startsWith('gemini') || modelId.startsWith('gpt');
-
-        const response = {
-          model_id: modelId,
-          tier: isCloud ? 'cloud' : (modelId.includes('70b') || modelId.includes('72b') ? 'local-llm' : 'local-slm'),
-          mode,
-          is_cloud: isCloud,
-          cost_estimate_usd: isCloud ? (pageCount || 1) * 0.003 : 0,
-          reasoning: isCompliance
-            ? 'Compliance checks always use cloud models for maximum accuracy'
-            : `${mode} mode: ${isCloud ? 'cloud model for accuracy' : 'local model for zero cost'}`,
-        };
-
-        if (responseFile) writeIpcResponse(responseFile, response);
-        logger.info({ groupFolder, modelId, mode, taskType }, 'Lexios: model selected');
-      } catch (err) {
-        logger.error({ err, groupFolder }, 'Lexios: model selection failed');
-        // Fallback to cloud Sonnet if routing fails
-        if (responseFile) writeIpcResponse(responseFile, {
-          model_id: 'claude-sonnet-4-6',
-          tier: 'cloud',
-          mode: data.mode,
-          is_cloud: true,
-          cost_estimate_usd: 0.01,
-          reasoning: 'Fallback to cloud model (routing error)',
-        });
-      }
-      break;
-    }
-
-    case 'lexios_save_extraction': {
-      const { saveLexiosExtraction } = await import('./db.js');
-      const extractionData = data.extraction_data as string;
-      const documentFilename = data.document_filename as string;
-
-      if (!extractionData || !documentFilename) {
-        if (responseFile) writeIpcResponse(responseFile, { error: 'Missing extraction_data or document_filename' });
-        break;
-      }
-
-      try {
-        const extractionPath = saveLexiosExtraction(chatJid, groupFolder, documentFilename, extractionData);
-        if (responseFile) writeIpcResponse(responseFile, { success: true, extraction_path: extractionPath });
-        logger.info({ groupFolder, documentFilename, extractionPath }, 'Lexios: extraction saved');
-      } catch (err) {
-        logger.error({ err, groupFolder, documentFilename }, 'Lexios: failed to save extraction');
-        if (responseFile) writeIpcResponse(responseFile, { error: `Failed to save extraction: ${(err as Error).message}` });
-      }
-      break;
-    }
-
-    // ── Jurisdiction Builder tools ──────────────────────────────────
-    case 'lexios_add_jurisdiction':
-    case 'lexios_add_rule':
-    case 'lexios_add_meta':
-    case 'lexios_get_coverage': {
-      await processJurisdictionMessage(data, groupFolder, responseFile);
-      break;
-    }
-
-    default:
-      logger.warn({ type: data.type, groupFolder }, 'Unknown Lexios IPC type');
-  }
-}
-
-// ── Jurisdiction Builder IPC Handler ──────────────────────────────────────
-
-let _codesDb: InstanceType<typeof Database> | null = null;
-
-function getCodesDb(): InstanceType<typeof Database> {
-  if (!_codesDb) {
-    if (!fs.existsSync(LEXIOS_CODES_DB)) {
-      throw new Error(`Compliance DB not found at ${LEXIOS_CODES_DB}. Run: python3 ~/Lexios/lexios/compliance.py --seed`);
-    }
-    _codesDb = new Database(LEXIOS_CODES_DB);
-    _codesDb.pragma('journal_mode = WAL');
-    _codesDb.pragma('foreign_keys = ON');
-  }
-  return _codesDb;
-}
-
-async function processJurisdictionMessage(
-  data: Record<string, unknown>,
-  groupFolder: string,
-  responseFile: string | undefined,
-): Promise<void> {
-  try {
-    const db = getCodesDb();
-    const now = new Date().toISOString();
-
-    switch (data.type) {
-      case 'lexios_add_jurisdiction': {
-        const id = data.id as string;
-        const parentId = data.parent_id as string | undefined;
-
-        db.prepare(`
-          INSERT OR REPLACE INTO jurisdictions
-            (id, name, state, level, parent_id, adopted_code, adopted_code_year,
-             adopted_residential_code, source_url, last_verified, completeness, notes)
-          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        `).run(
-          id, data.name, data.state, data.level,
-          parentId || null, data.adopted_code, data.adopted_code_year,
-          (data.adopted_residential_code as string) || null,
-          (data.source_url as string) || null,
-          now,
-          (data.completeness as number) || 0,
-          (data.notes as string) || null,
-        );
-
-        let inheritedRules = 0;
-        if (parentId) {
-          const parentRuleCount = db.prepare(
-            'SELECT COUNT(*) as cnt FROM effective_rules WHERE jurisdiction_id = ?'
-          ).get(parentId) as { cnt: number } | undefined;
-
-          if (parentRuleCount && parentRuleCount.cnt > 0) {
-            db.prepare(`
-              INSERT INTO effective_rules
-                (jurisdiction_id, code, section, title, category, requirement_text,
-                 check_type, threshold_value, threshold_unit, conditions, severity,
-                 extraction_types, extraction_field, amendment_source, applies_to)
-              SELECT
-                ?, code, section, title, category, requirement_text,
-                check_type, threshold_value, threshold_unit, conditions, severity,
-                extraction_types, extraction_field, amendment_source, applies_to
-              FROM effective_rules WHERE jurisdiction_id = ?
-            `).run(id, parentId);
-            inheritedRules = parentRuleCount.cnt;
-          }
-        }
-
-        if (responseFile) writeIpcResponse(responseFile, { success: true, inherited_rules: inheritedRules });
-        logger.info({ groupFolder, id, inheritedRules }, 'Jurisdiction: added');
-        break;
-      }
-
-      case 'lexios_add_rule': {
-        const ruleId = db.prepare(`
-          INSERT INTO effective_rules
-            (jurisdiction_id, code, section, title, category, requirement_text,
-             check_type, threshold_value, threshold_unit, conditions, severity,
-             extraction_types, extraction_field, amendment_source, applies_to)
-          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        `).run(
-          data.jurisdiction_id, data.code, data.section, data.title,
-          data.category, data.requirement_text, data.check_type,
-          (data.threshold_value as number) ?? null,
-          (data.threshold_unit as string) || null,
-          data.conditions ? JSON.stringify(data.conditions) : null,
-          (data.severity as string) || 'major',
-          data.extraction_types ? JSON.stringify(data.extraction_types) : null,
-          (data.extraction_field as string) || null,
-          (data.amendment_source as string) || null,
-          data.applies_to ? JSON.stringify(data.applies_to) : null,
-        ).lastInsertRowid;
-
-        db.prepare(`
-          INSERT INTO rule_history (effective_rule_id, jurisdiction_id, action, changed_by, changed_at, details)
-          VALUES (?, ?, ?, ?, ?, ?)
-        `).run(
-          ruleId, data.jurisdiction_id, 'added', 'claw-agent', now,
-          (data.amendment_source as string) || 'agent research',
-        );
-
-        if (responseFile) writeIpcResponse(responseFile, { success: true, rule_id: Number(ruleId) });
-        logger.info({ groupFolder, jurisdictionId: data.jurisdiction_id, ruleId: Number(ruleId) }, 'Jurisdiction: rule added');
-        break;
-      }
-
-      case 'lexios_add_meta': {
-        db.prepare(`
-          INSERT OR REPLACE INTO jurisdiction_meta (jurisdiction_id, key, value, source_url)
-          VALUES (?, ?, ?, ?)
-        `).run(
-          data.jurisdiction_id, data.key, data.value,
-          (data.source_url as string) || null,
-        );
-
-        if (responseFile) writeIpcResponse(responseFile, { success: true });
-        logger.info({ groupFolder, jurisdictionId: data.jurisdiction_id, key: data.key }, 'Jurisdiction: meta added');
-        break;
-      }
-
-      case 'lexios_get_coverage': {
-        const jurisdictions = db.prepare(`
-          SELECT j.id, j.name, j.state, j.level, j.adopted_code, j.completeness,
-                 j.last_verified, COUNT(r.id) as rule_count
-          FROM jurisdictions j
-          LEFT JOIN effective_rules r ON r.jurisdiction_id = j.id
-          GROUP BY j.id
-          ORDER BY j.state, j.level, j.name
-        `).all() as Array<{
-          id: string; name: string; state: string; level: string;
-          adopted_code: string; completeness: number; last_verified: string;
-          rule_count: number;
-        }>;
-
-        const metaCounts = db.prepare(`
-          SELECT jurisdiction_id, COUNT(*) as cnt FROM jurisdiction_meta GROUP BY jurisdiction_id
-        `).all() as Array<{ jurisdiction_id: string; cnt: number }>;
-
-        const metaMap: Record<string, number> = {};
-        for (const m of metaCounts) metaMap[m.jurisdiction_id] = m.cnt;
-
-        const nextTargets = [
-          'Cobb County', 'Fulton County', 'DeKalb County', 'Gwinnett County',
-          'Clayton County', 'Henry County', 'Fayette County', 'Cherokee County',
-          'Forsyth County', 'Rockdale County',
-        ];
-        const existingNames = new Set(jurisdictions.map(j => j.name));
-        const pendingTargets = nextTargets.filter(n => !existingNames.has(`${n}, GA`));
-
-        const response = {
-          jurisdictions: jurisdictions.map(j => ({
-            ...j,
-            meta_count: metaMap[j.id] || 0,
-          })),
-          total_jurisdictions: jurisdictions.length,
-          total_rules: jurisdictions.reduce((sum, j) => sum + j.rule_count, 0),
-          next_targets: pendingTargets.map(n => `${n}, GA`),
-        };
-
-        if (responseFile) writeIpcResponse(responseFile, response);
-        logger.debug({ groupFolder, count: jurisdictions.length }, 'Jurisdiction: coverage queried');
-        break;
-      }
-    }
-  } catch (err) {
-    logger.error({ err, type: data.type, groupFolder }, 'Jurisdiction IPC error');
-    if (responseFile) writeIpcResponse(responseFile, { error: (err as Error).message });
   }
 }
 

@@ -25,6 +25,7 @@ import { calculateCost } from './economics.js';
 import { cleanupOldMedia } from './media-cleanup.js';
 import { GroupQueue } from './group-queue.js';
 import { logger } from './logger.js';
+import { getIntegrations } from './integration-loader.js';
 import { AgentPriority, ResourceOrchestrator } from './resource-orchestrator.js';
 import { RegisteredGroup, ScheduledTask } from './types.js';
 
@@ -93,7 +94,11 @@ async function runTask(
 
   // Track task agent lifecycle in orchestrator
   const taskDesignation = task.id.includes('bounty-hunter') ? 'bounty' : 'task';
-  const orchType = task.group_folder.startsWith('lexios') ? 'lexios' : 'nanoclaw';
+  let orchType = 'nanoclaw';
+  for (const integration of getIntegrations()) {
+    const t = integration.determineOrchestratorType?.(task.group_folder);
+    if (t) { orchType = t; break; }
+  }
   const agentId = `nanoclaw-task-${task.group_folder}-${Date.now()}`;
   await deps.orchestrator?.requestAgent({
     id: agentId,

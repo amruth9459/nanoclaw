@@ -44,15 +44,26 @@ log "=== Backup started ==="
 
 git_backup() {
     local dir="$1" remote="$2" label="$3"
+    shift 3
+    # Remaining args are safe paths to stage (if empty, stage nothing)
+    local safe_paths=("$@")
+
     if [ ! -d "$dir/.git" ]; then
         log "WARN: $label git repo not found at $dir, skipping git backup"
         return
     fi
     cd "$dir"
 
-    # Check for uncommitted changes (tracked + untracked)
-    if [ -n "$(git status --porcelain 2>/dev/null)" ]; then
-        git add -A
+    # SECURITY: Only stage explicitly listed safe paths — NEVER "git add -A"
+    # on the whole project. A compromised agent with write access to any
+    # mounted dir could inject malicious code that gets auto-committed.
+    if [ ${#safe_paths[@]} -gt 0 ]; then
+        for p in "${safe_paths[@]}"; do
+            [ -e "$p" ] && git add "$p" 2>/dev/null || true
+        done
+    fi
+
+    if [ -n "$(git diff --cached --name-only 2>/dev/null)" ]; then
         git commit --no-verify -m "auto-backup $(date '+%Y-%m-%d %H:%M')" || true
         log "$label: committed changes"
     fi
@@ -67,8 +78,30 @@ git_backup() {
     fi
 }
 
-git_backup "$NANOCLAW_DIR" "fork" "NanoClaw"
-git_backup "$LEXIOS_DIR" "origin" "Lexios"
+# NanoClaw: only commit runtime data dirs, NEVER src/ or scripts/
+git_backup "$NANOCLAW_DIR" "fork" "NanoClaw" \
+    groups/ data/ store/ docs/ config/
+
+# Lexios: only commit core engine outputs and docs
+git_backup "$LEXIOS_DIR" "origin" "Lexios" \
+    lexios/corpus/ lexios/learnings.json lexios/work/ docs/
+
+# ---------- Step 1b: Atomic SQLite backup ----------
+# SECURITY: Copying .db without the WAL can produce an inconsistent backup.
+# Use sqlite3 .backup to create an atomic snapshot, then upload that.
+BACKUP_TMP="${NANOCLAW_DIR}/store/.backup"
+mkdir -p "$BACKUP_TMP"
+for dbfile in "$NANOCLAW_DIR"/store/*.db; do
+    [ -f "$dbfile" ] || continue
+    dbname=$(basename "$dbfile")
+    if command -v sqlite3 &>/dev/null; then
+        sqlite3 "$dbfile" ".backup '${BACKUP_TMP}/${dbname}'" 2>> "$LOG_FILE" \
+            && log "atomic backup: $dbname" \
+            || cp "$dbfile" "${BACKUP_TMP}/${dbname}" 2>/dev/null
+    else
+        cp "$dbfile" "${BACKUP_TMP}/${dbname}" 2>/dev/null
+    fi
+done
 
 # ---------- Step 2: rclone copy NanoClaw runtime dirs ----------
 # SECURITY: Using "copy" (additive) instead of "sync" (destructive).
@@ -84,7 +117,8 @@ RCLONE_FLAGS=(--quiet --transfers 8 --checkers 16 --fast-list --update)
 
 # Helper: copy to both latest/ (current state) and daily snapshot
 r2_copy() {
-    local src="$1" dest_suffix="$2" shift 2
+    local src="$1" dest_suffix="$2"
+    shift 2
     # Latest (always overwritten with newest version)
     rclone copy "$src" "${R2_REMOTE}:${R2_BUCKET}/latest/${dest_suffix}" \
         "${RCLONE_FLAGS[@]}" "$@" \
@@ -95,12 +129,18 @@ r2_copy() {
         2>> "$LOG_FILE" || log "WARN: snapshot/${dest_suffix} copy failed"
 }
 
-# store/ — SQLite DBs + WhatsApp auth
+# store/ — atomic SQLite backup copies (not the live WAL-mode DBs)
+r2_copy "$BACKUP_TMP/" "nanoclaw/store/db/" \
+    && log "copied atomic DB backups"
+
+# store/ — WhatsApp auth and other non-DB files
 r2_copy "$NANOCLAW_DIR/store/" "nanoclaw/store/" \
-    --exclude "*.html" \
+    --exclude "*.db" \
     --exclude "*.db-shm" \
     --exclude "*.db-wal" \
-    && log "copied store/"
+    --exclude "*.html" \
+    --exclude ".backup/**" \
+    && log "copied store/ (non-DB)"
 
 # groups/ — group data, conversations, CLAUDE.md
 r2_copy "$NANOCLAW_DIR/groups/" "nanoclaw/groups/" \
@@ -197,6 +237,9 @@ if [ -n "$CUTOFF_DATE" ]; then
 fi
 
 # ---------- Step 6: Log completion ----------
+
+# Cleanup temp backup dir
+rm -rf "$BACKUP_TMP"
 
 R2_SIZE=$(rclone size "${R2_REMOTE}:${R2_BUCKET}" --json 2>/dev/null | grep -o '"bytes":[0-9]*' | cut -d: -f2 || echo "unknown")
 if [ "$R2_SIZE" != "unknown" ] && [ -n "$R2_SIZE" ]; then

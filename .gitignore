@@ -21,6 +21,9 @@ groups/lexios-template/*
 !groups/global/CLAUDE.md
 !groups/lexios-template/CLAUDE.md
 
+# Integration files (synced from external repos)
+src/integrations/lexios/
+
 # Secrets
 *.keys.json
 .env

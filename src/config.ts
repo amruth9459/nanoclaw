@@ -98,10 +98,11 @@ export const OPEN_MENTIONS =
 export const WA2_ENABLED =
   process.env.NANOCLAW_WA2 === '1'; // Default: disabled
 
-// When enabled, connect a third WhatsApp account dedicated to Lexios (auth stored in store/auth3/).
-// Authenticate it first with: npm run auth -- --slot 3
-export const WA3_LEXIOS_ENABLED =
-  process.env.NANOCLAW_WA3_LEXIOS === '1'; // Default: disabled
+// Dashboard authentication token. Required for all API routes when accessing
+// via Cloudflare tunnel (remote). Set in .env: NANOCLAW_DASH_TOKEN=<random hex>
+// Access dashboard at: https://<tunnel>.trycloudflare.com/?token=<token>
+export const DASH_TOKEN =
+  process.env.NANOCLAW_DASH_TOKEN || '';
 
 // Timezone for scheduled tasks (cron expressions, etc.)
 // Uses system timezone by default
@@ -113,18 +114,10 @@ export const MAX_MEDIA_SIZE_MB = parseInt(
   process.env.NANOCLAW_MAX_MEDIA_SIZE_MB || '50',
   10,
 ); // 50MB default
-export const LEXIOS_MAX_MEDIA_SIZE_MB = parseInt(
-  process.env.NANOCLAW_LEXIOS_MAX_MEDIA_SIZE_MB || '100',
-  10,
-); // 100MB for large construction PDFs
 export const MEDIA_RETENTION_DAYS = parseInt(
   process.env.NANOCLAW_MEDIA_RETENTION_DAYS || '30',
   10,
 ); // 30 days default
-
-// Lexios compliance DB (jurisdiction-first building codes)
-export const LEXIOS_CODES_DB = process.env.LEXIOS_CODES_DB ||
-  path.resolve(HOME_DIR, 'Lexios', 'lexios', 'codes.db');
 
 // Economics / ClawWork settings
 export const INITIAL_BALANCE = parseFloat(process.env.NANOCLAW_INITIAL_BALANCE || '1000');
@@ -161,3 +154,7 @@ export const CLAW_REDDIT_USER = process.env.CLAW_REDDIT_USER || '';
 export const CLAW_REDDIT_PASS = process.env.CLAW_REDDIT_PASS || '';
 export const CLAW_REDDIT_CLIENT_ID = process.env.CLAW_REDDIT_CLIENT_ID || '';
 export const CLAW_REDDIT_CLIENT_SECRET = process.env.CLAW_REDDIT_CLIENT_SECRET || '';
+
+// Notification routing — topic-specific WhatsApp groups
+export const DESKTOP_NOTIFY_JID = process.env.NANOCLAW_DESKTOP_NOTIFY_JID || '120363408175994341@g.us';
+export const LEXIOS_NOTIFY_JID = process.env.NANOCLAW_LEXIOS_NOTIFY_JID || '120363425974206508@g.us';
