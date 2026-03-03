@@ -8,7 +8,7 @@ import fs from 'fs';
 import http from 'http';
 import path from 'path';
 
-import { EARNING_GOAL, GROUPS_DIR, STORE_DIR } from './config.js';
+import { DASH_TOKEN, EARNING_GOAL, GROUPS_DIR, STORE_DIR } from './config.js';
 import {
   getAllBounties,
   getAllRegisteredGroups,
@@ -16,20 +16,15 @@ import {
   getEconomicsSummary,
   getAllUsageRecent,
   getActiveClawworkTasks,
-  getLexiosBuildingSummary,
-  getLexiosCustomerStats,
-  getLexiosCustomerSummary,
-  getLexiosCostSummary,
-  getLexiosMetrics,
-  getBuildingMembers,
-  getLexiosBuildingDocuments,
   getTotalUsage,
   getUsageSince,
   getUsageByPurpose,
   getKanbanItems,
   createTaskRecord,
   updateTaskRecord,
+  syncKanbanFile,
 } from './db.js';
+import { getIntegrations } from './integration-loader.js';
 import { getSurvivalTier } from './economics.js';
 import { logger } from './logger.js';
 import { GroupQueue } from './group-queue.js';
@@ -397,8 +392,8 @@ function agentReason(g) {
 }
 
 function tabBar() {
-  var tabs = ['overview', 'economics', 'kanban', 'bounties', 'files', 'lexios', 'lexios-board', 'router'];
-  var labels = { overview: 'Overview', economics: 'Economics', kanban: 'Kanban', bounties: 'Bounties', files: 'Files', lexios: 'Lexios', 'lexios-board': 'Lexios Board', router: 'Router' };
+  var tabs = ['overview', 'economics', 'kanban', 'bounties', 'files'].concat(window._integrationTabIds || []).concat(['router']);
+  var labels = Object.assign({ overview: 'Overview', economics: 'Economics', kanban: 'Kanban', bounties: 'Bounties', files: 'Files', router: 'Router' }, window._integrationTabLabels || {});
   return tabs.map(function(t) {
     return '<span class="tab' + (dashTab === t ? ' active' : '') + '" onclick="dashTab=\\'' + t + '\\';refresh()">' + labels[t] + '</span>';
   }).join('');
@@ -739,130 +734,6 @@ async function refreshFiles() {
   }
 }
 
-async function refreshLexios() {
-  try {
-    var results = await Promise.all([
-      fetch('/api/lexios').then(function(r) { return r.json(); }),
-      fetch('/api/lexios-metrics').then(function(r) { return r.json(); })
-    ]);
-    var lex = results[0];
-    var m = results[1];
-    var bs = lex.buildings || { total_buildings: 0, total_documents: 0, total_queries: 0, active_buildings: 0, buildings: [] };
-    var cost = lex.cost || { total_cost: 0, total_runs: 0 };
-
-    var corpus = m.corpus || { total_docs: 0, by_type: {}, by_difficulty: {}, types_covered: 0, types_total: 101, growth: [] };
-    var modelsData = m.models || {};
-    var learnings = m.learnings || { total_tips: 0, by_category: {} };
-    var subs = m.substitution_candidates || [];
-    var recentRuns = m.recent_runs || [];
-
-    function sparkline(arr) {
-      if (!arr || arr.length === 0) return '';
-      var max = Math.max.apply(null, arr);
-      if (max === 0) return arr.map(function() { return '░'; }).join('');
-      var chars = ' ▁▂▃▄▅▆▇█';
-      return arr.map(function(v) { return chars[Math.min(Math.round(v / max * 8), 8)]; }).join('');
-    }
-
-    function pctBar(val, max) {
-      if (max === 0) return '';
-      var pct = Math.round(val / max * 100);
-      return '<div style="background:var(--border);border-radius:4px;height:8px;width:100%"><div style="background:var(--accent);border-radius:4px;height:8px;width:' + pct + '%"></div></div>';
-    }
-
-    var typeEntries = Object.entries(corpus.by_type);
-    var typeCards = typeEntries.map(function(e) { return '<span class="badge green">' + e[0] + ': ' + e[1] + '</span>'; }).join(' ');
-    var diffEntries = Object.entries(corpus.by_difficulty);
-    var diffCards = diffEntries.map(function(e) { return '<span class="badge gray">' + e[0] + ': ' + e[1] + '</span>'; }).join(' ');
-
-    var modelEntries = Object.entries(modelsData);
-    var modelRows = modelEntries.length === 0
-      ? '<tr><td colspan="5" style="text-align:center;opacity:0.5">No model data yet</td></tr>'
-      : modelEntries.sort(function(a, b) { return (b[1].avg_f1 || 0) - (a[1].avg_f1 || 0); }).map(function(e) {
-          var name = e[0];
-          var md = e[1];
-          var f1 = (md.avg_f1 || 0);
-          var bar = '';
-          for (var i = 0; i < 10; i++) bar += (i < Math.round(f1 * 10)) ? '█' : '░';
-          var isLocal = name.indexOf(':') > -1 || name.indexOf('llava') > -1 || name.indexOf('llama') > -1;
-          var costStr = isLocal ? 'free' : '$' + (md.cost_per_doc || 0).toFixed(4);
-          var subReady = subs.find(function(s) { return s.local_model === name && s.ready; });
-          var readyBadge = subReady ? ' <span class="badge green">sub-ready</span>' : '';
-          return '<tr><td>' + name + readyBadge + '</td><td class="mono">' + bar + ' ' + f1.toFixed(3) + '</td><td class="mono">' + sparkline(md.trend || []) + '</td><td class="mono">' + costStr + '</td></tr>';
-        }).join('');
-
-    var learningsEntries = Object.entries(learnings.by_category || {});
-    var learningsCats = learningsEntries.map(function(e) { return '<span class="badge gray">' + e[0] + ': ' + e[1] + '</span>'; }).join(' ');
-
-    var runRows = recentRuns.length === 0
-      ? '<tr><td colspan="4" style="text-align:center;opacity:0.5">No corpus builds yet</td></tr>'
-      : recentRuns.map(function(r) {
-          return '<tr><td>' + r.doc_id + '</td><td>' + r.date + '</td><td class="mono">' + r.models + '</td><td class="mono">' + (r.elements || 0) + '</td></tr>';
-        }).join('');
-
-    var buildingRows = (bs.buildings || []).length === 0
-      ? '<tr><td colspan="5" style="text-align:center;opacity:0.5">No buildings yet</td></tr>'
-      : (bs.buildings || []).map(function(b) {
-          return '<tr><td>' + (b.name || 'Unnamed') + '</td><td>' + (b.address || '-') + '</td><td class="mono">' + b.documents_count + '</td><td class="mono">' + b.queries_count + '</td><td><span class="badge ' + (b.status === 'active' ? 'green' : 'gray') + '">' + b.status + '</span></td></tr>';
-        }).join('');
-
-    document.getElementById('main').innerHTML = \`
-      <div class="card full" style="margin-bottom:0.5rem">
-        <div class="memory-tabs">\${tabBar()}</div>
-      </div>
-      <div class="grid">
-        <div class="card"><h3>\${corpus.total_docs}</h3><p class="label">Corpus Docs</p></div>
-        <div class="card"><h3>\${corpus.types_covered}/\${corpus.types_total}</h3><p class="label">Types Covered</p>\${pctBar(corpus.types_covered, corpus.types_total)}</div>
-        <div class="card"><h3>\${learnings.total_tips}</h3><p class="label">Learning Tips</p></div>
-        <div class="card"><h3>$\${cost.total_cost.toFixed(2)}</h3><p class="label">API Cost</p></div>
-      </div>
-      <div class="card full">
-        <h2>Corpus Health</h2>
-        <div style="display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:0.5rem">
-          <div><strong>By Type:</strong> \${typeCards || '<span style="opacity:0.5">none</span>'}</div>
-          <div><strong>Difficulty:</strong> \${diffCards || '<span style="opacity:0.5">none</span>'}</div>
-        </div>
-      </div>
-      <div class="card full">
-        <h2>Model Performance</h2>
-        <table>
-          <thead><tr><th>Model</th><th>Avg F1</th><th>Trend</th><th>Cost/Doc</th></tr></thead>
-          <tbody>\${modelRows}</tbody>
-        </table>
-      </div>
-      <div class="card full">
-        <h2>Learning Effectiveness</h2>
-        <div style="margin-bottom:0.5rem"><strong>\${learnings.total_tips}</strong> tips across categories: \${learningsCats || '<span style="opacity:0.5">none yet</span>'}</div>
-      </div>
-      \${subs.length > 0 ? \`<div class="card full">
-        <h2>Substitution Candidates</h2>
-        <table>
-          <thead><tr><th>Category</th><th>Local Model</th><th>Local F1</th><th>Cloud F1</th><th>Status</th></tr></thead>
-          <tbody>\${subs.map(function(s) {
-            return '<tr><td>' + s.category + '</td><td>' + s.local_model + '</td><td class="mono">' + s.local_f1.toFixed(3) + '</td><td class="mono">' + s.cloud_f1.toFixed(3) + '</td><td><span class="badge ' + (s.ready ? 'green' : 'gray') + '">' + (s.ready ? 'Ready' : Math.round(s.local_f1 / (s.cloud_f1 || 1) * 100) + '%') + '</span></td></tr>';
-          }).join('')}</tbody>
-        </table>
-      </div>\` : ''}
-      <div class="card full">
-        <h2>Recent Corpus Builds</h2>
-        <table>
-          <thead><tr><th>Document</th><th>Date</th><th>Models</th><th>Elements</th></tr></thead>
-          <tbody>\${runRows}</tbody>
-        </table>
-      </div>
-      <div class="card full">
-        <h2>Buildings</h2>
-        <table>
-          <thead><tr><th>Name</th><th>Address</th><th>Docs</th><th>Queries</th><th>Status</th></tr></thead>
-          <tbody>\${buildingRows}</tbody>
-        </table>
-      </div>
-    \`;
-  } catch(e) {
-    console.error('Lexios refresh failed', e);
-  }
-}
-
 async function refreshRouter() {
   try {
     var data = await fetch('/api/router').then(function(r) { return r.json(); });
@@ -998,50 +869,11 @@ async function refreshKanban() {
   }
 }
 
-async function refreshLexiosBoard() {
-  try {
-    var data = await fetch('/api/kanban?project=lexios').then(function(r) { return r.json(); });
-    var items = data.items || [];
-    var userItems = items.filter(function(i) { return i.source === 'user'; });
-    var systemItems = items.filter(function(i) { return i.source !== 'user'; });
-    var userTodo = userItems.filter(function(i) { return i.status === 'todo'; });
-    var userProg = userItems.filter(function(i) { return i.status === 'in_progress'; });
-    var userDone = userItems.filter(function(i) { return i.status === 'done'; });
-    var sysTodo = systemItems.filter(function(i) { return i.status === 'todo'; });
-    var sysProg = systemItems.filter(function(i) { return i.status === 'in_progress'; });
-    var sysDone = systemItems.filter(function(i) { return i.status === 'done'; });
-    document.getElementById('main').innerHTML =
-      '<div class="card full" style="margin-bottom:0.5rem"><div class="memory-tabs">' + tabBar() + '</div></div>' +
-      // My Tasks section
-      '<div class="card full" style="border-color:#ef4444">' +
-        '<h2>📌 My Tasks <span class="pill" style="background:#ef4444;color:#fff">' + userItems.length + '</span></h2>' +
-        kanbanAddForm('lexios') +
-        '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem">' +
-          kanbanColumn('Todo', '#f59e0b', userTodo) +
-          kanbanColumn('In Progress', 'var(--green)', userProg) +
-          kanbanColumn('Done', '#6b7280', userDone, 10) +
-        '</div>' +
-      '</div>' +
-      // System board
-      '<div class="card full">' +
-        '<h2>🏛️ Lexios System <span class="pill yellow">' + systemItems.length + '</span></h2>' +
-        '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;margin-top:0.75rem">' +
-          kanbanColumn('Todo', '#f59e0b', sysTodo) +
-          kanbanColumn('In Progress', 'var(--green)', sysProg) +
-          kanbanColumn('Done', '#6b7280', sysDone, 20) +
-        '</div>' +
-      '</div>';
-  } catch(e) {
-    console.error('Lexios board refresh failed', e);
-  }
-}
-
 async function refresh() {
   if (dashTab === 'economics') { await refreshEconomics(); return; }
   if (dashTab === 'bounties') { await refreshBounties(); return; }
   if (dashTab === 'kanban') { await refreshKanban(); return; }
-  if (dashTab === 'lexios-board') { await refreshLexiosBoard(); return; }
-  if (dashTab === 'lexios') { await refreshLexios(); return; }
+  if (window._integrationRefreshFns && window._integrationRefreshFns[dashTab]) { await window._integrationRefreshFns[dashTab](); return; }
   if (dashTab === 'router') { await refreshRouter(); return; }
   if (dashTab === 'files') {
     // If a file is currently open (viewer has content), only refresh the file list
@@ -1213,6 +1045,23 @@ function switchTab(file) {
   refresh();
 }
 
+// Integration tab/script injection
+window._integrationTabIds = [];
+window._integrationTabLabels = {};
+window._integrationRefreshFns = {};
+${getIntegrations().map(i => {
+  const parts: string[] = [];
+  if (i.dashboardTabs) {
+    for (const tab of i.dashboardTabs) {
+      parts.push(`window._integrationTabIds.push('${tab.id}');`);
+      parts.push(`window._integrationTabLabels['${tab.id}'] = '${tab.label}';`);
+      parts.push(`window._integrationRefreshFns['${tab.id}'] = ${tab.refreshFn};`);
+    }
+  }
+  if (i.dashboardScript) parts.push(i.dashboardScript);
+  return parts.join('\\n');
+}).join('\\n')}
+
 refresh();
 setInterval(refresh, 10000);
 </script>
@@ -1234,6 +1083,22 @@ export function startDashboard(queue: GroupQueue, sendFn?: (jid: string, text: s
       res.writeHead(403);
       res.end('Forbidden');
       return;
+    }
+
+    // SECURITY: Token authentication for remote access (Cloudflare tunnel).
+    // Localhost requests from the machine itself skip token check.
+    // Cloudflare tunnel proxies through localhost, so we check the
+    // CF-Connecting-IP header to detect tunneled requests.
+    const cfIp = req.headers['cf-connecting-ip'] as string | undefined;
+    const isTunneled = !!cfIp;
+    if (DASH_TOKEN && isTunneled) {
+      const tokenFromQuery = url.searchParams.get('token');
+      const tokenFromHeader = (req.headers.authorization || '').replace('Bearer ', '');
+      if (tokenFromQuery !== DASH_TOKEN && tokenFromHeader !== DASH_TOKEN) {
+        res.writeHead(401, { 'Content-Type': 'text/plain' });
+        res.end('Unauthorized — add ?token=<NANOCLAW_DASH_TOKEN> to the URL');
+        return;
+      }
     }
 
     if (url.pathname === '/api/status') {
@@ -1274,7 +1139,7 @@ export function startDashboard(queue: GroupQueue, sendFn?: (jid: string, text: s
 
     if (url.pathname === '/api/kanban') {
       try {
-        const project = (url.searchParams.get('project') || 'nanoclaw') as 'nanoclaw' | 'lexios';
+        const project = url.searchParams.get('project') || 'nanoclaw';
         const items = getKanbanItems(project);
         res.writeHead(200, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ items }));
@@ -1285,31 +1150,20 @@ export function startDashboard(queue: GroupQueue, sendFn?: (jid: string, text: s
       return;
     }
 
-    if (url.pathname === '/api/lexios') {
-      try {
-        const summary = getLexiosCustomerSummary();
-        const customers = getLexiosCustomerStats();
-        const cost = getLexiosCostSummary();
-        const buildings = getLexiosBuildingSummary();
-        res.writeHead(200, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ summary, customers, cost, buildings }));
-      } catch (err) {
-        res.writeHead(500);
-        res.end(JSON.stringify({ error: String(err) }));
+    // Integration API routes
+    {
+      let handled = false;
+      for (const integration of getIntegrations()) {
+        if (integration.apiRoutes) {
+          const route = integration.apiRoutes.get(url.pathname);
+          if (route) {
+            await route.handler(url, req, res);
+            handled = true;
+            break;
+          }
+        }
       }
-      return;
-    }
-
-    if (url.pathname === '/api/lexios-metrics') {
-      try {
-        const metrics = getLexiosMetrics();
-        res.writeHead(200, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify(metrics || { corpus: { total_docs: 0, by_type: {}, by_difficulty: {}, types_covered: 0, types_total: 101, growth: [] }, models: {}, learnings: { total_tips: 0, by_category: {} }, substitution_candidates: [], recent_runs: [] }));
-      } catch (err) {
-        res.writeHead(500);
-        res.end(JSON.stringify({ error: String(err) }));
-      }
-      return;
+      if (handled) return;
     }
 
     if (url.pathname === '/api/resources') {
@@ -1449,6 +1303,7 @@ export function startDashboard(queue: GroupQueue, sendFn?: (jid: string, text: s
             source: 'user',
             priority: priority || 3,
           });
+          syncKanbanFile();
           res.writeHead(200, { 'Content-Type': 'application/json' });
           res.end(JSON.stringify({ ok: true, task }));
         } catch (err) { res.writeHead(500); res.end(JSON.stringify({ error: String(err) })); }
@@ -1464,6 +1319,7 @@ export function startDashboard(queue: GroupQueue, sendFn?: (jid: string, text: s
           const { id, status } = JSON.parse(body);
           if (!id || !status) { res.writeHead(400); res.end(JSON.stringify({ error: 'missing id or status' })); return; }
           const task = updateTaskRecord(id, { status });
+          syncKanbanFile();
           res.writeHead(200, { 'Content-Type': 'application/json' });
           res.end(JSON.stringify({ ok: true, task }));
         } catch (err) { res.writeHead(500); res.end(JSON.stringify({ error: String(err) })); }
@@ -1525,10 +1381,11 @@ export function startDashboard(queue: GroupQueue, sendFn?: (jid: string, text: s
     res.end('Not found');
   });
 
-  // Listen on all interfaces (0.0.0.0) to allow Tailscale access
-  // Security: localhost check in request handler ensures only local/Tailscale access
-  server.listen(PORT, '0.0.0.0', () => {
-    logger.info({ port: PORT }, 'DashClaw running at http://localhost:8080 (accessible via Tailscale)');
+  // Bind to 127.0.0.1 only. Remote access goes through Cloudflare tunnel
+  // (which connects to localhost) with token auth, or through Tailscale
+  // (which also proxies to localhost). No reason to bind to 0.0.0.0.
+  server.listen(PORT, '127.0.0.1', () => {
+    logger.info({ port: PORT }, 'DashClaw running at http://localhost:8080');
   });
 
   server.on('error', (err: NodeJS.ErrnoException) => {

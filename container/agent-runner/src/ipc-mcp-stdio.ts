@@ -1193,7 +1193,7 @@ Tasks support:
     filterAgent: z.string().optional().describe('Filter by agent (for list/available)'),
   },
   async (args) => {
-    const { responseFile } = writeRequest({
+    const { responseFile } = writeClawworkRequest({
       type: 'task_tool',
       ...args,
     });
@@ -1201,7 +1201,53 @@ Tasks support:
     const result = await pollResponse(responseFile, 10000);
     if (!result) return { content: [{ type: 'text' as const, text: 'Error: task_tool request timed out' }], isError: true };
     if (result.error) return { content: [{ type: 'text' as const, text: `Error: ${result.error}` }], isError: true };
-    return { content: [{ type: 'text' as const, text: result.result }] };
+    return { content: [{ type: 'text' as const, text: String(result.result) }] };
+  },
+);
+
+// ── Desktop Claude Code remote control ─────────────────────────────────────────
+
+server.tool(
+  'desktop_claude',
+  `Run Claude Code on the host Mac as a remote control. This spawns a non-interactive Claude Code session
+on the desktop with full access to the NanoClaw codebase (or any specified directory).
+
+Use this when:
+- The user asks you to make code changes to NanoClaw itself (project source is read-only in your container)
+- You need to run host-side commands (brew, launchctl, git push, etc.)
+- Tasks that require desktop-level access (file system, network, etc.)
+
+The desktop agent runs with full permissions. You get back its text output.
+Only available to the main group.`,
+  {
+    prompt: z.string().describe('The task/prompt for the desktop Claude Code agent'),
+    workdir: z.string().optional().describe('Working directory (default: ~/nanoclaw)'),
+    max_budget_usd: z.number().optional().describe('Max spend in USD (default: 1.00)'),
+  },
+  async (args) => {
+    if (!isMain) {
+      return {
+        content: [{ type: 'text' as const, text: 'Error: desktop_claude is only available in the main group.' }],
+        isError: true,
+      };
+    }
+
+    const { responseFile } = writeClawworkRequest({
+      type: 'desktop_claude',
+      prompt: args.prompt,
+      workdir: args.workdir,
+      max_budget_usd: args.max_budget_usd,
+    });
+
+    // Desktop Claude sessions can take a while — poll with 5 min timeout
+    const result = await pollResponse(responseFile, 300000);
+    if (!result) {
+      return { content: [{ type: 'text' as const, text: 'Error: desktop_claude request timed out (5 min limit)' }], isError: true };
+    }
+    if (result.error) {
+      return { content: [{ type: 'text' as const, text: `Error: ${result.error}` }], isError: true };
+    }
+    return { content: [{ type: 'text' as const, text: String(result.output || 'Desktop agent completed with no output.') }] };
   },
 );
 

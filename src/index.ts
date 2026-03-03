@@ -17,8 +17,9 @@ import {
   STORE_DIR,
   TRIGGER_PATTERN,
   WA2_ENABLED,
-  WA3_LEXIOS_ENABLED,
   WARMUP_ON_START,
+  DESKTOP_NOTIFY_JID,
+  LEXIOS_NOTIFY_JID,
 } from './config.js';
 import { WhatsAppChannel } from './channels/whatsapp.js';
 import {
@@ -38,8 +39,6 @@ import {
   getChatName,
   getEconomicsSummary,
   getMessagesSince,
-  getNewLexiosDMs,
-  getNewLexiosGroupMessages,
   getNewMentions,
   getNewMessages,
   getOrCreateEconomics,
@@ -73,8 +72,7 @@ import { BountyGate } from './bounty-gate.js';
 import { GroupQueue } from './group-queue.js';
 import { HitlGate } from './hitl.js';
 import { startIpcWatcher } from './ipc.js';
-import { getOrCreateLexiosBuilding, getOrCreateLexiosCustomer } from './lexios-customer.js';
-import { validateQuery } from './lexios-security.js';
+import { getIntegrations, loadIntegrations } from './integration-loader.js';
 import { findChannel, formatMessages, formatOutbound } from './router.js';
 import { startSchedulerLoop } from './task-scheduler.js';
 import { Channel, NewMessage, RegisteredGroup } from './types.js';
@@ -119,6 +117,28 @@ function loadState(): void {
   }
   sessions = getAllSessions();
   registeredGroups = getAllRegisteredGroups();
+
+  // Auto-register notification-only group
+  if (DESKTOP_NOTIFY_JID && !registeredGroups[DESKTOP_NOTIFY_JID]) {
+    registerGroup(DESKTOP_NOTIFY_JID, {
+      name: 'claw-desktop',
+      folder: 'claw-desktop',
+      trigger: '@__notify_only__',
+      added_at: new Date().toISOString(),
+      requiresTrigger: true,
+    });
+  }
+  // Auto-register Lexios agent group — every message triggers agent
+  if (LEXIOS_NOTIFY_JID && !registeredGroups[LEXIOS_NOTIFY_JID]) {
+    registerGroup(LEXIOS_NOTIFY_JID, {
+      name: 'claw-lexios',
+      folder: 'claw-lexios',
+      trigger: '@Claw',
+      added_at: new Date().toISOString(),
+      requiresTrigger: false,
+    });
+  }
+
   logger.info(
     { groupCount: Object.keys(registeredGroups).length },
     'State loaded',
@@ -313,14 +333,20 @@ function pickAckEmoji(content: string): string {
 /** Determine the purpose of an agent run for cost tracking. */
 function determinePurpose(groupFolder: string, chatJid: string): string {
   if (guestGroups.has(chatJid)) return 'guest';
-  if (groupFolder.startsWith('lexios')) return 'lexios';
+  for (const integration of getIntegrations()) {
+    const p = integration.determinePurpose?.(groupFolder);
+    if (p) return p;
+  }
   return 'conversation';
 }
 
 /** Determine the designation for container/orchestrator tracking. */
 function determineDesignation(groupFolder: string, chatJid: string): string {
   if (guestGroups.has(chatJid)) return 'guest';
-  if (groupFolder.startsWith('lexios')) return 'lexios';
+  for (const integration of getIntegrations()) {
+    const d = integration.determineDesignation?.(groupFolder);
+    if (d) return d;
+  }
   return 'conversation';
 }
 
@@ -412,17 +438,97 @@ async function processGroupMessages(chatJid: string): Promise<boolean> {
 
   // --- Enrichment layers (all non-blocking) ---
 
-  // Context enrichment: prepend codified facts to prompt (main group only —
+  // Context enrichment: prepend codified facts + active work to prompt (main group only —
   // guest sessions must not see personal facts from the main group)
   let contextBlock = '';
   if (isMainGroup) {
     try {
       contextBlock = await contextManager.getPromptContext();
-      if (contextBlock) {
-        prompt = `<context>\n${contextBlock}\n</context>\n\n${prompt}`;
+
+      // Inject "Active Work" section from shared MEMORY.md so Claw knows
+      // what the last desktop Claude Code session touched (memory bridge)
+      let activeWork = '';
+      try {
+        const memoryPath = path.join(GROUPS_DIR, MAIN_GROUP_FOLDER, 'MEMORY.md');
+        const memoryContent = fs.readFileSync(memoryPath, 'utf-8');
+        const match = memoryContent.match(/## Active Work\n([\s\S]*?)(?=\n## |\Z)/);
+        if (match && match[1].trim()) {
+          activeWork = `### Desktop Session (Memory Bridge)\n${match[1].trim()}`;
+        }
+      } catch { /* MEMORY.md may not exist */ }
+
+      // Inject kanban summary so Claw always sees the task board
+      let kanbanSummary = '';
+      try {
+        const kanbanPath = path.join(GROUPS_DIR, MAIN_GROUP_FOLDER, 'KANBAN.md');
+        if (fs.existsSync(kanbanPath)) {
+          const kanbanContent = fs.readFileSync(kanbanPath, 'utf-8');
+          // Extract just the in-progress and todo counts + in-progress items
+          const ncMatch = kanbanContent.match(/## NanoClaw \(([^)]+)\)/);
+          const lexMatch = kanbanContent.match(/## Lexios \(([^)]+)\)/);
+          const inProgress = kanbanContent.match(/### In Progress\n([\s\S]*?)(?=\n### |\n## |\Z)/g);
+          const parts = [];
+          if (ncMatch) parts.push(`NanoClaw: ${ncMatch[1]}`);
+          if (lexMatch) parts.push(`Lexios: ${lexMatch[1]}`);
+          if (inProgress) {
+            parts.push('Active tasks:');
+            for (const section of inProgress) {
+              const items = section.split('\n').filter(l => l.startsWith('- [>]'));
+              parts.push(...items.map(l => l.replace('[>]', '🔄')));
+            }
+          }
+          if (parts.length) {
+            kanbanSummary = `### Kanban Board\n${parts.join('\n')}`;
+          }
+        }
+      } catch { /* KANBAN.md may not exist yet */ }
+
+      const combined = [activeWork, kanbanSummary, contextBlock].filter(Boolean).join('\n\n');
+      if (combined) {
+        prompt = `<context>\n${combined}\n</context>\n\n${prompt}`;
       }
     } catch (err) {
       logger.warn({ err }, 'Context enrichment failed');
+    }
+  } else if (group.folder === 'claw-lexios') {
+    // Inject Active Work + Lexios kanban for the Lexios dev agent
+    try {
+      let activeWork = '';
+      try {
+        const memoryPath = path.join(GROUPS_DIR, 'claw-lexios', 'MEMORY.md');
+        const memoryContent = fs.readFileSync(memoryPath, 'utf-8');
+        const match = memoryContent.match(/## Active Work\n([\s\S]*?)(?=\n## |\Z)/);
+        if (match && match[1].trim()) {
+          activeWork = `### Desktop Session (Memory Bridge)\n${match[1].trim()}`;
+        }
+      } catch { /* MEMORY.md may not exist */ }
+
+      let kanbanSummary = '';
+      try {
+        const kanbanPath = path.join(GROUPS_DIR, MAIN_GROUP_FOLDER, 'KANBAN.md');
+        if (fs.existsSync(kanbanPath)) {
+          const kanbanContent = fs.readFileSync(kanbanPath, 'utf-8');
+          // Extract Lexios section only
+          const lexMatch = kanbanContent.match(/## Lexios \(([^)]+)\)/);
+          const lexSection = kanbanContent.match(/## Lexios[\s\S]*?(?=\n## [^L]|\Z)/);
+          const parts = [];
+          if (lexMatch) parts.push(`Lexios: ${lexMatch[1]}`);
+          if (lexSection) {
+            const items = lexSection[0].split('\n').filter(l => l.startsWith('- ['));
+            parts.push(...items.map(l => l.replace('[>]', '🔄')));
+          }
+          if (parts.length) {
+            kanbanSummary = `### Kanban Board\n${parts.join('\n')}`;
+          }
+        }
+      } catch { /* KANBAN.md may not exist yet */ }
+
+      const combined = [activeWork, kanbanSummary].filter(Boolean).join('\n\n');
+      if (combined) {
+        prompt = `<context>\n${combined}\n</context>\n\n${prompt}`;
+      }
+    } catch (err) {
+      logger.warn({ err }, 'Lexios context enrichment failed');
     }
   }
 
@@ -436,7 +542,7 @@ async function processGroupMessages(chatJid: string): Promise<boolean> {
       costBudget: 'unlimited',
       qualityNeeds: 'best',
       latencyNeeds: 'fast',
-      source: chatChannelSource.get(chatJid) === 'lexios' ? 'lexios' : 'whatsapp',
+      source: (chatChannelSource.get(chatJid) || 'whatsapp') as import('./router/types.js').TaskSource,
       hasMedia: false,
       contentSample: strippedContent.slice(0, 500),
     };
@@ -560,7 +666,11 @@ async function processGroupMessages(chatJid: string): Promise<boolean> {
     const taskContent = lastMsg.content.replace(TRIGGER_PATTERN, '').trim();
     if (isUserTask(taskContent)) {
       try {
-        const project = group.folder.startsWith('lexios') ? 'lexios' : 'nanoclaw';
+        let project = 'nanoclaw';
+        for (const integration of getIntegrations()) {
+          const p = integration.determineProject?.(group.folder);
+          if (p) { project = p; break; }
+        }
         createTaskRecord({
           description: taskContent.slice(0, 200),
           project,
@@ -767,7 +877,11 @@ async function runAgent(
 
   // Track agent lifecycle in orchestrator (monitoring-only — always proceed)
   const designation = designationOverride || determineDesignation(group.folder, chatJid);
-  const orchType = designation === 'lexios' ? 'lexios' : 'nanoclaw';
+  let orchType = 'nanoclaw';
+  for (const integration of getIntegrations()) {
+    const t = integration.determineOrchestratorType?.(group.folder);
+    if (t) { orchType = t; break; }
+  }
   const agentId = `nanoclaw-${group.folder}-${Date.now()}`;
   await orchestrator.requestAgent({
     id: agentId,
@@ -1042,95 +1156,34 @@ async function startMessageLoop(): Promise<void> {
         }
       }
 
-      // --- Lexios DMs: auto-register customers from the Lexios WhatsApp channel ---
-      if (WA3_LEXIOS_ENABLED) {
-        const lexiosDms = getNewLexiosDMs(oldTimestamp, jids, ASSISTANT_NAME);
-        if (lexiosDms.length > 0) {
-          // Advance global cursor to cover Lexios DM timestamps
-          const maxLexiosTs = lexiosDms[lexiosDms.length - 1].timestamp;
-          if (maxLexiosTs > lastTimestamp) {
-            lastTimestamp = maxLexiosTs;
-            saveState();
-          }
-
-          // Group by chat
-          const lexiosByChat = new Map<string, NewMessage[]>();
-          for (const msg of lexiosDms) {
-            const existing = lexiosByChat.get(msg.chat_jid);
-            if (existing) existing.push(msg);
-            else lexiosByChat.set(msg.chat_jid, [msg]);
-          }
-
-          for (const [chatJid, msgs] of lexiosByChat) {
-            const group = getOrCreateLexiosCustomer(chatJid, registeredGroups, registerGroup);
-
-            if (!lastAgentTimestamp[chatJid]) {
-              const firstMsgTs = new Date(new Date(msgs[0].timestamp).getTime() - 1).toISOString();
-              lastAgentTimestamp[chatJid] = firstMsgTs;
-              saveState();
-            }
-
-            logger.info(
-              { chatJid, name: group.name, count: msgs.length },
-              'Lexios DM — queuing customer agent',
+      // --- Integration message loop ticks (auto-registration, etc.) ---
+      for (const integration of getIntegrations()) {
+        if (integration.onMessageLoopTick) {
+          try {
+            const integrationCtx = {
+              registeredGroups: () => registeredGroups,
+              registerGroup,
+              channels,
+              queue,
+              sendMessage: async (jid: string, text: string) => {
+                const ch = findChannel(channels, jid);
+                if (ch) await ch.sendMessage(jid, text);
+              },
+            };
+            const jidsToEnqueue = await integration.onMessageLoopTick(
+              oldTimestamp,
+              Array.from(jids),
+              integrationCtx,
             );
-
-            const channel = findChannel(channels, chatJid);
-            if (INSTANT_ACK) {
-              const last = msgs[msgs.length - 1];
-              const ackCh = findAckChannel(last.sender) ?? channel;
-              ackCh?.sendReaction?.(chatJid, last.id, last.sender, '📐').catch(() => {});
+            for (const chatJid of jidsToEnqueue) {
+              if (!lastAgentTimestamp[chatJid]) {
+                lastAgentTimestamp[chatJid] = oldTimestamp;
+                saveState();
+              }
+              queue.enqueueMessageCheck(chatJid);
             }
-
-            queue.enqueueMessageCheck(chatJid);
-          }
-        }
-
-        // --- Lexios Groups: auto-register building groups from the Lexios WhatsApp channel ---
-        const lexiosGroupMsgs = getNewLexiosGroupMessages(oldTimestamp, jids, ASSISTANT_NAME);
-        if (lexiosGroupMsgs.length > 0) {
-          const maxLexiosGTs = lexiosGroupMsgs[lexiosGroupMsgs.length - 1].timestamp;
-          if (maxLexiosGTs > lastTimestamp) {
-            lastTimestamp = maxLexiosGTs;
-            saveState();
-          }
-
-          const lexiosGroupByChat = new Map<string, NewMessage[]>();
-          for (const msg of lexiosGroupMsgs) {
-            // Security: validate Lexios group messages
-            const validation = validateQuery(msg.content || '');
-            if (!validation.safe) {
-              logger.warn({ chatJid: msg.chat_jid, reason: validation.reason }, 'Lexios security: blocked message');
-              continue;
-            }
-            const existing = lexiosGroupByChat.get(msg.chat_jid);
-            if (existing) existing.push(msg);
-            else lexiosGroupByChat.set(msg.chat_jid, [msg]);
-          }
-
-          for (const [chatJid, msgs] of lexiosGroupByChat) {
-            const senderPhone = msgs[0].sender?.split('@')[0] || '';
-            const group = getOrCreateLexiosBuilding(chatJid, senderPhone, registeredGroups, registerGroup);
-
-            if (!lastAgentTimestamp[chatJid]) {
-              const firstMsgTs = new Date(new Date(msgs[0].timestamp).getTime() - 1).toISOString();
-              lastAgentTimestamp[chatJid] = firstMsgTs;
-              saveState();
-            }
-
-            logger.info(
-              { chatJid, name: group.name, count: msgs.length },
-              'Lexios Group — queuing building agent',
-            );
-
-            const channel = findChannel(channels, chatJid);
-            if (INSTANT_ACK) {
-              const last = msgs[msgs.length - 1];
-              const ackCh = findAckChannel(last.sender) ?? channel;
-              ackCh?.sendReaction?.(chatJid, last.id, last.sender, '📐').catch(() => {});
-            }
-
-            queue.enqueueMessageCheck(chatJid);
+          } catch (err) {
+            logger.error({ err, integration: integration.name }, 'Integration message loop tick failed');
           }
         }
       }
@@ -1367,6 +1420,20 @@ async function main(): Promise<void> {
   ensureContainerSystemRunning();
   initDatabase();
   logger.info('Database initialized');
+
+  // Load integrations and initialize their DB schemas
+  await loadIntegrations();
+  {
+    const { getDb } = await import('./db.js');
+    const mainDb = getDb();
+    for (const integration of getIntegrations()) {
+      integration.initDatabase(mainDb);
+      logger.info({ name: integration.name }, 'Integration DB initialized');
+    }
+  }
+
+  // Sync kanban board to file for cross-agent visibility
+  try { const { syncKanbanFile } = await import('./db.js'); syncKanbanFile(); } catch { /* best-effort */ }
   orchestrator = new ResourceOrchestrator(path.join(STORE_DIR, 'resources.db'));
   logger.info('ResourceOrchestrator initialized');
   loadState();
@@ -1486,30 +1553,34 @@ async function main(): Promise<void> {
     });
   }
 
-  // Optional third WhatsApp number for Lexios (enable with NANOCLAW_WA3_LEXIOS=1)
-  // Skip if auth3 has no credentials — avoids QR timeout loop spam in logs
-  const auth3Dir = path.join(STORE_DIR, 'auth3');
-  const auth3HasCreds = fs.existsSync(path.join(auth3Dir, 'creds.json'));
-  if (WA3_LEXIOS_ENABLED && !auth3HasCreds) {
-    logger.info('WA3 Lexios enabled but auth3/creds.json missing — skipping. Run: npm run auth -- --slot 3');
-  }
-  if (WA3_LEXIOS_ENABLED && auth3HasCreds) {
-    const wa3 = new WhatsAppChannel({
-      ...channelOpts,
-      name: 'lexios',
-      authDir: path.join(STORE_DIR, 'auth3'),
-      primary: false,
-    });
-    channels.push(wa3);
-    await Promise.race([
-      wa3.connect(),
-      new Promise<void>((_, reject) =>
-        setTimeout(() => reject(new Error('WA3 Lexios connect timeout after 30s')), 30000),
-      ),
-    ]).catch((err: Error) => {
-      logger.warn({ err: err.message }, 'Lexios WhatsApp channel not connected — authenticate first: npm run auth -- --slot 3');
-      channels.splice(channels.indexOf(wa3), 1);
-    });
+  // Integration-provided WhatsApp channels
+  for (const integration of getIntegrations()) {
+    if (integration.channels) {
+      for (const chConfig of integration.channels) {
+        const authDir = path.join(STORE_DIR, chConfig.authDir);
+        const hasCreds = fs.existsSync(path.join(authDir, 'creds.json'));
+        if (!hasCreds) {
+          logger.info({ channel: chConfig.name }, `Integration channel ${chConfig.name} enabled but ${chConfig.authDir}/creds.json missing — skipping`);
+          continue;
+        }
+        const waCh = new WhatsAppChannel({
+          ...channelOpts,
+          name: chConfig.name,
+          authDir,
+          primary: false,
+        });
+        channels.push(waCh);
+        await Promise.race([
+          waCh.connect(),
+          new Promise<void>((_, reject) =>
+            setTimeout(() => reject(new Error(`${chConfig.name} connect timeout after 30s`)), 30000),
+          ),
+        ]).catch((err: Error) => {
+          logger.warn({ err: err.message, channel: chConfig.name }, `Integration channel not connected`);
+          channels.splice(channels.indexOf(waCh), 1);
+        });
+      }
+    }
   }
 
   // Start subsystems (independently of connection handler)
@@ -1628,7 +1699,10 @@ async function main(): Promise<void> {
             ([, g]) => g.folder === MAIN_GROUP_FOLDER,
           )?.[0];
           if (mainJid) {
-            await clawSend(mainJid, `🔄 *Restarted* — ${breadcrumb.summary || 'Agent deployed code changes'}`);
+            const { getNotifyJid } = await import('./notify.js');
+            const summary = breadcrumb.summary || 'Agent deployed code changes';
+            const topic = summary.toLowerCase().includes('lexios') ? 'lexios' as const : 'general' as const;
+            await clawSend(getNotifyJid(topic, mainJid), `🔄 *Restarted* — ${summary}`);
           }
         }
       }

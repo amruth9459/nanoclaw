@@ -48,3 +48,16 @@ launchctl unload ~/Library/LaunchAgents/com.nanoclaw.plist
 ## Container Build Cache
 
 The container buildkit caches the build context aggressively. `--no-cache` alone does NOT invalidate COPY steps — the builder's volume retains stale files. To force a truly clean rebuild, prune the builder then re-run `./container/build.sh`.
+
+## Memory Bridge (Claw ↔ Claude Code)
+
+`groups/main/MEMORY.md` is the shared memory between Claw and Claude Code.
+
+**Before starting work:** Read `groups/main/MEMORY.md` — check "Active Work" for what the last session did, and "Active Projects" for current state.
+
+**After significant work** (new files, architectural decisions, config changes):
+Update `groups/main/MEMORY.md` "Active Projects" section — add new projects, remove completed ones. Keep it current state, not a log.
+
+The `memory-bridge.sh` hook auto-updates "Active Work" with files touched live (every Edit/Write).
+
+`groups/main/KANBAN.md` is the shared task board (auto-generated from DB). Check it for current tasks across NanoClaw and Lexios. Claw sees a summary injected into every prompt. Tasks are managed via DashClaw UI or Claw's `task_tool`.
