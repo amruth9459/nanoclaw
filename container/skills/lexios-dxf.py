@@ -5,7 +5,7 @@ Also renders each layer to PNG for visual analysis.
 
 Usage: lexios-dxf <filepath> [output_dir]
   filepath:   Path to .dxf or .dwg file
-  output_dir: Directory for output files (default: /workspace/group/lexios-work)
+  output_dir: Directory for output files (default: $LEXIOS_WORK_DIR or ./work/dxf)
 
 Output files:
   dxf-extraction.json  - Structured data extraction
@@ -225,7 +225,7 @@ if __name__ == '__main__':
         sys.exit(1)
 
     filepath = sys.argv[1]
-    output_dir = sys.argv[2] if len(sys.argv) > 2 else '/workspace/group/lexios-work'
+    output_dir = sys.argv[2] if len(sys.argv) > 2 else os.environ.get('LEXIOS_WORK_DIR', './work/dxf')
 
     if not os.path.exists(filepath):
         print(json.dumps({"error": f"File not found: {filepath}"}))

@@ -85,6 +85,22 @@ RUN chmod +x /usr/local/bin/lexios-ifc
 COPY skills/lexios/query-classifier.py /usr/local/bin/lexios-classify
 RUN chmod +x /usr/local/bin/lexios-classify
 
+# Install Lexios deterministic pipelines (post-extraction analysis)
+COPY skills/lexios/post-extract.py /usr/local/bin/lexios-post-extract
+RUN chmod +x /usr/local/bin/lexios-post-extract
+
+COPY skills/lexios/takeoff.py /usr/local/bin/lexios-takeoff
+RUN chmod +x /usr/local/bin/lexios-takeoff
+
+COPY skills/lexios/conflicts.py /usr/local/bin/lexios-conflicts
+RUN chmod +x /usr/local/bin/lexios-conflicts
+
+COPY skills/lexios/query.py /usr/local/bin/lexios-query
+RUN chmod +x /usr/local/bin/lexios-query
+
+COPY skills/lexios/diff.py /usr/local/bin/lexios-diff
+RUN chmod +x /usr/local/bin/lexios-diff
+
 # Create workspace directories
 RUN mkdir -p /workspace/group /workspace/global /workspace/extra /workspace/ipc/messages /workspace/ipc/tasks /workspace/ipc/input
 

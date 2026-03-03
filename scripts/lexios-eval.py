@@ -168,10 +168,28 @@ def init_db():
             gt_verified INTEGER DEFAULT 0
         );
 
+        -- Per-model per-category performance tracking (multi-model comparison)
+        CREATE TABLE IF NOT EXISTS model_performance (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            doc_id TEXT NOT NULL,
+            model TEXT NOT NULL,
+            category TEXT NOT NULL,
+            precision REAL,
+            recall REAL,
+            f1 REAL,
+            elements_found INTEGER DEFAULT 0,
+            elements_correct INTEGER DEFAULT 0,
+            run_at TEXT NOT NULL,
+            learnings_version INTEGER DEFAULT 0,
+            cost_usd REAL DEFAULT 0
+        );
+
         CREATE INDEX IF NOT EXISTS idx_runs_doc ON eval_runs(doc_id);
         CREATE INDEX IF NOT EXISTS idx_runs_time ON eval_runs(run_at);
         CREATE INDEX IF NOT EXISTS idx_failures_cat ON failures(category, failure_type);
         CREATE INDEX IF NOT EXISTS idx_catscores_run ON eval_category_scores(run_id);
+        CREATE INDEX IF NOT EXISTS idx_modperf_model ON model_performance(model, category);
+        CREATE INDEX IF NOT EXISTS idx_modperf_doc ON model_performance(doc_id, model);
     """)
     return db
 
