@@ -82,6 +82,22 @@ MEMORY.md is shared between you and a desktop agent (Claude Code).
 
 **After significant work:** Update MEMORY.md "Active Projects" — add what you built, remove what's done. Current state only, not a log.
 
+## Desktop Remote Control
+
+You can run Claude Code on the host Mac using the `desktop_claude` MCP tool. This spawns a full Claude Code session with write access to the NanoClaw codebase.
+
+**When to use:**
+- User asks you to change NanoClaw source code (your project mount is read-only)
+- You need host-side commands (git push, launchctl, brew, etc.)
+- Any task requiring desktop-level file system access
+
+**Example:**
+```
+desktop_claude({ prompt: "Fix the typo in src/config.ts line 42", workdir: "~/nanoclaw" })
+```
+
+**Limits:** $1 budget per call (configurable via `max_budget_usd`), 5 min timeout. Main group only.
+
 ## 🔒 Safety Constraints
 
 ### 1. READ-ONLY Agent for Media Files
