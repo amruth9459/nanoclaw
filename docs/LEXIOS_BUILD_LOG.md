@@ -1,9 +1,9 @@
 # Lexios — Daily Build Log
 
 *Living document — auto-generated from git history*
-*Last generated: 2026-03-03*
+*Last generated: 2026-03-04*
 
-**46 total commits** (11 meaningful) | 2026-02-26 to 2026-03-03
+**53 total commits** (11 meaningful) | 2026-02-26 to 2026-03-03
 
 ---
 
@@ -14,33 +14,33 @@
 - Add efficiency modules: extraction cache, embeddings, IFC corpus tools
 - Remove update-docs.py (moved to NanoClaw scripts/)
 - Fix IFC corpus URLs, schema compatibility, and scoring bugs
-- (+4 auto-backup commits)
+- (+11 auto-backup commits)
 
-### Files (65 changed)
+### Files (112 changed)
+- ...-wall-with-opening-and-window.ground-truth.json
 - .../Building-Architecture.ground-truth.json
+- .../Building-Architecture.ifc
+- .../Building-Structural.ifc
 - .../Duplex_A_20110907.ground-truth.json
 - .../bsmart/tessellation-with-individual-colors.ifc
 - .../column-straight-rectangle-tessellation.ifc
-- .../ifc/bsmart/wall-with-opening-and-window.ifc
-- .gitignore
-- README.md
-- integrations/nanoclaw/CLAUDE.md
-- integrations/nanoclaw/SKILL.md
-- integrations/nanoclaw/host/config.ts
-- integrations/nanoclaw/host/container-mounts.ts
-- integrations/nanoclaw/host/customer.ts
-- integrations/nanoclaw/host/dashboard.ts
-- integrations/nanoclaw/host/db.ts
-- integrations/nanoclaw/host/index.ts
-- integrations/nanoclaw/host/ipc-handlers.ts
-- integrations/nanoclaw/host/router.ts
-- integrations/nanoclaw/host/security.ts
-- integrations/nanoclaw/sync.sh
-- lexios/__init__.py
-- ... and 45 more
+- .../corpus/ifc-duplex/ifc-duplex.ground-truth.json
+- .../corpus/ifc-infra-plumbing/Infra-Plumbing.ifc
+- .../corpus/ifc-structural/Building-Structural.ifc
+- .../ifc-building-arch.ground-truth.json
+- .../ifc-building-arch/Building-Architecture.ifc
+- .../ifc-building-architecture.ground-truth.json
+- .../ifc-building-hvac.ground-truth.json
+- .../ifc-building-structural.ground-truth.json
+- .../ifc-duplex-a-20110907.ground-truth.json
+- .../ifc-duplex-a-20110907/Duplex_A_20110907.ifc
+- .../ifc-infra-bridge.ground-truth.json
+- .../ifc-infra-plumbing.ground-truth.json
+- .../ifc-infra-road.ground-truth.json
+- ... and 92 more
 
 ### Stats
-- 53483 insertions, 349 deletions
+- 140382 insertions, 592 deletions
 
 ## 2026-03-02
 

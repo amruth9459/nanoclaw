@@ -1,9 +1,9 @@
 # NanoClaw — Daily Build Log
 
 *Living document — auto-generated from git history*
-*Last generated: 2026-03-03*
+*Last generated: 2026-03-04*
 
-**217 total commits** (198 meaningful) | 2026-01-31 to 2026-03-03
+**218 total commits** (198 meaningful) | 2026-01-31 to 2026-03-03
 
 ---
 
@@ -13,8 +13,9 @@
 - Extract Lexios into plugin architecture with integration loader
 - Add deterministic post-extraction pipeline scripts to container
 - Add memory bridge hook, update-docs script, and gitignore cleanup
+- (+1 auto-backup commits)
 
-### Files (31 changed)
+### Files (33 changed)
 - .claude/hooks/memory-bridge.sh
 - .gitignore
 - CLAUDE.md
@@ -27,18 +28,18 @@
 - container/skills/lexios/post-extract.py
 - container/skills/lexios/query.py
 - container/skills/lexios/takeoff.py
+- docs/LEXIOS_BUILD_LOG.md
+- docs/NANOCLAW_BUILD_LOG.md
 - scripts/backup.sh
 - scripts/lexios-eval.py
 - scripts/update-docs.py
 - src/channels/whatsapp.ts
 - src/config.ts
 - src/container-runner.ts
-- src/dashboard.ts
-- src/db.ts
-- ... and 11 more
+- ... and 13 more
 
 ### Stats
-- 2154 insertions, 2690 deletions
+- 3228 insertions, 2690 deletions
 
 ## 2026-03-02
 
