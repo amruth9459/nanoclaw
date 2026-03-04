@@ -70,21 +70,6 @@
     "metricsRetentionDays": 30
   },
 
-  "domains": {
-    "lexios": {
-      "enabled": true,
-      "defaultModel": "qwen2.5-vl-72b",
-      "paidCustomerModel": "claude-sonnet-4.6",
-      "complianceModel": "claude-opus-4.6",
-      "batchThreshold": 10
-    },
-    "osha": {
-      "enabled": true,
-      "defaultModel": "claude-opus-4.6",
-      "requiresHighAccuracy": true
-    }
-  },
-
   "costTargets": {
     "maxDailyCostUsd": 50.0,
     "targetLocalPercentage": 70.0,
