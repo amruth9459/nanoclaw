@@ -1,24 +1,27 @@
 # NanoClaw — Daily Build Log
 
 *Living document — auto-generated from git history*
-*Last generated: 2026-03-04*
+*Last generated: 2026-03-05*
 
-**221 total commits** (198 meaningful) | 2026-01-31 to 2026-03-04
+**223 total commits** (198 meaningful) | 2026-01-31 to 2026-03-04
 
 ---
 
 ## 2026-03-04
 
 ### What Changed
-- 3 auto-backup commits (incremental saves)
+- 5 auto-backup commits (incremental saves)
 
-### Files (3 changed)
+### Files (6 changed)
 - config/router-config.json
 - docs/LEXIOS_BUILD_LOG.md
 - docs/NANOCLAW_BUILD_LOG.md
+- docs/NANOCLAW_CHANGELOG.md
+- docs/NANOCLAW_PLATFORM.md
+- groups/lexios-template/CLAUDE.md
 
 ### Stats
-- 30 insertions, 216 deletions
+- 46 insertions, 411 deletions
 
 ## 2026-03-03
 
