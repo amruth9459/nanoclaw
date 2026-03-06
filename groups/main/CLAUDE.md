@@ -123,6 +123,18 @@ desktop_claude({ prompt: "Fix the typo in src/config.ts line 42", workdir: "~/na
 ### 5. Gmail Read-Only Mode (When Configured)
 - If Gmail OAuth uses `gmail.readonly` scope, you CANNOT delete, trash, archive, or modify labels
 
+## Learning
+
+You have a `learn` tool that persists knowledge across sessions. Use it when you discover:
+- **User preferences** — how they want things done, communication style, priorities
+- **What works** — techniques, parameters, or approaches that produced good results (with numbers)
+- **What doesn't work** — approaches that failed, with why
+- **System facts** — infrastructure details, API behaviors, tool quirks discovered through use
+
+Parameters: `topic` (category label, e.g. "extraction", "container", "user-preference"), `knowledge` (the actual insight, min 200 chars, be specific with numbers/files), `domain` ("nanoclaw" or "lexios").
+
+Don't learn obvious things or restate documentation. Learn things that would save time if you knew them at the start of next session.
+
 ## Deployment Status
 
 Do not speculate about whether env vars, features, or performance settings are active. If you need to know, check:
