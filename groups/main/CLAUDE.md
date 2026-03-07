@@ -298,45 +298,8 @@ Documents appear similarly:
 For other document types (Word, etc.):
 - Check the file extension and use appropriate tools to extract content
 
-#### Videos and GIFs
 
-Videos and GIFs appear like this:
-```
-<message sender="User Name" time="2026-02-25T14:00:00.000Z">[video: /workspace/media/ABC123.mp4] What breed is this dog?</message>
-```
-
-*To extract a frame from video for visual analysis:*
-```bash
-extract-frame /workspace/media/ABC123.mp4           # Extract frame at 1 second to /tmp/frame.jpg
-extract-frame /workspace/media/ABC123.mp4 frame.jpg # Extract to specific file
-extract-frame /workspace/media/ABC123.mp4 frame.jpg 00:00:05 # Extract at 5 seconds
-```
-
-Then use the `Read` tool on the extracted frame:
-```typescript
-Read({ file_path: "/tmp/frame.jpg" })
-```
-
-### Media Location
-
-All media files are stored at `/workspace/media/` (read-only access).
-
-## Communication
-
-**How messages reach the user:**
-
-There are two delivery paths — use exactly ONE per run:
-
-**Path A — Final output (default):**
-Just write your answer. It's automatically sent when you finish. Use `<internal>` to suppress parts that shouldn't go out.
-
-**Path B — `send_message` for immediate delivery:**
-`mcp__nanoclaw__send_message` sends immediately, before you finish. Use it ONLY when the task is long and the user needs an early answer (e.g., "Done! Here's your report…"). If you use `send_message`, the system suppresses your final output to avoid duplicates — so put the complete answer inside the `send_message` call and wrap everything else in `<internal>`.
-
-**Rules:**
-- Do NOT use `send_message` to narrate your process step-by-step ("Searching…", "Analyzing…", "Done!")
-
-<!-- [38 lines trimmed by size guard] -->
+<!-- [40 lines trimmed by size guard] -->
 
 
 ```bash
