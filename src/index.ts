@@ -19,7 +19,6 @@ import {
   WA2_ENABLED,
   WARMUP_ON_START,
   DESKTOP_NOTIFY_JID,
-  LEXIOS_NOTIFY_JID,
 } from './config.js';
 import { WhatsAppChannel } from './channels/whatsapp.js';
 import {
@@ -53,13 +52,14 @@ import {
   createClawworkTask,
   createTaskRecord,
   getChatChannel,
+  updateTask,
 } from './db.js';
 import { classifyTask, computeMaxPayment } from './clawwork.js';
 // Local routing disabled while Max subscription is active
 // import { routeWithOpus, executeLocal } from './opus-router.js';
 import { calculateCost, formatCostFooter } from './economics.js';
 // Dead code clusters — wired as enrichment/monitoring layers (non-blocking)
-import { contextManager, setSystemFact, setCapability } from './context/index.js';
+import { contextManager, codedContext, setSystemFact, setCapability } from './context/index.js';
 import { pruneOldChunks } from './semantic-index.js';
 import { RouterFactory, type UniversalRouter } from './router/index.js';
 import type { RoutingContext, RoutingDecision } from './router/types.js';
@@ -87,7 +87,7 @@ let registeredGroups: Record<string, RegisteredGroup> = {};
 // In-memory guest groups created on first @-mention from unregistered chats.
 // Ephemeral: cleared on restart. Guests get isolated agent sessions.
 const guestGroups = new Map<string, RegisteredGroup>();
-// Tracks which channel name a chatJid's most recent message came from (e.g. 'lexios', 'whatsapp')
+// Tracks which channel name a chatJid's most recent message came from (e.g. 'whatsapp')
 const chatChannelSource = new Map<string, string>();
 let lastAgentTimestamp: Record<string, string> = {};
 let messageLoopRunning = false;
@@ -128,15 +128,21 @@ function loadState(): void {
       requiresTrigger: true,
     });
   }
-  // Auto-register Lexios agent group — every message triggers agent
-  if (LEXIOS_NOTIFY_JID && !registeredGroups[LEXIOS_NOTIFY_JID]) {
-    registerGroup(LEXIOS_NOTIFY_JID, {
-      name: 'claw-lexios',
-      folder: 'claw-lexios',
-      trigger: '@Claw',
-      added_at: new Date().toISOString(),
-      requiresTrigger: false,
-    });
+  // Auto-register integration groups
+  for (const integration of getIntegrations()) {
+    if (integration.autoRegisterGroups) {
+      for (const g of integration.autoRegisterGroups()) {
+        if (!registeredGroups[g.jid]) {
+          registerGroup(g.jid, {
+            name: g.name,
+            folder: g.folder,
+            trigger: g.trigger,
+            added_at: new Date().toISOString(),
+            requiresTrigger: g.requiresTrigger,
+          });
+        }
+      }
+    }
   }
 
   logger.info(
@@ -312,7 +318,6 @@ const EMOJI_RULES: Array<{ pattern: RegExp; emojis: string[] }> = [
   { pattern: /\b(build|create|make|implement|add|write|code)/i, emojis: ['🛠️', '⚡', '🏗️'] },
   { pattern: /\b(money|cost|price|revenue|earn|bounty|\$)/i, emojis: ['💰', '📊'] },
   { pattern: /\b(help|explain|what|how|why)\b/i, emojis: ['💡', '🧐'] },
-  { pattern: /\b(lexios|blueprint|construction|pdf|document)/i, emojis: ['📐', '🏛️'] },
   { pattern: /\b(test|check|verify|validate)/i, emojis: ['🧪', '✅'] },
   { pattern: /\b(deploy|push|ship|launch|release)/i, emojis: ['🚀'] },
   { pattern: /\b(schedule|remind|later|timer|cron)/i, emojis: ['⏰', '📅'] },
@@ -320,6 +325,13 @@ const EMOJI_RULES: Array<{ pattern: RegExp; emojis: string[] }> = [
   { pattern: /\b(read|summary|summarize|review|analyze)/i, emojis: ['📖', '🔬'] },
 ];
 const DEFAULT_EMOJIS = ['👀', '👍', '⚡', '🫡'];
+
+// Append integration-provided emoji rules
+for (const integration of getIntegrations()) {
+  if (integration.emojiRules) {
+    EMOJI_RULES.push(...integration.emojiRules);
+  }
+}
 
 function pickAckEmoji(content: string): string {
   for (const rule of EMOJI_RULES) {
@@ -465,11 +477,14 @@ async function processGroupMessages(chatJid: string): Promise<boolean> {
           const kanbanContent = fs.readFileSync(kanbanPath, 'utf-8');
           // Extract just the in-progress and todo counts + in-progress items
           const ncMatch = kanbanContent.match(/## NanoClaw \(([^)]+)\)/);
-          const lexMatch = kanbanContent.match(/## Lexios \(([^)]+)\)/);
           const inProgress = kanbanContent.match(/### In Progress\n([\s\S]*?)(?=\n### |\n## |\Z)/g);
           const parts = [];
           if (ncMatch) parts.push(`NanoClaw: ${ncMatch[1]}`);
-          if (lexMatch) parts.push(`Lexios: ${lexMatch[1]}`);
+          // Collect kanban summaries from integrations
+          for (const integration of getIntegrations()) {
+            const summary = integration.getKanbanSummary?.(kanbanContent);
+            if (summary) parts.push(summary);
+          }
           if (inProgress) {
             parts.push('Active tasks:');
             for (const section of inProgress) {
@@ -490,45 +505,18 @@ async function processGroupMessages(chatJid: string): Promise<boolean> {
     } catch (err) {
       logger.warn({ err }, 'Context enrichment failed');
     }
-  } else if (group.folder === 'claw-lexios') {
-    // Inject Active Work + Lexios kanban for the Lexios dev agent
-    try {
-      let activeWork = '';
+  } else {
+    // Integration-provided context enrichment for non-main groups
+    for (const integration of getIntegrations()) {
       try {
-        const memoryPath = path.join(GROUPS_DIR, 'claw-lexios', 'MEMORY.md');
-        const memoryContent = fs.readFileSync(memoryPath, 'utf-8');
-        const match = memoryContent.match(/## Active Work\n([\s\S]*?)(?=\n## |\Z)/);
-        if (match && match[1].trim()) {
-          activeWork = `### Desktop Session (Memory Bridge)\n${match[1].trim()}`;
+        const enriched = integration.enrichPromptContext?.(group.folder, GROUPS_DIR);
+        if (enriched) {
+          prompt = `<context>\n${enriched}\n</context>\n\n${prompt}`;
+          break;
         }
-      } catch { /* MEMORY.md may not exist */ }
-
-      let kanbanSummary = '';
-      try {
-        const kanbanPath = path.join(GROUPS_DIR, MAIN_GROUP_FOLDER, 'KANBAN.md');
-        if (fs.existsSync(kanbanPath)) {
-          const kanbanContent = fs.readFileSync(kanbanPath, 'utf-8');
-          // Extract Lexios section only
-          const lexMatch = kanbanContent.match(/## Lexios \(([^)]+)\)/);
-          const lexSection = kanbanContent.match(/## Lexios[\s\S]*?(?=\n## [^L]|\Z)/);
-          const parts = [];
-          if (lexMatch) parts.push(`Lexios: ${lexMatch[1]}`);
-          if (lexSection) {
-            const items = lexSection[0].split('\n').filter(l => l.startsWith('- ['));
-            parts.push(...items.map(l => l.replace('[>]', '🔄')));
-          }
-          if (parts.length) {
-            kanbanSummary = `### Kanban Board\n${parts.join('\n')}`;
-          }
-        }
-      } catch { /* KANBAN.md may not exist yet */ }
-
-      const combined = [activeWork, kanbanSummary].filter(Boolean).join('\n\n');
-      if (combined) {
-        prompt = `<context>\n${combined}\n</context>\n\n${prompt}`;
+      } catch (err) {
+        logger.warn({ err, integration: integration.name }, 'Integration context enrichment failed');
       }
-    } catch (err) {
-      logger.warn({ err }, 'Lexios context enrichment failed');
     }
   }
 
@@ -685,14 +673,25 @@ async function processGroupMessages(chatJid: string): Promise<boolean> {
   }
 
   // INSTANT FEEDBACK: React with a context-aware emoji
-  // Use whichever channel is NOT the sender's number so the ack is always visible.
-  const ackChannel = findAckChannel(lastMsg.sender) ?? channel;
+  // Prefer the channel whose number differs from sender (so reaction is visible).
+  // If that channel fails (e.g. not in this group), fall back to the receiving channel.
+  const preferredAckChannel = findAckChannel(lastMsg.sender) ?? channel;
+  const ackChannel = preferredAckChannel;
   if (INSTANT_ACK) {
     const ackEmoji = pickAckEmoji(lastMsg.content);
-    if (ackChannel.sendReaction) {
-      await ackChannel.sendReaction(chatJid, lastMsg.id, lastMsg.sender, ackEmoji).catch(() => {});
-    } else {
-      await channel.sendMessage(chatJid, ackEmoji).catch(() => {});
+    const tryReact = async (ch: typeof channel) => {
+      if (ch.sendReaction) {
+        await ch.sendReaction(chatJid, lastMsg.id, lastMsg.sender, ackEmoji);
+      } else {
+        await ch.sendMessage(chatJid, ackEmoji);
+      }
+    };
+    try {
+      await tryReact(preferredAckChannel);
+    } catch {
+      if (preferredAckChannel !== channel) {
+        await tryReact(channel).catch(() => {});
+      }
     }
   }
   await ackChannel.setTyping?.(chatJid, true);
@@ -835,6 +834,7 @@ async function runAgent(
   onOutput?: (output: ContainerOutput) => Promise<void>,
   routingDecisionHint?: RoutingDecision,
   designationOverride?: string,
+  maxTurns?: number,
 ): Promise<'success' | 'error'> {
   const isMain = group.folder === MAIN_GROUP_FOLDER;
   const sessionId = sessions[group.folder];
@@ -906,6 +906,7 @@ async function runAgent(
           confidence: routingDecisionHint.confidence,
           reasoning: routingDecisionHint.reasoning,
         } : undefined,
+        maxTurns,
       },
       (proc, containerName) => {
         queue.registerProcess(chatJid, proc, containerName, group.folder);
@@ -1050,13 +1051,20 @@ async function startMessageLoop(): Promise<void> {
             // ACK the message and show typing indicator
             if (INSTANT_ACK) {
               const lastMsg = messagesToSend[messagesToSend.length - 1];
-              const ackCh = findAckChannel(lastMsg.sender) ?? channel;
-              if (ackCh.sendReaction) {
-                ackCh.sendReaction(chatJid, lastMsg.id, lastMsg.sender, '👀').catch(() => {});
+              const preferredCh = findAckChannel(lastMsg.sender) ?? channel;
+              if (preferredCh.sendReaction) {
+                preferredCh.sendReaction(chatJid, lastMsg.id, lastMsg.sender, '👀').catch(() => {
+                  // Preferred channel not in group — fall back to receiving channel
+                  if (preferredCh !== channel && channel.sendReaction) {
+                    channel.sendReaction(chatJid, lastMsg.id, lastMsg.sender, '👀').catch(() => {});
+                  }
+                });
               }
-              ackCh.setTyping?.(chatJid, true)?.catch((err) =>
-                logger.warn({ chatJid, err }, 'Failed to set typing indicator'),
-              );
+              preferredCh.setTyping?.(chatJid, true)?.catch(() => {
+                channel.setTyping?.(chatJid, true)?.catch((err) =>
+                  logger.warn({ chatJid, err }, 'Failed to set typing indicator'),
+                );
+              });
             } else {
               channel.setTyping?.(chatJid, true)?.catch((err) =>
                 logger.warn({ chatJid, err }, 'Failed to set typing indicator'),
@@ -1140,14 +1148,21 @@ async function startMessageLoop(): Promise<void> {
           const channel = findChannel(channels, chatJid);
           if (INSTANT_ACK && channel) {
             const last = msgs[msgs.length - 1];
-            const ackCh = findAckChannel(last.sender) ?? channel;
+            const preferredCh = findAckChannel(last.sender) ?? channel;
             const ackEmoji = pickAckEmoji(last.content);
-            if (ackCh.sendReaction) {
-              ackCh.sendReaction(chatJid, last.id, last.sender, ackEmoji).catch(() => {});
-            } else {
-              channel.sendMessage(chatJid, ackEmoji).catch(() => {});
-            }
-            ackCh.setTyping?.(chatJid, true)?.catch(() => {});
+            const doReact = async (ch: typeof channel) => {
+              if (ch.sendReaction) {
+                await ch.sendReaction(chatJid, last.id, last.sender, ackEmoji);
+              } else {
+                await ch.sendMessage(chatJid, ackEmoji);
+              }
+            };
+            doReact(preferredCh).catch(() => {
+              if (preferredCh !== channel) doReact(channel).catch(() => {});
+            });
+            preferredCh.setTyping?.(chatJid, true)?.catch(() => {
+              channel.setTyping?.(chatJid, true)?.catch(() => {});
+            });
           } else if (channel) {
             channel.setTyping?.(chatJid, true)?.catch(() => {});
           }
@@ -1225,7 +1240,7 @@ async function warmupGroupContainer(chatJid: string): Promise<boolean> {
 
   logger.info({ group: group.name }, 'Pre-warming container');
 
-  await runAgent(group, '[system: warming up — do not respond to the user]', chatJid, async (result) => {
+  await runAgent(group, '[system: warming up — reply with a single period]', chatJid, async (result) => {
     // Suppress all output — this is a silent warmup run
     if (result.status === 'success') {
       queue.notifyIdle(chatJid);
@@ -1233,7 +1248,7 @@ async function warmupGroupContainer(chatJid: string): Promise<boolean> {
     if (result.status === 'error') {
       logger.warn({ group: group.name }, 'Warmup run errored (non-fatal)');
     }
-  }, undefined, 'warmup');
+  }, undefined, 'warmup', 1);
 
   return true;
 }
@@ -1402,8 +1417,8 @@ The first $149 sale is the proof of concept. Then you scale.`;
     group_folder: MAIN_GROUP_FOLDER,
     chat_jid: mainJid,
     prompt,
-    schedule_type: 'interval',
-    schedule_value: String(BOUNTY_HUNT_INTERVAL_MS),
+    schedule_type: 'cron',
+    schedule_value: '0 8 * * *', // 8 AM daily
     context_mode: 'group',
     next_run: new Date(Date.now() + 60000).toISOString(), // first run in 1 minute
     status: 'active',
@@ -1411,8 +1426,8 @@ The first $149 sale is the proof of concept. Then you scale.`;
   });
 
   logger.info(
-    { taskId, intervalMs: BOUNTY_HUNT_INTERVAL_MS, mainJid },
-    'Bounty hunter scheduled task created',
+    { taskId, cron: '0 8 * * *', mainJid },
+    'Bounty hunter scheduled task created (daily 8 AM)',
   );
 }
 
@@ -1420,6 +1435,23 @@ async function main(): Promise<void> {
   ensureContainerSystemRunning();
   initDatabase();
   logger.info('Database initialized');
+
+  // Migrate existing bounty-hunter/biz-opps tasks from interval to daily cron
+  {
+    const existingTasks = getAllTasks();
+    for (const t of existingTasks) {
+      if (t.status !== 'active') continue;
+      const isBountyHunter = t.prompt?.includes('BOUNTY_HUNTER_TASK');
+      const isBizOpps = t.prompt?.includes('biz-opps') || t.prompt?.includes('business opportunities');
+      if ((isBountyHunter || isBizOpps) && t.schedule_type === 'interval') {
+        updateTask(t.id, {
+          schedule_type: 'cron',
+          schedule_value: isBountyHunter ? '0 8 * * *' : '0 9 * * *',
+        });
+        logger.info({ taskId: t.id, type: isBountyHunter ? 'bounty-hunter' : 'biz-opps' }, 'Migrated task to daily cron');
+      }
+    }
+  }
 
   // Load integrations and initialize their DB schemas
   await loadIntegrations();
@@ -1430,6 +1462,12 @@ async function main(): Promise<void> {
       integration.initDatabase(mainDb);
       logger.info({ name: integration.name }, 'Integration DB initialized');
     }
+  }
+
+  // Load integration learnings into hot cache
+  for (const integration of getIntegrations()) {
+    const learningsPath = integration.getLearningsPath?.();
+    if (learningsPath) codedContext.loadLearningsFromFile(learningsPath);
   }
 
   // Sync kanban board to file for cross-agent visibility
@@ -1583,6 +1621,20 @@ async function main(): Promise<void> {
     }
   }
 
+  // Integration-provided custom channels (non-Baileys, e.g. Twilio)
+  for (const integration of getIntegrations()) {
+    if (integration.createChannels) {
+      const customChannels = integration.createChannels(channelOpts);
+      for (const ch of customChannels) {
+        channels.push(ch);
+        await ch.connect().catch((err: Error) => {
+          logger.warn({ err: err.message, channel: ch.name }, 'Custom channel connect failed');
+          channels.splice(channels.indexOf(ch), 1);
+        });
+      }
+    }
+  }
+
   // Start subsystems (independently of connection handler)
   startDashboard(queue, (jid, text) => clawSend(jid, text), orchestrator, router);
   startSchedulerLoop({
@@ -1605,10 +1657,15 @@ async function main(): Promise<void> {
   // they trigger notifications — sending from the same number as the user gets
   // silenced by WhatsApp as "your own message". Falls back to WA1 if WA2 not in group.
   const clawSend = async (jid: string, text: string): Promise<void> => {
-    // Respect the channel the chat arrived on (critical for guest DMs)
-    const dbChannel = getChatChannel(jid);
-    if (dbChannel) {
-      const ch = channels.find((c) => c.name === dbChannel && c.isConnected());
+    // First, use ownsJid-based routing — respects registered group context
+    // and prevents cross-channel contamination when a JID appears on multiple channels.
+    const owned = findChannel(channels, jid);
+    if (owned?.isConnected()) return owned.sendMessage(jid, text);
+
+    // For unregistered/guest JIDs, fall back to in-memory source then DB.
+    const channelName = chatChannelSource.get(jid) || getChatChannel(jid);
+    if (channelName) {
+      const ch = channels.find((c) => c.name === channelName && c.isConnected());
       if (ch) return ch.sendMessage(jid, text);
     }
     // Fallback: prefer WA2 for notifications, then any channel
@@ -1616,16 +1673,22 @@ async function main(): Promise<void> {
     if (wa2) {
       try { return await wa2.sendMessage(jid, text); } catch { /* WA2 not in group, fall through */ }
     }
-    const channel = findChannel(channels, jid);
-    if (!channel) throw new Error(`No channel for JID: ${jid}`);
-    return channel.sendMessage(jid, text);
+    if (owned) return owned.sendMessage(jid, text); // owned but was disconnected earlier — retry
+    // Last resort: try any connected channel (handles disconnected preferred channel)
+    const anyConnected = channels.find((c) => c.isConnected());
+    if (!anyConnected) throw new Error(`No connected channel for JID: ${jid}`);
+    return anyConnected.sendMessage(jid, text);
   };
 
   const clawSendFile = async (jid: string, buffer: Buffer, mimetype: string, filename: string, caption?: string): Promise<void> => {
-    // Respect the channel the chat arrived on (critical for guest DMs)
-    const dbChannel = getChatChannel(jid);
-    if (dbChannel) {
-      const ch = channels.find((c) => c.name === dbChannel && c.isConnected());
+    // First, use ownsJid-based routing — respects registered group context.
+    const owned = findChannel(channels, jid);
+    if (owned?.isConnected() && owned.sendFile) return owned.sendFile(jid, buffer, mimetype, filename, caption);
+
+    // For unregistered/guest JIDs, fall back to in-memory source then DB.
+    const channelName = chatChannelSource.get(jid) || getChatChannel(jid);
+    if (channelName) {
+      const ch = channels.find((c) => c.name === channelName && c.isConnected());
       if (ch?.sendFile) return ch.sendFile(jid, buffer, mimetype, filename, caption);
     }
     // Fallback: prefer WA2 for notifications, then any channel
@@ -1633,10 +1696,10 @@ async function main(): Promise<void> {
     if (wa2?.sendFile) {
       try { return await wa2.sendFile(jid, buffer, mimetype, filename, caption); } catch { /* fall through */ }
     }
-    const channel = findChannel(channels, jid);
-    if (!channel) throw new Error(`No channel for JID: ${jid}`);
-    if (!channel.sendFile) throw new Error(`Channel ${channel.name} does not support file sending`);
-    return channel.sendFile(jid, buffer, mimetype, filename, caption);
+    const ch = owned || findChannel(channels, jid);
+    if (!ch) throw new Error(`No channel for JID: ${jid}`);
+    if (!ch.sendFile) throw new Error(`Channel ${ch.name} does not support file sending`);
+    return ch.sendFile(jid, buffer, mimetype, filename, caption);
   };
 
   startIpcWatcher({
@@ -1701,7 +1764,15 @@ async function main(): Promise<void> {
           if (mainJid) {
             const { getNotifyJid } = await import('./notify.js');
             const summary = breadcrumb.summary || 'Agent deployed code changes';
-            const topic = summary.toLowerCase().includes('lexios') ? 'lexios' as const : 'general' as const;
+            // Match summary to integration notify topics
+            let topic: string = 'general';
+            const summaryLower = summary.toLowerCase();
+            for (const integ of getIntegrations()) {
+              if (integ.notifyTopics && summaryLower.includes(integ.name)) {
+                topic = Object.keys(integ.notifyTopics)[0] || 'general';
+                break;
+              }
+            }
             await clawSend(getNotifyJid(topic, mainJid), `🔄 *Restarted* — ${summary}`);
           }
         }

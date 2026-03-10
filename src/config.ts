@@ -138,9 +138,9 @@ export const GITHUB_TOKEN = process.env.NANOCLAW_GITHUB_TOKEN || '';
 // $5000 for Mac Studio + $250 already spent (Claude Max + extra usage) = $5250 total
 export const EARNING_GOAL = parseFloat(process.env.NANOCLAW_EARNING_GOAL || '5250');
 
-// How often the agent auto-hunts for opportunities (default: every 6 hours)
+// How often the agent auto-hunts for opportunities (default: every 24 hours)
 export const BOUNTY_HUNT_INTERVAL_MS = parseInt(
-  process.env.NANOCLAW_BOUNTY_HUNT_INTERVAL_MS || String(6 * 60 * 60 * 1000),
+  process.env.NANOCLAW_BOUNTY_HUNT_INTERVAL_MS || String(24 * 60 * 60 * 1000),
   10,
 );
 
@@ -157,4 +157,3 @@ export const CLAW_REDDIT_CLIENT_SECRET = process.env.CLAW_REDDIT_CLIENT_SECRET |
 
 // Notification routing — topic-specific WhatsApp groups
 export const DESKTOP_NOTIFY_JID = process.env.NANOCLAW_DESKTOP_NOTIFY_JID || '120363408175994341@g.us';
-export const LEXIOS_NOTIFY_JID = process.env.NANOCLAW_LEXIOS_NOTIFY_JID || '120363425974206508@g.us';

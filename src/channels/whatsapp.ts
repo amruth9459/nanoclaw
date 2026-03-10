@@ -63,6 +63,7 @@ export class WhatsAppChannel implements Channel {
   private connected = false;
   private lidToPhoneMap: Record<string, string> = {};
   private outgoingQueue: Array<{ jid: string; text: string }> = [];
+  private outgoingFileQueue: Array<{ jid: string; buffer: Buffer; mimetype: string; filename: string; caption?: string }> = [];
   private flushing = false;
   private groupSyncTimerStarted = false;
 
@@ -424,22 +425,34 @@ export class WhatsAppChannel implements Channel {
 
   async sendFile(jid: string, buffer: Buffer, mimetype: string, filename: string, caption?: string): Promise<void> {
     if (!this.connected) {
-      logger.warn({ jid, filename }, 'WA disconnected, cannot send file');
+      this.outgoingFileQueue.push({ jid, buffer, mimetype, filename, caption });
+      logger.info({ jid, filename, queueSize: this.outgoingFileQueue.length }, 'WA disconnected, file queued');
       return;
     }
     try {
-      if (mimetype.startsWith('image/')) {
-        await this.sock.sendMessage(jid, { image: buffer, caption: caption ?? '', mimetype });
-      } else if (mimetype.startsWith('video/')) {
-        await this.sock.sendMessage(jid, { video: buffer, caption: caption ?? '', mimetype });
-      } else {
-        await this.sock.sendMessage(jid, { document: buffer, mimetype, fileName: filename, caption: caption ?? '' });
-      }
-      logger.info({ jid, filename, mimetype, bytes: buffer.length }, 'File sent');
+      await this._sendFileInternal(jid, buffer, mimetype, filename, caption);
     } catch (err) {
-      logger.warn({ jid, filename, err }, 'Failed to send file');
-      throw err;
+      // Retry once after 2s, then queue for later
+      logger.info({ jid, filename, err }, 'File send failed, retrying in 2s');
+      await new Promise((r) => setTimeout(r, 2000));
+      try {
+        await this._sendFileInternal(jid, buffer, mimetype, filename, caption);
+      } catch (retryErr) {
+        this.outgoingFileQueue.push({ jid, buffer, mimetype, filename, caption });
+        logger.warn({ jid, filename, retryErr, queueSize: this.outgoingFileQueue.length }, 'File send retry failed, queued for reconnect');
+      }
     }
+  }
+
+  private async _sendFileInternal(jid: string, buffer: Buffer, mimetype: string, filename: string, caption?: string): Promise<void> {
+    if (mimetype.startsWith('image/')) {
+      await this.sock.sendMessage(jid, { image: buffer, caption: caption ?? '', mimetype });
+    } else if (mimetype.startsWith('video/')) {
+      await this.sock.sendMessage(jid, { video: buffer, caption: caption ?? '', mimetype });
+    } else {
+      await this.sock.sendMessage(jid, { document: buffer, mimetype, fileName: filename, caption: caption ?? '' });
+    }
+    logger.info({ jid, filename, mimetype, bytes: buffer.length }, 'File sent');
   }
 
   isConnected(): boolean {
@@ -711,15 +724,33 @@ export class WhatsAppChannel implements Channel {
   }
 
   private async flushOutgoingQueue(): Promise<void> {
-    if (this.flushing || this.outgoingQueue.length === 0) return;
+    if (this.flushing || (this.outgoingQueue.length === 0 && this.outgoingFileQueue.length === 0)) return;
     this.flushing = true;
     try {
-      logger.info({ count: this.outgoingQueue.length }, 'Flushing outgoing message queue');
+      // Flush text messages (dedup by jid+text)
+      const flushedKeys = new Set<string>();
+      logger.info({ texts: this.outgoingQueue.length, files: this.outgoingFileQueue.length }, 'Flushing outgoing queues');
       while (this.outgoingQueue.length > 0) {
         const item = this.outgoingQueue.shift()!;
+        const key = `${item.jid}:${item.text}`;
+        if (flushedKeys.has(key)) {
+          logger.info({ jid: item.jid }, 'Skipped duplicate in flush queue');
+          continue;
+        }
+        flushedKeys.add(key);
         // Send directly — queued items are already prefixed by sendMessage
         await this.sock.sendMessage(item.jid, { text: item.text });
         logger.info({ jid: item.jid, length: item.text.length }, 'Queued message sent');
+      }
+      // Flush file queue
+      while (this.outgoingFileQueue.length > 0) {
+        const item = this.outgoingFileQueue.shift()!;
+        try {
+          await this._sendFileInternal(item.jid, item.buffer, item.mimetype, item.filename, item.caption);
+          logger.info({ jid: item.jid, filename: item.filename }, 'Queued file sent');
+        } catch (err) {
+          logger.warn({ jid: item.jid, filename: item.filename, err }, 'Failed to send queued file');
+        }
       }
     } finally {
       this.flushing = false;

@@ -1,3 +1,4 @@
+import { createHash } from 'crypto';
 import fs from 'fs';
 import path from 'path';
 import Database from 'better-sqlite3';
@@ -33,8 +34,10 @@ import {
 import { evaluateWork } from './clawwork.js';
 import { Bounty, findBounties } from './bounty-hunter.js';
 import { BountyGate } from './bounty-gate.js';
+import { learnFact } from './context/index.js';
 import { getSurvivalTier } from './economics.js';
 import { HitlGate } from './hitl.js';
+import { getIntegration } from './integration-loader.js';
 import { logger } from './logger.js';
 import { indexDocument, semanticSearch } from './semantic-index.js';
 import { RegisteredGroup } from './types.js';
@@ -64,6 +67,28 @@ export interface IpcDeps {
    * Used by the host to suppress the redundant final streaming output.
    */
   onAgentSendMessage?: (chatJid: string) => void;
+}
+
+// Outgoing message dedup: skip identical content sent to same JID within 30s
+const outgoingDedup = new Map<string, number>();
+const DEDUP_WINDOW_MS = 30_000;
+
+function isDuplicateOutgoing(jid: string, text: string): boolean {
+  const hash = createHash('md5').update(`${jid}:${text}`).digest('hex');
+  const now = Date.now();
+  const lastSent = outgoingDedup.get(hash);
+  if (lastSent && now - lastSent < DEDUP_WINDOW_MS) {
+    logger.info({ jid, hash, agoMs: now - lastSent }, 'Duplicate outgoing message suppressed');
+    return true;
+  }
+  outgoingDedup.set(hash, now);
+  // Prune old entries every 100 inserts
+  if (outgoingDedup.size > 200) {
+    for (const [k, ts] of outgoingDedup) {
+      if (now - ts > DEDUP_WINDOW_MS) outgoingDedup.delete(k);
+    }
+  }
+  return false;
 }
 
 let ipcWatcherRunning = false;
@@ -152,7 +177,7 @@ export function startIpcWatcher(deps: IpcDeps): void {
 
                 // ── ClawWork + Bounty IPC handlers ─────────────────────────
                 const CLAWWORK_BOUNTY_TYPES = new Set([
-                  'clawwork_get_status', 'clawwork_decide_activity', 'clawwork_learn', 'clawwork_submit_work',
+                  'clawwork_get_status', 'clawwork_decide_activity', 'clawwork_learn', 'learn', 'clawwork_submit_work',
                   'find_bounties', 'propose_bounty', 'submit_bounty',
                 ]);
                 if (data.type && CLAWWORK_BOUNTY_TYPES.has(data.type)) {
@@ -180,9 +205,33 @@ export function startIpcWatcher(deps: IpcDeps): void {
                 }
 
                 // ── Desktop Claude Code remote control ────────────────────
-                if (data.type === 'desktop_claude' && (isMain || sourceGroup === 'claw-lexios')) {
+                if (data.type === 'desktop_claude') {
+                  // Check authorization: main group always allowed, integrations provide config
+                  const home = process.env.HOME || '/Users/amrut';
+                  let desktopConfig: { workdir: string; allowedRoots: string[]; notifyTopic: string } | undefined;
+
+                  if (isMain) {
+                    desktopConfig = {
+                      workdir: path.join(home, 'nanoclaw'),
+                      allowedRoots: [path.join(home, 'nanoclaw')],
+                      notifyTopic: 'desktop',
+                    };
+                  } else {
+                    for (const integ of getIntegrations()) {
+                      desktopConfig = integ.getDesktopClaudeConfig?.(sourceGroup);
+                      if (desktopConfig) break;
+                    }
+                  }
+
+                  if (!desktopConfig) {
+                    logger.warn({ sourceGroup }, 'Unauthorized desktop_claude attempt blocked');
+                    fs.unlinkSync(filePath);
+                    continue;
+                  }
+
                   const rawResponseFile = data.responseFile as string | undefined;
                   const responseFile = rawResponseFile ? toHostIpcPath(rawResponseFile, sourceGroup) : undefined;
+                  const capturedConfig = desktopConfig;
                   // Spawn in background so IPC loop isn't blocked
                   (async () => {
                     try {
@@ -190,21 +239,14 @@ export function startIpcWatcher(deps: IpcDeps): void {
                       const { promisify } = await import('util');
                       const execFileAsync = promisify(execFile);
                       const prompt = data.prompt as string;
-                      const defaultWorkdir = sourceGroup === 'claw-lexios'
-                        ? path.join(process.env.HOME || '/Users/amrut', 'Lexios')
-                        : path.join(process.env.HOME || '/Users/amrut', 'nanoclaw');
-                      const workdir = (data.workdir as string) || defaultWorkdir;
+                      const workdir = (data.workdir as string) || capturedConfig.workdir;
                       const maxBudget = (data.max_budget_usd as number) || 1.0;
 
-                      // ── Safety: lock workdir to nanoclaw repo only ──
-                      const home = process.env.HOME || '/Users/amrut';
-                      const allowedRoots = [
-                        path.join(home, 'nanoclaw'),
-                        path.join(home, 'Lexios'),
-                      ];
+                      // ── Safety: lock workdir to allowed roots ──
+                      const allAllowedRoots = [path.join(home, 'nanoclaw'), ...capturedConfig.allowedRoots];
                       const resolved = path.resolve(workdir);
-                      if (!allowedRoots.some(r => resolved === r || resolved.startsWith(r + '/'))) {
-                        throw new Error(`Workdir "${workdir}" outside allowed roots: ${allowedRoots.join(', ')}`);
+                      if (!allAllowedRoots.some(r => resolved === r || resolved.startsWith(r + '/'))) {
+                        throw new Error(`Workdir "${workdir}" outside allowed roots: ${allAllowedRoots.join(', ')}`);
                       }
 
                       // ── Safety: cap budget at $5 ──
@@ -217,15 +259,14 @@ export function startIpcWatcher(deps: IpcDeps): void {
                           '-p', prompt,
                           '--output-format', 'text',
                           '--max-budget-usd', String(cappedBudget),
-                          // Scoped permissions: only allow code editing tools, no arbitrary bash
                           '--allowedTools', 'Read', 'Write', 'Edit', 'Glob', 'Grep',
                             'Bash(npm run build)', 'Bash(npm run dev)', 'Bash(npm test)',
                             'Bash(git:*)',
                         ],
                         {
                           cwd: resolved,
-                          timeout: 270000, // 4.5 min (under container's 5 min poll)
-                          maxBuffer: 1024 * 1024, // 1 MB
+                          timeout: 270000,
+                          maxBuffer: 1024 * 1024,
                           env: { ...process.env, CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC: '1' },
                         },
                       );
@@ -237,9 +278,8 @@ export function startIpcWatcher(deps: IpcDeps): void {
                         const mainJid = deps.getMainGroupJid?.();
                         if (mainJid) {
                           const { getNotifyJid } = await import('./notify.js');
-                          const notifyTopic = sourceGroup === 'claw-lexios' ? 'lexios' as const : 'desktop' as const;
                           const summary = prompt.slice(0, 100) + (prompt.length > 100 ? '...' : '');
-                          await deps.sendMessage(getNotifyJid(notifyTopic, mainJid), `🖥️ Desktop Claude pushed code.\nTask: ${summary}`);
+                          await deps.sendMessage(getNotifyJid(capturedConfig.notifyTopic, mainJid), `🖥️ Desktop Claude pushed code.\nTask: ${summary}`);
                         }
                       }
 
@@ -252,8 +292,7 @@ export function startIpcWatcher(deps: IpcDeps): void {
                       const mainJid = deps.getMainGroupJid?.();
                       if (mainJid) {
                         const { getNotifyJid } = await import('./notify.js');
-                        const notifyTopic = sourceGroup === 'claw-lexios' ? 'lexios' as const : 'desktop' as const;
-                        await deps.sendMessage(getNotifyJid(notifyTopic, mainJid), `🖥️ Desktop Claude failed: ${msg.slice(0, 200)}`);
+                        await deps.sendMessage(getNotifyJid(capturedConfig.notifyTopic, mainJid), `🖥️ Desktop Claude failed: ${msg.slice(0, 200)}`);
                       }
                       if (responseFile) {
                         writeIpcResponse(responseFile, { error: msg });
@@ -316,19 +355,30 @@ export function startIpcWatcher(deps: IpcDeps): void {
                 }
 
                 if (data.type === 'send_file' && data.chatJid && data.filePath) {
+                  const rawRF = data.responseFile as string | undefined;
+                  const rfPath = rawRF ? toHostIpcPath(rawRF, sourceGroup) : undefined;
                   const hostPath = toHostWorkspacePath(data.filePath as string, sourceGroup);
                   if (!fs.existsSync(hostPath)) {
                     logger.warn({ hostPath, sourceGroup }, 'send_file: file not found on host');
+                    if (rfPath) writeIpcResponse(rfPath, { success: false, error: `File not found: ${data.filePath}` });
                   } else if (!deps.sendFile) {
                     logger.warn({ hostPath }, 'send_file: channel does not support file sending');
+                    if (rfPath) writeIpcResponse(rfPath, { success: false, error: 'Channel does not support file sending' });
                   } else {
-                    const buffer = fs.readFileSync(hostPath);
-                    const mimetype = (data.mimetype as string) || 'application/octet-stream';
-                    const filename = (data.filename as string) || path.basename(hostPath);
-                    const caption = (data.caption as string) || undefined;
-                    const targetJid = (data.chatJid as string);
-                    await deps.sendFile(targetJid, buffer, mimetype, filename, caption);
-                    logger.info({ targetJid, filename, bytes: buffer.length, sourceGroup }, 'File sent via IPC');
+                    try {
+                      const buffer = fs.readFileSync(hostPath);
+                      const mimetype = (data.mimetype as string) || 'application/octet-stream';
+                      const filename = (data.filename as string) || path.basename(hostPath);
+                      const caption = (data.caption as string) || undefined;
+                      const targetJid = (data.chatJid as string);
+                      await deps.sendFile(targetJid, buffer, mimetype, filename, caption);
+                      logger.info({ targetJid, filename, bytes: buffer.length, sourceGroup }, 'File sent via IPC');
+                      if (rfPath) writeIpcResponse(rfPath, { success: true, filename, bytes: buffer.length });
+                    } catch (err) {
+                      const errMsg = err instanceof Error ? err.message : String(err);
+                      logger.warn({ hostPath, sourceGroup, err: errMsg }, 'send_file failed');
+                      if (rfPath) writeIpcResponse(rfPath, { success: false, error: errMsg });
+                    }
                   }
                   fs.unlinkSync(filePath);
                   continue;
@@ -376,6 +426,10 @@ export function startIpcWatcher(deps: IpcDeps): void {
                     isMain ||
                     (targetGroup && targetGroup.folder === sourceGroup)
                   ) {
+                    if (isDuplicateOutgoing(data.chatJid as string, data.text as string)) {
+                      fs.unlinkSync(filePath);
+                      continue;
+                    }
                     await deps.sendMessage(data.chatJid, data.text);
                     deps.onAgentSendMessage?.(data.chatJid);
                     logger.info(
@@ -539,23 +593,55 @@ async function processClawworkMessage(
       break;
     }
 
+    case 'learn':
     case 'clawwork_learn': {
       const topic = data.topic as string;
       const knowledge = data.knowledge as string;
       if (topic && knowledge) {
-        saveLearn(groupFolder, topic, knowledge);
-        // Append to MEMORY.md
-        const memoryPath = path.join(GROUPS_DIR, groupFolder, 'MEMORY.md');
-        const entry = `\n## Learned Knowledge\n\n**Topic:** ${topic}\n\n${knowledge}\n`;
-        try {
-          fs.appendFileSync(memoryPath, entry);
-        } catch {
-          // MEMORY.md may not exist yet — create it
-          fs.mkdirSync(path.join(GROUPS_DIR, groupFolder), { recursive: true });
-          fs.writeFileSync(memoryPath, entry);
+        const domain = (data.domain as string) || 'nanoclaw';
+        saveLearn(domain, topic, knowledge);
+
+        // Determine target file: integration learnings path, or group MEMORY.md
+        let targetPath: string;
+        const sectionHeading = '## Learned Facts';
+        if (domain !== 'nanoclaw') {
+          const integration = getIntegration(domain);
+          targetPath = integration?.getLearningsPath?.()
+            || path.join(GROUPS_DIR, groupFolder, 'MEMORY.md');
+        } else {
+          targetPath = path.join(GROUPS_DIR, groupFolder, 'MEMORY.md');
         }
+
+        // Append as list item under "## Learned Facts" section
+        const listItem = `- **${topic}:** ${knowledge}`;
+        try {
+          let content = '';
+          try { content = fs.readFileSync(targetPath, 'utf-8'); } catch { /* file may not exist */ }
+
+          const sectionIdx = content.indexOf(sectionHeading);
+          if (sectionIdx !== -1) {
+            // Find end of section (next ## heading or end of file)
+            const afterHeader = content.indexOf('\n', sectionIdx);
+            const nextSection = content.indexOf('\n## ', afterHeader + 1);
+            const insertAt = nextSection === -1 ? content.length : nextSection;
+            const updated = content.slice(0, insertAt).trimEnd() + '\n' + listItem + '\n' + content.slice(insertAt);
+            const tmpPath = targetPath + '.tmp';
+            fs.writeFileSync(tmpPath, updated);
+            fs.renameSync(tmpPath, targetPath);
+          } else {
+            // Section doesn't exist — append it
+            fs.mkdirSync(path.dirname(targetPath), { recursive: true });
+            fs.appendFileSync(targetPath, `\n${sectionHeading}\n${listItem}\n`);
+          }
+        } catch (err) {
+          logger.warn({ err, targetPath }, 'Failed to write learning to file');
+        }
+
+        // Update hot cache so learning is visible immediately (no restart needed)
+        learnFact(topic, knowledge, 0.85, 'learn');
+
         if (responseFile) writeIpcResponse(responseFile, { success: true, topic, knowledge_length: knowledge.length });
-        logger.info({ groupFolder, topic, length: knowledge.length }, 'ClawWork: learn saved');
+        logger.info({ groupFolder, domain, topic, length: knowledge.length }, 'Learn: saved');
       } else {
         if (responseFile) writeIpcResponse(responseFile, { error: 'Missing topic or knowledge' });
       }

@@ -139,6 +139,27 @@ desktop_claude({ prompt: "Fix the typo in src/config.ts line 42", workdir: "~/na
 
 **Limits:** $1 budget per call (configurable via `max_budget_usd`), 5 min timeout. Main group only.
 
+## Source Citations
+
+When making claims sourced from the web, always include inline citations: `[Source](url)`.
+- Every factual claim from web search must have a `[Source](url)` link
+- If no URL is available, state the source name and date: "according to [source], as of [date]"
+- For multi-source answers, number sources: `[1](url1)`, `[2](url2)` and reference inline
+- Never present web-sourced information without attribution
+
+## Deep Research Protocol
+
+When the user asks for research or investigation on a topic:
+
+1. **Decompose** the question into 3-5 sub-questions
+2. **Search iteratively** — use multiple search queries, not just one. Refine based on initial results.
+3. **Cross-reference** — verify claims across at least 2 independent sources before presenting as fact
+4. **Synthesize** with confidence levels:
+   - **High confidence**: verified across multiple sources, recent data
+   - **Medium confidence**: single reliable source, or older data
+   - **Low confidence**: unverified, speculative, or conflicting sources
+5. **Gap analysis** — explicitly state what you couldn't find or verify. "I was unable to determine X" is better than guessing.
+
 ## 🔒 Safety Constraints
 
 ### 1. READ-ONLY Agent for Media Files
@@ -276,43 +297,6 @@ ocr /workspace/media/ABC123.jpg           # typed/printed text, auto language
 ocr /workspace/media/ABC123.jpg hin       # Hindi text in image
 ocr /workspace/media/ABC123.jpg ara       # Arabic text in image
 ```
-
-*Only use `Read` tool when you need visual analysis* (describe objects, understand context, identify non-text content, or when `ocr` output is garbled/unreadable):
-```typescript
-Read({ file_path: "/workspace/media/ABC123.jpg" })
-```
-
-#### Documents (PDFs)
-
-Documents appear similarly:
-```
-<message sender="User Name" time="2026-02-22T14:00:00.000Z">[document: /workspace/media/XYZ789.pdf] Please summarize this document</message>
-```
-
-**Decision order (cheapest first):**
-
-1. *Digital PDF (has selectable text)* — `ocr` handles this automatically via `pdftotext`:
-   ```bash
-   ocr /workspace/media/XYZ789.pdf
-   ```
-
-2. *Scanned PDF or typed text in any language* — Tesseract OCR, free, 160+ languages:
-   ```bash
-   ocr /workspace/media/XYZ789.pdf hin       # Hindi
-   ocr /workspace/media/XYZ789.pdf ara       # Arabic
-   ocr /workspace/media/XYZ789.pdf chi_sim   # Chinese Simplified
-   ocr /workspace/media/XYZ789.pdf hin+eng   # mixed Hindi/English
-   ocr /workspace/media/XYZ789.pdf list      # show all supported languages
-   ```
-   Language codes: `hin` Hindi · `ara` Arabic · `chi_sim` Chinese · `jpn` Japanese · `kor` Korean · `rus` Russian · `ben` Bengali · `tam` Tamil · `tel` Telugu · `urd` Urdu · `guj` Gujarati · `mar` Marathi · `pan` Punjabi · `fra` French · `deu` German · `spa` Spanish
-
-3. *Only use `Read` tool when:* Tesseract output is garbled, the document has complex handwriting that didn't OCR well, or you need to visually understand layout/diagrams:
-   ```typescript
-   Read({ file_path: "/workspace/media/XYZ789.pdf", pages: "1-5" })  // max 20 pages per call
-   ```
-
-For other document types (Word, etc.):
-- Check the file extension and use appropriate tools to extract content
 
 
 <!-- [40 lines trimmed by size guard] -->

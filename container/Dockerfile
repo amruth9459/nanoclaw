@@ -32,12 +32,17 @@ RUN apt-get update && apt-get install -y \
     sqlite3 \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Python libraries: PDF generation + DWG/DXF parsing + IFC parsing + rendering
-RUN pip3 install --break-system-packages weasyprint ezdxf matplotlib ifcopenshell
+# Install Python libraries (base + any integration deps from skills/*/requirements.txt)
+COPY requirements.txt /tmp/requirements.txt
+COPY skills/ /tmp/skills-scan/
+RUN find /tmp/skills-scan -name requirements.txt -exec cat {} + >> /tmp/requirements.txt 2>/dev/null; \
+    pip3 install --break-system-packages -r /tmp/requirements.txt && \
+    rm -rf /tmp/requirements.txt /tmp/skills-scan
 
 # Set Chromium path for agent-browser
 ENV AGENT_BROWSER_EXECUTABLE_PATH=/usr/bin/chromium
 ENV PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH=/usr/bin/chromium
+ENV PATH="/usr/local/bin/integration-scripts:${PATH}"
 
 # Install agent-browser and claude-code globally
 RUN npm install -g agent-browser @anthropic-ai/claude-code
@@ -69,37 +74,10 @@ RUN chmod +x /usr/local/bin/extract-frame
 COPY skills/generate-pdf.sh /usr/local/bin/generate-pdf
 RUN chmod +x /usr/local/bin/generate-pdf
 
-# Install Lexios document preparation (PDF → PNG for construction doc analysis)
-COPY skills/lexios-prep.sh /usr/local/bin/lexios-prep
-RUN chmod +x /usr/local/bin/lexios-prep
-
-# Install Lexios DXF/DWG extraction (structured data + layer rendering)
-COPY skills/lexios-dxf.py /usr/local/bin/lexios-dxf
-RUN chmod +x /usr/local/bin/lexios-dxf
-
-# Install Lexios IFC extraction (IfcOpenShell → structured JSON)
-COPY skills/lexios-ifc.py /usr/local/bin/lexios-ifc
-RUN chmod +x /usr/local/bin/lexios-ifc
-
-# Install Lexios query classifier (fast keyword-based routing)
-COPY skills/lexios/query-classifier.py /usr/local/bin/lexios-classify
-RUN chmod +x /usr/local/bin/lexios-classify
-
-# Install Lexios deterministic pipelines (post-extraction analysis)
-COPY skills/lexios/post-extract.py /usr/local/bin/lexios-post-extract
-RUN chmod +x /usr/local/bin/lexios-post-extract
-
-COPY skills/lexios/takeoff.py /usr/local/bin/lexios-takeoff
-RUN chmod +x /usr/local/bin/lexios-takeoff
-
-COPY skills/lexios/conflicts.py /usr/local/bin/lexios-conflicts
-RUN chmod +x /usr/local/bin/lexios-conflicts
-
-COPY skills/lexios/query.py /usr/local/bin/lexios-query
-RUN chmod +x /usr/local/bin/lexios-query
-
-COPY skills/lexios/diff.py /usr/local/bin/lexios-diff
-RUN chmod +x /usr/local/bin/lexios-diff
+# Install GWS helper script
+RUN mkdir -p /workspace/gws
+COPY skills/gws/gws_helper.py /workspace/gws/gws_helper.py
+RUN chmod +x /workspace/gws/gws_helper.py
 
 # Create workspace directories
 RUN mkdir -p /workspace/group /workspace/global /workspace/extra /workspace/ipc/messages /workspace/ipc/tasks /workspace/ipc/input

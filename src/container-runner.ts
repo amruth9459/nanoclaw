@@ -28,6 +28,7 @@ import { logger } from './logger.js';
 import { CONTAINER_RUNTIME_BIN, readonlyMountArgs, stopContainer } from './container-runtime.js';
 import { validateAdditionalMounts } from './mount-security.js';
 import { getIntegrations } from './integration-loader.js';
+import type { NanoClawIntegration } from './integration-types.js';
 import { RegisteredGroup } from './types.js';
 
 // Sentinel markers for robust output parsing (must match agent-runner)
@@ -51,7 +52,7 @@ export interface ContainerInput {
   chatJid: string;
   isMain: boolean;
   isScheduledTask?: boolean;
-  designation?: string;  // e.g. 'conversation', 'task', 'guest', 'lexios', 'bounty', 'warmup'
+  designation?: string;  // e.g. 'conversation', 'task', 'guest', 'bounty', 'warmup'
   secrets?: Record<string, string>;
   routingHint?: {
     suggestedModel: string;
@@ -59,6 +60,8 @@ export interface ContainerInput {
     confidence: number;
     reasoning: string;
   };
+  /** Limit agentic turns (API round-trips). Used for warmup to keep it fast. */
+  maxTurns?: number;
 }
 
 export interface ContainerOutput {
@@ -79,6 +82,35 @@ interface VolumeMount {
   hostPath: string;
   containerPath: string;
   readonly: boolean;
+}
+
+/**
+ * Stage integration scripts into a single directory for bind-mounting.
+ * Apple Container only supports directory mounts, not individual file mounts.
+ * Returns the staging directory path, or null if no scripts to stage.
+ */
+function stageIntegrationScripts(integrations: NanoClawIntegration[], all: boolean): string | null {
+  const scripts: Array<{ hostPath: string; containerName: string }> = [];
+  for (const integration of integrations) {
+    if (integration.getContainerScripts) {
+      for (const script of integration.getContainerScripts()) {
+        if (fs.existsSync(script.hostPath)) {
+          scripts.push(script);
+        }
+      }
+    }
+  }
+  if (scripts.length === 0) return null;
+
+  const stagingDir = path.join(DATA_DIR, 'container-scripts', all ? '_all' : '_group');
+  fs.mkdirSync(stagingDir, { recursive: true });
+
+  for (const script of scripts) {
+    const dest = path.join(stagingDir, script.containerName);
+    fs.copyFileSync(script.hostPath, dest);
+    fs.chmodSync(dest, 0o755);
+  }
+  return stagingDir;
 }
 
 function buildVolumeMounts(
@@ -116,6 +148,27 @@ function buildVolumeMounts(
         }
       }
     }
+
+    // GWS OAuth tokens (read-only) — for Google Workspace integration
+    const gwsTokenDir = path.join(homeDir, '.config', 'gws');
+    if (fs.existsSync(gwsTokenDir)) {
+      mounts.push({
+        hostPath: gwsTokenDir,
+        containerPath: '/workspace/gws/tokens',
+        readonly: true,
+      });
+    }
+
+    // Integration scripts: stage into a single directory and mount it
+    // (Apple Container only supports directory mounts, not individual files)
+    const scriptsDir = stageIntegrationScripts(getIntegrations(), true);
+    if (scriptsDir) {
+      mounts.push({
+        hostPath: scriptsDir,
+        containerPath: '/usr/local/bin/integration-scripts',
+        readonly: true,
+      });
+    }
   } else {
     // Other groups only get their own folder
     mounts.push({
@@ -125,12 +178,33 @@ function buildVolumeMounts(
     });
 
     // Global memory directory (read-only for non-main)
-    // Only directory mounts are supported, not file mounts
+    // Skip if isolatedPersona is set — the group uses its own persona exclusively
     const globalDir = path.join(GROUPS_DIR, 'global');
-    if (fs.existsSync(globalDir)) {
+    if (fs.existsSync(globalDir) && !group.containerConfig?.isolatedPersona) {
       mounts.push({
         hostPath: globalDir,
         containerPath: '/workspace/global',
+        readonly: true,
+      });
+    }
+
+    // Integration-provided container mounts for owned groups
+    const owningIntegrations = getIntegrations().filter(i => i.ownsGroup?.(group.folder));
+    for (const integration of owningIntegrations) {
+      if (integration.getContainerMounts) {
+        const integrationMounts = integration.getContainerMounts(isMain, homeDir);
+        for (const m of integrationMounts) {
+          mounts.push(m);
+        }
+      }
+    }
+
+    // Integration scripts: stage owned integration scripts and mount the directory
+    const scriptsDir = stageIntegrationScripts(owningIntegrations, false);
+    if (scriptsDir) {
+      mounts.push({
+        hostPath: scriptsDir,
+        containerPath: '/usr/local/bin/integration-scripts',
         readonly: true,
       });
     }
@@ -163,12 +237,32 @@ function buildVolumeMounts(
   }
 
   // Sync skills from container/skills/ into each group's .claude/skills/
+  // Integration-owned skill dirs are only synced to groups owned by that integration (+ main)
   const skillsSrc = path.join(process.cwd(), 'container', 'skills');
   const skillsDst = path.join(groupSessionsDir, 'skills');
   if (fs.existsSync(skillsSrc)) {
+    // Collect skill dirs claimed by integrations
+    const claimedSkillDirs = new Set<string>();
+    for (const integration of getIntegrations()) {
+      if (integration.getSkillDirs) {
+        for (const dir of integration.getSkillDirs()) {
+          claimedSkillDirs.add(dir);
+        }
+      }
+    }
+
     for (const skillDir of fs.readdirSync(skillsSrc)) {
       const srcDir = path.join(skillsSrc, skillDir);
       if (!fs.statSync(srcDir).isDirectory()) continue;
+
+      if (claimedSkillDirs.has(skillDir)) {
+        // Integration-owned skill: only sync to owned groups + main
+        const shouldSync = isMain || getIntegrations().some(
+          i => i.getSkillDirs?.().includes(skillDir) && i.ownsGroup?.(group.folder),
+        );
+        if (!shouldSync) continue;
+      }
+
       const dstDir = path.join(skillsDst, skillDir);
       fs.cpSync(srcDir, dstDir, { recursive: true });
     }
@@ -269,6 +363,29 @@ function buildContainerArgs(
   // Extra env vars from containerConfig
   for (const [key, value] of Object.entries(group.containerConfig?.env ?? {})) {
     args.push('-e', `${key}=${value}`);
+  }
+
+  // Tell the container which integration tool modules to load.
+  // Collected from integrations that own this group (or all for main).
+  const toolModules: string[] = [];
+  for (const integration of getIntegrations()) {
+    if (integration.getContainerToolModule) {
+      const isOwned = integration.ownsGroup?.(group.folder);
+      if (isOwned || group.folder === 'main') {
+        toolModules.push(integration.getContainerToolModule());
+      }
+    }
+  }
+  // GWS tools for main group (when OAuth tokens are available)
+  if (group.folder === 'main') {
+    const gwsTokenDir = path.join(getHomeDir(), '.config', 'gws');
+    if (fs.existsSync(gwsTokenDir)) {
+      toolModules.push('gws-tools');
+    }
+  }
+
+  if (toolModules.length > 0) {
+    args.push('-e', `NANOCLAW_TOOL_MODULES=${toolModules.join(',')}`);
   }
 
   for (const mount of mounts) {
