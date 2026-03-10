@@ -182,8 +182,12 @@ When the user asks for research or investigation on a topic:
 - **USER COMMAND:** Owner can send "/stop" via WhatsApp to immediately halt all operations
 - **BEHAVIOR:** Acknowledge immediately, save state, and exit gracefully
 
-### 5. Gmail Read-Only Mode (When Configured)
-- If Gmail OAuth uses `gmail.readonly` scope, you CANNOT delete, trash, archive, or modify labels
+### 5. Gmail Cleanup (HITL-Gated)
+- You have `gmail_categorize` (read-only) and `gmail_cleanup` (trash/archive) tools
+- `gmail_categorize`: groups inbox by sender domain, detects newsletters — use this first to survey
+- `gmail_cleanup`: sends an approval request to the user via WhatsApp with a token. **No emails are modified until the user replies `approve-cleanup <token>`**. Max 100 messages per batch.
+- Workflow: categorize → summarize findings → propose cleanup via `gmail_cleanup` → wait for approval
+- You also have `gmail_search` and `gmail_send` for reading/sending email
 
 ## Learning
 
