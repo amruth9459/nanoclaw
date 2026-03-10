@@ -1,11 +1,37 @@
 # NanoClaw — Daily Build Log
 
 *Living document — auto-generated from git history*
-*Last generated: 2026-03-09*
+*Last generated: 2026-03-10*
 
-**239 total commits** (198 meaningful) | 2026-01-31 to 2026-03-08
+**264 total commits** (199 meaningful) | 2026-01-31 to 2026-03-09
 
 ---
+
+## 2026-03-09
+
+### What Changed
+- Fix duplicate messages, file delivery, task frequency; add cross-group messaging, GWS integration, research protocol
+- (+24 auto-backup commits)
+
+### Files (15 changed)
+- container/Dockerfile
+- container/agent-runner/src/gws-tools.ts
+- container/agent-runner/src/ipc-mcp-stdio.ts
+- container/requirements.txt
+- container/skills/gws/gws_helper.py
+- container/skills/gws/requirements.txt
+- docs/DEVLOG.md
+- docs/NANOCLAW_BUILD_LOG.md
+- groups/main/CLAUDE.md
+- scripts/pdf-metric-to-us.py
+- src/channels/whatsapp.ts
+- src/config.ts
+- src/container-runner.ts
+- src/index.ts
+- src/ipc.ts
+
+### Stats
+- 1374 insertions, 605 deletions
 
 ## 2026-03-08
 
