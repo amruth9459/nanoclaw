@@ -137,7 +137,7 @@ You can run Claude Code on the host Mac using the `desktop_claude` MCP tool. Thi
 desktop_claude({ prompt: "Fix the typo in src/config.ts line 42", workdir: "~/nanoclaw" })
 ```
 
-**Limits:** $1 budget per call (configurable via `max_budget_usd`), 5 min timeout. Main group only.
+**Limits:** $10 budget per call (configurable via `max_budget_usd`, capped at $20), 10 min timeout. Main group only.
 
 ## Source Citations
 
