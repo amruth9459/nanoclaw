@@ -56,7 +56,12 @@ export const logger = pino(
 );
 
 // Route uncaught errors through pino so they get timestamps in stderr
-process.on('uncaughtException', (err) => {
+process.on('uncaughtException', (err: NodeJS.ErrnoException) => {
+  // EPIPE is non-fatal — just means a write target disconnected (e.g. container stdin).
+  if (err.code === 'EPIPE') {
+    logger.warn({ err }, 'EPIPE (non-fatal, write target disconnected)');
+    return;
+  }
   logger.fatal({ err }, 'Uncaught exception');
   process.exit(1);
 });

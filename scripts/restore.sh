@@ -1,17 +1,16 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Restore NanoClaw + Lexios state from Cloudflare R2 + GitHub.
+# Restore NanoClaw state from Cloudflare R2 + GitHub.
 # Run on a fresh Mac to resume where you left off.
+# Integration restore hooks run automatically if present.
 
 R2_REMOTE="${R2_REMOTE:-r2}"
 R2_BUCKET="${R2_BUCKET:-nanoclaw-backup}"
 NANOCLAW_DIR="${NANOCLAW_DIR:-$HOME/nanoclaw}"
-LEXIOS_DIR="${LEXIOS_DIR:-$HOME/Lexios}"
 
-echo "=== NanoClaw + Lexios Restore ==="
+echo "=== NanoClaw Restore ==="
 echo "NanoClaw dir: $NANOCLAW_DIR"
-echo "Lexios dir:   $LEXIOS_DIR"
 echo ""
 
 # ---------- Prerequisites ----------
@@ -39,13 +38,6 @@ else
     echo "NanoClaw repo exists at $NANOCLAW_DIR"
 fi
 
-if [ ! -d "$LEXIOS_DIR/.git" ]; then
-    echo "Cloning Lexios..."
-    git clone https://github.com/amruth9459/Lexios-NanoClaw.git "$LEXIOS_DIR"
-else
-    echo "Lexios repo exists at $LEXIOS_DIR"
-fi
-
 # ---------- Step 2: Restore NanoClaw runtime data from R2 ----------
 
 RCLONE_FLAGS=(--transfers 8 --checkers 16 --fast-list --progress)
@@ -71,18 +63,11 @@ rclone copy "${R2_REMOTE}:${R2_BUCKET}/nanoclaw/env/" /tmp/nanoclaw-env-restore/
     --progress 2>/dev/null && mv /tmp/nanoclaw-env-restore/dot-env "$NANOCLAW_DIR/.env" && rm -rf /tmp/nanoclaw-env-restore \
     || echo "WARN: no .env found in R2 (you may need to create one)"
 
-# ---------- Step 3: Restore Lexios runtime data from R2 ----------
+# ---------- Step 3: Run integration restore hooks ----------
 
-echo ""
-echo "Restoring Lexios runtime data from R2..."
-
-mkdir -p "$LEXIOS_DIR/backend"/{uploads,database}
-
-rclone copy "${R2_REMOTE}:${R2_BUCKET}/lexios/backend/uploads/" "$LEXIOS_DIR/backend/uploads/" \
-    "${RCLONE_FLAGS[@]}" 2>/dev/null || echo "WARN: no Lexios uploads in R2"
-
-rclone copy "${R2_REMOTE}:${R2_BUCKET}/lexios/backend/database/" "$LEXIOS_DIR/backend/database/" \
-    "${RCLONE_FLAGS[@]}" 2>/dev/null || echo "WARN: no Lexios database in R2"
+for hook in ~/*/integrations/nanoclaw/restore-hook.sh; do
+    [ -x "$hook" ] && "$hook" || true
+done
 
 # ---------- Step 4: Next steps ----------
 

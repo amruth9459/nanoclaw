@@ -1,13 +1,14 @@
 /**
  * NanoClaw Integration Interface
  *
- * Defines the contract for integrations (e.g., Lexios) to plug into
- * NanoClaw's core without the core knowing about their domain specifics.
+ * Defines the contract for integrations to plug into NanoClaw's core
+ * without the core knowing about their domain specifics.
  */
 import type Database from 'better-sqlite3';
 import type http from 'http';
-import type { RegisteredGroup, NewMessage, Channel } from './types.js';
+import type { RegisteredGroup, NewMessage, Channel, OnInboundMessage, OnChatMetadata } from './types.js';
 import type { GroupQueue } from './group-queue.js';
+import type { RoutingRule } from './router/types.js';
 
 export interface IntegrationContext {
   registeredGroups: () => Record<string, RegisteredGroup>;
@@ -47,7 +48,7 @@ export interface ApiRouteHandler {
 export interface ChannelConfig {
   name: string;
   authDir: string;
-  /** Environment variable that gates this channel (e.g. 'NANOCLAW_WA3_LEXIOS') */
+  /** Environment variable that gates this channel (e.g. 'NANOCLAW_WA3_MYAPP') */
   enabledEnvVar: string;
 }
 
@@ -104,8 +105,15 @@ export interface NanoClawIntegration {
   /** API routes to inject into the dashboard server */
   apiRoutes?: Map<string, ApiRouteHandler>;
 
-  /** Extra WhatsApp channels to create */
+  /** Extra WhatsApp (Baileys) channels to create */
   channels?: ChannelConfig[];
+
+  /** Create non-Baileys channel instances. Called with shared channel callbacks. */
+  createChannels?(channelOpts: {
+    onMessage: OnInboundMessage;
+    onChatMetadata: OnChatMetadata;
+    registeredGroups: () => Record<string, RegisteredGroup>;
+  }): Channel[];
 
   /** Determine the purpose string for usage tracking */
   determinePurpose?(groupFolder: string): string | undefined;
@@ -118,4 +126,52 @@ export interface NanoClawIntegration {
 
   /** Determine the project for kanban task tagging */
   determineProject?(groupFolder: string): string | undefined;
+
+  // ── Decoupling hooks ────────────────────────────────────────────
+
+  /** Topic name → JID for notification routing (e.g. { myapp: '120363...@g.us' }) */
+  notifyTopics?: Record<string, string>;
+
+  /** Emoji ACK keyword rules to append to the core emoji list */
+  emojiRules?: Array<{ pattern: RegExp; emojis: string[] }>;
+
+  /** Routing rules to inject into the routing engine */
+  routingRules?: RoutingRule[];
+
+  /** Groups to auto-register at startup */
+  autoRegisterGroups?(): Array<{
+    jid: string;
+    name: string;
+    folder: string;
+    trigger: string;
+    requiresTrigger: boolean;
+  }>;
+
+  /** Contribute to the main group kanban context summary */
+  getKanbanSummary?(kanbanContent: string): string | undefined;
+
+  /** Context injection for integration-owned groups */
+  enrichPromptContext?(groupFolder: string, groupsDir: string): string | undefined;
+
+  /** IPC desktop_claude authorization + config for integration-owned groups */
+  getDesktopClaudeConfig?(groupFolder: string): {
+    workdir: string;
+    allowedRoots: string[];
+    notifyTopic: string;
+  } | undefined;
+
+  /** Claim a userId for task source routing (e.g. integration customers) */
+  claimsUserId?(userId: string): { source: string; agentType: string } | undefined;
+
+  /** Scripts to bind-mount into /usr/local/bin/ for groups owned by this integration */
+  getContainerScripts?(): Array<{ hostPath: string; containerName: string }>;
+
+  /** Skill directory names (under container/skills/) owned by this integration */
+  getSkillDirs?(): string[];
+
+  /** Absolute path to the learnings file for this integration (used by the learn IPC handler) */
+  getLearningsPath?(): string;
+
+  /** Container-side MCP tool module to load (e.g. 'my-tools' → import('./my-tools.js')) */
+  getContainerToolModule?(): string;
 }

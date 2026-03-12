@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Cloud state backup for NanoClaw + Lexios
+# Cloud state backup for NanoClaw
 # Copies runtime data to Cloudflare R2 and pushes git repos.
+# Integration backups run via hooks (e.g. ~/MyApp/integrations/nanoclaw/backup-hook.sh).
 # Designed to run every 15 min via launchd.
 #
 # SECURITY: Uses "rclone copy" (additive) NOT "rclone sync" (destructive).
@@ -10,7 +11,6 @@ set -euo pipefail
 # point-in-time recovery. A compromised agent cannot wipe the backup.
 
 NANOCLAW_DIR="${NANOCLAW_DIR:-/Users/amrut/nanoclaw}"
-LEXIOS_DIR="${LEXIOS_DIR:-/Users/amrut/Lexios}"
 R2_REMOTE="${R2_REMOTE:-r2}"
 R2_BUCKET="${R2_BUCKET:-nanoclaw-backup}"
 LOCK_FILE="/tmp/nanoclaw-backup.lock"
@@ -78,13 +78,21 @@ git_backup() {
     fi
 }
 
-# NanoClaw: only commit runtime data dirs, NEVER src/ or scripts/
+# NanoClaw: commit runtime data AND source code (desktop_claude makes real code changes)
 git_backup "$NANOCLAW_DIR" "fork" "NanoClaw" \
-    groups/ data/ store/ docs/ config/
+    groups/ data/ store/ docs/ config/ \
+    src/ container/ scripts/ \
+    CLAUDE.md package.json package-lock.json \
+    .claude/hooks/ .githooks/
 
-# Lexios: only commit core engine outputs and docs
-git_backup "$LEXIOS_DIR" "origin" "Lexios" \
-    lexios/corpus/ lexios/learnings.json lexios/work/ docs/
+# Run integration backup hooks (e.g. ~/MyApp/integrations/nanoclaw/backup-hook.sh)
+for hook in "$NANOCLAW_DIR"/src/integrations/*/backup-hook.sh; do
+    [ -x "$hook" ] && "$hook" || true
+done
+# Also check external integration repos
+for hook in ~/*/integrations/nanoclaw/backup-hook.sh; do
+    [ -x "$hook" ] && "$hook" || true
+done
 
 # ---------- Step 1b: Atomic SQLite backup ----------
 # SECURITY: Copying .db without the WAL can produce an inconsistent backup.
@@ -173,30 +181,7 @@ if [ -f "$NANOCLAW_DIR/.env" ]; then
     rm -rf "$tmp_env"
 fi
 
-# ---------- Step 3: rclone copy Lexios runtime dirs ----------
-
-if [ -d "$LEXIOS_DIR/backend/uploads/" ]; then
-    r2_copy "$LEXIOS_DIR/backend/uploads/" "lexios/backend/uploads/" \
-        && log "copied lexios uploads/"
-fi
-
-if [ -d "$LEXIOS_DIR/backend/database/" ]; then
-    r2_copy "$LEXIOS_DIR/backend/database/" "lexios/backend/database/" \
-        && log "copied lexios database/"
-fi
-
-# Lexios core data (eval.db, codes.db, learnings.json, corpus)
-if [ -d "$LEXIOS_DIR/lexios/" ]; then
-    r2_copy "$LEXIOS_DIR/lexios/" "lexios/core/" \
-        --include "*.db" \
-        --include "*.json" \
-        --include "corpus/**" \
-        --exclude "work/**" \
-        --exclude "__pycache__/**" \
-        && log "copied lexios core data"
-fi
-
-# ---------- Step 4: Generate + upload contingency doc to Google Drive ----------
+# ---------- Step 3: Generate + upload contingency doc to Google Drive ----------
 
 CONTINGENCY_DOC="${NANOCLAW_DIR}/data/contingency.md"
 if [ -x "${NANOCLAW_DIR}/scripts/generate-contingency.sh" ]; then
@@ -205,16 +190,11 @@ if [ -x "${NANOCLAW_DIR}/scripts/generate-contingency.sh" ]; then
         rclone copyto "$CONTINGENCY_DOC" "gdrive:NanoClaw-Contingency.md" \
             --quiet 2>> "$LOG_FILE" && log "uploaded contingency doc to Google Drive" || log "WARN: Google Drive upload failed"
 
-        # Upload live platform + changelog docs
-        LEXIOS_DOCS_DIR="${LEXIOS_DIR}/docs"
+        # Upload NanoClaw platform + changelog docs
         NANOCLAW_DOCS_DIR="${NANOCLAW_DIR}/docs"
-        for doc in "LEXIOS_PLATFORM.md" "LEXIOS_CHANGELOG.md"; do
-            [ -f "${LEXIOS_DOCS_DIR}/${doc}" ] && rclone copyto "${LEXIOS_DOCS_DIR}/${doc}" "gdrive:Lexios/${doc}" \
-                --quiet 2>> "$LOG_FILE" && log "uploaded ${doc} to Google Drive" || log "WARN: ${doc} upload failed"
-        done
-        for doc in "NANOCLAW_PLATFORM.md" "NANOCLAW_CHANGELOG.md"; do
+        for doc in "NANOCLAW_PLATFORM.md" "NANOCLAW_CHANGELOG.md" "NANOCLAW_BUILD_LOG.md"; do
             [ -f "${NANOCLAW_DOCS_DIR}/${doc}" ] && rclone copyto "${NANOCLAW_DOCS_DIR}/${doc}" "gdrive:NanoClaw/${doc}" \
-                --quiet 2>> "$LOG_FILE" && log "uploaded ${doc} to Google Drive" || log "WARN: ${doc} upload failed"
+                --quiet 2>> "$LOG_FILE" && log "uploaded ${doc} to Google Drive" || true
         done
         log "uploaded live docs to Google Drive"
     fi

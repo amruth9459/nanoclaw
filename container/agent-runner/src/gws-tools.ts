@@ -1,6 +1,7 @@
 /**
  * Google Workspace MCP tools — registered conditionally for main group.
- * Provides gmail_search, gmail_send, calendar_events, drive_search.
+ * Provides gmail_search, gmail_send, calendar_events, drive_search,
+ * gmail_categorize (read-only), and gmail_cleanup (HITL-gated via IPC).
  * Shells out to a Python helper that uses Google API client with OAuth tokens.
  */
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
@@ -46,7 +47,7 @@ async function runGwsHelper(action: string, args: Record<string, string>): Promi
   }
 }
 
-export function registerTools(server: McpServer, _ctx: GwsToolsContext): void {
+export function registerTools(server: McpServer, ctx: GwsToolsContext): void {
   server.tool(
     'gmail_search',
     `Search Gmail messages. Returns subject, sender, date, and snippet for matching messages.
@@ -114,6 +115,65 @@ Requires Google Workspace OAuth setup on the host.`,
         max_results: String(args.max_results ?? 10),
       });
       return { content: [{ type: 'text' as const, text: result }] };
+    },
+  );
+
+  // --- Cleanup tools ---
+
+  server.tool(
+    'gmail_categorize',
+    `Categorize Gmail messages by sender domain for cleanup review. Read-only — does not modify any messages.
+Groups messages by domain, detects newsletters (List-Unsubscribe header), shows example subjects.
+Use this before gmail_cleanup to build a cleanup proposal.`,
+    {
+      query: z.string().describe('Gmail search query, e.g. "category:promotions older_than:30d" or "is:unread from:newsletter"'),
+      max_results: z.number().int().min(1).max(100).default(50).describe('Maximum messages to scan (max 100)'),
+    },
+    async (args) => {
+      const result = await runGwsHelper('gmail_categorize', {
+        query: args.query,
+        max_results: String(args.max_results ?? 50),
+      });
+      return { content: [{ type: 'text' as const, text: result }] };
+    },
+  );
+
+  server.tool(
+    'gmail_cleanup',
+    `Request approval to trash or archive Gmail messages. This does NOT execute immediately —
+it sends a WhatsApp notification to the user who must reply "approve-cleanup <token>" to proceed.
+Safety: max 100 messages per batch, no permanent delete, 30-minute expiry.
+Use gmail_categorize first to identify messages, then pass IDs here.`,
+    {
+      action: z.enum(['trash', 'archive']).describe('Cleanup action: "trash" (recoverable) or "archive" (remove from inbox)'),
+      message_ids: z.array(z.string()).min(1).max(100).describe('Gmail message IDs to act on (max 100)'),
+      summary: z.string().describe('Human-readable summary of what is being cleaned up, e.g. "47 promotional emails from newsletters older than 30 days"'),
+      breakdown: z.string().describe('Domain-grouped breakdown for the approval message, e.g. "  - marketing.example.com: 15 msgs"'),
+    },
+    async (args) => {
+      // Hard cap enforcement at container level
+      if (args.message_ids.length > 100) {
+        return { content: [{ type: 'text' as const, text: JSON.stringify({ error: 'Exceeds hard cap of 100 messages' }) }] };
+      }
+
+      // Write IPC to host for HITL approval
+      const responseFile = `/workspace/ipc/messages/gmail-cleanup-${Date.now()}.response.json`;
+      ctx.writeIpcFile(ctx.MESSAGES_DIR, {
+        type: 'gmail_cleanup',
+        action: args.action,
+        message_ids: args.message_ids,
+        summary: args.summary,
+        breakdown: args.breakdown,
+        chatJid: ctx.chatJid,
+        responseFile,
+      });
+
+      // Poll for host response
+      const response = await ctx.pollResponse(responseFile, 30_000);
+      if (!response) {
+        return { content: [{ type: 'text' as const, text: JSON.stringify({ error: 'Host did not respond to cleanup request in time' }) }] };
+      }
+      return { content: [{ type: 'text' as const, text: JSON.stringify(response) }] };
     },
   );
 }

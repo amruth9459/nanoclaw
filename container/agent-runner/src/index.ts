@@ -28,6 +28,10 @@ interface ContainerInput {
   isMain: boolean;
   isScheduledTask?: boolean;
   secrets?: Record<string, string>;
+  maxTurns?: number;
+  personaId?: string;
+  /** Full persona markdown content (read from ~/.claude/agents/ on host) */
+  personaContent?: string;
 }
 
 interface ContainerOutput {
@@ -514,14 +518,41 @@ async function runQuery(
   let lastAssistantUuid: string | undefined;
   let messageCount = 0;
   let resultCount = 0;
-  const safetyPulse = new SafetyPulse();
-
   // Load global CLAUDE.md as additional system context (shared across all groups)
   const globalClaudeMdPath = '/workspace/global/CLAUDE.md';
   let globalClaudeMd: string | undefined;
   if (!containerInput.isMain && fs.existsSync(globalClaudeMdPath)) {
     globalClaudeMd = fs.readFileSync(globalClaudeMdPath, 'utf-8');
   }
+
+  // Load persona from dispatch (passed via ContainerInput.personaContent)
+  // or from PERSONA.md file. Dispatch personas take precedence.
+  const personaMdPath = '/workspace/group/PERSONA.md';
+  let personaMd: string | undefined;
+  let personaPulseRules: string[] | undefined;
+  if (containerInput.personaContent) {
+    personaMd = containerInput.personaContent;
+    log(`Loaded dispatched persona '${containerInput.personaId}' (${personaMd.length} chars) — injecting into system prompt`);
+  } else if (fs.existsSync(personaMdPath)) {
+    personaMd = fs.readFileSync(personaMdPath, 'utf-8');
+    log(`Loaded PERSONA.md (${personaMd.length} chars) — injecting into system prompt`);
+    personaPulseRules = [
+      '⚠️ PERSONA REMINDER (Auto-injected — re-read your PERSONA.md rules):',
+      '',
+      'You MUST follow your PERSONA.md behavioral rules. Key reminders:',
+      '• You are an NPA Defense Strategist for the DEBTOR — not a coding assistant',
+      '• NO fabrication of case law, judgments, or citations',
+      '• NO hype, NO padding — every sentence must add legal value',
+      '• Read EVERY document word-to-word before forming any opinion',
+      '• Extract verbatim evidence, catalog chronologically',
+      '• Play devil\'s advocate — anticipate opponent\'s counter-arguments',
+      '• Apply ALL relevant laws, not just the obvious one',
+      '• WhatsApp formatting only — no markdown',
+      '',
+      '--- End Persona Pulse ---',
+    ];
+  }
+  const safetyPulse = new SafetyPulse({}, personaPulseRules);
 
   // Inject Claw's outreach identity if configured
   const clawName = process.env.CLAW_NAME;
@@ -579,8 +610,9 @@ async function runQuery(
       additionalDirectories: extraDirs.length > 0 ? extraDirs : undefined,
       resume: sessionId,
       resumeSessionAt: resumeAt,
-      systemPrompt: globalClaudeMd
-        ? { type: 'preset' as const, preset: 'claude_code' as const, append: globalClaudeMd }
+      ...(containerInput.maxTurns ? { maxTurns: containerInput.maxTurns } : {}),
+      systemPrompt: (globalClaudeMd || personaMd)
+        ? { type: 'preset' as const, preset: 'claude_code' as const, append: [personaMd, globalClaudeMd].filter(Boolean).join('\n\n') }
         : undefined,
       allowedTools: [
         'Bash',
@@ -746,7 +778,8 @@ async function main(): Promise<void> {
   const __dirname = path.dirname(fileURLToPath(import.meta.url));
   const mcpServerPath = path.join(__dirname, 'ipc-mcp-stdio.js');
 
-  let sessionId = containerInput.sessionId;
+  // Skip session resume for warmup — fresh start is much faster
+  let sessionId = containerInput.maxTurns ? undefined : containerInput.sessionId;
   fs.mkdirSync(IPC_INPUT_DIR, { recursive: true });
 
   // Clean up stale _close sentinel from previous container runs
@@ -775,6 +808,13 @@ async function main(): Promise<void> {
       }
       if (queryResult.lastAssistantUuid) {
         resumeAt = queryResult.lastAssistantUuid;
+      }
+
+      // If maxTurns is set (warmup), exit after the first query — no IPC loop.
+      if (containerInput.maxTurns) {
+        log(`maxTurns=${containerInput.maxTurns} — exiting after query`);
+        writeOutput({ status: 'success', result: null, newSessionId: sessionId });
+        process.exit(0);
       }
 
       // If _close was consumed during the query, exit immediately.

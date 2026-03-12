@@ -64,7 +64,10 @@ export async function executeTaskTool(input: TaskToolInput): Promise<string> {
           estimatedHours: input.estimatedHours,
         });
 
-        return `✓ Task created: ${task.id}\n${task.description}\nPriority: ${'★'.repeat(Math.min(task.priority, 5))}`;
+        const depsLine = task.dependencies.length > 0
+          ? `\nDependencies: ${task.dependencies.join(', ')}`
+          : '\nDependencies: none (independent task)';
+        return `✓ Task created: ${task.id}\n${task.description}\nPriority: ${'★'.repeat(Math.min(task.priority, 5))}${depsLine}`;
       }
 
       case 'update': {
@@ -176,15 +179,21 @@ Actions:
 - delete: Delete a task
 - available: List tasks available to work on (dependencies met)
 
+IMPORTANT — Dependency analysis is COMPULSORY:
+- When creating a task, ALWAYS specify dependencies (task IDs this task depends on).
+- If you omit dependencies, the system auto-infers them from existing tasks — but
+  explicit is always better than inferred. Think about what must be done BEFORE this task.
+- A task with unmet dependencies will NOT be dispatched until all deps are completed.
+
 Tasks support:
-- Dependencies: Tasks can depend on other tasks
+- Dependencies: Tasks can depend on other tasks (auto-inferred if not specified)
 - Assignment: Tasks can be assigned to specific agents
 - Priority: 1-100 scale (100 = highest)
 - Status tracking: pending → in_progress → completed
 - Complexity estimation: trivial, simple, moderate, complex, expert
 
 Example usage:
-- Create: action=create, description="Build login page", priority=90
+- Create: action=create, description="Build login page", priority=90, dependencies=["task_setup_db"]
 - Update: action=update, taskId="task_123", status="completed"
 - List: action=list, filterStatus="pending"
 - Available: action=available, filterAgent="frontend-dev"`,

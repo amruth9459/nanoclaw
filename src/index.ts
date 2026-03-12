@@ -69,6 +69,7 @@ import { NanoClawOrchestrator } from './nanoclaw-orchestrator.js';
 import { listGroupFiles, startDashboard } from './dashboard.js';
 import { ResourceOrchestrator, AgentPriority } from './resource-orchestrator.js';
 import { BountyGate } from './bounty-gate.js';
+import { CleanupGate } from './cleanup-gate.js';
 import { GroupQueue } from './group-queue.js';
 import { HitlGate } from './hitl.js';
 import { startIpcWatcher } from './ipc.js';
@@ -77,6 +78,8 @@ import { findChannel, formatMessages, formatOutbound } from './router.js';
 import { startSchedulerLoop } from './task-scheduler.js';
 import { Channel, NewMessage, RegisteredGroup } from './types.js';
 import { logger } from './logger.js';
+import { PersonaRegistry } from './persona-registry.js';
+import { AutoDispatcher } from './auto-dispatch.js';
 
 // Re-export for backwards compatibility during refactor
 export { escapeXml, formatMessages } from './router.js';
@@ -97,10 +100,13 @@ const channels: Channel[] = [];
 const queue = new GroupQueue();
 const hitlGate = new HitlGate();
 const bountyGate = new BountyGate();
+const cleanupGate = new CleanupGate();
 let orchestrator: ResourceOrchestrator;
 let router: UniversalRouter;
 let responseTimeManager: ResponseTimeManager;
 let nanoClawOrchestrator: NanoClawOrchestrator | undefined;
+let personaRegistry: PersonaRegistry | undefined;
+let autoDispatcher: AutoDispatcher | undefined;
 
 // Tracks which chatJids had a send_message IPC call during the current agent run.
 // Used to suppress the redundant final streaming output when agent already sent via send_message.
@@ -1015,6 +1021,13 @@ async function startMessageLoop(): Promise<void> {
               ).catch((err) =>
                 logger.warn({ err }, 'BountyGate approval handling error'),
               );
+              // CleanupGate: handle approve-cleanup / reject-cleanup tokens
+              cleanupGate.tryHandleApproval(
+                msg.content,
+                (text) => channel.sendMessage(chatJid, text),
+              ).catch((err) =>
+                logger.warn({ err }, 'CleanupGate approval handling error'),
+              );
             }
           }
           const needsTrigger = !isMainGroup && group.requiresTrigger !== false;
@@ -1470,6 +1483,17 @@ async function main(): Promise<void> {
     if (learningsPath) codedContext.loadLearningsFromFile(learningsPath);
   }
 
+  // Initialize persona registry (scans ~/.claude/agents/)
+  try {
+    const { getDb } = await import('./db.js');
+    personaRegistry = new PersonaRegistry(getDb());
+    personaRegistry.initSchema();
+    const count = await personaRegistry.scan();
+    logger.info({ count }, 'Persona registry loaded');
+  } catch (err) {
+    logger.warn({ err }, 'Persona registry init failed — auto-dispatch disabled');
+  }
+
   // Sync kanban board to file for cross-agent visibility
   try { const { syncKanbanFile } = await import('./db.js'); syncKanbanFile(); } catch { /* best-effort */ }
   orchestrator = new ResourceOrchestrator(path.join(STORE_DIR, 'resources.db'));
@@ -1531,6 +1555,7 @@ async function main(): Promise<void> {
     logger.info({ signal }, 'Shutdown signal received');
     orchestrator.destroy();
     try { nanoClawOrchestrator?.destroy(); } catch { /* non-blocking */ }
+    try { autoDispatcher?.stop(); } catch { /* non-blocking */ }
     try { await contextManager.persist(); } catch { /* non-blocking */ }
     await queue.shutdown(10000);
     for (const ch of channels) await ch.disconnect();
@@ -1725,6 +1750,7 @@ async function main(): Promise<void> {
     writeGroupsSnapshot: (gf, im, ag, rj) => writeGroupsSnapshot(gf, im, ag, rj),
     hitlGate,
     bountyGate,
+    cleanupGate,
     getMainGroupJid: () =>
       Object.entries(registeredGroups).find(
         ([, g]) => g.folder === MAIN_GROUP_FOLDER,
@@ -1734,6 +1760,111 @@ async function main(): Promise<void> {
   queue.setProcessMessagesFn(processGroupMessages);
   recoverPendingMessages();
   ensureBountyHunterTask();
+
+  // Initialize auto-dispatcher (requires persona registry + queue + container spawning)
+  if (personaRegistry) {
+    try {
+      const { getDb } = await import('./db.js');
+      autoDispatcher = new AutoDispatcher({
+        db: getDb(),
+        registry: personaRegistry,
+        queue,
+        getRegisteredGroups: () => registeredGroups,
+        spawnTaskFn: async (groupJid, group, input) => {
+          const output = await runContainerAgent(
+            group,
+            input,
+            (proc, containerName) => {
+              queue.registerProcess(groupJid, proc, containerName, group.folder);
+              queue.setDesignation(groupJid, 'dispatch', true);
+              queue.setSpawnReason(groupJid, `Persona: ${input.personaId}`, true);
+              // Mark dispatch as running now that container actually started
+              if (input.dispatchTaskId) {
+                try {
+                  getDb().prepare('UPDATE dispatch_log SET status = ? WHERE task_id = ? AND status = ?')
+                    .run('running', input.dispatchTaskId, 'queued');
+                } catch { /* best effort */ }
+              }
+            },
+          );
+          // Update dispatch + kanban task status based on result
+          const taskId = input.dispatchTaskId || '';
+          if (taskId) {
+            const success = output.status === 'success';
+            autoDispatcher?.updateDispatchStatus(taskId, success ? 'completed' : 'failed');
+
+            // Look up task description for the report
+            const taskRow = getDb().prepare('SELECT description, project FROM tasks WHERE id = ?').get(taskId) as any;
+            const taskDesc = taskRow?.description?.slice(0, 120) || taskId;
+            const project = taskRow?.project || 'unknown';
+            const persona = input.personaId || 'unknown';
+
+            if (success) {
+              // Mark kanban task as completed
+              try {
+                getDb().prepare(
+                  'UPDATE tasks SET status = ?, completed_at = ? WHERE id = ? AND status = ?',
+                ).run('completed', Date.now(), taskId, 'in_progress');
+                logger.info({ taskId }, 'Task completed by dispatch agent');
+              } catch { /* best effort */ }
+
+              // Send completion report to desktop notify group
+              try {
+                const { getNotifyJid } = await import('./notify.js');
+                const mainJid = Object.entries(registeredGroups)
+                  .find(([, g]) => g.folder === MAIN_GROUP_FOLDER)?.[0];
+                if (mainJid) {
+                  const notifyJid = getNotifyJid(project === 'lexios' ? 'lexios' : 'desktop', mainJid);
+                  // Count remaining tasks
+                  const stats = getDb().prepare(`
+                    SELECT
+                      SUM(CASE WHEN status IN ('completed','done') THEN 1 ELSE 0 END) as done,
+                      COUNT(*) as total
+                    FROM tasks WHERE project = ?
+                  `).get(project) as any;
+                  const progress = stats ? `${stats.done}/${stats.total}` : '';
+
+                  await clawSend(notifyJid,
+                    `✅ *Task Completed* [${progress}]\n` +
+                    `*${taskId}*: ${taskDesc}\n` +
+                    `Agent: ${persona}\n` +
+                    `Result: ${output.result?.slice(0, 200) || 'completed successfully'}`,
+                  );
+                }
+              } catch { /* notification best effort */ }
+            } else {
+              // Reset failed tasks back to pending so they can be retried
+              try {
+                getDb().prepare('UPDATE tasks SET status = ?, assigned_agent = NULL WHERE id = ?')
+                  .run('pending', taskId);
+                logger.info({ taskId }, 'Reset failed dispatch task to pending');
+              } catch { /* best effort */ }
+
+              // Send failure report
+              try {
+                const { getNotifyJid } = await import('./notify.js');
+                const mainJid = Object.entries(registeredGroups)
+                  .find(([, g]) => g.folder === MAIN_GROUP_FOLDER)?.[0];
+                if (mainJid) {
+                  const notifyJid = getNotifyJid(project === 'lexios' ? 'lexios' : 'desktop', mainJid);
+                  await clawSend(notifyJid,
+                    `❌ *Task Failed* — will retry\n` +
+                    `*${taskId}*: ${taskDesc}\n` +
+                    `Agent: ${persona}\n` +
+                    `Error: ${output.error?.slice(0, 200) || 'container exited with error'}`,
+                  );
+                }
+              } catch { /* notification best effort */ }
+            }
+          }
+        },
+      });
+      autoDispatcher.start();
+      logger.info('AutoDispatcher started');
+    } catch (err) {
+      logger.warn({ err }, 'AutoDispatcher init failed');
+    }
+  }
 
   // Omi Integration — dynamic import with availability check
   // Uses dynamic import() so NanoClaw starts even if Omi deps are missing
@@ -1820,7 +1951,9 @@ async function main(): Promise<void> {
   // WhatsApp finish its initial sync. Warmup is best-effort and non-blocking.
   if (WARMUP_ON_START) {
     setTimeout(() => {
-      for (const [chatJid] of Object.entries(registeredGroups)) {
+      for (const [chatJid, group] of Object.entries(registeredGroups)) {
+        // Skip warmup for dispatch-only groups (saves RAM for task slots)
+        if (group.containerConfig?.noWarmup) continue;
         queue.warmup(chatJid, () => warmupGroupContainer(chatJid));
       }
     }, 30000); // 30s after startup — after WA initial sync settles

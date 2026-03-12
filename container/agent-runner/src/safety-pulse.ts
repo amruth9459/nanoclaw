@@ -16,13 +16,15 @@ export interface SafetyPulseConfig {
 export class SafetyPulse {
   private turnCount = 0;
   private config: SafetyPulseConfig;
+  private personaRules: string[] | null = null;
 
-  constructor(config: Partial<SafetyPulseConfig> = {}) {
+  constructor(config: Partial<SafetyPulseConfig> = {}, personaRules?: string[]) {
     this.config = {
       enabled: config.enabled ?? true,
       intervalTurns: config.intervalTurns ?? 5,
       rules: config.rules ?? this.getDefaultRules(),
     };
+    this.personaRules = personaRules ?? null;
   }
 
   private getDefaultRules(): string[] {
@@ -58,7 +60,8 @@ export class SafetyPulse {
   }
 
   /**
-   * Increment turn counter and return safety reminder if interval reached
+   * Increment turn counter and return safety reminder if interval reached.
+   * Alternates between safety rules and persona rules (if set) on successive pulses.
    */
   public tick(): string | null {
     if (!this.config.enabled) {
@@ -68,6 +71,11 @@ export class SafetyPulse {
     this.turnCount++;
 
     if (this.turnCount % this.config.intervalTurns === 0) {
+      // Which pulse cycle is this? Alternate safety vs persona
+      const pulseNumber = this.turnCount / this.config.intervalTurns;
+      if (this.personaRules && pulseNumber % 2 === 0) {
+        return this.personaRules.join('\n');
+      }
       return this.config.rules.join('\n');
     }
 

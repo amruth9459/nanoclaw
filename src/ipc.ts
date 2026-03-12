@@ -34,6 +34,7 @@ import {
 import { evaluateWork } from './clawwork.js';
 import { Bounty, findBounties } from './bounty-hunter.js';
 import { BountyGate } from './bounty-gate.js';
+import { CleanupGate } from './cleanup-gate.js';
 import { learnFact } from './context/index.js';
 import { getSurvivalTier } from './economics.js';
 import { HitlGate } from './hitl.js';
@@ -60,6 +61,8 @@ export interface IpcDeps {
   hitlGate?: HitlGate;
   /** Bounty gate — HITL approval for bounty proposals */
   bountyGate?: BountyGate;
+  /** Cleanup gate — HITL approval for Gmail cleanup operations */
+  cleanupGate?: CleanupGate;
   /** Returns the JID of the main group (used for HITL notifications) */
   getMainGroupJid?: () => string | undefined;
   /**
@@ -239,8 +242,10 @@ export function startIpcWatcher(deps: IpcDeps): void {
                       const { promisify } = await import('util');
                       const execFileAsync = promisify(execFile);
                       const prompt = data.prompt as string;
-                      const workdir = (data.workdir as string) || capturedConfig.workdir;
-                      const maxBudget = (data.max_budget_usd as number) || 1.0;
+                      const rawWorkdir = (data.workdir as string) || capturedConfig.workdir;
+                      // Expand ~ to home directory (container sends ~/Lexios which path.resolve won't expand)
+                      const workdir = rawWorkdir.startsWith('~/') ? path.join(home, rawWorkdir.slice(2)) : rawWorkdir;
+                      const maxBudget = (data.max_budget_usd as number) || 0; // 0 = no limit
 
                       // ── Safety: lock workdir to allowed roots ──
                       const allAllowedRoots = [path.join(home, 'nanoclaw'), ...capturedConfig.allowedRoots];
@@ -249,24 +254,28 @@ export function startIpcWatcher(deps: IpcDeps): void {
                         throw new Error(`Workdir "${workdir}" outside allowed roots: ${allAllowedRoots.join(', ')}`);
                       }
 
-                      // ── Safety: cap budget at $5 ──
-                      const cappedBudget = Math.min(maxBudget, 5.0);
+                      // Build CLI args — budget only if explicitly set
+                      const cliArgs = [
+                        '-p', prompt,
+                        '--output-format', 'text',
+                        // Full tool access — same as interactive Claude Code
+                        '--allowedTools', 'Read', 'Write', 'Edit', 'Glob', 'Grep',
+                          'Bash', 'WebFetch', 'WebSearch', 'Agent',
+                      ];
+                      if (maxBudget > 0) {
+                        cliArgs.push('--max-budget-usd', String(maxBudget));
+                      }
 
-                      logger.info({ prompt: prompt.slice(0, 200), workdir: resolved, maxBudget: cappedBudget }, 'Spawning desktop Claude Code');
+                      // Resolve claude binary — launchd PATH may not include /opt/homebrew/bin
+                      const claudeBin = process.env.CLAUDE_BIN || '/opt/homebrew/bin/claude';
+                      logger.info({ prompt: prompt.slice(0, 200), workdir: resolved, maxBudget: maxBudget || 'unlimited' }, 'Spawning desktop Claude Code');
                       const { stdout, stderr } = await execFileAsync(
-                        'claude',
-                        [
-                          '-p', prompt,
-                          '--output-format', 'text',
-                          '--max-budget-usd', String(cappedBudget),
-                          '--allowedTools', 'Read', 'Write', 'Edit', 'Glob', 'Grep',
-                            'Bash(npm run build)', 'Bash(npm run dev)', 'Bash(npm test)',
-                            'Bash(git:*)',
-                        ],
+                        claudeBin,
+                        cliArgs,
                         {
                           cwd: resolved,
-                          timeout: 270000,
-                          maxBuffer: 1024 * 1024,
+                          timeout: 1_800_000, // 30 min — let complex tasks finish
+                          maxBuffer: 10 * 1024 * 1024, // 10MB output buffer
                           env: { ...process.env, CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC: '1' },
                         },
                       );
@@ -287,15 +296,23 @@ export function startIpcWatcher(deps: IpcDeps): void {
                         writeIpcResponse(responseFile, { output });
                       }
                     } catch (err: unknown) {
-                      const msg = err instanceof Error ? err.message : String(err);
-                      logger.error({ err: msg }, 'Desktop Claude Code failed');
-                      const mainJid = deps.getMainGroupJid?.();
-                      if (mainJid) {
-                        const { getNotifyJid } = await import('./notify.js');
-                        await deps.sendMessage(getNotifyJid(capturedConfig.notifyTopic, mainJid), `🖥️ Desktop Claude failed: ${msg.slice(0, 200)}`);
-                      }
+                      // Extract stderr/stdout from execFile errors (contains actual failure reason)
+                      const execErr = err as { message?: string; stderr?: string; stdout?: string; code?: number };
+                      const stderr = execErr.stderr?.slice(-1000) || '';
+                      const stdout = execErr.stdout?.slice(-500) || '';
+                      const exitCode = execErr.code;
+                      const reason = stderr || stdout || execErr.message || String(err);
+                      logger.error({ err: reason.slice(0, 500), exitCode }, 'Desktop Claude Code failed');
                       if (responseFile) {
-                        writeIpcResponse(responseFile, { error: msg });
+                        // Error goes back to calling container — don't spam user
+                        writeIpcResponse(responseFile, { error: reason.slice(0, 2000) });
+                      } else {
+                        // No responseFile = fire-and-forget call, notify user
+                        const mainJid = deps.getMainGroupJid?.();
+                        if (mainJid) {
+                          const { getNotifyJid } = await import('./notify.js');
+                          await deps.sendMessage(getNotifyJid(capturedConfig.notifyTopic, mainJid), `🖥️ Desktop Claude failed: ${reason.slice(0, 200)}`);
+                        }
                       }
                     }
                   })();
@@ -812,6 +829,54 @@ async function processClawworkMessage(
       break;
     }
 
+    // ── Gmail Cleanup (HITL-gated) ────────────────────────────────
+    case 'gmail_cleanup': {
+      const action = data.action as 'trash' | 'archive';
+      const messageIds = data.message_ids as string[];
+      const summary = data.summary as string;
+      const breakdown = data.breakdown as string;
+
+      if (!deps.cleanupGate) {
+        if (responseFile) writeIpcResponse(responseFile, { error: 'CleanupGate not configured' });
+        break;
+      }
+
+      if (groupFolder !== MAIN_GROUP_FOLDER) {
+        if (responseFile) writeIpcResponse(responseFile, { error: 'Gmail cleanup only allowed from main group' });
+        break;
+      }
+
+      const mainJid = deps.getMainGroupJid?.();
+      if (!mainJid) {
+        if (responseFile) writeIpcResponse(responseFile, { error: 'Main group JID not configured' });
+        break;
+      }
+
+      try {
+        const token = deps.cleanupGate.propose({
+          action,
+          messageIds,
+          summary,
+          breakdown,
+          groupFolder,
+        });
+
+        const msg = CleanupGate.formatProposalMessage(
+          { action, messageIds, summary, breakdown, groupFolder },
+          token,
+        );
+        await deps.sendMessage(mainJid, msg);
+
+        if (responseFile) writeIpcResponse(responseFile, { status: 'pending_approval', token });
+        logger.info({ groupFolder, action, count: messageIds.length, token }, 'Gmail cleanup proposal sent');
+      } catch (err) {
+        const errMsg = err instanceof Error ? err.message : String(err);
+        if (responseFile) writeIpcResponse(responseFile, { error: errMsg });
+        logger.error({ err, groupFolder }, 'Gmail cleanup proposal failed');
+      }
+      break;
+    }
+
     default:
       logger.warn({ type: data.type, groupFolder }, 'Unknown ClawWork IPC type');
   }
@@ -842,6 +907,10 @@ export async function processTaskIpc(
     deadline?: string;
     // For restart_service
     summary?: string;
+    // For dispatch_task
+    description?: string;
+    role?: string;
+    responseFile?: string;
   },
   sourceGroup: string, // Verified identity from IPC directory
   isMain: boolean, // Verified from directory path
@@ -1121,6 +1190,45 @@ export async function processTaskIpc(
         logger.warn({ data }, 'Invalid spawn_team request - missing goal or chatJid');
       }
       break;
+
+    case 'dispatch_task': {
+      // Manual dispatch via WhatsApp: agent requests a specific persona for a task
+      if (!isMain) break;
+      const taskDesc = data.description as string;
+      const preferredRole = data.role as string | undefined;
+      if (!taskDesc) break;
+
+      try {
+        const { PersonaRegistry } = await import('./persona-registry.js');
+        const { getDb } = await import('./db.js');
+        const registry = new PersonaRegistry(getDb());
+        registry.initSchema();
+        await registry.scan();
+
+        const match = registry.findBestPersona(taskDesc, preferredRole);
+        if (match && match.confidence > 0.2) {
+          const responseFile = data.responseFile as string | undefined;
+          if (responseFile) {
+            const result = {
+              matched: true,
+              persona: match.persona.name,
+              department: match.persona.department,
+              confidence: match.confidence,
+              matchedKeywords: match.matchedKeywords,
+            };
+            fs.writeFileSync(responseFile, JSON.stringify(result, null, 2));
+          }
+        } else {
+          const responseFile = data.responseFile as string | undefined;
+          if (responseFile) {
+            fs.writeFileSync(responseFile, JSON.stringify({ matched: false }));
+          }
+        }
+      } catch (err) {
+        logger.warn({ err }, 'dispatch_task IPC handler error');
+      }
+      break;
+    }
 
     default:
       logger.warn({ type: data.type }, 'Unknown IPC task type');

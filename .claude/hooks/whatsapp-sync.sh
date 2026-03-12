@@ -4,7 +4,7 @@
 
 set -euo pipefail
 
-JID="120363427991119489@g.us"
+JID="120363408175994341@g.us"  # Claw Desktop group (not main)
 API="http://localhost:8080/api/send"
 
 INPUT=$(cat)

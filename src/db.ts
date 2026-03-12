@@ -206,23 +206,26 @@ function createSchema(database: Database.Database): void {
     CREATE INDEX IF NOT EXISTS idx_transcripts_created ON transcripts(created_at);
 
     CREATE VIRTUAL TABLE IF NOT EXISTS transcripts_fts USING fts5(
-      transcript_id,
       text,
       content='transcripts',
       content_rowid='rowid'
     );
 
     CREATE TRIGGER IF NOT EXISTS transcripts_ai AFTER INSERT ON transcripts BEGIN
-      INSERT INTO transcripts_fts(rowid, transcript_id, text)
-      VALUES (new.rowid, new.id, new.text);
+      INSERT INTO transcripts_fts(rowid, text)
+      VALUES (new.rowid, new.text);
     END;
 
     CREATE TRIGGER IF NOT EXISTS transcripts_ad AFTER DELETE ON transcripts BEGIN
-      DELETE FROM transcripts_fts WHERE rowid = old.rowid;
+      INSERT INTO transcripts_fts(transcripts_fts, rowid, text)
+      VALUES ('delete', old.rowid, old.text);
     END;
 
     CREATE TRIGGER IF NOT EXISTS transcripts_au AFTER UPDATE ON transcripts BEGIN
-      UPDATE transcripts_fts SET text = new.text WHERE rowid = new.rowid;
+      INSERT INTO transcripts_fts(transcripts_fts, rowid, text)
+      VALUES ('delete', old.rowid, old.text);
+      INSERT INTO transcripts_fts(rowid, text)
+      VALUES (new.rowid, new.text);
     END;
   `);
 
@@ -1479,8 +1482,147 @@ export interface TaskRecord {
   source?: string;
 }
 
+// Stop words excluded from dependency keyword matching
+const DEP_STOP_WORDS = new Set([
+  'the', 'and', 'for', 'that', 'this', 'with', 'from', 'have', 'will',
+  'are', 'was', 'been', 'being', 'were', 'does', 'done', 'doing',
+  'should', 'would', 'could', 'must', 'shall', 'into', 'also', 'each',
+  'than', 'then', 'when', 'what', 'which', 'where', 'while', 'about',
+  'after', 'before', 'between', 'through', 'during', 'without',
+  'phase', 'task', 'add', 'create', 'build', 'implement', 'update', 'use',
+  'using', 'make', 'need', 'needs', 'currently', 'existing', 'new',
+]);
+
 /**
- * Create a new task
+ * Extract meaningful technical keywords from a task description.
+ */
+function extractTaskKeywords(description: string): Set<string> {
+  return new Set(
+    description.toLowerCase()
+      .replace(/\[.*?\]/g, ' ')           // strip [Phase 0 · Engineering] tags
+      .replace(/[^a-z0-9_.\-/\s]/g, ' ')  // keep dots, hyphens, slashes for tech terms
+      .split(/\s+/)
+      .filter(w => w.length > 2 && !DEP_STOP_WORDS.has(w))
+  );
+}
+
+// Highly specific technical terms — a single match on these is significant
+const HIGH_SPECIFICITY_TERMS = new Set([
+  'postgresql', 'postgres', 'sqlite', 'mysql', 'mongodb', 'redis', 'elasticsearch',
+  'flask', 'django', 'fastapi', 'express', 'nextjs', 'react', 'vue', 'angular', 'svelte',
+  'docker', 'kubernetes', 'nginx', 'cloudflare', 'terraform', 'ansible',
+  'stripe', 'twilio', 'sendgrid', 'auth0', 'firebase',
+  'jwt', 'oauth', 'saml', 'openid',
+  'websocket', 'graphql', 'grpc', 'rest',
+  'prometheus', 'grafana', 'datadog', 'sentry',
+  'github', 'gitlab', 'ci/cd', 'pipeline',
+  'r2', 's3', 'cloudfront', 'lambda',
+  'vite', 'webpack', 'tailwind', 'typescript', 'python',
+  'anthropic', 'openai', 'gemini', 'claude', 'gpt-4',
+  'extraction', 'compliance', 'takeoff', 'classification',
+]);
+
+/**
+ * Compute a weighted overlap score between two keyword sets.
+ * High-specificity technical terms count as 3 matches; regular terms count as 1.
+ */
+function computeOverlapScore(setA: Set<string>, setB: Set<string>): { score: number; shared: string[] } {
+  let score = 0;
+  const shared: string[] = [];
+  for (const kw of setA) {
+    if (setB.has(kw)) {
+      shared.push(kw);
+      score += HIGH_SPECIFICITY_TERMS.has(kw) ? 3 : 1;
+    }
+  }
+  return { score, shared };
+}
+
+/**
+ * Infer dependencies for a new task by analyzing existing incomplete tasks
+ * in the same project. Uses weighted keyword overlap + prerequisite heuristics.
+ *
+ * Rules:
+ * 1. Explicit ID references in description → dependency
+ * 2. Weighted keyword overlap ≥ 3 (tech terms = 3 pts, regular = 1 pt) where
+ *    existing task is a setup/infrastructure task → dependency
+ * 3. For phased task IDs (lex-N-*), earlier-phase tasks with 2+ specific term overlap → dependency
+ */
+export function inferDependencies(description: string, project: string): string[] {
+  const incompleteTasks = db.prepare(`
+    SELECT id, description FROM tasks
+    WHERE project = ? AND status NOT IN ('completed', 'done')
+  `).all(project) as { id: string; description: string }[];
+
+  if (incompleteTasks.length === 0) return [];
+
+  const descLower = description.toLowerCase();
+  const newKeywords = extractTaskKeywords(description);
+  const deps: string[] = [];
+
+  // Prerequisite indicators: existing task creates/sets up something
+  const setupPatterns = [
+    /\b(set\s*up|create|configure|establish|initialize|wire|connect|install|migrate)\b/i,
+    /\b(schema|database|table|migration|infrastructure|pipeline|framework|architecture)\b/i,
+    /\b(api\s*key|credentials|authentication|token|secret|config|environment)\b/i,
+  ];
+
+  // Usage indicators: new task uses/needs what existing task provides
+  const usagePatterns = [
+    /\b(use|using|requires|needs|depends|relies|consumes|calls|queries|connects?\s+to)\b/i,
+    /\b(endpoint|route|api|service|provider|module|component|interface)\b/i,
+  ];
+
+  const newIsUsage = usagePatterns.some(p => p.test(description));
+
+  for (const task of incompleteTasks) {
+    // Rule 1: Explicit task ID reference in description
+    if (descLower.includes(task.id.toLowerCase())) {
+      deps.push(task.id);
+      continue;
+    }
+
+    // Rule 2: Weighted keyword overlap + prerequisite heuristic
+    const existingKeywords = extractTaskKeywords(task.description);
+    const { score, shared } = computeOverlapScore(newKeywords, existingKeywords);
+
+    if (score >= 3) {
+      const existingIsSetup = setupPatterns.some(p => p.test(task.description));
+      // Existing task sets up infrastructure OR new task uses/needs things → dependency
+      if (existingIsSetup || newIsUsage) {
+        deps.push(task.id);
+        continue;
+      }
+      // Even without setup/usage patterns, high overlap (≥5) implies strong relationship
+      if (score >= 5) {
+        deps.push(task.id);
+        continue;
+      }
+    }
+
+    // Rule 3: Phase-based ordering for phased IDs
+    const phaseMatch = task.id.match(/^(\w+)-(\d+)-(\w+)-/);
+    if (phaseMatch) {
+      const existingPhase = parseInt(phaseMatch[2], 10);
+      if (existingPhase === 0) {
+        // Phase 0 setup tasks with 2+ specific keyword overlap → dependency
+        const specificOverlap = shared.filter(
+          k => k.length > 4 && !['phase', 'engineering', 'security', 'product', 'infrastructure'].includes(k)
+        );
+        if (specificOverlap.length >= 2 && !deps.includes(task.id)) {
+          deps.push(task.id);
+        }
+      }
+    }
+  }
+
+  return deps;
+}
+
+/**
+ * Create a new task (with compulsory dependency analysis).
+ * If no explicit dependencies are provided, automatically infers them
+ * by analyzing existing tasks in the same project.
  */
 export function createTaskRecord(params: {
   description: string;
@@ -1495,6 +1637,20 @@ export function createTaskRecord(params: {
 }): TaskRecord {
   const taskId = `task_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`;
   const now = Date.now();
+  const project = params.project || 'nanoclaw';
+
+  // Compulsory dependency analysis: infer when not explicitly provided
+  let dependencies = params.dependencies || [];
+  if (dependencies.length === 0) {
+    dependencies = inferDependencies(params.description, project);
+    if (dependencies.length > 0) {
+      logger.info({
+        taskId,
+        inferred: dependencies,
+        desc: params.description.slice(0, 80),
+      }, 'Auto-inferred task dependencies');
+    }
+  }
 
   const task: TaskRecord = {
     id: taskId,
@@ -1504,11 +1660,11 @@ export function createTaskRecord(params: {
     estimatedHours: params.estimatedHours || null,
     status: 'pending',
     priority: params.priority || 3,
-    dependencies: params.dependencies || [],
+    dependencies,
     assignedAgent: params.assignedAgent || null,
     createdAt: now,
     completedAt: null,
-    project: params.project || 'nanoclaw',
+    project,
     source: params.source || 'agent',
   };
 
@@ -1534,7 +1690,7 @@ export function createTaskRecord(params: {
     task.source,
   );
 
-  logger.info({ taskId, description: task.description }, 'Task created');
+  logger.info({ taskId, description: task.description, deps: dependencies.length }, 'Task created');
   return task;
 }
 
@@ -1824,7 +1980,7 @@ export function searchTranscripts(query: string, limit: number = 10): Transcript
   const rows = db.prepare(`
     SELECT t.*
     FROM transcripts t
-    INNER JOIN transcripts_fts fts ON fts.transcript_id = t.id
+    INNER JOIN transcripts_fts fts ON fts.rowid = t.rowid
     WHERE transcripts_fts MATCH ?
     ORDER BY rank
     LIMIT ?

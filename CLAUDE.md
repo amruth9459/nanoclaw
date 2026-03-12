@@ -61,3 +61,19 @@ Update `groups/main/MEMORY.md` "Active Projects" section — add new projects, r
 The `memory-bridge.sh` hook auto-updates "Active Work" with files touched live (every Edit/Write).
 
 `groups/main/KANBAN.md` is the shared task board (auto-generated from DB). Check it for current tasks across NanoClaw and Lexios. Claw sees a summary injected into every prompt. Tasks are managed via DashClaw UI or Claw's `task_tool`.
+
+## Documentation Rules
+
+After significant work sessions (new features, architectural changes, test results with metrics):
+- Update `docs/LEXIOS_CHANGELOG.md` or `docs/NANOCLAW_CHANGELOG.md` with a version entry
+- Include: problem statement, what changed, test results with numbers, files modified
+- The DEVLOG.md is auto-generated per session; the CHANGELOG is for milestone summaries
+
+When you discover something non-obvious that would help future sessions:
+- **NanoClaw learnings** → add to `groups/main/MEMORY.md` under `## Learned Facts` as `- **topic:** detail`
+- **Lexios learnings** → add to `~/Lexios/docs/LEARNINGS.md` under `## Learned Facts` as `- **topic:** detail`
+These feed into Claw's hot cache and benefit both desktop and container agents.
+
+## Integration Boundary
+
+Core files (`src/*.ts`, `container/Dockerfile`, `container/agent-runner/src/ipc-mcp-stdio.ts`) must NEVER reference integration-specific names (e.g. `lexios`, `ezdxf`, `ifcopenshell`). All integration logic goes through `src/integration-types.ts` hooks. Integration-specific code lives in `src/integrations/`, `container/skills/`, `scripts/`, `groups/`, and `docs/`. A pre-commit hook (`.githooks/no-lexios-in-core.sh`) enforces this.

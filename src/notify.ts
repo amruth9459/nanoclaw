@@ -1,11 +1,18 @@
-import { DESKTOP_NOTIFY_JID, LEXIOS_NOTIFY_JID } from './config.js';
+import { DESKTOP_NOTIFY_JID } from './config.js';
+import { getIntegrations } from './integration-loader.js';
 
-export type NotifyTopic = 'desktop' | 'lexios' | 'deploy' | 'general';
+export type NotifyTopic = string;
 
 export function getNotifyJid(topic: NotifyTopic, mainJid: string): string {
-  switch (topic) {
-    case 'desktop': return DESKTOP_NOTIFY_JID || mainJid;
-    case 'lexios': return LEXIOS_NOTIFY_JID || mainJid;
-    default: return mainJid;
+  // Core topics
+  if (topic === 'desktop') return DESKTOP_NOTIFY_JID || mainJid;
+
+  // Integration-provided topics
+  for (const integration of getIntegrations()) {
+    if (integration.notifyTopics?.[topic]) {
+      return integration.notifyTopics[topic];
+    }
   }
+
+  return mainJid;
 }

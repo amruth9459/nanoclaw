@@ -29,7 +29,7 @@ interface GroupState {
   taskSpawnReason: string | null; // why the current task container was spawned
   startedAt: number | null;     // when the message container started (epoch ms)
   taskStartedAt: number | null; // when the task container started (epoch ms)
-  designation: string | null;   // what spawned the current container (conversation, task, guest, lexios, warmup)
+  designation: string | null;   // what spawned the current container (conversation, task, guest, warmup)
   taskDesignation: string | null; // designation for the current task container
 }
 

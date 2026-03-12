@@ -62,6 +62,12 @@ export interface ContainerInput {
   };
   /** Limit agentic turns (API round-trips). Used for warmup to keep it fast. */
   maxTurns?: number;
+  /** Persona ID for agent dispatch (maps to ~/.claude/agents/ persona file) */
+  personaId?: string;
+  /** Full persona markdown content (read from ~/.claude/agents/ on host, passed via stdin) */
+  personaContent?: string;
+  /** Kanban task ID for dispatch status tracking */
+  dispatchTaskId?: string;
 }
 
 export interface ContainerOutput {
@@ -336,6 +342,10 @@ function buildContainerArgs(
 ): string[] {
   const args: string[] = ['run', '-i', '--rm', '--name', containerName];
 
+  // Memory limit (default 4GB)
+  const memLimit = group.containerConfig?.memoryLimit ?? '4G';
+  args.push('-m', memLimit);
+
   // Run as host user so bind-mounted files are accessible.
   // Skip when running as root (uid 0), as the container's node user (uid 1000),
   // or when getuid is unavailable (native Windows without WSL).
@@ -364,6 +374,9 @@ function buildContainerArgs(
   for (const [key, value] of Object.entries(group.containerConfig?.env ?? {})) {
     args.push('-e', `${key}=${value}`);
   }
+
+  // Persona ID is passed via stdin (ContainerInput.personaId) and read by agent-runner.
+  // No need for env var — the agent-runner reads it from the JSON input.
 
   // Tell the container which integration tool modules to load.
   // Collected from integrations that own this group (or all for main).

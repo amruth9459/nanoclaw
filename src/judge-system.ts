@@ -2,8 +2,6 @@
  * LLM-as-Judges System for NanoClaw
  *
  * Provides peer review for outputs before delivery to users.
- * Inspired by Lexios 3-judge system.
- *
  * Use cases:
  * - Code changes: QA review before deployment
  * - Revenue product content: OSHA reports, grant digests (quality check)
@@ -67,7 +65,7 @@ export interface JudgeResult {
 }
 
 export interface JudgeSystemConfig {
-  judgeCount: number; // Default: 3 judges (like Lexios)
+  judgeCount: number; // Default: 3 judges
   requireUnanimous: boolean; // Default: false (majority rule)
   minConfidence: number; // Default: 0.7 (filter low-confidence votes)
   useLocalModels: boolean; // Default: true (cost optimization)

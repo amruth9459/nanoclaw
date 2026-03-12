@@ -13,6 +13,7 @@ import {
   getAllBounties,
   getAllRegisteredGroups,
   getAllTasks,
+  getDb,
   getEconomicsSummary,
   getAllUsageRecent,
   getActiveClawworkTasks,
@@ -329,7 +330,7 @@ const HTML = `<!DOCTYPE html>
 
 <script>
 let memTab = 'global/MEMORY.md';
-let dashTab = 'overview'; // 'overview' | 'economics' | 'bounties' | 'kanban' | 'lexios-board' | 'files' | 'lexios' | 'router'
+let dashTab = 'overview'; // 'overview' | 'economics' | 'bounties' | 'kanban' | 'files' | 'router' | integration tabs
 
 function fmt(iso) {
   if (!iso) return '—';
@@ -374,7 +375,7 @@ function elapsed(startMs) {
 function designationBadge(g) {
   var d = g.designation || g.taskDesignation;
   if (!d) return '<span style="color:var(--muted);font-size:0.7rem">—</span>';
-  var colors = { conversation: 'var(--green)', task: '#60a5fa', bounty: '#f59e0b', guest: '#a78bfa', lexios: 'var(--accent2)', warmup: 'var(--yellow)', indexing: '#6b7280', judge: '#ef4444' };
+  var colors = { conversation: 'var(--green)', task: '#60a5fa', bounty: '#f59e0b', guest: '#a78bfa', warmup: 'var(--yellow)', indexing: '#6b7280', judge: '#ef4444' };
   return '<span class="pill" style="background:' + (colors[d] || 'var(--muted)') + ';color:#fff;font-size:0.65rem">' + d + '</span>';
 }
 
@@ -1089,9 +1090,12 @@ export function startDashboard(queue: GroupQueue, sendFn?: (jid: string, text: s
     // Localhost requests from the machine itself skip token check.
     // Cloudflare tunnel proxies through localhost, so we check the
     // CF-Connecting-IP header to detect tunneled requests.
+    // Webhook paths (/webhooks/*) are exempt — they use their own signature validation.
     const cfIp = req.headers['cf-connecting-ip'] as string | undefined;
     const isTunneled = !!cfIp;
-    if (DASH_TOKEN && isTunneled) {
+    const isWebhook = url.pathname.startsWith('/webhooks/');
+    const isUpload = url.pathname === '/upload';
+    if (DASH_TOKEN && isTunneled && !isWebhook && !isUpload) {
       const tokenFromQuery = url.searchParams.get('token');
       const tokenFromHeader = (req.headers.authorization || '').replace('Bearer ', '');
       if (tokenFromQuery !== DASH_TOKEN && tokenFromHeader !== DASH_TOKEN) {
@@ -1180,6 +1184,74 @@ export function startDashboard(queue: GroupQueue, sendFn?: (jid: string, text: s
       } catch (err) {
         res.writeHead(500);
         res.end(JSON.stringify({ error: String(err) }));
+      }
+      return;
+    }
+
+    if (url.pathname === '/api/dispatch') {
+      try {
+        const { PersonaRegistry } = await import('./persona-registry.js');
+        const { AutoDispatcher } = await import('./auto-dispatch.js');
+        const db = getDb();
+
+        const registry = new PersonaRegistry(db);
+        registry.initSchema();
+        // Load from DB (already scanned at startup)
+        const personas = registry.getAll();
+        const departments = registry.getDepartmentSummary();
+        const recentDispatches = registry.getRecentDispatches(20);
+
+        // Get dispatch stats from dispatch_log table
+        let dispatchStats = { total: 0, queued: 0, running: 0, completed: 0, failed: 0 };
+        try {
+          const row = db.prepare(`
+            SELECT COUNT(*) as total,
+              SUM(CASE WHEN status = 'queued' THEN 1 ELSE 0 END) as queued,
+              SUM(CASE WHEN status = 'running' THEN 1 ELSE 0 END) as running,
+              SUM(CASE WHEN status = 'completed' THEN 1 ELSE 0 END) as completed,
+              SUM(CASE WHEN status = 'failed' THEN 1 ELSE 0 END) as failed
+            FROM dispatch_log
+          `).get() as any;
+          if (row) dispatchStats = row;
+        } catch { /* table may not exist yet */ }
+
+        // Get recent dispatch log
+        let recentDispatchLog: any[] = [];
+        try {
+          recentDispatchLog = db.prepare(`
+            SELECT task_id, persona_id, persona_name, department, description, confidence,
+                   dispatched_at, completed_at, status
+            FROM dispatch_log ORDER BY dispatched_at DESC LIMIT 20
+          `).all();
+        } catch { /* table may not exist */ }
+
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({
+          personas: personas.length,
+          departments,
+          recentDispatches,
+          recentDispatchLog,
+          stats: dispatchStats,
+        }));
+      } catch (err) {
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ personas: 0, departments: {}, recentDispatches: [], recentDispatchLog: [], stats: {} }));
+      }
+      return;
+    }
+
+    if (url.pathname === '/api/personas') {
+      try {
+        const { PersonaRegistry } = await import('./persona-registry.js');
+        const db = getDb();
+        const registry = new PersonaRegistry(db);
+        registry.initSchema();
+        const personas = registry.getAll();
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify(personas));
+      } catch {
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end('[]');
       }
       return;
     }
@@ -1342,7 +1414,10 @@ export function startDashboard(queue: GroupQueue, sendFn?: (jid: string, text: s
       return;
     }
 
-    // Fieldy webhook endpoint
+    // Fieldy webhook endpoint — log all requests to this path
+    if (url.pathname.startsWith('/webhooks/fieldy')) {
+      logger.info({ method: req.method, pathname: url.pathname, headers: req.headers }, 'Fieldy webhook request received');
+    }
     if (url.pathname === '/webhooks/fieldy' && req.method === 'POST') {
       let body = '';
       req.on('data', (chunk) => { body += chunk; });
@@ -1368,6 +1443,18 @@ export function startDashboard(queue: GroupQueue, sendFn?: (jid: string, text: s
           res.end(JSON.stringify({ error: String(err) }));
         }
       });
+      return;
+    }
+
+    if (url.pathname === '/office' || url.pathname === '/office/') {
+      try {
+        const officePath = path.join(GROUPS_DIR, 'main', 'nanoclaw-office', 'index.html');
+        const content = fs.readFileSync(officePath, 'utf-8');
+        res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+        res.end(content);
+      } catch {
+        res.writeHead(404); res.end('Office dashboard not found');
+      }
       return;
     }
 

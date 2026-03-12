@@ -38,6 +38,12 @@ export interface ContainerConfig {
    * Create the network first: ./scripts/setup-egress.sh
    */
   networkRestricted?: boolean;
+  /** When true, the global CLAUDE.md/MEMORY.md is not mounted. Use for isolated personas. */
+  isolatedPersona?: boolean;
+  /** Container memory limit (e.g. '4G', '2G'). Default: '4G'. */
+  memoryLimit?: string;
+  /** When true, skip warmup for this group (dispatch-only groups). */
+  noWarmup?: boolean;
 }
 
 export interface RegisteredGroup {

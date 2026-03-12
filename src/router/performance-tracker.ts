@@ -109,17 +109,10 @@ export class PerformanceTracker {
       byTaskType[r.taskType]++;
     });
 
-    // Count by source
-    const bySource: Record<TaskSource, number> = {
-      whatsapp: 0,
-      lexios: 0,
-      osha: 0,
-      scheduled_task: 0,
-      bounty: 0,
-      internal: 0,
-    };
+    // Count by source (dynamic accumulation)
+    const bySource: Record<string, number> = {};
     records.forEach((r) => {
-      bySource[r.source]++;
+      bySource[r.source] = (bySource[r.source] || 0) + 1;
     });
 
     // Calculate latencies
@@ -397,14 +390,7 @@ export class PerformanceTracker {
         data: 0,
         web: 0,
       },
-      bySource: {
-        whatsapp: 0,
-        lexios: 0,
-        osha: 0,
-        scheduled_task: 0,
-        bounty: 0,
-        internal: 0,
-      },
+      bySource: {},
       avgLatencyMs: 0,
       p50LatencyMs: 0,
       p95LatencyMs: 0,

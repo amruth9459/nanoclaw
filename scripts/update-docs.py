@@ -22,10 +22,7 @@ from datetime import datetime
 from pathlib import Path
 
 NANOCLAW_ROOT = Path(__file__).resolve().parent.parent
-LEXIOS_ROOT = Path(os.environ.get("LEXIOS_ROOT", Path.home() / "Lexios"))
 
-LEXIOS_PLATFORM = LEXIOS_ROOT / "docs" / "LEXIOS_PLATFORM.md"
-LEXIOS_CHANGELOG = LEXIOS_ROOT / "docs" / "LEXIOS_CHANGELOG.md"
 NANOCLAW_PLATFORM = NANOCLAW_ROOT / "docs" / "NANOCLAW_PLATFORM.md"
 NANOCLAW_CHANGELOG = NANOCLAW_ROOT / "docs" / "NANOCLAW_CHANGELOG.md"
 
@@ -80,53 +77,6 @@ def update_timestamp(filepath: Path):
     print(f"  Updated timestamp: {filepath.name} → {today}")
 
 
-def update_lexios_stats(filepath: Path):
-    """Update Lexios platform doc with current stats."""
-    if not filepath.exists():
-        return
-
-    content = filepath.read_text()
-
-    # Update corpus stats if eval.db exists
-    eval_db = LEXIOS_ROOT / "lexios" / "eval.db"
-    if eval_db.exists():
-        try:
-            import sqlite3
-            conn = sqlite3.connect(str(eval_db))
-            cursor = conn.cursor()
-
-            # Corpus doc count
-            try:
-                cursor.execute("SELECT COUNT(*) FROM corpus_docs")
-                doc_count = cursor.fetchone()[0]
-            except Exception:
-                doc_count = None
-
-            # Types covered
-            try:
-                cursor.execute("SELECT COUNT(DISTINCT category) FROM model_performance")
-                types_covered = cursor.fetchone()[0]
-            except Exception:
-                types_covered = None
-
-            conn.close()
-
-            if doc_count is not None:
-                print(f"  Corpus: {doc_count} docs, {types_covered or '?'} types covered")
-        except Exception as e:
-            print(f"  Could not read eval.db: {e}")
-
-    # Update learnings count
-    learnings_path = LEXIOS_ROOT / "lexios" / "learnings.json"
-    if learnings_path.exists():
-        try:
-            learnings = json.loads(learnings_path.read_text())
-            total_tips = sum(len(v) if isinstance(v, list) else 0 for v in learnings.values())
-            print(f"  Learnings: {total_tips} tips across {len(learnings)} categories")
-        except Exception:
-            pass
-
-
 def append_recent_commits(changelog_path: Path, repo_path: Path, repo_name: str):
     """Append any commits newer than the changelog's latest entry."""
     if not changelog_path.exists() or not repo_path.exists():
@@ -177,12 +127,9 @@ def main():
     print("Updating live documents...")
 
     if do_platform:
-        update_timestamp(LEXIOS_PLATFORM)
-        update_lexios_stats(LEXIOS_PLATFORM)
         update_timestamp(NANOCLAW_PLATFORM)
 
     if do_changelog:
-        append_recent_commits(LEXIOS_CHANGELOG, LEXIOS_ROOT, "Lexios")
         append_recent_commits(NANOCLAW_CHANGELOG, NANOCLAW_ROOT, "NanoClaw")
 
     print("Done.")

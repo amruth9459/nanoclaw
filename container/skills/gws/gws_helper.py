@@ -8,6 +8,9 @@ Usage:
     python3 gws_helper.py gmail_send --to "user@example.com" --subject "Hi" --body "Hello"
     python3 gws_helper.py calendar_events --days 7 --calendar_id primary
     python3 gws_helper.py drive_search --query "name contains 'report'" --max_results 10
+    python3 gws_helper.py gmail_categorize --query "category:promotions" --max_results 50
+    python3 gws_helper.py gmail_batch_trash --message_ids '["id1","id2"]'
+    python3 gws_helper.py gmail_batch_archive --message_ids '["id1","id2"]'
 
 Token directory (GWS_TOKEN_DIR env var) must contain:
     - token.json (OAuth2 refresh token)
@@ -16,7 +19,9 @@ Token directory (GWS_TOKEN_DIR env var) must contain:
 import argparse
 import json
 import os
+import re
 import sys
+from collections import defaultdict
 from datetime import datetime, timedelta, timezone
 
 TOKEN_DIR = os.environ.get('GWS_TOKEN_DIR', '/workspace/gws/tokens')
@@ -155,6 +160,123 @@ def drive_search(args):
     print(json.dumps({"files": output, "total": len(output)}))
 
 
+def gmail_categorize(args):
+    """Search Gmail and group results by sender domain for cleanup review."""
+    from googleapiclient.discovery import build
+    creds = get_credentials()
+    service = build('gmail', 'v1', credentials=creds)
+
+    max_results = min(int(args.max_results), 100)
+    results = service.users().messages().list(
+        userId='me', q=args.query, maxResults=max_results
+    ).execute()
+
+    messages = results.get('messages', [])
+    if not messages:
+        print(json.dumps({"domains": {}, "total": 0, "message_ids": []}))
+        return
+
+    domains = defaultdict(lambda: {"count": 0, "examples": [], "ids": []})
+    all_ids = []
+
+    for msg_ref in messages:
+        msg = service.users().messages().get(userId='me', id=msg_ref['id'], format='metadata',
+            metadataHeaders=['Subject', 'From', 'Date', 'List-Unsubscribe']).execute()
+
+        headers = {h['name']: h['value'] for h in msg.get('payload', {}).get('headers', [])}
+        from_addr = headers.get('From', '')
+        subject = headers.get('Subject', '(no subject)')
+        has_unsubscribe = 'List-Unsubscribe' in headers
+
+        # Extract domain from email address
+        email_match = re.search(r'<([^>]+)>|[\w.+-]+@[\w.-]+', from_addr)
+        if email_match:
+            email = email_match.group(1) or email_match.group(0)
+            domain = email.split('@')[-1] if '@' in email else 'unknown'
+        else:
+            domain = 'unknown'
+
+        entry = domains[domain]
+        entry["count"] += 1
+        entry["ids"].append(msg_ref['id'])
+        if len(entry["examples"]) < 3:
+            entry["examples"].append(subject[:80])
+        if has_unsubscribe:
+            entry["is_newsletter"] = True
+
+        all_ids.append(msg_ref['id'])
+
+    # Convert to serializable dict
+    output = {}
+    for domain, data in sorted(domains.items(), key=lambda x: -x[1]["count"]):
+        output[domain] = {
+            "count": data["count"],
+            "examples": data["examples"],
+            "ids": data["ids"],
+            "is_newsletter": data.get("is_newsletter", False),
+        }
+
+    print(json.dumps({
+        "domains": output,
+        "total": len(all_ids),
+        "total_estimate": results.get('resultSizeEstimate', len(all_ids)),
+        "message_ids": all_ids,
+    }))
+
+
+MAX_BATCH = 100
+
+
+def gmail_batch_trash(args):
+    """Move messages to Trash via batchModify. Hard cap 100 messages."""
+    from googleapiclient.discovery import build
+    creds = get_credentials()
+
+    message_ids = json.loads(args.message_ids)
+    if not isinstance(message_ids, list):
+        print(json.dumps({"error": "message_ids must be a JSON array"}))
+        sys.exit(1)
+    if len(message_ids) > MAX_BATCH:
+        print(json.dumps({"error": f"Exceeds hard cap of {MAX_BATCH} messages (got {len(message_ids)})"}))
+        sys.exit(1)
+    if len(message_ids) == 0:
+        print(json.dumps({"error": "Empty message_ids list"}))
+        sys.exit(1)
+
+    service = build('gmail', 'v1', credentials=creds)
+    service.users().messages().batchModify(userId='me', body={
+        'ids': message_ids,
+        'addLabelIds': ['TRASH'],
+    }).execute()
+
+    print(json.dumps({"success": True, "trashed": len(message_ids)}))
+
+
+def gmail_batch_archive(args):
+    """Archive messages (remove INBOX label) via batchModify. Hard cap 100 messages."""
+    from googleapiclient.discovery import build
+    creds = get_credentials()
+
+    message_ids = json.loads(args.message_ids)
+    if not isinstance(message_ids, list):
+        print(json.dumps({"error": "message_ids must be a JSON array"}))
+        sys.exit(1)
+    if len(message_ids) > MAX_BATCH:
+        print(json.dumps({"error": f"Exceeds hard cap of {MAX_BATCH} messages (got {len(message_ids)})"}))
+        sys.exit(1)
+    if len(message_ids) == 0:
+        print(json.dumps({"error": "Empty message_ids list"}))
+        sys.exit(1)
+
+    service = build('gmail', 'v1', credentials=creds)
+    service.users().messages().batchModify(userId='me', body={
+        'ids': message_ids,
+        'removeLabelIds': ['INBOX'],
+    }).execute()
+
+    print(json.dumps({"success": True, "archived": len(message_ids)}))
+
+
 def main():
     parser = argparse.ArgumentParser(description='Google Workspace helper')
     subparsers = parser.add_subparsers(dest='action')
@@ -177,6 +299,16 @@ def main():
     p_drive.add_argument('--query', required=True)
     p_drive.add_argument('--max_results', default='10')
 
+    p_categorize = subparsers.add_parser('gmail_categorize')
+    p_categorize.add_argument('--query', required=True)
+    p_categorize.add_argument('--max_results', default='50')
+
+    p_trash = subparsers.add_parser('gmail_batch_trash')
+    p_trash.add_argument('--message_ids', required=True)
+
+    p_archive = subparsers.add_parser('gmail_batch_archive')
+    p_archive.add_argument('--message_ids', required=True)
+
     args = parser.parse_args()
 
     if not args.action:
@@ -188,6 +320,9 @@ def main():
         'gmail_send': gmail_send,
         'calendar_events': calendar_events,
         'drive_search': drive_search,
+        'gmail_categorize': gmail_categorize,
+        'gmail_batch_trash': gmail_batch_trash,
+        'gmail_batch_archive': gmail_batch_archive,
     }
 
     try:

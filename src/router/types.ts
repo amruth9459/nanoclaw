@@ -14,7 +14,7 @@ export type TaskType =
 export type UserTier =
   | 'internal'       // NanoClaw team/owner
   | 'beta'           // Beta testers
-  | 'paid_customer'; // Paying customers (e.g., Lexios)
+  | 'paid_customer'; // Paying customers
 
 export type CostBudget =
   | 'unlimited'  // Quality first, cost no object
@@ -38,11 +38,10 @@ export type ModelTier =
 
 export type TaskSource =
   | 'whatsapp'
-  | 'lexios'
-  | 'osha'
   | 'scheduled_task'
   | 'bounty'
-  | 'internal';
+  | 'internal'
+  | (string & {});
 
 /**
  * Context provided to the router for decision-making
@@ -170,7 +169,7 @@ export interface RoutingMetrics {
   totalRequests: number;
   byTier: Record<ModelTier, number>;
   byTaskType: Record<TaskType, number>;
-  bySource: Record<TaskSource, number>;
+  bySource: Record<string, number>;
 
   // Performance
   avgLatencyMs: number;

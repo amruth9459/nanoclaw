@@ -1,44 +1,36 @@
 /**
- * Fieldy (Field Labs Compass) Webhook Integration for NanoClaw
+ * Fieldy Webhook Integration for NanoClaw
  *
  * Receives real-time transcripts from Fieldy device via webhook,
  * stores them in database, and provides WhatsApp query interface.
  *
  * Webhook endpoint: POST /webhooks/fieldy
  *
- * Expected payload format (adjust based on actual Fieldy webhook):
+ * Actual Fieldy payload format:
  * {
- *   "id": "transcript_12345",
- *   "device_id": "device_abc",
- *   "start_time": "2026-03-02T10:30:00Z",
- *   "end_time": "2026-03-02T10:45:00Z",
- *   "duration": 900,
- *   "transcript": "Full transcript text here...",
- *   "language": "en",
- *   "speakers": [
- *     {"speaker": "Speaker 1", "start": 0, "end": 120},
- *     {"speaker": "Speaker 2", "start": 120, "end": 300}
+ *   "date": "2025-03-01T16:35:00.100907+00:00",
+ *   "transcription": "Hi, my name is Adam.",
+ *   "transcriptions": [
+ *     {"text": "Hi, my name is Adam.", "speaker": "A", "start": 0.04, "end": 4.4, "duration": 4.36}
  *   ]
  * }
  */
 
+import crypto from 'crypto';
 import { storeTranscript, getTranscript, searchTranscripts, getTranscriptsByDate, getTranscriptStats } from '../db.js';
 import { logger } from '../logger.js';
 
+/** Raw payload from Fieldy device */
 export interface FieldyWebhookPayload {
-  id: string;
-  device_id?: string;
-  start_time: string;
-  end_time: string;
-  duration: number; // seconds
-  transcript: string;
-  language?: string;
-  speakers?: Array<{
+  date: string;
+  transcription: string;
+  transcriptions?: Array<{
+    text: string;
     speaker: string;
     start: number;
     end: number;
+    duration: number;
   }>;
-  metadata?: Record<string, any>;
 }
 
 export class FieldyIntegration {
@@ -47,43 +39,61 @@ export class FieldyIntegration {
    */
   async handleWebhook(payload: FieldyWebhookPayload): Promise<{ success: boolean; message: string }> {
     try {
-      // Validate payload
-      if (!payload.id || !payload.transcript || !payload.start_time || !payload.end_time) {
+      // Validate required fields
+      if (!payload.date || !payload.transcription) {
         logger.warn({ payload }, 'Invalid Fieldy webhook payload - missing required fields');
-        return { success: false, message: 'Missing required fields: id, transcript, start_time, end_time' };
+        return { success: false, message: 'Missing required fields: date, transcription' };
       }
 
-      // Check if transcript already exists (prevent duplicates)
-      const existing = getTranscript(payload.id);
+      // Generate deterministic ID from date + transcript hash (Fieldy doesn't send an ID)
+      const id = 'fieldy_' + crypto.createHash('sha256')
+        .update(payload.date + payload.transcription)
+        .digest('hex')
+        .substring(0, 16);
+
+      // Check for duplicates
+      const existing = getTranscript(id);
       if (existing) {
-        logger.info({ transcriptId: payload.id }, 'Fieldy transcript already exists, skipping');
+        logger.info({ transcriptId: id }, 'Fieldy transcript already exists, skipping');
         return { success: true, message: 'Transcript already stored' };
       }
 
-      // Store transcript in database
+      // Compute total duration from speaker segments, or 0 if no segments
+      const segments = payload.transcriptions || [];
+      const totalDuration = segments.length > 0
+        ? Math.ceil(Math.max(...segments.map(s => s.end)) - Math.min(...segments.map(s => s.start)))
+        : 0;
+
+      // Map speaker segments to our format
+      const speakers = segments.map(s => ({
+        speaker: `Speaker ${s.speaker}`,
+        start: s.start,
+        end: s.end,
+      }));
+
+      // Compute end_time from date + duration
+      const startTime = payload.date;
+      const endDate = new Date(payload.date);
+      endDate.setSeconds(endDate.getSeconds() + totalDuration);
+      const endTime = endDate.toISOString();
+
       storeTranscript({
-        id: payload.id,
+        id,
         source: 'fieldy',
-        deviceId: payload.device_id,
-        startTime: payload.start_time,
-        endTime: payload.end_time,
-        durationSeconds: payload.duration,
-        text: payload.transcript,
-        speakers: payload.speakers,
-        language: payload.language,
-        metadata: payload.metadata,
+        startTime,
+        endTime,
+        durationSeconds: totalDuration,
+        text: payload.transcription,
+        speakers: speakers.length > 0 ? speakers : undefined,
+        metadata: segments.length > 0 ? { rawTranscriptions: segments } : undefined,
       });
 
       logger.info(
-        {
-          transcriptId: payload.id,
-          duration: payload.duration,
-          textLength: payload.transcript.length,
-        },
+        { transcriptId: id, duration: totalDuration, textLength: payload.transcription.length },
         'Fieldy transcript stored successfully'
       );
 
-      return { success: true, message: `Transcript ${payload.id} stored successfully` };
+      return { success: true, message: `Transcript ${id} stored successfully` };
     } catch (error) {
       logger.error({ error, payload }, 'Error handling Fieldy webhook');
       return {
@@ -98,7 +108,7 @@ export class FieldyIntegration {
    *
    * Examples:
    * - "What did I say today?"
-   * - "Find conversations about Lexios"
+   * - "Find conversations about project X"
    * - "Show me yesterday's recordings"
    */
   async handleWhatsAppQuery(query: string): Promise<string> {
@@ -118,7 +128,7 @@ export class FieldyIntegration {
         const totalMinutes = Math.round(totalDuration / 60);
 
         let response = `*Fieldy Recordings - Today*\n\n`;
-        response += `📊 ${transcripts.length} recording(s), ${totalMinutes} minutes total\n\n`;
+        response += `${transcripts.length} recording(s), ${totalMinutes} minutes total\n\n`;
 
         for (const transcript of transcripts.slice(0, 5)) {
           const startTime = new Date(transcript.startTime);
@@ -151,7 +161,7 @@ export class FieldyIntegration {
         const totalMinutes = Math.round(totalDuration / 60);
 
         let response = `*Fieldy Recordings - Yesterday*\n\n`;
-        response += `📊 ${transcripts.length} recording(s), ${totalMinutes} minutes total\n\n`;
+        response += `${transcripts.length} recording(s), ${totalMinutes} minutes total\n\n`;
 
         for (const transcript of transcripts.slice(0, 5)) {
           const startTime = new Date(transcript.startTime);
@@ -171,7 +181,6 @@ export class FieldyIntegration {
 
       // Intent: Search transcripts
       if (lowerQuery.includes('find') || lowerQuery.includes('search') || lowerQuery.includes('about')) {
-        // Extract search terms
         const searchMatch = query.match(/(?:find|search|about)\s+(.+?)(?:\s+today|\s+yesterday|$)/i);
         const searchQuery = searchMatch ? searchMatch[1].trim() : query;
 
@@ -190,7 +199,6 @@ export class FieldyIntegration {
           const timeStr = startTime.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
           const duration = Math.round(transcript.durationSeconds / 60);
 
-          // Find snippet with search terms
           const snippet = this.extractSnippet(transcript.text, searchQuery);
 
           response += `*${dateStr} at ${timeStr}* (${duration} min)\n${snippet}\n\n`;
@@ -208,8 +216,8 @@ export class FieldyIntegration {
         const stats = getTranscriptStats();
 
         let response = `*Fieldy Recording Stats*\n\n`;
-        response += `📊 Total recordings: ${stats.total}\n`;
-        response += `⏱ Total duration: ${stats.totalDurationHours} hours\n\n`;
+        response += `Total recordings: ${stats.total}\n`;
+        response += `Total duration: ${stats.totalDurationHours} hours\n\n`;
 
         if (stats.bySource.fieldy) {
           response += `Fieldy recordings: ${stats.bySource.fieldy}\n`;
@@ -218,7 +226,7 @@ export class FieldyIntegration {
         if (stats.oldestTranscript && stats.newestTranscript) {
           const oldest = new Date(stats.oldestTranscript);
           const newest = new Date(stats.newestTranscript);
-          response += `\n📅 Date range:\n`;
+          response += `\nDate range:\n`;
           response += `Oldest: ${oldest.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}\n`;
           response += `Newest: ${newest.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`;
         }
@@ -251,9 +259,7 @@ export class FieldyIntegration {
     }
   }
 
-  /**
-   * Extract snippet around search terms
-   */
+  /** Extract snippet around search terms */
   private extractSnippet(text: string, query: string, contextChars: number = 150): string {
     const queryLower = query.toLowerCase();
     const textLower = text.toLowerCase();
@@ -261,7 +267,6 @@ export class FieldyIntegration {
     const index = textLower.indexOf(queryLower);
 
     if (index === -1) {
-      // No exact match, return beginning
       return text.substring(0, contextChars) + (text.length > contextChars ? '...' : '');
     }
 
@@ -274,15 +279,6 @@ export class FieldyIntegration {
     if (end < text.length) snippet = snippet + '...';
 
     return snippet;
-  }
-
-  /**
-   * Verify webhook signature (if Fieldy supports webhook signing)
-   */
-  verifyWebhookSignature(payload: string, signature: string, secret: string): boolean {
-    // TODO: Implement signature verification once Fieldy webhook specs are available
-    // For now, assume all webhooks are valid
-    return true;
   }
 }
 

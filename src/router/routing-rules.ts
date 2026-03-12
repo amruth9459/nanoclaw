@@ -11,6 +11,7 @@ import type {
   TaskType,
   TaskSource,
 } from './types.js';
+import { getIntegrations } from '../integration-loader.js';
 
 /**
  * Rules engine for routing decisions
@@ -82,30 +83,7 @@ export class RoutingRulesEngine {
       description: 'Code tasks use Claude Sonnet',
     });
 
-    // Rule 6: Lexios extraction (high volume) uses local models
-    this.addRule({
-      name: 'lexios-extraction',
-      priority: 70,
-      sources: ['lexios'],
-      maxComplexity: 0.6,
-      preferredTier: 'local-llm',
-      preferredModel: 'qwen2.5-vl-72b',
-      enabled: true,
-      description: 'Lexios extraction uses local vision model',
-    });
-
-    // Rule 7: OSHA compliance (critical) uses cloud
-    this.addRule({
-      name: 'osha-compliance',
-      priority: 95,
-      sources: ['osha'],
-      preferredTier: 'cloud',
-      preferredModel: 'claude-opus-4.6',
-      enabled: true,
-      description: 'OSHA compliance needs highest accuracy',
-    });
-
-    // Rule 8: Scheduled tasks (batch) use local models
+    // Rule 6: Scheduled tasks (batch) use local models
     this.addRule({
       name: 'scheduled-batch',
       priority: 60,
@@ -137,6 +115,15 @@ export class RoutingRulesEngine {
       enabled: true,
       description: 'Data extraction uses local models',
     });
+
+    // Inject integration-provided routing rules
+    for (const integration of getIntegrations()) {
+      if (integration.routingRules) {
+        for (const rule of integration.routingRules) {
+          this.addRule(rule);
+        }
+      }
+    }
   }
 
   /**

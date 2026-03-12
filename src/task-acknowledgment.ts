@@ -1,6 +1,6 @@
 /**
  * Task Acknowledgment & Time Estimation System
- * Ensures no user (WhatsApp or Lexios) waits silently
+ * Ensures no user waits silently
  *
  * Features:
  * - Immediate acknowledgment for all tasks
@@ -13,6 +13,7 @@ import Database from 'better-sqlite3';
 import { logger } from './logger.js';
 import { UniversalRouter, type RoutingContext } from './router/index.js';
 import { ResourceOrchestrator } from './resource-orchestrator.js';
+import { getIntegrations } from './integration-loader.js';
 
 // Default RAM estimate for task agents
 const DEFAULT_AGENT_RAM = 2;
@@ -105,7 +106,7 @@ export class TaskAcknowledgment {
       costBudget: request.userId ? 'limited' : 'zero',
       qualityNeeds: request.complexity === 'expert' ? 'best' : 'good',
       latencyNeeds: 'fast',
-      source: request.userId ? 'lexios' : 'whatsapp',
+      source: request.userId ? this.resolveSource(request.userId) : 'whatsapp',
       isPaidCustomer: !!request.userId,
       customerId: request.userId,
     };
@@ -125,7 +126,7 @@ export class TaskAcknowledgment {
     // Check resource availability
     const resourceRequest = await this.resourceOrchestrator.requestAgent({
       id: request.taskId,
-      type: request.userId ? 'lexios' : 'nanoclaw',
+      type: request.userId ? this.resolveAgentType(request.userId) : 'nanoclaw',
       priority: request.userId ? 100 : 75,
       estimatedRamGB: DEFAULT_AGENT_RAM,
       userId: request.userId,
@@ -428,6 +429,22 @@ export class TaskAcknowledgment {
       review: 'reasoning',
     };
     return typeMap[taskType.toLowerCase()] || 'conversation';
+  }
+
+  private resolveSource(userId: string): string {
+    for (const integration of getIntegrations()) {
+      const claim = integration.claimsUserId?.(userId);
+      if (claim) return claim.source;
+    }
+    return 'whatsapp';
+  }
+
+  private resolveAgentType(userId: string): string {
+    for (const integration of getIntegrations()) {
+      const claim = integration.claimsUserId?.(userId);
+      if (claim) return claim.agentType;
+    }
+    return 'nanoclaw';
   }
 
   /**

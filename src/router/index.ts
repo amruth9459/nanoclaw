@@ -115,30 +115,14 @@ const { result, decision } = await router.execute(context, async (modelId) => {
 });
 */
 
-// Example 3: Lexios-specific routing
-/*
-import { LexiosRouterFactory } from './router/index.js';
-
-const lexiosRouter = LexiosRouterFactory.createProduction();
-
-const lexiosContext = {
-  lexiosTaskType: 'extraction',
-  isPaidCustomer: false,
-  costBudget: 'zero',
-  source: 'lexios',
-};
-
-const decision = await lexiosRouter.routeLexios(lexiosContext);
-*/
-
-// Example 4: Get metrics
+// Example 3: Get metrics
 /*
 const metrics = router.getMetrics('24h');
 console.log(`Cost saved: $${metrics.costSavedUsd}`);
 console.log(`Local models: ${metrics.localSlmPercentage + metrics.localLlmPercentage}%`);
 */
 
-// Example 5: Monitor performance
+// Example 4: Monitor performance
 /*
 import { RouterMetrics } from './router/index.js';
 

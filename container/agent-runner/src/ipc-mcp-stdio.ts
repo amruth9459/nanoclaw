@@ -888,7 +888,7 @@ Only available to the main group.`,
   {
     prompt: z.string().describe('The task/prompt for the desktop Claude Code agent'),
     workdir: z.string().optional().describe('Working directory (default: ~/nanoclaw)'),
-    max_budget_usd: z.number().optional().describe('Max spend in USD (default: 1.00)'),
+    max_budget_usd: z.number().optional().describe('Max spend in USD (default: unlimited, set 0 for no limit)'),
   },
   async (args) => {
     if (!isMain) {
@@ -905,10 +905,10 @@ Only available to the main group.`,
       max_budget_usd: args.max_budget_usd,
     });
 
-    // Desktop Claude sessions can take a while — poll with 5 min timeout
-    const result = await pollResponse(responseFile, 300000);
+    // Desktop Claude sessions can take a while — poll with 30 min timeout
+    const result = await pollResponse(responseFile, 1_800_000);
     if (!result) {
-      return { content: [{ type: 'text' as const, text: 'Error: desktop_claude request timed out (5 min limit)' }], isError: true };
+      return { content: [{ type: 'text' as const, text: 'Error: desktop_claude request timed out (30 min limit)' }], isError: true };
     }
     if (result.error) {
       return { content: [{ type: 'text' as const, text: `Error: ${result.error}` }], isError: true };

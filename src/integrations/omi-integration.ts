@@ -7,7 +7,7 @@
  * - "What did I discuss today?"
  * - "Extract action items from last week"
  * - "Summarize my meeting with John"
- * - "Find conversations about Lexios"
+ * - "Find conversations about project X"
  */
 
 import axios from 'axios';
@@ -74,7 +74,7 @@ export class OmiIntegration {
   /**
    * Query conversations by natural language
    *
-   * @param query Natural language query (e.g., "what did I discuss about Lexios today?")
+   * @param query Natural language query (e.g., "what did I discuss about the project today?")
    * @param limit Number of results to return
    * @returns Array of relevant conversation snippets
    */

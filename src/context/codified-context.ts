@@ -202,6 +202,25 @@ export class CodedContext {
   }
 
   /**
+   * Load learned facts from an external file (e.g. integration learnings).
+   * Parses ## Learned Facts section using the same format as MEMORY.md.
+   */
+  loadLearningsFromFile(filePath: string): number {
+    if (!fs.existsSync(filePath)) return 0;
+    try {
+      const content = fs.readFileSync(filePath, 'utf-8');
+      const loaded = this.parseSimpleSection(content, '## Learned Facts', 'learned_fact');
+      if (loaded > 0) {
+        logger.info({ filePath, factsLoaded: loaded }, 'Loaded learnings from external file');
+      }
+      return loaded;
+    } catch (err) {
+      logger.warn({ err, filePath }, 'Failed to load learnings from external file');
+      return 0;
+    }
+  }
+
+  /**
    * Parse the structured Codified Context section
    * Format: - **key:** value (XX% confident)
    * Subsections: ### CATEGORY_NAME

@@ -1,6 +1,6 @@
 /**
  * Resource Orchestrator
- * Manages compute resources (RAM, CPU, concurrent agents) across NanoClaw and Lexios
+ * Manages compute resources (RAM, CPU, concurrent agents) across all products
  *
  * Integrates with:
  * - Universal Router (model selection)
@@ -8,8 +8,8 @@
  * - Task scheduler (background tasks)
  *
  * Key Features:
- * - 64GB RAM monitoring and limits
- * - Agent prioritization (Lexios users > NanoClaw tasks)
+ * - Auto-detect RAM monitoring and limits
+ * - Agent prioritization (paid customers > internal tasks)
  * - Queue management with ETA
  * - Auto-kill low-priority agents when RAM critical
  */
@@ -43,7 +43,7 @@ const RESOURCE_CONFIG = {
 };
 
 export enum AgentPriority {
-  CRITICAL = 100, // Paying Lexios customer
+  CRITICAL = 100, // Paying customer
   HIGH = 75,      // User-initiated NanoClaw task
   MEDIUM = 50,    // Scheduled task
   LOW = 25,       // Background optimization
@@ -52,14 +52,14 @@ export enum AgentPriority {
 
 export interface AgentRequest {
   id: string;
-  type: string; // e.g., 'lexios', 'nanoclaw', 'vantage', 'osha', any product
+  type: string; // e.g., 'nanoclaw', or any integration-provided type
   priority: AgentPriority;
   estimatedRamGB: number;
   modelTier?: 'local-slm' | 'local-llm' | 'cloud';
   userId?: string; // For paying customers
   taskId?: string; // For tasks
   teamId?: string; // For team members
-  product?: string; // Product name (e.g., 'Lexios', 'Vantage Intelligence')
+  product?: string; // Product name for tracking
 }
 
 export interface AgentProcess {
@@ -108,6 +108,9 @@ export class ResourceOrchestrator {
   }
 
   private initDatabase() {
+    // Drop old schema with hardcoded columns (monitoring data, auto-purged)
+    this.db.exec(`DROP TABLE IF EXISTS resource_usage`);
+
     this.db.exec(`
       CREATE TABLE IF NOT EXISTS resource_usage (
         timestamp INTEGER PRIMARY KEY,
@@ -116,8 +119,7 @@ export class ResourceOrchestrator {
         available_ram_gb REAL,
         used_percent REAL,
         active_agents INTEGER,
-        lexios_agents INTEGER,
-        nanoclaw_agents INTEGER,
+        agents_by_type TEXT,
         queued_agents INTEGER,
         local_models_active INTEGER
       );
@@ -493,9 +495,9 @@ export class ResourceOrchestrator {
     this.db.prepare(`
       INSERT INTO resource_usage (
         timestamp, total_ram_gb, used_ram_gb, available_ram_gb, used_percent,
-        active_agents, lexios_agents, nanoclaw_agents, queued_agents,
+        active_agents, agents_by_type, queued_agents,
         local_models_active
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
     `).run(
       Date.now(),
       status.totalRamGB,
@@ -503,8 +505,7 @@ export class ResourceOrchestrator {
       status.availableRamGB,
       status.usedPercent,
       status.activeAgents,
-      status.agentsByType['lexios'] || 0,
-      status.agentsByType['nanoclaw'] || 0,
+      JSON.stringify(status.agentsByType),
       status.queuedAgents,
       status.localModelsActive
     );
