@@ -1,11 +1,43 @@
 # NanoClaw — Daily Build Log
 
 *Living document — auto-generated from git history*
-*Last generated: 2026-03-11*
+*Last generated: 2026-03-12*
 
-**279 total commits** (199 meaningful) | 2026-01-31 to 2026-03-10
+**290 total commits** (200 meaningful) | 2026-01-31 to 2026-03-11
 
 ---
+
+## 2026-03-11
+
+### What Changed
+- Auto-dispatch, dependency inference, task completion loop, infrastructure fixes
+- (+10 auto-backup commits)
+
+### Files (49 changed)
+- .claude/hooks/memory-bridge.sh
+- .claude/hooks/whatsapp-sync.sh
+- .githooks/no-lexios-in-core.sh
+- CLAUDE.md
+- container/agent-runner/src/gws-tools.ts
+- container/agent-runner/src/index.ts
+- container/agent-runner/src/ipc-mcp-stdio.ts
+- container/agent-runner/src/lexios-tools.ts
+- container/agent-runner/src/safety-pulse.ts
+- container/skills/gws/gws_helper.py
+- container/skills/lexios/requirements.txt
+- docs/DEVLOG.md
+- docs/NANOCLAW_BUILD_LOG.md
+- package-lock.json
+- package.json
+- scripts/backup.sh
+- scripts/generate-build-log.py
+- scripts/generate-contingency.sh
+- scripts/lexios-eval.py
+- scripts/migrate-to-mac-studio.sh
+- ... and 29 more
+
+### Stats
+- 3535 insertions, 2060 deletions
 
 ## 2026-03-10
 
