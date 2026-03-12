@@ -96,6 +96,38 @@ function isDuplicateOutgoing(jid: string, text: string): boolean {
 
 let ipcWatcherRunning = false;
 
+// ── Desktop Claude concurrency semaphore ──────────────────────────────
+// Serialize desktop_claude spawns to prevent FD exhaustion from parallel claude -p
+let activeDesktopClaude = 0;
+const MAX_CONCURRENT_DESKTOP = 1;
+const DESKTOP_QUEUE_TIMEOUT_MS = 5 * 60 * 1000; // 5 min max wait in queue
+const desktopQueue: Array<{ resolve: () => void; reject: (err: Error) => void; timer: ReturnType<typeof setTimeout> }> = [];
+
+function acquireDesktopSlot(): Promise<void> {
+  if (activeDesktopClaude < MAX_CONCURRENT_DESKTOP) {
+    activeDesktopClaude++;
+    return Promise.resolve();
+  }
+  return new Promise((resolve, reject) => {
+    const timer = setTimeout(() => {
+      const idx = desktopQueue.findIndex(e => e.resolve === resolve);
+      if (idx >= 0) desktopQueue.splice(idx, 1);
+      reject(new Error('desktop_claude queue timeout — waited 5 minutes'));
+    }, DESKTOP_QUEUE_TIMEOUT_MS);
+    desktopQueue.push({ resolve, reject, timer });
+  });
+}
+
+function releaseDesktopSlot(): void {
+  activeDesktopClaude--;
+  if (desktopQueue.length > 0) {
+    const next = desktopQueue.shift()!;
+    clearTimeout(next.timer);
+    activeDesktopClaude++;
+    next.resolve();
+  }
+}
+
 export function startIpcWatcher(deps: IpcDeps): void {
   if (ipcWatcherRunning) {
     logger.debug('IPC watcher already running, skipping duplicate start');
@@ -237,6 +269,16 @@ export function startIpcWatcher(deps: IpcDeps): void {
                   const capturedConfig = desktopConfig;
                   // Spawn in background so IPC loop isn't blocked
                   (async () => {
+                    // Acquire semaphore slot (serialize desktop_claude to prevent FD exhaustion)
+                    try {
+                      await acquireDesktopSlot();
+                    } catch (err) {
+                      logger.warn({ err }, 'desktop_claude semaphore timeout');
+                      if (responseFile) {
+                        writeIpcResponse(responseFile, { error: 'desktop_claude queue timeout — all slots busy for 5 minutes' });
+                      }
+                      return;
+                    }
                     try {
                       const { execFile } = await import('child_process');
                       const { promisify } = await import('util');
@@ -276,7 +318,11 @@ export function startIpcWatcher(deps: IpcDeps): void {
                           cwd: resolved,
                           timeout: 1_800_000, // 30 min — let complex tasks finish
                           maxBuffer: 10 * 1024 * 1024, // 10MB output buffer
-                          env: { ...process.env, CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC: '1' },
+                          env: {
+                            ...process.env,
+                            CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC: '1',
+                            PATH: `/opt/homebrew/bin:${process.env.PATH || '/usr/bin:/bin'}`,
+                          },
                         },
                       );
                       const output = stdout || stderr || 'Completed with no output.';
@@ -314,6 +360,8 @@ export function startIpcWatcher(deps: IpcDeps): void {
                           await deps.sendMessage(getNotifyJid(capturedConfig.notifyTopic, mainJid), `🖥️ Desktop Claude failed: ${reason.slice(0, 200)}`);
                         }
                       }
+                    } finally {
+                      releaseDesktopSlot();
                     }
                   })();
                   fs.unlinkSync(filePath);

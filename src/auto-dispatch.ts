@@ -33,6 +33,8 @@ export interface DispatchRecord {
 
 const DISPATCH_INTERVAL_MS = 60_000; // Check every 60s
 const MIN_CONFIDENCE = 0.15;         // Minimum match confidence to auto-dispatch
+const MAX_FAILURES = 3;              // Stop re-dispatching after this many failures
+const FAILURE_COOLDOWN_MIN = 30;     // Minutes to wait after a failure before retrying
 
 export class AutoDispatcher {
   private db: Database.Database;
@@ -180,28 +182,56 @@ export class AutoDispatcher {
           JOIN tasks dep ON dep.id = d.value
           WHERE dep.status NOT IN ('completed', 'done')
         )
+        -- Skip tasks that have failed too many times
+        AND NOT EXISTS (
+          SELECT 1 FROM dispatch_log d
+          WHERE d.task_id = t.id AND d.status = 'failed'
+          GROUP BY d.task_id
+          HAVING COUNT(*) >= ${MAX_FAILURES}
+        )
+        -- Skip tasks whose last failure was within cooldown period
+        AND NOT EXISTS (
+          SELECT 1 FROM dispatch_log d
+          WHERE d.task_id = t.id AND d.status = 'failed'
+            AND (julianday('now') - julianday(d.completed_at)) * 24 * 60 < ${FAILURE_COOLDOWN_MIN}
+        )
       ORDER BY t.priority DESC
       LIMIT ?
     `).all(project, limit) as any[];
 
-    if (tasks.length > 0) {
-      // Count blocked tasks for logging
-      const blocked = this.db.prepare(`
-        SELECT COUNT(*) as cnt FROM tasks t
-        WHERE t.status IN ('todo', 'pending')
-          AND (t.assigned_agent IS NULL OR t.assigned_agent = '')
-          AND t.project = ?
-          AND EXISTS (
-            SELECT 1 FROM json_each(t.dependencies) d
-            JOIN tasks dep ON dep.id = d.value
-            WHERE dep.status NOT IN ('completed', 'done')
-          )
-      `).get(project) as any;
+    // Count blocked and retry-exhausted tasks for logging
+    const blocked = this.db.prepare(`
+      SELECT COUNT(*) as cnt FROM tasks t
+      WHERE t.status IN ('todo', 'pending')
+        AND (t.assigned_agent IS NULL OR t.assigned_agent = '')
+        AND t.project = ?
+        AND EXISTS (
+          SELECT 1 FROM json_each(t.dependencies) d
+          JOIN tasks dep ON dep.id = d.value
+          WHERE dep.status NOT IN ('completed', 'done')
+        )
+    `).get(project) as any;
 
+    const retryExhausted = this.db.prepare(`
+      SELECT t.id FROM tasks t
+      WHERE t.status IN ('todo', 'pending')
+        AND (t.assigned_agent IS NULL OR t.assigned_agent = '')
+        AND t.project = ?
+        AND EXISTS (
+          SELECT 1 FROM dispatch_log d
+          WHERE d.task_id = t.id AND d.status = 'failed'
+          GROUP BY d.task_id
+          HAVING COUNT(*) >= ${MAX_FAILURES}
+        )
+    `).all(project) as any[];
+
+    if (tasks.length > 0 || retryExhausted.length > 0) {
       logger.info({
         project,
         ready: tasks.length,
         blocked: blocked?.cnt || 0,
+        retryExhausted: retryExhausted.length,
+        exhaustedIds: retryExhausted.map((t: any) => t.id),
         readyIds: tasks.map((t: any) => t.id),
       }, 'Dependency-aware dispatch');
     }
