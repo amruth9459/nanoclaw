@@ -3,14 +3,21 @@
  *
  * Scans ~/.claude/agents/ for persona files, registers them in the DB,
  * and provides matching for task dispatch.
+ *
+ * Supports semantic matching via Claude Haiku embeddings (128-dim float32).
+ * Domain descriptions are auto-generated from persona .md files and cached
+ * in sqlite-vec for fast cosine similarity lookups.
  */
+import crypto from 'crypto';
 import fs from 'fs';
 import os from 'os';
 import path from 'path';
 import Database from 'better-sqlite3';
+import * as sqliteVec from 'sqlite-vec';
 
 import { GROUPS_DIR } from './config.js';
 import { logger } from './logger.js';
+import { embedText } from './semantic-index.js';
 
 export interface Persona {
   id: string;
@@ -23,12 +30,16 @@ export interface Persona {
   active: boolean;
   dispatchedCount: number;
   lastDispatchedAt: string | null;
+  domainDescription?: string;
+  embedding?: Float32Array;
 }
 
 export interface PersonaMatch {
   persona: Persona;
   confidence: number;
   matchedKeywords: string[];
+  semanticScore?: number;
+  keywordScore?: number;
 }
 
 const AGENTS_DIR = path.join(os.homedir(), '.claude', 'agents');
@@ -69,7 +80,9 @@ export class PersonaRegistry {
     this.db = db;
   }
 
-  /** Create the agent_personas table */
+  private vecLoaded = false;
+
+  /** Create the agent_personas table and embedding tables */
   initSchema(): void {
     this.db.exec(`
       CREATE TABLE IF NOT EXISTS agent_personas (
@@ -88,6 +101,39 @@ export class PersonaRegistry {
       CREATE INDEX IF NOT EXISTS idx_personas_dept ON agent_personas(department);
       CREATE INDEX IF NOT EXISTS idx_personas_role ON agent_personas(role_mapping);
       CREATE INDEX IF NOT EXISTS idx_personas_active ON agent_personas(active);
+    `);
+
+    // Add domain_description column (idempotent)
+    try {
+      this.db.exec('ALTER TABLE agent_personas ADD COLUMN domain_description TEXT');
+    } catch { /* column already exists */ }
+
+    // Load sqlite-vec for virtual table support (guard against double-load)
+    if (!this.vecLoaded) {
+      try {
+        sqliteVec.load(this.db);
+        this.vecLoaded = true;
+      } catch (err: any) {
+        // Already loaded on this connection (e.g. shared db handle)
+        if (!String(err).includes('already loaded')) {
+          logger.warn({ err }, 'Failed to load sqlite-vec for persona registry');
+        }
+        this.vecLoaded = true;
+      }
+    }
+
+    // Embedding cache metadata + vec0 virtual table
+    this.db.exec(`
+      CREATE TABLE IF NOT EXISTS persona_embedding_meta (
+        rowid INTEGER PRIMARY KEY AUTOINCREMENT,
+        persona_id TEXT NOT NULL UNIQUE,
+        embedded_at TEXT NOT NULL,
+        source_hash TEXT NOT NULL
+      );
+      CREATE VIRTUAL TABLE IF NOT EXISTS persona_vec USING vec0(
+        persona_rowid INTEGER PRIMARY KEY,
+        embedding float[128]
+      );
     `);
   }
 
@@ -279,37 +325,235 @@ export class PersonaRegistry {
     }
   }
 
-  /** Find the best persona for a task description */
-  findBestPersona(taskDescription: string, requiredRole?: string): PersonaMatch | null {
-    // Clean tokens: strip punctuation, split compounds (docker-compose → docker, compose)
+  /** Generate a rich domain description from a persona's .md file for embedding */
+  private generateDomainDescription(persona: Persona): string {
+    // Check for manual override in persona-tuning.json
+    const tuningPath = path.join(GROUPS_DIR, 'main', 'persona-autoresearch', 'persona-tuning.json');
+    if (fs.existsSync(tuningPath)) {
+      try {
+        const tuning = JSON.parse(fs.readFileSync(tuningPath, 'utf-8'));
+        const override = tuning.overrides?.[persona.id]?.domain_description;
+        if (override) return override;
+      } catch { /* fall through to auto-generation */ }
+    }
+
+    const parts: string[] = [];
+
+    try {
+      const content = fs.readFileSync(persona.filePath, 'utf-8');
+
+      // 1. Frontmatter description
+      const fmMatch = content.match(/^---\n([\s\S]*?)\n---/);
+      if (fmMatch) {
+        const descMatch = fmMatch[1].match(/^description:\s*(.+)$/m);
+        if (descMatch) parts.push(descMatch[1].trim());
+      }
+
+      // 2. Department
+      parts.push(`Department: ${persona.department}`);
+
+      // 3. Specialties
+      if (persona.specialties.length > 0) {
+        parts.push(`Specialties: ${persona.specialties.join(', ')}`);
+      }
+
+      // 4. First 5 actionable bullet points from body
+      const body = fmMatch ? content.slice(fmMatch[0].length) : content;
+      const bullets = body.match(/^[-*]\s+\*?\*?(.+)/gm);
+      if (bullets) {
+        const actionable = bullets
+          .map(b => b.replace(/^[-*]\s+\*?\*?/, '').replace(/\*?\*?$/, '').trim())
+          .filter(b => b.length > 10 && b.length < 200)
+          .slice(0, 5);
+        if (actionable.length > 0) {
+          parts.push('Capabilities: ' + actionable.join('. '));
+        }
+      }
+    } catch {
+      // Fallback to basic info
+      parts.push(`${persona.name} - ${persona.department}`);
+      if (persona.specialties.length > 0) {
+        parts.push(`Specialties: ${persona.specialties.join(', ')}`);
+      }
+    }
+
+    return parts.join('. ');
+  }
+
+  /**
+   * Embed all personas. Call after scan().
+   * Caches embeddings by content hash — only re-embeds when description changes.
+   * Returns the number of personas that were newly embedded (API calls made).
+   */
+  async embedPersonas(): Promise<number> {
+    let embedded = 0;
+
+    const getMeta = this.db.prepare(
+      'SELECT rowid, source_hash FROM persona_embedding_meta WHERE persona_id = ?',
+    );
+    const upsertMeta = this.db.prepare(`
+      INSERT INTO persona_embedding_meta (persona_id, embedded_at, source_hash)
+      VALUES (?, ?, ?)
+      ON CONFLICT(persona_id) DO UPDATE SET
+        embedded_at = excluded.embedded_at,
+        source_hash = excluded.source_hash
+    `);
+    const upsertVec = this.db.prepare(
+      'INSERT OR REPLACE INTO persona_vec (persona_rowid, embedding) VALUES (?, ?)',
+    );
+    const getVec = this.db.prepare(
+      'SELECT embedding FROM persona_vec WHERE persona_rowid = ?',
+    );
+    const updateDomainDesc = this.db.prepare(
+      'UPDATE agent_personas SET domain_description = ? WHERE id = ?',
+    );
+
+    for (const persona of this.personas.values()) {
+      try {
+        const desc = this.generateDomainDescription(persona);
+        persona.domainDescription = desc;
+        updateDomainDesc.run(desc, persona.id);
+
+        const hash = crypto.createHash('md5').update(desc).digest('hex');
+        const meta = getMeta.get(persona.id) as { rowid: number; source_hash: string } | undefined;
+
+        if (meta && meta.source_hash === hash) {
+          // Cached — load embedding from DB (BigInt for vec0 primary key)
+          const vecRow = getVec.get(BigInt(meta.rowid)) as { embedding: Buffer } | undefined;
+          if (vecRow && vecRow.embedding) {
+            // sqlite-vec returns raw bytes as Buffer — convert to Float32Array
+            const buf = Buffer.isBuffer(vecRow.embedding) ? vecRow.embedding : Buffer.from(vecRow.embedding as any);
+            persona.embedding = new Float32Array(buf.buffer, buf.byteOffset, 128);
+            continue;
+          }
+        }
+
+        // Need to embed (new or stale)
+        const embedding = await embedText(desc);
+        persona.embedding = embedding;
+
+        // Store in meta table first to get rowid
+        upsertMeta.run(persona.id, new Date().toISOString(), hash);
+        const newMeta = getMeta.get(persona.id) as { rowid: number; source_hash: string };
+        // vec0 requires INTEGER primary key — BigInt forces integer binding
+        upsertVec.run(BigInt(newMeta.rowid), embedding);
+
+        embedded++;
+      } catch (err) {
+        logger.warn({ personaId: persona.id, err }, 'Failed to embed persona');
+      }
+    }
+
+    logger.info({ total: this.personas.size, embedded }, 'Persona embeddings loaded');
+    return embedded;
+  }
+
+  /** Compute keyword overlap score (extracted from findBestPersona for reuse) */
+  private computeKeywordScore(taskTokens: string[], persona: Persona): { score: number; matchedKeywords: string[] } {
+    const matchedKeywords: string[] = [];
+    for (const specialty of persona.specialties) {
+      const specWords = specialty.split(/\s+/).map(s => s.replace(/[^a-z0-9_./-]/g, ''));
+      for (const sw of specWords) {
+        if (sw.length > 2 && !MATCH_STOP_WORDS.has(sw) && taskTokens.includes(sw) && !matchedKeywords.includes(sw)) {
+          matchedKeywords.push(sw);
+        }
+      }
+    }
+    const score = matchedKeywords.length / Math.max(Math.min(taskTokens.length, 15), 1);
+    return { score, matchedKeywords };
+  }
+
+  /** Tokenize a task description for keyword matching */
+  private tokenizeTask(taskDescription: string): string[] {
     const rawTokens = taskDescription.toLowerCase()
       .split(/\s+/)
       .map(w => w.replace(/[^a-z0-9_./-]/g, ''))
       .filter(w => w.length > 2);
-    // Also add sub-tokens from compound words (split on - and . but keep originals)
-    const taskTokens = [...new Set(rawTokens.flatMap(t => {
+    return [...new Set(rawTokens.flatMap(t => {
       const parts = t.split(/[-.]/).filter(p => p.length > 2);
       return parts.length > 1 ? [t, ...parts] : [t];
     }))];
+  }
+
+  /**
+   * Semantic persona matching using embeddings + keyword hybrid scoring.
+   * Returns null if no persona exceeds the confidence threshold.
+   */
+  async findBestPersonaSemantic(taskDescription: string, requiredRole?: string): Promise<PersonaMatch | null> {
+    let taskEmbedding: Float32Array;
+    try {
+      taskEmbedding = await embedText(taskDescription);
+    } catch (err) {
+      logger.warn({ err }, 'Task embedding failed, falling back to keyword matching');
+      return this.findBestPersona(taskDescription, requiredRole);
+    }
+
+    const taskTokens = this.tokenizeTask(taskDescription);
+    let bestMatch: PersonaMatch | null = null;
+    let bestRankScore = -1;
+
+    for (const persona of this.personas.values()) {
+      if (!persona.active) continue;
+      if (requiredRole && persona.roleMapping !== requiredRole) continue;
+      if (!persona.embedding) continue;
+
+      // Cosine similarity via dot product (both vectors are L2-normalized)
+      let semanticScore = 0;
+      for (let i = 0; i < 128; i++) {
+        semanticScore += taskEmbedding[i] * persona.embedding[i];
+      }
+      // Clamp to [0, 1] — negative similarity means completely unrelated
+      semanticScore = Math.max(0, Math.min(1, semanticScore));
+
+      // Keyword score as secondary signal
+      const { score: keywordScore, matchedKeywords } = this.computeKeywordScore(taskTokens, persona);
+
+      // Hybrid: 75% semantic + 25% keyword
+      let confidence = 0.75 * semanticScore + 0.25 * Math.min(keywordScore, 1.0);
+
+      // Department bonus (reduced from 0.15 — semantic already captures domain)
+      const deptWords = persona.department.split('-');
+      for (const dw of deptWords) {
+        if (taskTokens.includes(dw)) { confidence += 0.05; break; }
+      }
+
+      confidence = Math.min(confidence, 1.0);
+
+      // Ranking score: apply recency + dispatch penalties (don't affect confidence threshold)
+      let rankScore = confidence;
+      if (persona.lastDispatchedAt) {
+        const hoursSince = (Date.now() - new Date(persona.lastDispatchedAt).getTime()) / 3_600_000;
+        if (hoursSince < 1) rankScore *= 0.8;
+        else if (hoursSince < 4) rankScore *= 0.9;
+      }
+      if (persona.dispatchedCount > 5) rankScore *= 0.95;
+
+      if (rankScore > bestRankScore) {
+        bestRankScore = rankScore;
+        bestMatch = { persona, confidence, matchedKeywords, semanticScore, keywordScore };
+      }
+    }
+
+    // If no persona had embeddings, fall back to keyword matching
+    if (!bestMatch) {
+      logger.warn('No persona embeddings available, falling back to keyword matching');
+      return this.findBestPersona(taskDescription, requiredRole);
+    }
+
+    return bestMatch;
+  }
+
+  /** Find the best persona for a task description (keyword-only fallback) */
+  findBestPersona(taskDescription: string, requiredRole?: string): PersonaMatch | null {
+    const taskTokens = this.tokenizeTask(taskDescription);
     let bestMatch: PersonaMatch | null = null;
 
     for (const persona of this.personas.values()) {
       if (!persona.active) continue;
       if (requiredRole && persona.roleMapping !== requiredRole) continue;
 
-      // Score: keyword overlap between task tokens and specialties
-      const matchedKeywords: string[] = [];
-      for (const specialty of persona.specialties) {
-        const specWords = specialty.split(/\s+/).map(s => s.replace(/[^a-z0-9_./-]/g, ''));
-        for (const sw of specWords) {
-          if (sw.length > 2 && !MATCH_STOP_WORDS.has(sw) && taskTokens.includes(sw) && !matchedKeywords.includes(sw)) {
-            matchedKeywords.push(sw);
-          }
-        }
-      }
-
-      // Cap denominator at 15 so long task descriptions don't kill the score
-      let score = matchedKeywords.length / Math.max(Math.min(taskTokens.length, 15), 1);
+      const { score: keywordScore, matchedKeywords } = this.computeKeywordScore(taskTokens, persona);
+      let score = keywordScore;
 
       // Department keyword bonus
       const deptWords = persona.department.split('-');
@@ -321,20 +565,19 @@ export class PersonaRegistry {
       const rawScore = Math.min(score, 1.0);
 
       // Recency penalty: prefer personas not recently dispatched (ranking only)
+      let rankScore = score;
       if (persona.lastDispatchedAt) {
         const hoursSince = (Date.now() - new Date(persona.lastDispatchedAt).getTime()) / 3_600_000;
-        if (hoursSince < 1) score *= 0.8;
-        else if (hoursSince < 4) score *= 0.9;
+        if (hoursSince < 1) rankScore *= 0.8;
+        else if (hoursSince < 4) rankScore *= 0.9;
       }
 
       // Dispatch count penalty (spread work across personas, ranking only)
-      if (persona.dispatchedCount > 5) score *= 0.95;
+      if (persona.dispatchedCount > 5) rankScore *= 0.95;
 
-      const confidence = Math.min(score, 1.0);
-
-      if (!bestMatch || confidence > bestMatch.confidence) {
-        // Report raw score as confidence (for threshold check in auto-dispatch)
+      if (!bestMatch || rankScore > (bestMatch as any)._rankScore) {
         bestMatch = { persona, confidence: rawScore, matchedKeywords };
+        (bestMatch as any)._rankScore = rankScore;
       }
     }
 

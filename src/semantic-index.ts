@@ -71,7 +71,7 @@ function getClient(): Anthropic {
   return _client;
 }
 
-async function embedText(text: string): Promise<Float32Array> {
+export async function embedText(text: string): Promise<Float32Array> {
   const client = getClient();
 
   // Ask Haiku to produce a semantic embedding as a JSON float array.

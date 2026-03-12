@@ -32,7 +32,7 @@ export interface DispatchRecord {
 }
 
 const DISPATCH_INTERVAL_MS = 60_000; // Check every 60s
-const MIN_CONFIDENCE = 0.10;         // Minimum match confidence to auto-dispatch
+const MIN_CONFIDENCE = 0.30;         // Minimum match confidence (semantic 0-1 scale)
 const MAX_FAILURES = 3;              // Stop re-dispatching after this many failures
 const FAILURE_COOLDOWN_MIN = 30;     // Minutes to wait after a failure before retrying
 
@@ -42,7 +42,8 @@ export class AutoDispatcher {
   private queue: GroupQueue;
   private getRegisteredGroups: () => Record<string, RegisteredGroup>;
   private spawnTaskFn: SpawnTaskFn;
-  private timer: ReturnType<typeof setInterval> | null = null;
+  private timer: ReturnType<typeof setTimeout> | null = null;
+  private running = false;
   private dispatches: DispatchRecord[] = [];
 
   constructor(opts: {
@@ -79,33 +80,38 @@ export class AutoDispatcher {
 
   /** Start the auto-dispatch timer */
   start(): void {
-    if (this.timer) return;
+    if (this.running) return;
+    this.running = true;
     logger.info('AutoDispatcher started (checking every 60s)');
-    this.timer = setInterval(() => this.tick(), DISPATCH_INTERVAL_MS);
-    // Run immediately on start
+    // Run immediately, then schedule next tick after completion (no overlap)
     this.tick();
   }
 
   /** Stop the auto-dispatch timer */
   stop(): void {
+    this.running = false;
     if (this.timer) {
-      clearInterval(this.timer);
+      clearTimeout(this.timer);
       this.timer = null;
-      logger.info('AutoDispatcher stopped');
     }
+    logger.info('AutoDispatcher stopped');
   }
 
-  /** One tick of the dispatch loop */
-  private tick(): void {
+  /** One tick of the dispatch loop (async, schedules next tick after completion) */
+  private async tick(): Promise<void> {
     try {
-      this.dispatchUnassignedTasks();
+      await this.dispatchUnassignedTasks();
     } catch (err) {
       logger.warn({ err }, 'AutoDispatcher tick error');
+    }
+    // Schedule next tick only if not stopped
+    if (this.running) {
+      this.timer = setTimeout(() => this.tick(), DISPATCH_INTERVAL_MS);
     }
   }
 
   /** Find unassigned kanban tasks and dispatch them */
-  private dispatchUnassignedTasks(): void {
+  private async dispatchUnassignedTasks(): Promise<void> {
     // Reset stale dispatches: tasks stuck in_progress from failed dispatches
     this.resetStaleDispatches();
 
@@ -144,9 +150,16 @@ export class AutoDispatcher {
       for (const task of eligibleTasks) {
         if (slotIdx >= idleSlots.length) break;
 
-        const match = this.registry.findBestPersona(task.description);
+        const match = await this.registry.findBestPersonaSemantic(task.description);
         if (!match || match.confidence < MIN_CONFIDENCE) {
-          logger.info({ taskId: task.id, confidence: match?.confidence?.toFixed(3), persona: match?.persona?.name, desc: task.description?.slice(0, 60) }, 'No persona match above threshold');
+          logger.info({
+            taskId: task.id,
+            confidence: match?.confidence?.toFixed(3),
+            semanticScore: match?.semanticScore?.toFixed(3),
+            keywordScore: match?.keywordScore?.toFixed(3),
+            persona: match?.persona?.name,
+            desc: task.description?.slice(0, 60),
+          }, 'No persona match above threshold');
           continue;
         }
 
@@ -405,7 +418,10 @@ When you finish this task:
       taskId: task.id,
       persona: persona.name,
       department: persona.department,
-      confidence: confidence.toFixed(2),
+      confidence: confidence.toFixed(3),
+      semanticScore: match.semanticScore?.toFixed(3),
+      keywordScore: match.keywordScore?.toFixed(3),
+      matchedKeywords: match.matchedKeywords?.slice(0, 5),
     }, 'Auto-dispatched task to persona');
   }
 
