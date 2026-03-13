@@ -76,6 +76,9 @@ export class AutoDispatcher {
       CREATE INDEX IF NOT EXISTS idx_dispatch_status ON dispatch_log(status);
       CREATE INDEX IF NOT EXISTS idx_dispatch_time ON dispatch_log(dispatched_at);
     `);
+
+    // On startup, reset any tasks orphaned by previous process death
+    this.resetOrphanedOnStartup();
   }
 
   /** Start the auto-dispatch timer */
@@ -256,7 +259,7 @@ export class AutoDispatcher {
   private resetStaleDispatches(): void {
     // Find tasks that are in_progress but their latest dispatch either:
     // 1. Failed explicitly
-    // 2. Has been "running" for over 50 minutes (container was killed/orphaned)
+    // 2. Has been "running" for over 100 minutes (exceeds max container timeout of 90 min)
     const stale = this.db.prepare(`
       SELECT t.id, d.status as dispatch_status FROM tasks t
       INNER JOIN dispatch_log d ON d.task_id = t.id
@@ -266,7 +269,7 @@ export class AutoDispatcher {
         )
         AND (
           d.status = 'failed'
-          OR (d.status = 'running' AND (julianday('now') - julianday(d.dispatched_at)) * 24 * 60 > 50)
+          OR (d.status = 'running' AND (julianday('now') - julianday(d.dispatched_at)) * 24 * 60 > 100)
         )
     `).all() as any[];
 
@@ -285,6 +288,41 @@ export class AutoDispatcher {
         }
       }
       logger.info({ count: stale.length, ids: stale.map((r: any) => r.id) }, 'Reset stale dispatched tasks');
+    }
+  }
+
+  /**
+   * On startup, reset ALL in_progress tasks whose dispatch is still "running".
+   * After a service restart, those containers are dead — the work was lost.
+   * Called once from the constructor, not on every tick.
+   */
+  private resetOrphanedOnStartup(): void {
+    const orphaned = this.db.prepare(`
+      SELECT t.id FROM tasks t
+      INNER JOIN dispatch_log d ON d.task_id = t.id
+      WHERE t.status = 'in_progress'
+        AND d.dispatched_at = (
+          SELECT MAX(d2.dispatched_at) FROM dispatch_log d2 WHERE d2.task_id = t.id
+        )
+        AND d.status IN ('running', 'queued')
+    `).all() as any[];
+
+    if (orphaned.length > 0) {
+      const resetTask = this.db.prepare(
+        'UPDATE tasks SET status = ?, assigned_agent = NULL WHERE id = ?',
+      );
+      const resetDispatch = this.db.prepare(
+        'UPDATE dispatch_log SET status = ?, completed_at = ? WHERE task_id = ? AND status IN (?, ?)',
+      );
+      const now = new Date().toISOString();
+      for (const row of orphaned) {
+        resetTask.run('pending', row.id);
+        resetDispatch.run('failed', now, row.id, 'running', 'queued');
+      }
+      logger.info(
+        { count: orphaned.length, ids: orphaned.map((r: any) => r.id) },
+        'Reset orphaned in_progress tasks on startup',
+      );
     }
   }
 
