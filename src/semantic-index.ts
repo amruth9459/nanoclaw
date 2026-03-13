@@ -1,20 +1,15 @@
 /**
  * Semantic indexing with sqlite-vec.
  *
- * Embeds text using Claude Haiku (prompt → float32 vector via a
- * deterministic JSON array extraction) and stores them in a
- * sqlite-vec virtual table. Agents can search via the MCP tool
- * or the host can index OCR output and conversations automatically.
+ * Embeds text using Google's gemini-embedding-001 model, which produces
+ * mathematically meaningful vectors via a trained embedding model.
+ * Vectors are stored in a sqlite-vec virtual table for fast cosine
+ * similarity search.
  *
- * Embedding model: we ask claude-haiku-4-5 to produce a 128-dim
- * float32 vector JSON array representing the semantic content of a
- * chunk. This avoids a separate embedding API dependency while
- * keeping latency low (haiku is fast).
- *
- * Dimensions: 128 (compact, fast, sufficient for personal-scale retrieval)
+ * Dimensions: 768 (Gemini's default, highly expressive)
  */
 
-import Anthropic from '@anthropic-ai/sdk';
+import { GoogleGenerativeAI, TaskType } from '@google/generative-ai';
 import Database from 'better-sqlite3';
 import fs from 'fs';
 import path from 'path';
@@ -22,11 +17,11 @@ import * as sqliteVec from 'sqlite-vec';
 
 import { STORE_DIR } from './config.js';
 import { readEnvFile } from './env.js';
-import { logUsage } from './db.js';
-import { calculateCost } from './economics.js';
 import { logger } from './logger.js';
 
-const DIMS = 128;
+export { TaskType };
+
+export const DIMS = 768;
 const DB_PATH = path.join(STORE_DIR, 'messages.db');
 const CHUNK_SIZE = 800;  // chars per chunk
 const CHUNK_OVERLAP = 100;
@@ -36,6 +31,25 @@ const CHUNK_OVERLAP = 100;
 function openVecDb(): Database.Database {
   const db = new Database(DB_PATH);
   sqliteVec.load(db);
+
+  // Metadata table to track stored embedding dimensions
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS semantic_meta (
+      key   TEXT PRIMARY KEY,
+      value TEXT NOT NULL
+    );
+  `);
+
+  // Check for dimension migration
+  const storedDims = db.prepare("SELECT value FROM semantic_meta WHERE key = 'dims'").get() as { value: string } | undefined;
+  if (storedDims && parseInt(storedDims.value, 10) !== DIMS) {
+    logger.info({ oldDims: storedDims.value, newDims: DIMS }, 'Embedding dimensions changed — dropping semantic_vec for re-index');
+    db.exec('DROP TABLE IF EXISTS semantic_vec');
+    db.exec('DELETE FROM semantic_chunks');
+    db.exec("UPDATE semantic_meta SET value = ? WHERE key = 'dims'");
+    db.prepare("UPDATE semantic_meta SET value = ? WHERE key = 'dims'").run(String(DIMS));
+  }
+
   db.exec(`
     CREATE TABLE IF NOT EXISTS semantic_chunks (
       id       INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -53,66 +67,42 @@ function openVecDb(): Database.Database {
       embedding float[${DIMS}]
     );
   `);
+
+  // Store current dims
+  db.prepare("INSERT OR REPLACE INTO semantic_meta (key, value) VALUES ('dims', ?)").run(String(DIMS));
+
   return db;
 }
 
-// ── Embedding via Claude Haiku ─────────────────────────────────────────────────
+// ── Embedding via Gemini ──────────────────────────────────────────────────────
 
-let _client: Anthropic | null = null;
+let _client: GoogleGenerativeAI | null = null;
 
-function getClient(): Anthropic {
+function getClient(): GoogleGenerativeAI {
   if (_client) return _client;
-  const env = readEnvFile(['ANTHROPIC_API_KEY', 'CLAUDE_CODE_OAUTH_TOKEN']);
-  const apiKey = env.ANTHROPIC_API_KEY || process.env.ANTHROPIC_API_KEY;
+  const env = readEnvFile(['GOOGLE_API_KEY']);
+  const apiKey = env.GOOGLE_API_KEY || process.env.GOOGLE_API_KEY;
   if (!apiKey) {
-    throw new Error('ANTHROPIC_API_KEY required for semantic indexing');
+    throw new Error('GOOGLE_API_KEY required for semantic indexing');
   }
-  _client = new Anthropic({ apiKey });
+  _client = new GoogleGenerativeAI(apiKey);
   return _client;
 }
 
-export async function embedText(text: string): Promise<Float32Array> {
+export async function embedText(
+  text: string,
+  taskType: TaskType = TaskType.RETRIEVAL_DOCUMENT,
+): Promise<Float32Array> {
   const client = getClient();
-
-  // Ask Haiku to produce a semantic embedding as a JSON float array.
-  // We use a strict prompt so the output is parseable deterministically.
-  const resp = await client.messages.create({
-    model: 'claude-haiku-4-5-20251001',
-    max_tokens: 1024,
-    messages: [{
-      role: 'user',
-      content: `Produce a ${DIMS}-dimensional semantic embedding for the following text.
-
-Output ONLY a JSON array of ${DIMS} float numbers between -1 and 1. No explanation, no code block, just the raw JSON array starting with [ and ending with ].
-
-Text to embed:
-${text.slice(0, 1200)}`,
-    }],
+  const model = client.getGenerativeModel({ model: 'gemini-embedding-001' });
+  const result = await model.embedContent({
+    content: { role: 'user', parts: [{ text: text.slice(0, 2048) }] },
+    taskType,
   });
-
-  // Track embedding cost
-  if (resp.usage) {
-    const usage = {
-      inputTokens: resp.usage.input_tokens,
-      outputTokens: resp.usage.output_tokens,
-    };
-    const costUsd = calculateCost(usage);
-    logUsage('_system', '_semantic_index', usage, 0, false, costUsd, 'indexing');
-  }
-
-  const raw = resp.content[0].type === 'text' ? resp.content[0].text.trim() : '';
-  const match = raw.match(/\[[\s\S]+\]/);
-  if (!match) throw new Error(`Embedding parse failed: ${raw.slice(0, 100)}`);
-
-  const arr: number[] = JSON.parse(match[0]);
-
-  // Haiku occasionally returns ±1-2 dimensions — pad/truncate to exact DIMS
-  while (arr.length < DIMS) arr.push(0);
-  if (arr.length > DIMS) arr.length = DIMS;
-
-  // L2-normalize for cosine similarity via dot product
-  const norm = Math.sqrt(arr.reduce((s, x) => s + x * x, 0)) || 1;
-  return new Float32Array(arr.map(x => x / norm));
+  const values = result.embedding.values;
+  // L2-normalize
+  const norm = Math.sqrt(values.reduce((s, x) => s + x * x, 0)) || 1;
+  return new Float32Array(values.map(x => x / norm));
 }
 
 // ── Chunking ───────────────────────────────────────────────────────────────────

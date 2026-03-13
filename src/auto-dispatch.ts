@@ -32,7 +32,7 @@ export interface DispatchRecord {
 }
 
 const DISPATCH_INTERVAL_MS = 60_000; // Check every 60s
-const MIN_CONFIDENCE = 0.15;         // Minimum match confidence (keyword-dominant hybrid)
+const MIN_CONFIDENCE = 0.30;         // Minimum match confidence (Gemini semantic-dominant hybrid)
 const MAX_FAILURES = 3;              // Stop re-dispatching after this many failures
 const FAILURE_COOLDOWN_MIN = 30;     // Minutes to wait after a failure before retrying
 

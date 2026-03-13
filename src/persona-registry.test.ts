@@ -9,10 +9,15 @@ import { PersonaRegistry } from './persona-registry.js';
 
 // Mock embedText — returns deterministic pseudo-embeddings based on content hash
 vi.mock('./semantic-index.js', () => ({
-  embedText: vi.fn(async (text: string) => {
-    // Generate a deterministic 128-dim L2-normalized vector from text
-    const vec = new Float32Array(128);
-    for (let i = 0; i < 128; i++) {
+  DIMS: 768,
+  TaskType: {
+    RETRIEVAL_DOCUMENT: 'RETRIEVAL_DOCUMENT',
+    RETRIEVAL_QUERY: 'RETRIEVAL_QUERY',
+  },
+  embedText: vi.fn(async (text: string, _taskType?: string) => {
+    // Generate a deterministic 768-dim L2-normalized vector from text
+    const vec = new Float32Array(768);
+    for (let i = 0; i < 768; i++) {
       // Simple hash-based seed per dimension
       let h = 0;
       for (let j = 0; j < text.length; j++) {
@@ -22,7 +27,7 @@ vi.mock('./semantic-index.js', () => ({
     }
     // L2 normalize
     const norm = Math.sqrt(vec.reduce((s, x) => s + x * x, 0)) || 1;
-    for (let i = 0; i < 128; i++) vec[i] /= norm;
+    for (let i = 0; i < 768; i++) vec[i] /= norm;
     return vec;
   }),
 }));
@@ -229,11 +234,11 @@ describe('PersonaRegistry', () => {
       expect(match).toBeTruthy();
 
       // The confidence should reflect the hybrid formula
-      // confidence ≈ 0.25 * semantic + 0.75 * keyword (+ optional dept bonus)
-      const expected = 0.25 * match!.semanticScore! + 0.75 * Math.min(match!.keywordScore!, 1.0);
-      // Allow for department bonus (+0.15 max)
+      // confidence ≈ 0.75 * semantic + 0.25 * keyword (+ optional dept bonus)
+      const expected = 0.75 * match!.semanticScore! + 0.25 * Math.min(match!.keywordScore!, 1.0);
+      // Allow for department bonus (+0.05 max)
       expect(match!.confidence).toBeGreaterThanOrEqual(expected - 0.001);
-      expect(match!.confidence).toBeLessThanOrEqual(expected + 0.16);
+      expect(match!.confidence).toBeLessThanOrEqual(expected + 0.06);
     });
   });
 

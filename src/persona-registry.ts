@@ -4,7 +4,7 @@
  * Scans ~/.claude/agents/ for persona files, registers them in the DB,
  * and provides matching for task dispatch.
  *
- * Supports semantic matching via Claude Haiku embeddings (128-dim float32).
+ * Supports semantic matching via Gemini embeddings (768-dim float32).
  * Domain descriptions are auto-generated from persona .md files and cached
  * in sqlite-vec for fast cosine similarity lookups.
  */
@@ -17,7 +17,7 @@ import * as sqliteVec from 'sqlite-vec';
 
 import { GROUPS_DIR } from './config.js';
 import { logger } from './logger.js';
-import { embedText } from './semantic-index.js';
+import { DIMS, TaskType, embedText } from './semantic-index.js';
 
 export interface Persona {
   id: string;
@@ -130,9 +130,29 @@ export class PersonaRegistry {
         embedded_at TEXT NOT NULL,
         source_hash TEXT NOT NULL
       );
+    `);
+
+    // Dimension migration: if stored dims don't match current DIMS, drop and recreate
+    try {
+      this.db.exec(`
+        CREATE TABLE IF NOT EXISTS persona_embedding_dims (
+          key TEXT PRIMARY KEY,
+          value INTEGER NOT NULL
+        );
+      `);
+      const storedDims = this.db.prepare("SELECT value FROM persona_embedding_dims WHERE key = 'dims'").get() as { value: number } | undefined;
+      if (storedDims && storedDims.value !== DIMS) {
+        logger.info({ oldDims: storedDims.value, newDims: DIMS }, 'Persona embedding dimensions changed — re-indexing');
+        this.db.exec('DROP TABLE IF EXISTS persona_vec');
+        this.db.exec('DELETE FROM persona_embedding_meta');
+      }
+      this.db.prepare("INSERT OR REPLACE INTO persona_embedding_dims (key, value) VALUES ('dims', ?)").run(DIMS);
+    } catch { /* first run, table doesn't exist yet */ }
+
+    this.db.exec(`
       CREATE VIRTUAL TABLE IF NOT EXISTS persona_vec USING vec0(
         persona_rowid INTEGER PRIMARY KEY,
-        embedding float[128]
+        embedding float[${DIMS}]
       );
     `);
   }
@@ -423,13 +443,13 @@ export class PersonaRegistry {
           if (vecRow && vecRow.embedding) {
             // sqlite-vec returns raw bytes as Buffer — convert to Float32Array
             const buf = Buffer.isBuffer(vecRow.embedding) ? vecRow.embedding : Buffer.from(vecRow.embedding as any);
-            persona.embedding = new Float32Array(buf.buffer, buf.byteOffset, 128);
+            persona.embedding = new Float32Array(buf.buffer, buf.byteOffset, DIMS);
             continue;
           }
         }
 
         // Need to embed (new or stale)
-        const embedding = await embedText(desc);
+        const embedding = await embedText(desc, TaskType.RETRIEVAL_DOCUMENT);
         persona.embedding = embedding;
 
         // Store in meta table first to get rowid
@@ -482,7 +502,7 @@ export class PersonaRegistry {
   async findBestPersonaSemantic(taskDescription: string, requiredRole?: string): Promise<PersonaMatch | null> {
     let taskEmbedding: Float32Array;
     try {
-      taskEmbedding = await embedText(taskDescription);
+      taskEmbedding = await embedText(taskDescription, TaskType.RETRIEVAL_QUERY);
     } catch (err) {
       logger.warn({ err }, 'Task embedding failed, falling back to keyword matching');
       return this.findBestPersona(taskDescription, requiredRole);
@@ -499,7 +519,7 @@ export class PersonaRegistry {
 
       // Cosine similarity via dot product (both vectors are L2-normalized)
       let semanticScore = 0;
-      for (let i = 0; i < 128; i++) {
+      for (let i = 0; i < DIMS; i++) {
         semanticScore += taskEmbedding[i] * persona.embedding[i];
       }
       // Clamp to [0, 1] — negative similarity means completely unrelated
@@ -508,14 +528,13 @@ export class PersonaRegistry {
       // Keyword score as secondary signal
       const { score: keywordScore, matchedKeywords } = this.computeKeywordScore(taskTokens, persona);
 
-      // Hybrid: 25% semantic + 75% keyword (Haiku pseudo-embeddings are noisy,
-      // so keyword overlap remains the primary signal until real embeddings are used)
-      let confidence = 0.25 * semanticScore + 0.75 * Math.min(keywordScore, 1.0);
+      // Hybrid: 75% semantic + 25% keyword (Gemini embeddings are the primary signal)
+      let confidence = 0.75 * semanticScore + 0.25 * Math.min(keywordScore, 1.0);
 
-      // Department keyword bonus
+      // Department keyword bonus (reduced — semantic already captures domain relevance)
       const deptWords = persona.department.split('-');
       for (const dw of deptWords) {
-        if (taskTokens.includes(dw)) { confidence += 0.15; break; }
+        if (taskTokens.includes(dw)) { confidence += 0.05; break; }
       }
 
       confidence = Math.min(confidence, 1.0);
