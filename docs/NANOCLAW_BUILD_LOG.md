@@ -1,25 +1,44 @@
 # NanoClaw — Daily Build Log
 
 *Living document — auto-generated from git history*
-*Last generated: 2026-03-12*
+*Last generated: 2026-03-13*
 
-**294 total commits** (200 meaningful) | 2026-01-31 to 2026-03-12
+**308 total commits** (203 meaningful) | 2026-01-31 to 2026-03-12
 
 ---
 
 ## 2026-03-12
 
 ### What Changed
-- 4 auto-backup commits (incremental saves)
+- Replace Haiku pseudo-embeddings with Gemini real embeddings
+- Fix Gemini embedding integration: truncate 3072→768 dims, fix migration
+- Fix ENFILE file table overflow: cleanup stopped containers and remove leaked VMs
+- (+15 auto-backup commits)
 
-### Files (4 changed)
+### Files (20 changed)
+- container/skills/lexios-ifc.py
+- container/skills/lexios-sandbox.md
+- container/skills/lexios/SKILL.md
 - docs/DEVLOG.md
 - docs/NANOCLAW_BUILD_LOG.md
+- groups/lexios-template/CLAUDE.md
+- package-lock.json
+- package.json
+- scripts/lexios-eval.py
+- scripts/test-lexios.sh
 - src/auto-dispatch.ts
+- src/container-runner.ts
+- src/container-runtime.test.ts
+- src/container-runtime.ts
+- src/index.ts
+- src/integration-types.ts
 - src/ipc.ts
+- src/persona-registry.test.ts
+- src/persona-registry.ts
+- src/semantic-index.ts
 
 ### Stats
-- 210 insertions, 16 deletions
+- 3723 insertions, 227 deletions
 
 ## 2026-03-11
 
