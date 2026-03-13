@@ -318,7 +318,7 @@ export function startIpcWatcher(deps: IpcDeps): void {
                         cliArgs,
                         {
                           cwd: resolved,
-                          timeout: 1_800_000, // 30 min — let complex tasks finish
+                          timeout: 5_400_000, // 90 min — complex tasks need time
                           maxBuffer: 10 * 1024 * 1024, // 10MB output buffer
                           env: {
                             ...process.env,

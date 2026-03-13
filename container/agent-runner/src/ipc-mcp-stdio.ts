@@ -905,10 +905,10 @@ Only available to the main group.`,
       max_budget_usd: args.max_budget_usd,
     });
 
-    // Desktop Claude sessions can take a while — poll with 30 min timeout
-    const result = await pollResponse(responseFile, 1_800_000);
+    // Desktop Claude sessions can take a while — poll with 90 min timeout
+    const result = await pollResponse(responseFile, 5_400_000);
     if (!result) {
-      return { content: [{ type: 'text' as const, text: 'Error: desktop_claude request timed out (30 min limit)' }], isError: true };
+      return { content: [{ type: 'text' as const, text: 'Error: desktop_claude request timed out (90 min limit)' }], isError: true };
     }
     if (result.error) {
       return { content: [{ type: 'text' as const, text: `Error: ${result.error}` }], isError: true };
