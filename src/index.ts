@@ -1964,7 +1964,7 @@ async function main(): Promise<void> {
                   const progress = stats ? `${stats.done}/${stats.total}` : '';
 
                   await clawSend(notifyJid,
-                    `✅ *Task Completed* [${progress}]\n` +
+                    `🤖 ✅ *Agent Task Completed* [${progress}]\n` +
                     `*${taskId}*: ${taskDesc}\n` +
                     `Agent: ${persona}\n` +
                     `Result: ${output.result?.slice(0, 200) || 'completed successfully'}`,
@@ -1995,7 +1995,7 @@ async function main(): Promise<void> {
                   if (mainJid) {
                     const notifyJid = getNotifyJid(project !== 'nanoclaw' ? project : 'desktop', mainJid);
                     await clawSend(notifyJid,
-                      `✅ *Task Done* (container timed out but work committed)\n` +
+                      `🤖 ✅ *Agent Task Done* (container timed out but work committed)\n` +
                       `*${taskId}*: ${taskDesc}\n` +
                       `Agent: ${persona} (${desktopCompletions} desktop runs)`,
                     );
@@ -2017,7 +2017,7 @@ async function main(): Promise<void> {
                   if (mainJid) {
                     const notifyJid = getNotifyJid(project !== 'nanoclaw' ? project : 'desktop', mainJid);
                     await clawSend(notifyJid,
-                      `❌ *Task Failed* — will retry\n` +
+                      `🤖 ❌ *Agent Task Failed* — will retry\n` +
                       `*${taskId}*: ${taskDesc}\n` +
                       `Agent: ${persona}\n` +
                       `Error: ${output.error?.slice(0, 200) || 'container exited with error'}`,

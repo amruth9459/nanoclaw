@@ -406,7 +406,7 @@ export function startIpcWatcher(deps: IpcDeps): void {
                         if (mainJid) {
                           const { getNotifyJid } = await import('./notify.js');
                           const summary = prompt.slice(0, 100) + (prompt.length > 100 ? '...' : '');
-                          await deps.sendMessage(getNotifyJid(capturedConfig.notifyTopic, mainJid), `🖥️ Desktop Claude pushed code.\nTask: ${summary}`);
+                          await deps.sendMessage(getNotifyJid(capturedConfig.notifyTopic, mainJid), `🤖 Agent pushed code via Desktop Claude.\nSource: ${sourceGroup}\nTask: ${summary}`);
                         }
                       }
 

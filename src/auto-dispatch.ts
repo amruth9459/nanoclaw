@@ -424,11 +424,15 @@ You must verify every code change. No exceptions.
 `;
 
     // Task completion protocol
+    const agentAuthor = `${persona.name} (${persona.department}) <agent@nanoclaw>`;
     const completionBlock = `
 ## MANDATORY: Task Completion
 When you finish this task:
 1. **Git commit your work.** In your desktop_claude prompt, ALWAYS include at the end:
-   "After all changes, run: git add -A && git commit -m '${task.id}: <brief description>'"
+   "After all changes, run: git add -A && git commit --author='${agentAuthor}' -m '[Agent] ${task.id}: <brief description>
+
+Automated by: ${persona.name} (${persona.department})
+Dispatched by: NanoClaw Auto-Dispatch'"
    This is critical — uncommitted work is invisible and gets redone.
 2. Use task_tool to mark it done: action=update, taskId="${task.id}", status="completed"
 3. Your final message MUST include a summary of what was done, files changed, and test results.
