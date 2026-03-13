@@ -34,6 +34,7 @@ import { RegisteredGroup } from './types.js';
 // Sentinel markers for robust output parsing (must match agent-runner)
 const OUTPUT_START_MARKER = '---NANOCLAW_OUTPUT_START---';
 const OUTPUT_END_MARKER = '---NANOCLAW_OUTPUT_END---';
+const HEARTBEAT_MARKER = '---NANOCLAW_HEARTBEAT---';
 
 function getHomeDir(): string {
   const home = process.env.HOME || os.homedir();
@@ -535,9 +536,15 @@ export async function runContainerAgent(
         }
       }
 
+      // Heartbeat detection — reset timeout without treating it as output
+      if (chunk.includes(HEARTBEAT_MARKER)) {
+        resetTimeout();
+      }
+
       // Stream-parse for output markers
       if (onOutput) {
-        parseBuffer += chunk;
+        // Strip heartbeat lines from parse buffer to avoid polluting output parsing
+        parseBuffer += chunk.replace(new RegExp(`\\s*${HEARTBEAT_MARKER}\\s*`, 'g'), '');
         let startIdx: number;
         while ((startIdx = parseBuffer.indexOf(OUTPUT_START_MARKER)) !== -1) {
           const endIdx = parseBuffer.indexOf(OUTPUT_END_MARKER, startIdx);

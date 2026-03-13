@@ -100,8 +100,8 @@ let ipcWatcherRunning = false;
 // ── Desktop Claude concurrency semaphore ──────────────────────────────
 // Serialize desktop_claude spawns to prevent FD exhaustion from parallel claude -p
 let activeDesktopClaude = 0;
-const MAX_CONCURRENT_DESKTOP = 3;
-const DESKTOP_QUEUE_TIMEOUT_MS = 15 * 60 * 1000; // 15 min max wait in queue
+const MAX_CONCURRENT_DESKTOP = 5;
+const DESKTOP_QUEUE_TIMEOUT_MS = 30 * 60 * 1000; // 30 min max wait in queue
 const desktopQueue: Array<{ resolve: () => void; reject: (err: Error) => void; timer: ReturnType<typeof setTimeout> }> = [];
 
 function acquireDesktopSlot(): Promise<void> {
@@ -113,7 +113,7 @@ function acquireDesktopSlot(): Promise<void> {
     const timer = setTimeout(() => {
       const idx = desktopQueue.findIndex(e => e.resolve === resolve);
       if (idx >= 0) desktopQueue.splice(idx, 1);
-      reject(new Error('desktop_claude queue timeout — waited 5 minutes'));
+      reject(new Error('desktop_claude queue timeout — waited 30 minutes'));
     }, DESKTOP_QUEUE_TIMEOUT_MS);
     desktopQueue.push({ resolve, reject, timer });
   });

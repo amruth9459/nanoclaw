@@ -178,11 +178,19 @@ async function readStdin(): Promise<string> {
 
 const OUTPUT_START_MARKER = '---NANOCLAW_OUTPUT_START---';
 const OUTPUT_END_MARKER = '---NANOCLAW_OUTPUT_END---';
+const HEARTBEAT_MARKER = '---NANOCLAW_HEARTBEAT---';
 
 function writeOutput(output: ContainerOutput): void {
   console.log(OUTPUT_START_MARKER);
   console.log(JSON.stringify(output));
   console.log(OUTPUT_END_MARKER);
+}
+
+/** Emit periodic heartbeats to stdout so the host resets its container timeout. */
+function startHeartbeat(intervalMs = 60_000): NodeJS.Timeout {
+  return setInterval(() => {
+    console.log(HEARTBEAT_MARKER);
+  }, intervalMs);
 }
 
 function log(message: string): void {
@@ -869,7 +877,10 @@ async function main(): Promise<void> {
         try {
           log(`Starting query (session: ${sessionId || 'new'}, resumeAt: ${resumeAt || 'latest'})...`);
 
+          const hb = startHeartbeat();
+          try {
           queryResult = await runQuery(prompt, sessionId, mcpServerPath, containerInput, sdkEnv, resumeAt);
+          } finally { clearInterval(hb); }
           if (queryResult.newSessionId) {
             sessionId = queryResult.newSessionId;
           }
