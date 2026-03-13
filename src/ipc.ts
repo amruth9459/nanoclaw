@@ -282,9 +282,7 @@ export function startIpcWatcher(deps: IpcDeps): void {
                       return;
                     }
                     try {
-                      const { execFile } = await import('child_process');
-                      const { promisify } = await import('util');
-                      const execFileAsync = promisify(execFile);
+                      const { execFile, execSync } = await import('child_process');
                       const prompt = data.prompt as string;
                       const rawWorkdir = (data.workdir as string) || capturedConfig.workdir;
                       // Expand ~ to home directory (container sends ~/Lexios which path.resolve won't expand)
@@ -298,10 +296,12 @@ export function startIpcWatcher(deps: IpcDeps): void {
                         throw new Error(`Workdir "${workdir}" outside allowed roots: ${allAllowedRoots.join(', ')}`);
                       }
 
-                      // Build CLI args — budget only if explicitly set
+                      // Build CLI args
                       const cliArgs = [
                         '-p', prompt,
                         '--output-format', 'text',
+                        '--dangerously-skip-permissions',  // Non-interactive: prevent permission prompt stalls
+                        '--no-session-persistence',        // Prevent lock file contention in ~/.claude/tasks/
                         // Full tool access — same as interactive Claude Code
                         '--allowedTools', 'Read', 'Write', 'Edit', 'Glob', 'Grep',
                           'Bash', 'WebFetch', 'WebSearch', 'Agent',
@@ -313,24 +313,77 @@ export function startIpcWatcher(deps: IpcDeps): void {
                       // Use wrapper script to fully isolate from parent Claude Code env
                       const claudeWrapper = path.join(process.cwd(), 'scripts', 'desktop-claude.sh');
                       const claudeBin = fs.existsSync(claudeWrapper) ? claudeWrapper : (process.env.CLAUDE_BIN || '/opt/homebrew/bin/claude');
+                      const cleanEnv = (() => {
+                        const e = { ...process.env };
+                        delete e.CLAUDECODE;              // Must delete — even '' blocks nested sessions
+                        delete e.CLAUDE_CODE_ENTRYPOINT;  // Also blocks nesting detection
+                        e.CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC = '1';
+                        e.PATH = `/opt/homebrew/bin:${e.PATH || '/usr/bin:/bin'}`;
+                        return e;
+                      })();
+
+                      const STALL_CHECK_MS = 120_000;    // 2 min — if no TCP by then, it's stalled
+                      const OVERALL_TIMEOUT_MS = 20 * 60 * 1000; // 20 min
+                      const MAX_STALL_RETRIES = 1;
+
+                      // ── Spawn with stall detection and retry ──
+                      const runClaude = (): Promise<{ stdout: string; stderr: string }> => {
+                        return new Promise((resolve, reject) => {
+                          const child = execFile(
+                            claudeBin, cliArgs,
+                            { cwd: resolved, timeout: OVERALL_TIMEOUT_MS, maxBuffer: 10 * 1024 * 1024, env: cleanEnv },
+                            (error, stdout, stderr) => {
+                              clearTimeout(stallTimer);
+                              if (error) {
+                                reject(Object.assign(error, { stdout, stderr }));
+                              } else {
+                                resolve({ stdout: stdout || '', stderr: stderr || '' });
+                              }
+                            },
+                          );
+
+                          // Stall detection: kill if no TCP connections after 2 minutes
+                          const stallTimer = setTimeout(() => {
+                            try {
+                              const lsofOut = execSync(`lsof -iTCP -a -p ${child.pid} 2>/dev/null`, { encoding: 'utf-8' });
+                              if (!lsofOut.includes('ESTABLISHED')) {
+                                logger.warn({ pid: child.pid }, 'desktop_claude stall detected (no TCP after 2 min) — killing');
+                                child.kill('SIGTERM');
+                              }
+                            } catch {
+                              // lsof returned nothing = no TCP connections = stalled
+                              logger.warn({ pid: child.pid }, 'desktop_claude stall detected (no connections) — killing');
+                              child.kill('SIGTERM');
+                            }
+                          }, STALL_CHECK_MS);
+                        });
+                      };
+
                       logger.info({ prompt: prompt.slice(0, 200), workdir: resolved, maxBudget: maxBudget || 'unlimited' }, 'Spawning desktop Claude Code');
-                      const { stdout, stderr } = await execFileAsync(
-                        claudeBin,
-                        cliArgs,
-                        {
-                          cwd: resolved,
-                          timeout: 5_400_000, // 90 min — complex tasks need time
-                          maxBuffer: 10 * 1024 * 1024, // 10MB output buffer
-                          env: (() => {
-                            const e = { ...process.env };
-                            delete e.CLAUDECODE;              // Must delete — even '' blocks nested sessions
-                            delete e.CLAUDE_CODE_ENTRYPOINT;  // Also blocks nesting detection
-                            e.CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC = '1';
-                            e.PATH = `/opt/homebrew/bin:${e.PATH || '/usr/bin:/bin'}`;
-                            return e;
-                          })(),
-                        },
-                      );
+
+                      let lastErr: unknown;
+                      let stdout = '';
+                      let stderr = '';
+                      for (let attempt = 0; attempt <= MAX_STALL_RETRIES; attempt++) {
+                        try {
+                          if (attempt > 0) {
+                            logger.info({ attempt }, 'Retrying desktop_claude after stall');
+                            await new Promise(r => setTimeout(r, 3000)); // Brief delay before retry
+                          }
+                          ({ stdout, stderr } = await runClaude());
+                          lastErr = null;
+                          break;
+                        } catch (err: unknown) {
+                          lastErr = err;
+                          const execErr = err as { signal?: string; killed?: boolean };
+                          // Only retry if killed by our stall detector (SIGTERM), not other errors
+                          const wasStallKill = execErr.signal === 'SIGTERM' || execErr.killed;
+                          if (!wasStallKill || attempt >= MAX_STALL_RETRIES) break;
+                        }
+                      }
+
+                      if (lastErr) throw lastErr;
+
                       const output = stdout || stderr || 'Completed with no output.';
                       logger.info({ outputLen: output.length }, 'Desktop Claude Code completed');
 
