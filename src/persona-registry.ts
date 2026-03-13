@@ -508,13 +508,14 @@ export class PersonaRegistry {
       // Keyword score as secondary signal
       const { score: keywordScore, matchedKeywords } = this.computeKeywordScore(taskTokens, persona);
 
-      // Hybrid: 75% semantic + 25% keyword
-      let confidence = 0.75 * semanticScore + 0.25 * Math.min(keywordScore, 1.0);
+      // Hybrid: 25% semantic + 75% keyword (Haiku pseudo-embeddings are noisy,
+      // so keyword overlap remains the primary signal until real embeddings are used)
+      let confidence = 0.25 * semanticScore + 0.75 * Math.min(keywordScore, 1.0);
 
-      // Department bonus (reduced from 0.15 — semantic already captures domain)
+      // Department keyword bonus
       const deptWords = persona.department.split('-');
       for (const dw of deptWords) {
-        if (taskTokens.includes(dw)) { confidence += 0.05; break; }
+        if (taskTokens.includes(dw)) { confidence += 0.15; break; }
       }
 
       confidence = Math.min(confidence, 1.0);

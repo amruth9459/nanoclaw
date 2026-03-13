@@ -229,11 +229,11 @@ describe('PersonaRegistry', () => {
       expect(match).toBeTruthy();
 
       // The confidence should reflect the hybrid formula
-      // confidence ≈ 0.75 * semantic + 0.25 * keyword (+ optional dept bonus)
-      const expected = 0.75 * match!.semanticScore! + 0.25 * Math.min(match!.keywordScore!, 1.0);
-      // Allow for department bonus (+0.05 max)
+      // confidence ≈ 0.25 * semantic + 0.75 * keyword (+ optional dept bonus)
+      const expected = 0.25 * match!.semanticScore! + 0.75 * Math.min(match!.keywordScore!, 1.0);
+      // Allow for department bonus (+0.15 max)
       expect(match!.confidence).toBeGreaterThanOrEqual(expected - 0.001);
-      expect(match!.confidence).toBeLessThanOrEqual(expected + 0.06);
+      expect(match!.confidence).toBeLessThanOrEqual(expected + 0.16);
     });
   });
 

@@ -78,7 +78,7 @@ export async function embedText(text: string): Promise<Float32Array> {
   // We use a strict prompt so the output is parseable deterministically.
   const resp = await client.messages.create({
     model: 'claude-haiku-4-5-20251001',
-    max_tokens: 512,
+    max_tokens: 1024,
     messages: [{
       role: 'user',
       content: `Produce a ${DIMS}-dimensional semantic embedding for the following text.
@@ -105,7 +105,10 @@ ${text.slice(0, 1200)}`,
   if (!match) throw new Error(`Embedding parse failed: ${raw.slice(0, 100)}`);
 
   const arr: number[] = JSON.parse(match[0]);
-  if (arr.length !== DIMS) throw new Error(`Wrong dims: got ${arr.length}, expected ${DIMS}`);
+
+  // Haiku occasionally returns ±1-2 dimensions — pad/truncate to exact DIMS
+  while (arr.length < DIMS) arr.push(0);
+  if (arr.length > DIMS) arr.length = DIMS;
 
   // L2-normalize for cosine similarity via dot product
   const norm = Math.sqrt(arr.reduce((s, x) => s + x * x, 0)) || 1;
