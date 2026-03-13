@@ -6,7 +6,10 @@
       "WebFetch(domain:api.github.com)",
       "WebFetch(domain:github.com)",
       "Bash(git:*)",
-      "WebSearch"
+      "WebSearch",
+      "Bash(./integrations/nanoclaw/sync.sh:*)",
+      "Bash(cloudflared tunnel:*)",
+      "Skill(agent-browser)"
     ]
   }
 }

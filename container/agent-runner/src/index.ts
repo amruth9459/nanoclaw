@@ -66,9 +66,69 @@ interface SDKUserMessage {
   session_id: string;
 }
 
-const IPC_INPUT_DIR = '/workspace/ipc/input';
+const IPC_DIR = '/workspace/ipc';
+const IPC_MESSAGES_DIR = path.join(IPC_DIR, 'messages');
+const IPC_INPUT_DIR = path.join(IPC_DIR, 'input');
 const IPC_INPUT_CLOSE_SENTINEL = path.join(IPC_INPUT_DIR, '_close');
 const IPC_POLL_MS = 500;
+
+/** Detect OAuth/authentication errors from SDK exceptions. */
+function isAuthError(err: unknown): boolean {
+  const msg = err instanceof Error ? err.message : String(err);
+  return /401|authentication|unauthorized|oauth|token.expired|invalid.{0,10}token/i.test(msg);
+}
+
+/**
+ * Request a fresh OAuth token from the host via IPC.
+ * Writes a token_refresh request, polls for the response.
+ * Returns the new token value, or null if refresh failed/timed out.
+ */
+async function requestTokenRefresh(currentToken: string | undefined): Promise<string | null> {
+  const requestId = `token-refresh-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+  const requestFile = path.join(IPC_MESSAGES_DIR, `${requestId}.json`);
+  const responseFile = path.join(IPC_MESSAGES_DIR, `${requestId}.response.json`);
+
+  const payload = {
+    type: 'token_refresh',
+    requestId,
+    responseFile,
+    currentTokenPrefix: currentToken?.slice(0, 20), // for host to detect if token changed
+    timestamp: new Date().toISOString(),
+  };
+
+  fs.mkdirSync(IPC_MESSAGES_DIR, { recursive: true });
+  const tmp = `${requestFile}.tmp`;
+  fs.writeFileSync(tmp, JSON.stringify(payload, null, 2));
+  fs.renameSync(tmp, requestFile);
+
+  log('Requested token refresh via IPC');
+
+  // Poll for response (10s timeout — host IPC polls every ~1s)
+  const deadline = Date.now() + 10_000;
+  while (Date.now() < deadline) {
+    await new Promise(r => setTimeout(r, 400));
+    if (fs.existsSync(responseFile)) {
+      try {
+        const result = JSON.parse(fs.readFileSync(responseFile, 'utf-8'));
+        fs.unlinkSync(responseFile);
+        if (result.token && result.token !== currentToken) {
+          log('Received fresh token from host');
+          return result.token;
+        }
+        if (result.error) {
+          log(`Token refresh failed: ${result.error}`);
+        } else {
+          log('Token unchanged — host returned same token');
+        }
+        return null;
+      } catch {
+        return null;
+      }
+    }
+  }
+  log('Token refresh timed out');
+  return null;
+}
 
 /**
  * Push-based async iterable for streaming user messages to the SDK.
@@ -200,8 +260,6 @@ function createPreCompactHook(): HookCallback {
 // These are needed by claude-code for API auth but should never
 // be visible to commands Kit runs.
 const SECRET_ENV_VARS = ['ANTHROPIC_API_KEY', 'CLAUDE_CODE_OAUTH_TOKEN'];
-
-const IPC_MESSAGES_DIR = '/workspace/ipc/messages';
 
 /**
  * Write a security alert IPC message so the host sends it to the user via WhatsApp.
@@ -797,17 +855,53 @@ async function main(): Promise<void> {
   }
 
   // Query loop: run query → wait for IPC message → run new query → repeat
+  // Auth errors trigger IPC-based token refresh and in-place retry (no container restart).
+  const AUTH_RETRY_MAX = 2;
   let resumeAt: string | undefined;
   try {
     while (true) {
-      log(`Starting query (session: ${sessionId || 'new'}, resumeAt: ${resumeAt || 'latest'})...`);
+      let authRetries = 0;
+      let lastAuthError: string | undefined;
 
-      const queryResult = await runQuery(prompt, sessionId, mcpServerPath, containerInput, sdkEnv, resumeAt);
-      if (queryResult.newSessionId) {
-        sessionId = queryResult.newSessionId;
+      // Auth-retry loop: on OAuth failure, request fresh token via IPC and retry in-place
+      let queryResult: { newSessionId?: string; lastAssistantUuid?: string; closedDuringQuery: boolean };
+      while (true) {
+        try {
+          log(`Starting query (session: ${sessionId || 'new'}, resumeAt: ${resumeAt || 'latest'})...`);
+
+          queryResult = await runQuery(prompt, sessionId, mcpServerPath, containerInput, sdkEnv, resumeAt);
+          if (queryResult.newSessionId) {
+            sessionId = queryResult.newSessionId;
+          }
+          if (queryResult.lastAssistantUuid) {
+            resumeAt = queryResult.lastAssistantUuid;
+          }
+          break; // Query succeeded — exit auth-retry loop
+        } catch (err) {
+          if (!isAuthError(err) || authRetries >= AUTH_RETRY_MAX) {
+            throw err; // Not auth or exhausted retries — propagate
+          }
+
+          authRetries++;
+          const errorMessage = err instanceof Error ? err.message : String(err);
+          log(`Auth error on attempt ${authRetries}/${AUTH_RETRY_MAX + 1}: ${errorMessage}`);
+
+          // Ask host for a fresh token via IPC
+          const currentToken = sdkEnv.CLAUDE_CODE_OAUTH_TOKEN;
+          const newToken = await requestTokenRefresh(currentToken);
+          if (!newToken) {
+            log('No fresh token available — giving up');
+            throw err; // Propagate the original auth error
+          }
+
+          // Hot-swap the token and retry the query in-place
+          sdkEnv.CLAUDE_CODE_OAUTH_TOKEN = newToken;
+          log(`Token refreshed, retrying query (attempt ${authRetries + 1})`);
+        }
       }
-      if (queryResult.lastAssistantUuid) {
-        resumeAt = queryResult.lastAssistantUuid;
+
+      if (authRetries > 0) {
+        log(`Recovered from auth error after ${authRetries} retries`);
       }
 
       // If maxTurns is set (warmup), exit after the first query — no IPC loop.

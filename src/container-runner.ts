@@ -823,6 +823,16 @@ export async function runContainerAgent(
   });
 }
 
+/**
+ * Check if a container error looks like an OAuth/authentication failure.
+ * Used to trigger targeted retry (re-read secrets) instead of failing immediately.
+ */
+export function isOAuthError(errorMessage: string | undefined): boolean {
+  if (!errorMessage) return false;
+  const lower = errorMessage.toLowerCase();
+  return /401|authentication|unauthorized|oauth|token expired|invalid.*token/.test(lower);
+}
+
 export function writeTasksSnapshot(
   groupFolder: string,
   isMain: boolean,

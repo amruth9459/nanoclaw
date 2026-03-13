@@ -3,6 +3,9 @@
  * All runtime-specific logic lives here so swapping runtimes means changing one file.
  */
 import { execSync } from 'child_process';
+import fs from 'fs';
+import os from 'os';
+import path from 'path';
 
 import { logger } from './logger.js';
 
@@ -106,5 +109,53 @@ export function cleanupOrphans(): void {
     }
   } catch (err) {
     logger.warn({ err }, 'Failed to clean up orphaned containers');
+  }
+
+  // Prune Apple Container snapshots that aren't associated with running containers.
+  // These accumulate unboundedly (~75GB observed) and are not cleaned up by the runtime.
+  pruneOrphanedSnapshots();
+}
+
+/** Remove Apple Container snapshots not associated with any current container. */
+function pruneOrphanedSnapshots(): void {
+  const snapshotsDir = path.join(
+    os.homedir(), 'Library', 'Application Support', 'com.apple.container', 'snapshots',
+  );
+  if (!fs.existsSync(snapshotsDir)) return;
+
+  try {
+    // Get IDs of all current containers (running + stopped)
+    const output = execSync(`${CONTAINER_RUNTIME_BIN} ls -a --format json`, {
+      stdio: ['pipe', 'pipe', 'pipe'],
+      encoding: 'utf-8',
+    });
+    const containers: { configuration: { id: string } }[] = JSON.parse(output || '[]');
+    const activeIds = new Set(containers.map((c) => c.configuration.id));
+
+    const entries = fs.readdirSync(snapshotsDir);
+    let removed = 0;
+    for (const entry of entries) {
+      // Skip snapshots belonging to active containers
+      if (activeIds.has(entry)) continue;
+
+      const fullPath = path.join(snapshotsDir, entry);
+      try {
+        const stat = fs.statSync(fullPath);
+        if (!stat.isDirectory()) continue;
+        // Safety: only remove if older than 1 hour (avoid race with container startup)
+        if (Date.now() - stat.mtimeMs < 3600_000) continue;
+
+        fs.rmSync(fullPath, { recursive: true, force: true });
+        removed++;
+      } catch {
+        // Permission error or already removed — skip
+      }
+    }
+
+    if (removed > 0) {
+      logger.info({ removed, total: entries.length }, 'Pruned orphaned Apple Container snapshots');
+    }
+  } catch (err) {
+    logger.debug({ err }, 'Snapshot pruning skipped (non-fatal)');
   }
 }

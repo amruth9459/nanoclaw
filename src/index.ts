@@ -23,10 +23,12 @@ import {
 import { WhatsAppChannel } from './channels/whatsapp.js';
 import {
   ContainerOutput,
+  isOAuthError,
   runContainerAgent,
   writeGroupsSnapshot,
   writeTasksSnapshot,
 } from './container-runner.js';
+import { readEnvFile } from './env.js';
 import { cleanupOrphans, ensureContainerRuntimeRunning } from './container-runtime.js';
 import {
   createTask,
@@ -896,7 +898,16 @@ async function runAgent(
     estimatedRamGB: 2,
   });
 
+  // Host-side retry: only retries if the .env token actually changed (avoids wasting a
+  // 30s+ container restart with the same expired token). The container-side IPC retry
+  // (requestTokenRefresh in agent-runner) is the primary mechanism — this is the fallback
+  // for cases where the container crashed before IPC could fire.
+  const OAUTH_HOST_RETRY_DELAY_MS = 5000;
+
   try {
+    // Snapshot the current token so we can detect if .env was updated between attempts
+    let lastTokenPrefix = readEnvFile(['CLAUDE_CODE_OAUTH_TOKEN']).CLAUDE_CODE_OAUTH_TOKEN?.slice(0, 20);
+
     const output = await runContainerAgent(
       group,
       {
@@ -920,6 +931,81 @@ async function runAgent(
       },
       wrappedOnOutput,
     );
+
+    // If OAuth error: check if .env token was updated, retry once if so
+    if (output.status === 'error' && isOAuthError(output.error)) {
+      logger.warn(
+        { group: group.name, error: output.error },
+        'OAuth error detected — checking if .env token was refreshed',
+      );
+
+      // Wait briefly for potential background token refresh
+      await new Promise((r) => setTimeout(r, OAUTH_HOST_RETRY_DELAY_MS));
+
+      const freshToken = readEnvFile(['CLAUDE_CODE_OAUTH_TOKEN']).CLAUDE_CODE_OAUTH_TOKEN;
+      const freshPrefix = freshToken?.slice(0, 20);
+
+      if (freshPrefix && freshPrefix !== lastTokenPrefix) {
+        // Token changed — worth retrying with a new container
+        logger.info({ group: group.name }, 'Token changed in .env — retrying with fresh token');
+        lastTokenPrefix = freshPrefix;
+
+        const retryOutput = await runContainerAgent(
+          group,
+          {
+            prompt,
+            sessionId, // Same session = conversation context preserved
+            groupFolder: group.folder,
+            chatJid,
+            isMain,
+            designation,
+            routingHint: routingDecisionHint ? {
+              suggestedModel: routingDecisionHint.modelId,
+              tier: routingDecisionHint.modelTier,
+              confidence: routingDecisionHint.confidence,
+              reasoning: routingDecisionHint.reasoning,
+            } : undefined,
+            maxTurns,
+          },
+          (proc, containerName) => {
+            queue.registerProcess(chatJid, proc, containerName, group.folder);
+            queue.setDesignation(chatJid, designation);
+          },
+          wrappedOnOutput,
+        );
+
+        // Use retry result regardless of outcome
+        if (retryOutput.newSessionId) {
+          sessions[group.folder] = retryOutput.newSessionId;
+          setSession(group.folder, retryOutput.newSessionId);
+        }
+
+        if (retryOutput.status === 'error') {
+          logger.error({ group: group.name, error: retryOutput.error }, 'Container agent error (after OAuth retry)');
+          await orchestrator.releaseAgent(agentId, 'error');
+          return 'error';
+        }
+
+        await orchestrator.releaseAgent(agentId, 'completed');
+        return 'success';
+      }
+
+      // Token unchanged — notify user with actionable instructions
+      logger.error(
+        { group: group.name, error: output.error },
+        'OAuth token expired and unchanged in .env — cannot retry',
+      );
+      const ch = findChannel(channels, chatJid);
+      if (ch?.isConnected()) {
+        ch.sendMessage(chatJid,
+          `⚠️ *OAuth token expired*\n\n` +
+          `The agent couldn't authenticate with Claude. To fix:\n` +
+          `1. Generate a new token at console.anthropic.com\n` +
+          `2. Update \`CLAUDE_CODE_OAUTH_TOKEN\` in .env\n` +
+          `3. Send your message again (session will resume automatically)`,
+        ).catch(() => {});
+      }
+    }
 
     if (output.newSessionId) {
       sessions[group.folder] = output.newSessionId;

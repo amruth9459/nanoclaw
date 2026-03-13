@@ -36,6 +36,7 @@ import { Bounty, findBounties } from './bounty-hunter.js';
 import { BountyGate } from './bounty-gate.js';
 import { CleanupGate } from './cleanup-gate.js';
 import { learnFact } from './context/index.js';
+import { readEnvFile } from './env.js';
 import { getSurvivalTier } from './economics.js';
 import { HitlGate } from './hitl.js';
 import { getIntegration } from './integration-loader.js';
@@ -214,6 +215,7 @@ export function startIpcWatcher(deps: IpcDeps): void {
                 const CLAWWORK_BOUNTY_TYPES = new Set([
                   'clawwork_get_status', 'clawwork_decide_activity', 'clawwork_learn', 'learn', 'clawwork_submit_work',
                   'find_bounties', 'propose_bounty', 'submit_bounty',
+                  'token_refresh',
                 ]);
                 if (data.type && CLAWWORK_BOUNTY_TYPES.has(data.type)) {
                   await processClawworkMessage(data, sourceGroup, messagesDir, deps);
@@ -921,6 +923,31 @@ async function processClawworkMessage(
         const errMsg = err instanceof Error ? err.message : String(err);
         if (responseFile) writeIpcResponse(responseFile, { error: errMsg });
         logger.error({ err, groupFolder }, 'Gmail cleanup proposal failed');
+      }
+      break;
+    }
+
+    // ── Token Refresh (container-initiated) ─────────────────────────
+    case 'token_refresh': {
+      try {
+        const fresh = readEnvFile(['CLAUDE_CODE_OAUTH_TOKEN']);
+        const token = fresh.CLAUDE_CODE_OAUTH_TOKEN;
+        if (token) {
+          const currentPrefix = data.currentTokenPrefix as string | undefined;
+          const changed = !currentPrefix || !token.startsWith(currentPrefix);
+          if (responseFile) writeIpcResponse(responseFile, { token });
+          logger.info(
+            { groupFolder, changed },
+            `Token refresh: responded with ${changed ? 'new' : 'same'} token`,
+          );
+        } else {
+          if (responseFile) writeIpcResponse(responseFile, { error: 'No CLAUDE_CODE_OAUTH_TOKEN in .env' });
+          logger.warn({ groupFolder }, 'Token refresh: no token found in .env');
+        }
+      } catch (err) {
+        const errMsg = err instanceof Error ? err.message : String(err);
+        if (responseFile) writeIpcResponse(responseFile, { error: errMsg });
+        logger.error({ err, groupFolder }, 'Token refresh failed');
       }
       break;
     }
