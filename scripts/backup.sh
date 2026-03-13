@@ -11,7 +11,7 @@ set -euo pipefail
 # point-in-time recovery. A compromised agent cannot wipe the backup.
 
 NANOCLAW_DIR="${NANOCLAW_DIR:-/Users/amrut/nanoclaw}"
-R2_REMOTE="${R2_REMOTE:-r2}"
+R2_REMOTE="${R2_REMOTE:-r2-backup-writeonly}"
 R2_BUCKET="${R2_BUCKET:-nanoclaw-backup}"
 LOCK_FILE="/tmp/nanoclaw-backup.lock"
 LOG_FILE="${NANOCLAW_DIR}/logs/backup.log"
@@ -202,19 +202,19 @@ fi
 
 # ---------- Step 5: Log completion ----------
 
-# ---------- Step 5a: Prune old snapshots (keep last 30 days) ----------
-# List snapshot dirs older than 30 days and delete them.
-# This is the ONLY place where R2 objects are deleted.
-CUTOFF_DATE=$(date -v-30d '+%Y-%m-%d' 2>/dev/null || date -d '30 days ago' '+%Y-%m-%d' 2>/dev/null || echo "")
-if [ -n "$CUTOFF_DATE" ]; then
-    rclone lsf "${R2_REMOTE}:${R2_BUCKET}/snapshots/" --dirs-only 2>/dev/null | while read -r dir; do
-        dir_date="${dir%/}"
-        if [[ "$dir_date" < "$CUTOFF_DATE" ]]; then
-            rclone purge "${R2_REMOTE}:${R2_BUCKET}/snapshots/${dir_date}" --quiet 2>> "$LOG_FILE" \
-                && log "pruned old snapshot: ${dir_date}" || true
-        fi
-    done
-fi
+# DISABLED: Automatic snapshot pruning (write-only token has no delete permission)
+# Manual pruning procedure (quarterly or as needed):
+#   1. Recreate full-access 'r2' remote temporarily
+#   2. List snapshots: rclone ls r2:nanoclaw-backup/snapshots/ --dirs-only
+#   3. Delete old ones: rclone purge r2:nanoclaw-backup/snapshots/YYYY-MM-DD
+#   4. Remove full-access remote: rclone config delete r2
+#
+# CUTOFF_DATE=$(date -v-90d '+%Y-%m-%d' 2>/dev/null || date -d '90 days ago' '+%Y-%m-%d' 2>/dev/null || echo "")
+# if [ -n "$CUTOFF_DATE" ]; then
+#     rclone lsf "r2:${R2_BUCKET}/snapshots/" --dirs-only 2>/dev/null | while read -r dir; do
+#         [[ "${dir%/}" < "$CUTOFF_DATE" ]] && rclone purge "r2:${R2_BUCKET}/snapshots/${dir%/}" --quiet 2>> "$LOG_FILE"
+#     done
+# fi
 
 # ---------- Step 6: Log completion ----------
 
