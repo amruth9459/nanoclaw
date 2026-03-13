@@ -480,6 +480,16 @@ export function startIpcWatcher(deps: IpcDeps): void {
                 }
 
                 if (data.type === 'send_file' && data.chatJid && data.filePath) {
+                  // Authorization: non-main groups can only send files to their own JID
+                  const fileTargetGroup = registeredGroups[data.chatJid as string];
+                  if (!isMain && (!fileTargetGroup || fileTargetGroup.folder !== sourceGroup)) {
+                    logger.warn(
+                      { chatJid: data.chatJid, sourceGroup },
+                      'SECURITY: send_file to unauthorized JID blocked',
+                    );
+                    fs.unlinkSync(filePath);
+                    continue;
+                  }
                   const rawRF = data.responseFile as string | undefined;
                   const rfPath = rawRF ? toHostIpcPath(rawRF, sourceGroup) : undefined;
                   const hostPath = toHostWorkspacePath(data.filePath as string, sourceGroup);
@@ -510,6 +520,16 @@ export function startIpcWatcher(deps: IpcDeps): void {
                 }
 
                 if (data.type === 'react' && data.chatJid && data.messageId && data.emoji) {
+                  // Authorization: non-main groups can only react in their own JID
+                  const reactTargetGroup = registeredGroups[data.chatJid as string];
+                  if (!isMain && (!reactTargetGroup || reactTargetGroup.folder !== sourceGroup)) {
+                    logger.warn(
+                      { chatJid: data.chatJid, sourceGroup },
+                      'SECURITY: react to unauthorized JID blocked',
+                    );
+                    fs.unlinkSync(filePath);
+                    continue;
+                  }
                   if (deps.sendReaction) {
                     await deps.sendReaction(
                       data.chatJid as string,

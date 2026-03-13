@@ -358,9 +358,13 @@ function buildContainerArgs(
     args.push('-e', 'HOME=/home/node');
   }
 
-  // Network isolation: use restricted bridge network (no external internet).
+  // Network isolation: non-main containers default to restricted network (no external internet).
+  // Main container keeps internet access for web browsing, API calls, etc.
+  // Set networkRestricted=false explicitly to opt out for a non-main group.
   // Requires the nanoclaw-restricted Docker network to exist (run setup-egress.sh first).
-  if (group.containerConfig?.networkRestricted) {
+  const isMainGroup = group.folder === 'main';
+  const networkRestricted = group.containerConfig?.networkRestricted ?? !isMainGroup;
+  if (networkRestricted) {
     args.push('--network', 'nanoclaw-restricted');
     args.push('-e', 'NANOCLAW_NETWORK_RESTRICTED=1');
     logger.info({ group: group.name }, 'Container spawned on restricted network (no external internet)');
