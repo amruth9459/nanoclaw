@@ -99,7 +99,9 @@ export async function embedText(
     content: { role: 'user', parts: [{ text: text.slice(0, 2048) }] },
     taskType,
   });
-  const values = result.embedding.values;
+  // Gemini returns 3072 dims natively; truncate to DIMS (MRL-safe)
+  const raw = result.embedding.values;
+  const values = raw.length > DIMS ? raw.slice(0, DIMS) : raw;
   // L2-normalize
   const norm = Math.sqrt(values.reduce((s, x) => s + x * x, 0)) || 1;
   return new Float32Array(values.map(x => x / norm));

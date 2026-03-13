@@ -141,8 +141,9 @@ export class PersonaRegistry {
         );
       `);
       const storedDims = this.db.prepare("SELECT value FROM persona_embedding_dims WHERE key = 'dims'").get() as { value: number } | undefined;
-      if (storedDims && storedDims.value !== DIMS) {
-        logger.info({ oldDims: storedDims.value, newDims: DIMS }, 'Persona embedding dimensions changed — re-indexing');
+      const needsMigration = storedDims ? storedDims.value !== DIMS : true;
+      if (needsMigration) {
+        logger.info({ oldDims: storedDims?.value ?? 'unknown', newDims: DIMS }, 'Persona embedding dimensions changed — re-indexing');
         this.db.exec('DROP TABLE IF EXISTS persona_vec');
         this.db.exec('DELETE FROM persona_embedding_meta');
       }
@@ -441,9 +442,12 @@ export class PersonaRegistry {
           // Cached — load embedding from DB (BigInt for vec0 primary key)
           const vecRow = getVec.get(BigInt(meta.rowid)) as { embedding: Buffer } | undefined;
           if (vecRow && vecRow.embedding) {
-            // sqlite-vec returns raw bytes as Buffer — convert to Float32Array
+            // sqlite-vec returns raw bytes as Buffer — copy into own ArrayBuffer to avoid
+            // reading garbage from Node.js Buffer pool when dimensions change
             const buf = Buffer.isBuffer(vecRow.embedding) ? vecRow.embedding : Buffer.from(vecRow.embedding as any);
-            persona.embedding = new Float32Array(buf.buffer, buf.byteOffset, DIMS);
+            const copy = new ArrayBuffer(DIMS * 4);
+            new Uint8Array(copy).set(buf.subarray(0, DIMS * 4));
+            persona.embedding = new Float32Array(copy);
             continue;
           }
         }
