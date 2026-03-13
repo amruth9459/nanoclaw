@@ -82,6 +82,10 @@ RUN chmod +x /workspace/gws/gws_helper.py
 # Create workspace directories
 RUN mkdir -p /workspace/group /workspace/global /workspace/extra /workspace/ipc/messages /workspace/ipc/tasks /workspace/ipc/input
 
+# Force IPv4 preference — Apple Container networks lack IPv6 connectivity
+# but glibc resolves to IPv6 first, causing Claude API connections to hang.
+RUN echo 'precedence ::ffff:0:0/96 100' >> /etc/gai.conf
+
 # Create entrypoint script
 # Uses pre-compiled /app/dist (built during docker build) — no runtime tsc.
 # To update agent code, rebuild the image with ./container/build.sh or ./deploy.sh.

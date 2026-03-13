@@ -31,6 +31,7 @@ import { logger } from './logger.js';
 import { GroupQueue } from './group-queue.js';
 import { ResourceOrchestrator } from './resource-orchestrator.js';
 import type { UniversalRouter } from './router/index.js';
+import { routeNotification } from './notification-router.js';
 import { getIndexStats } from './semantic-index.js';
 
 const PORT = parseInt(process.env.DASHCLAW_PORT || '8080', 10);
@@ -1502,6 +1503,29 @@ export function startDashboard(queue: GroupQueue, sendFn?: (jid: string, text: s
           res.end(JSON.stringify({ ok: true, remaining: rateLimitResult.remaining }));
         } catch (err) {
           logger.error({ error: err }, '/api/send error');
+          res.writeHead(500, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ error: String(err) }));
+        }
+      });
+      return;
+    }
+
+    if (url.pathname === '/api/notify' && req.method === 'POST') {
+      let body = '';
+      req.on('data', (chunk) => { body += chunk; });
+      req.on('end', async () => {
+        try {
+          const { title, body: notifBody, source } = JSON.parse(body);
+          if (!title || !source) {
+            res.writeHead(400, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ error: 'missing title or source' }));
+            return;
+          }
+          await routeNotification({ title, body: notifBody || '', source });
+          res.writeHead(200, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ ok: true }));
+        } catch (err) {
+          logger.error({ error: err }, '/api/notify error');
           res.writeHead(500, { 'Content-Type': 'application/json' });
           res.end(JSON.stringify({ error: String(err) }));
         }

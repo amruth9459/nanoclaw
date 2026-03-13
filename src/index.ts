@@ -70,6 +70,7 @@ import { classifyGoalHeuristic, extractGoalDetails } from './goal-classifier.js'
 import { ResponseTimeManager } from './response-time-manager.js';
 import { NanoClawOrchestrator } from './nanoclaw-orchestrator.js';
 import { listGroupFiles, startDashboard } from './dashboard.js';
+import { initNotificationRouter } from './notification-router.js';
 import { ResourceOrchestrator, AgentPriority } from './resource-orchestrator.js';
 import { BountyGate } from './bounty-gate.js';
 import { CleanupGate } from './cleanup-gate.js';
@@ -1865,6 +1866,9 @@ async function main(): Promise<void> {
     if (!ch.sendFile) throw new Error(`Channel ${ch.name} does not support file sending`);
     return ch.sendFile(jid, buffer, mimetype, filename, caption);
   };
+
+  // Initialize notification router so /api/notify can send to WhatsApp
+  initNotificationRouter(clawSend);
 
   startIpcWatcher({
     sendMessage: clawSend,
