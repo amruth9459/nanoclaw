@@ -100,7 +100,7 @@ let ipcWatcherRunning = false;
 // ── Desktop Claude concurrency semaphore ──────────────────────────────
 // Serialize desktop_claude spawns to prevent FD exhaustion from parallel claude -p
 let activeDesktopClaude = 0;
-const MAX_CONCURRENT_DESKTOP = 5;
+const MAX_CONCURRENT_DESKTOP = 2;
 const DESKTOP_QUEUE_TIMEOUT_MS = 30 * 60 * 1000; // 30 min max wait in queue
 const desktopQueue: Array<{ resolve: () => void; reject: (err: Error) => void; timer: ReturnType<typeof setTimeout> }> = [];
 
@@ -322,7 +322,8 @@ export function startIpcWatcher(deps: IpcDeps): void {
                           maxBuffer: 10 * 1024 * 1024, // 10MB output buffer
                           env: (() => {
                             const e = { ...process.env };
-                            delete e.CLAUDECODE;       // Must delete — even '' blocks nested sessions
+                            delete e.CLAUDECODE;              // Must delete — even '' blocks nested sessions
+                            delete e.CLAUDE_CODE_ENTRYPOINT;  // Also blocks nesting detection
                             e.CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC = '1';
                             e.PATH = `/opt/homebrew/bin:${e.PATH || '/usr/bin:/bin'}`;
                             return e;
@@ -347,15 +348,19 @@ export function startIpcWatcher(deps: IpcDeps): void {
                       }
                     } catch (err: unknown) {
                       // Extract stderr/stdout from execFile errors (contains actual failure reason)
-                      const execErr = err as { message?: string; stderr?: string; stdout?: string; code?: number };
+                      const execErr = err as { message?: string; stderr?: string; stdout?: string; code?: number; killed?: boolean; signal?: string };
                       const stderr = execErr.stderr?.slice(-1000) || '';
-                      const stdout = execErr.stdout?.slice(-500) || '';
+                      const stdout = execErr.stdout || '';
                       const exitCode = execErr.code;
-                      const reason = stderr || stdout || execErr.message || String(err);
-                      logger.error({ err: reason.slice(0, 500), exitCode }, 'Desktop Claude Code failed');
+                      const reason = stderr || stdout.slice(-500) || execErr.message || String(err);
+                      logger.error({ err: reason.slice(0, 500), exitCode, signal: execErr.signal, stdoutLen: stdout.length }, 'Desktop Claude Code failed');
                       if (responseFile) {
-                        // Error goes back to calling container — don't spam user
-                        writeIpcResponse(responseFile, { error: reason.slice(0, 2000) });
+                        // If killed (SIGTERM/SIGKILL) but had stdout, send output — work may be done
+                        if (stdout.length > 100 && (exitCode === 143 || exitCode === 137 || execErr.killed)) {
+                          writeIpcResponse(responseFile, { output: stdout.slice(-8000), partial: true });
+                        } else {
+                          writeIpcResponse(responseFile, { error: reason.slice(0, 2000) });
+                        }
                       } else {
                         // No responseFile = fire-and-forget call, notify user
                         const mainJid = deps.getMainGroupJid?.();
