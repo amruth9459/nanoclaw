@@ -25,7 +25,7 @@ import {
 } from './config.js';
 import { readEnvFile } from './env.js';
 import { logger } from './logger.js';
-import { CONTAINER_RUNTIME_BIN, readonlyMountArgs, stopContainer } from './container-runtime.js';
+import { CONTAINER_RUNTIME_BIN, readonlyMountArgs, removeContainer, stopContainer } from './container-runtime.js';
 import { validateAdditionalMounts } from './mount-security.js';
 import { getIntegrations } from './integration-loader.js';
 import type { NanoClawIntegration } from './integration-types.js';
@@ -619,6 +619,9 @@ export async function runContainerAgent(
 
     container.on('close', (code) => {
       clearTimeout(timeout);
+      // Remove stopped container immediately to free Apple Virtualization VM file descriptors.
+      // Without this, stopped VMs leak FDs and eventually cause ENFILE system-wide.
+      removeContainer(containerName);
       const duration = Date.now() - startTime;
 
       if (timedOut) {

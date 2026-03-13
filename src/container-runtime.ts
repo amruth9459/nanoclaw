@@ -19,6 +19,16 @@ export function stopContainer(name: string): string {
   return `${CONTAINER_RUNTIME_BIN} stop ${name}`;
 }
 
+/** Remove a stopped container to free VM resources (file descriptors). */
+export function removeContainer(name: string): void {
+  try {
+    execSync(`${CONTAINER_RUNTIME_BIN} delete ${name}`, { stdio: 'pipe', timeout: 15000 });
+    logger.debug({ name }, 'Removed stopped container');
+  } catch {
+    // Already removed or still running — not critical
+  }
+}
+
 /** Ensure the container runtime is running, starting it if needed. */
 export function ensureContainerRuntimeRunning(): void {
   try {
@@ -60,24 +70,39 @@ export function ensureContainerRuntimeRunning(): void {
   }
 }
 
-/** Kill orphaned NanoClaw containers from previous runs. */
+/** Kill orphaned NanoClaw containers and remove stopped ones to free VM FDs. */
 export function cleanupOrphans(): void {
   try {
-    const output = execSync(`${CONTAINER_RUNTIME_BIN} ls --format json`, {
+    const output = execSync(`${CONTAINER_RUNTIME_BIN} ls -a --format json`, {
       stdio: ['pipe', 'pipe', 'pipe'],
       encoding: 'utf-8',
     });
     const containers: { status: string; configuration: { id: string } }[] = JSON.parse(output || '[]');
-    const orphans = containers
+
+    // Stop running orphans
+    const running = containers
       .filter((c) => c.status === 'running' && c.configuration.id.startsWith('nanoclaw-'))
       .map((c) => c.configuration.id);
-    for (const name of orphans) {
+    for (const name of running) {
       try {
         execSync(stopContainer(name), { stdio: 'pipe' });
       } catch { /* already stopped */ }
     }
-    if (orphans.length > 0) {
-      logger.info({ count: orphans.length, names: orphans }, 'Stopped orphaned containers');
+    if (running.length > 0) {
+      logger.info({ count: running.length, names: running }, 'Stopped orphaned containers');
+    }
+
+    // Remove all stopped nanoclaw containers (frees Apple Virtualization VM file descriptors)
+    const stopped = containers
+      .filter((c) => c.status === 'stopped' && c.configuration.id.startsWith('nanoclaw-'))
+      .map((c) => c.configuration.id);
+    // Also remove the ones we just stopped
+    const toRemove = [...new Set([...stopped, ...running])];
+    for (const name of toRemove) {
+      removeContainer(name);
+    }
+    if (toRemove.length > 0) {
+      logger.info({ count: toRemove.length }, 'Removed stopped containers');
     }
   } catch (err) {
     logger.warn({ err }, 'Failed to clean up orphaned containers');

@@ -20,6 +20,7 @@ import {
   CONTAINER_RUNTIME_BIN,
   readonlyMountArgs,
   stopContainer,
+  removeContainer,
   ensureContainerRuntimeRunning,
   cleanupOrphans,
 } from './container-runtime.js';
@@ -99,8 +100,8 @@ describe('ensureContainerRuntimeRunning', () => {
 // --- cleanupOrphans ---
 
 describe('cleanupOrphans', () => {
-  it('stops orphaned nanoclaw containers from JSON output', () => {
-    // Apple Container ls returns JSON
+  it('stops and removes orphaned nanoclaw containers from JSON output', () => {
+    // Apple Container ls -a returns JSON
     const lsOutput = JSON.stringify([
       { status: 'running', configuration: { id: 'nanoclaw-group1-111' } },
       { status: 'stopped', configuration: { id: 'nanoclaw-group2-222' } },
@@ -108,13 +109,13 @@ describe('cleanupOrphans', () => {
       { status: 'running', configuration: { id: 'other-container' } },
     ]);
     mockExecSync.mockReturnValueOnce(lsOutput);
-    // stop calls succeed
+    // stop + delete calls succeed
     mockExecSync.mockReturnValue('');
 
     cleanupOrphans();
 
-    // ls + 2 stop calls (only running nanoclaw- containers)
-    expect(mockExecSync).toHaveBeenCalledTimes(3);
+    // ls + 2 stop calls + 3 delete calls (2 running + 1 stopped nanoclaw- containers)
+    expect(mockExecSync).toHaveBeenCalledTimes(6);
     expect(mockExecSync).toHaveBeenNthCalledWith(
       2,
       `${CONTAINER_RUNTIME_BIN} stop nanoclaw-group1-111`,
@@ -128,6 +129,10 @@ describe('cleanupOrphans', () => {
     expect(logger.info).toHaveBeenCalledWith(
       { count: 2, names: ['nanoclaw-group1-111', 'nanoclaw-group3-333'] },
       'Stopped orphaned containers',
+    );
+    expect(logger.info).toHaveBeenCalledWith(
+      { count: 3 },
+      'Removed stopped containers',
     );
   });
 
@@ -163,15 +168,20 @@ describe('cleanupOrphans', () => {
     mockExecSync.mockImplementationOnce(() => {
       throw new Error('already stopped');
     });
-    // Second stop succeeds
-    mockExecSync.mockReturnValueOnce('');
+    // Remaining calls (stop + deletes) succeed
+    mockExecSync.mockReturnValue('');
 
     cleanupOrphans(); // should not throw
 
-    expect(mockExecSync).toHaveBeenCalledTimes(3);
+    // ls + 2 stop + 2 delete = 5 calls
+    expect(mockExecSync).toHaveBeenCalledTimes(5);
     expect(logger.info).toHaveBeenCalledWith(
       { count: 2, names: ['nanoclaw-a-1', 'nanoclaw-b-2'] },
       'Stopped orphaned containers',
+    );
+    expect(logger.info).toHaveBeenCalledWith(
+      { count: 2 },
+      'Removed stopped containers',
     );
   });
 });
