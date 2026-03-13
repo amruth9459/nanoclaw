@@ -310,8 +310,9 @@ export function startIpcWatcher(deps: IpcDeps): void {
                         cliArgs.push('--max-budget-usd', String(maxBudget));
                       }
 
-                      // Resolve claude binary — launchd PATH may not include /opt/homebrew/bin
-                      const claudeBin = process.env.CLAUDE_BIN || '/opt/homebrew/bin/claude';
+                      // Use wrapper script to fully isolate from parent Claude Code env
+                      const claudeWrapper = path.join(process.cwd(), 'scripts', 'desktop-claude.sh');
+                      const claudeBin = fs.existsSync(claudeWrapper) ? claudeWrapper : (process.env.CLAUDE_BIN || '/opt/homebrew/bin/claude');
                       logger.info({ prompt: prompt.slice(0, 200), workdir: resolved, maxBudget: maxBudget || 'unlimited' }, 'Spawning desktop Claude Code');
                       const { stdout, stderr } = await execFileAsync(
                         claudeBin,
