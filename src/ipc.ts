@@ -25,6 +25,7 @@ import {
   getAllBounties,
   getOrCreateEconomics,
   getTaskById,
+  getTasksForGroup,
   saveLearn,
   updateBountyStatus,
   updateTask,
@@ -1083,13 +1084,47 @@ export async function processTaskIpc(
 
         const scheduleType = data.schedule_type as 'cron' | 'interval' | 'once';
 
+        // Security: max 10 active tasks per group
+        const MAX_ACTIVE_TASKS_PER_GROUP = 10;
+        const existingTasks = getTasksForGroup(targetFolder).filter(t => t.status === 'active');
+        if (existingTasks.length >= MAX_ACTIVE_TASKS_PER_GROUP) {
+          logger.warn(
+            { sourceGroup, targetFolder, activeCount: existingTasks.length },
+            'schedule_task blocked: max active tasks exceeded',
+          );
+          break;
+        }
+
+        // Security: minimum 5-minute interval for recurring tasks
+        const MIN_INTERVAL_MS = 5 * 60 * 1000; // 5 minutes
+        if (scheduleType === 'interval') {
+          const ms = parseInt(data.schedule_value, 10);
+          if (!isNaN(ms) && ms < MIN_INTERVAL_MS) {
+            logger.warn(
+              { sourceGroup, intervalMs: ms },
+              'schedule_task blocked: interval below 5-minute minimum',
+            );
+            break;
+          }
+        }
+
         let nextRun: string | null = null;
         if (scheduleType === 'cron') {
           try {
             const interval = CronExpressionParser.parse(data.schedule_value, {
               tz: TIMEZONE,
             });
-            nextRun = interval.next().toISOString();
+            const first = interval.next().toDate();
+            const second = interval.next().toDate();
+            const gapMs = second.getTime() - first.getTime();
+            if (gapMs < MIN_INTERVAL_MS) {
+              logger.warn(
+                { sourceGroup, cron: data.schedule_value, gapMs },
+                'schedule_task blocked: cron runs more frequently than 5-minute minimum',
+              );
+              break;
+            }
+            nextRun = first.toISOString();
           } catch {
             logger.warn(
               { scheduleValue: data.schedule_value },

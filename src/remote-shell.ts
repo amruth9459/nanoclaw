@@ -187,7 +187,6 @@ export function formatRemoteShellResult(
  * Commonly used commands for quick access.
  */
 export const PRESET_COMMANDS = {
-  restart_nanoclaw: 'launchctl kickstart -k gui/$(id -u)/com.nanoclaw',
   check_nanoclaw_status: 'launchctl list | grep nanoclaw',
   view_recent_logs: 'tail -50 logs/nanoclaw.log',
   check_disk_space: 'df -h',
