@@ -1028,6 +1028,17 @@ async function startMessageLoop(): Promise<void> {
               ).catch((err) =>
                 logger.warn({ err }, 'CleanupGate approval handling error'),
               );
+              // Integration gates (e.g. SandboxGate)
+              for (const integ of getIntegrations()) {
+                if (integ.tryHandleApproval) {
+                  integ.tryHandleApproval(
+                    msg.content,
+                    (text) => channel.sendMessage(chatJid, text),
+                  ).catch((err) =>
+                    logger.warn({ err, integration: integ.name }, 'Integration approval handling error'),
+                  );
+                }
+              }
             }
           }
           const needsTrigger = !isMainGroup && group.requiresTrigger !== false;

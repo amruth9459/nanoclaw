@@ -148,7 +148,7 @@ function buildVolumeMounts(
     // Integration-provided container mounts
     for (const integration of getIntegrations()) {
       if (integration.getContainerMounts) {
-        const integrationMounts = integration.getContainerMounts(isMain, homeDir);
+        const integrationMounts = integration.getContainerMounts(isMain, homeDir, group.folder);
         for (const m of integrationMounts) {
           mounts.push(m);
         }
@@ -198,7 +198,7 @@ function buildVolumeMounts(
     const owningIntegrations = getIntegrations().filter(i => i.ownsGroup?.(group.folder));
     for (const integration of owningIntegrations) {
       if (integration.getContainerMounts) {
-        const integrationMounts = integration.getContainerMounts(isMain, homeDir);
+        const integrationMounts = integration.getContainerMounts(isMain, homeDir, group.folder);
         for (const m of integrationMounts) {
           mounts.push(m);
         }

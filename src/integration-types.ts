@@ -94,7 +94,10 @@ export interface NanoClawIntegration {
   validateMessage?(text: string): ValidationResult;
 
   /** Extra container mounts for groups owned by this integration */
-  getContainerMounts?(isMain: boolean, homeDir: string): VolumeMount[];
+  getContainerMounts?(isMain: boolean, homeDir: string, groupFolder?: string): VolumeMount[];
+
+  /** Check if an inbound message is an approval/rejection for this integration's gates */
+  tryHandleApproval?(message: string, notifyFn: (text: string) => Promise<void>): Promise<boolean>;
 
   /** Dashboard tabs to inject */
   dashboardTabs?: DashboardTab[];
