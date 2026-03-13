@@ -320,12 +320,13 @@ export function startIpcWatcher(deps: IpcDeps): void {
                           cwd: resolved,
                           timeout: 5_400_000, // 90 min — complex tasks need time
                           maxBuffer: 10 * 1024 * 1024, // 10MB output buffer
-                          env: {
-                            ...process.env,
-                            CLAUDECODE: '', // Unset to allow nested Claude Code sessions
-                            CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC: '1',
-                            PATH: `/opt/homebrew/bin:${process.env.PATH || '/usr/bin:/bin'}`,
-                          },
+                          env: (() => {
+                            const e = { ...process.env };
+                            delete e.CLAUDECODE;       // Must delete — even '' blocks nested sessions
+                            e.CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC = '1';
+                            e.PATH = `/opt/homebrew/bin:${e.PATH || '/usr/bin:/bin'}`;
+                            return e;
+                          })(),
                         },
                       );
                       const output = stdout || stderr || 'Completed with no output.';
