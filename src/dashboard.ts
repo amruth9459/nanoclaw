@@ -1533,6 +1533,27 @@ export function startDashboard(queue: GroupQueue, sendFn?: (jid: string, text: s
       return;
     }
 
+    // Agent quality review stats
+    if (url.pathname === '/api/quality/stats' && req.method === 'GET') {
+      const groupId = url.searchParams.get('group_id') || undefined;
+      const days = parseInt(url.searchParams.get('days') || '30', 10);
+      const { getQualityStats } = await import('./db.js');
+      const stats = getQualityStats(groupId, days);
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify(stats));
+      return;
+    }
+
+    if (url.pathname === '/api/quality/reviews' && req.method === 'GET') {
+      const groupId = url.searchParams.get('group_id') || undefined;
+      const limit = parseInt(url.searchParams.get('limit') || '20', 10);
+      const { getRecentReviews } = await import('./db.js');
+      const reviews = getRecentReviews(groupId, limit);
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify(reviews));
+      return;
+    }
+
     // Fieldy webhook endpoint — log all requests to this path
     if (url.pathname.startsWith('/webhooks/fieldy')) {
       logger.info({ method: req.method, pathname: url.pathname, headers: req.headers }, 'Fieldy webhook request received');

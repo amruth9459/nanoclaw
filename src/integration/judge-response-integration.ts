@@ -9,6 +9,7 @@
 
 import { JudgeSystem, JudgeSystemFactory, JudgeResult } from '../judge-system.js';
 import { ResponseTimeManager, ResponseTimeManagerFactory } from '../response-time-manager.js';
+import { logQualityReview } from '../db.js';
 
 export interface IntegrationConfig {
   enableJudges: boolean; // Default: true for code/reports, false for simple queries
@@ -117,6 +118,28 @@ export class IntegratedTaskManager {
       const decision = this.makeDecision(judgeResult);
       approved = decision.approved;
       recommendation = decision.recommendation;
+
+      // Log review to database
+      try {
+        logQualityReview({
+          id: `qr-${context.taskId}-${Date.now()}`,
+          group_id: context.taskId.split('-')[0] || 'unknown',
+          response_preview: content.substring(0, 500),
+          content_type: context.taskType,
+          approved: approved ? 1 : 0,
+          consensus: judgeResult.confidence,
+          judge_count: judgeResult.votes.length,
+          approval_count: judgeResult.votes.filter(v => v.verdict === 'approve').length,
+          issues_found: judgeResult.criticalIssues + judgeResult.majorIssues + judgeResult.minorIssues,
+          critical_issues: judgeResult.criticalIssues,
+          major_issues: judgeResult.majorIssues,
+          minor_issues: judgeResult.minorIssues,
+          processing_time_ms: Date.now() - startTime,
+          cost_usd: 0,
+          recommendation,
+          metadata: JSON.stringify({ votes: judgeResult.votes.map(v => ({ judge: v.judgeId, model: v.modelUsed, verdict: v.verdict, confidence: v.confidence })) }),
+        });
+      } catch { /* db logging should never block delivery */ }
 
       // Send judge verdict to user
       await this.sendJudgeVerdict(judgeResult, decision, context.sendMessage);

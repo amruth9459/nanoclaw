@@ -326,6 +326,31 @@ function createSchema(database: Database.Database): void {
   } catch {
     /* column already exists */
   }
+
+  // Agent quality review tables
+  database.exec(`
+    CREATE TABLE IF NOT EXISTS agent_quality_reviews (
+      id TEXT PRIMARY KEY,
+      group_id TEXT NOT NULL,
+      response_preview TEXT,
+      content_type TEXT,
+      approved INTEGER,
+      consensus REAL,
+      judge_count INTEGER,
+      approval_count INTEGER,
+      issues_found INTEGER,
+      critical_issues INTEGER DEFAULT 0,
+      major_issues INTEGER DEFAULT 0,
+      minor_issues INTEGER DEFAULT 0,
+      processing_time_ms INTEGER,
+      cost_usd REAL DEFAULT 0,
+      recommendation TEXT,
+      metadata TEXT,
+      created_at TEXT NOT NULL
+    );
+    CREATE INDEX IF NOT EXISTS idx_aqr_group ON agent_quality_reviews(group_id);
+    CREATE INDEX IF NOT EXISTS idx_aqr_created ON agent_quality_reviews(created_at);
+  `);
 }
 
 /** Get the main database handle (must be called after initDatabase) */
@@ -2096,6 +2121,84 @@ export function getTranscriptStats(): {
     oldestTranscript: oldest?.start_time || null,
     newestTranscript: newest?.start_time || null,
   };
+}
+
+// ──────────────────────────────────────────────────────────────────
+// Agent Quality Reviews
+// ──────────────────────────────────────────────────────────────────
+
+export interface QualityReview {
+  id: string;
+  group_id: string;
+  response_preview: string | null;
+  content_type: string | null;
+  approved: number;
+  consensus: number;
+  judge_count: number;
+  approval_count: number;
+  issues_found: number;
+  critical_issues: number;
+  major_issues: number;
+  minor_issues: number;
+  processing_time_ms: number | null;
+  cost_usd: number;
+  recommendation: string | null;
+  metadata: string | null;
+  created_at: string;
+}
+
+export function logQualityReview(review: Omit<QualityReview, 'created_at'>): void {
+  db.prepare(`
+    INSERT INTO agent_quality_reviews (id, group_id, response_preview, content_type, approved, consensus,
+      judge_count, approval_count, issues_found, critical_issues, major_issues, minor_issues,
+      processing_time_ms, cost_usd, recommendation, metadata, created_at)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+  `).run(
+    review.id, review.group_id, review.response_preview, review.content_type,
+    review.approved, review.consensus, review.judge_count, review.approval_count,
+    review.issues_found, review.critical_issues, review.major_issues, review.minor_issues,
+    review.processing_time_ms, review.cost_usd, review.recommendation, review.metadata,
+    new Date().toISOString(),
+  );
+}
+
+export function getQualityStats(groupId?: string, days = 30): {
+  total_reviews: number;
+  approval_rate: number;
+  avg_consensus: number;
+  total_issues: number;
+  avg_processing_ms: number;
+  total_cost: number;
+} {
+  const since = new Date(Date.now() - days * 86400000).toISOString();
+  const where = groupId ? 'WHERE group_id = ? AND created_at >= ?' : 'WHERE created_at >= ?';
+  const params = groupId ? [groupId, since] : [since];
+  const row = db.prepare(`
+    SELECT COUNT(*) as total,
+      COALESCE(AVG(approved), 0) as approval_rate,
+      COALESCE(AVG(consensus), 0) as avg_consensus,
+      COALESCE(SUM(issues_found), 0) as total_issues,
+      COALESCE(AVG(processing_time_ms), 0) as avg_processing_ms,
+      COALESCE(SUM(cost_usd), 0) as total_cost
+    FROM agent_quality_reviews ${where}
+  `).get(...params) as any;
+  return {
+    total_reviews: row.total,
+    approval_rate: Math.round(row.approval_rate * 100) / 100,
+    avg_consensus: Math.round(row.avg_consensus * 100) / 100,
+    total_issues: row.total_issues,
+    avg_processing_ms: Math.round(row.avg_processing_ms),
+    total_cost: Math.round(row.total_cost * 10000) / 10000,
+  };
+}
+
+export function getRecentReviews(groupId?: string, limit = 20): QualityReview[] {
+  const where = groupId ? 'WHERE group_id = ?' : '';
+  const params = groupId ? [groupId, limit] : [limit];
+  return db.prepare(`
+    SELECT * FROM agent_quality_reviews ${where}
+    ORDER BY created_at DESC LIMIT ?
+  `).all(...params) as QualityReview[];
 }
 
 /**
