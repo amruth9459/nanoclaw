@@ -427,9 +427,12 @@ You must verify every code change. No exceptions.
     const completionBlock = `
 ## MANDATORY: Task Completion
 When you finish this task:
-1. Use task_tool to mark it done: action=update, taskId="${task.id}", status="completed"
-2. Your final message MUST include a summary of what was done, files changed, and test results.
-3. If you cannot complete the task, use task_tool: action=update, taskId="${task.id}", status="blocked"
+1. **Git commit your work.** In your desktop_claude prompt, ALWAYS include at the end:
+   "After all changes, run: git add -A && git commit -m '${task.id}: <brief description>'"
+   This is critical — uncommitted work is invisible and gets redone.
+2. Use task_tool to mark it done: action=update, taskId="${task.id}", status="completed"
+3. Your final message MUST include a summary of what was done, files changed, and test results.
+4. If you cannot complete the task, use task_tool: action=update, taskId="${task.id}", status="blocked"
    and explain what's blocking you.
 `;
 
