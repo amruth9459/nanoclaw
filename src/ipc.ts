@@ -322,6 +322,7 @@ export function startIpcWatcher(deps: IpcDeps): void {
                           maxBuffer: 10 * 1024 * 1024, // 10MB output buffer
                           env: {
                             ...process.env,
+                            CLAUDECODE: '', // Unset to allow nested Claude Code sessions
                             CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC: '1',
                             PATH: `/opt/homebrew/bin:${process.env.PATH || '/usr/bin:/bin'}`,
                           },
