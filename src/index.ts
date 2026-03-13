@@ -1953,7 +1953,7 @@ async function main(): Promise<void> {
                 const mainJid = Object.entries(registeredGroups)
                   .find(([, g]) => g.folder === MAIN_GROUP_FOLDER)?.[0];
                 if (mainJid) {
-                  const notifyJid = getNotifyJid(project === 'lexios' ? 'lexios' : 'desktop', mainJid);
+                  const notifyJid = getNotifyJid(project !== 'nanoclaw' ? project : 'desktop', mainJid);
                   // Count remaining tasks
                   const stats = getDb().prepare(`
                     SELECT
@@ -1972,28 +1972,59 @@ async function main(): Promise<void> {
                 }
               } catch { /* notification best effort */ }
             } else {
-              // Reset failed tasks back to pending so they can be retried
-              try {
-                getDb().prepare('UPDATE tasks SET status = ?, assigned_agent = NULL WHERE id = ?')
-                  .run('pending', taskId);
-                logger.info({ taskId }, 'Reset failed dispatch task to pending');
-              } catch { /* best effort */ }
+              // Check if desktop_claude completed work even though the container failed/timed out.
+              // The agent may have done real work (committed code) but the container died before
+              // calling task_tool. In that case, mark as done instead of resetting to pending.
+              const { consumeDesktopCompletions } = await import('./ipc.js');
+              const desktopCompletions = consumeDesktopCompletions(group.folder);
 
-              // Send failure report
-              try {
-                const { getNotifyJid } = await import('./notify.js');
-                const mainJid = Object.entries(registeredGroups)
-                  .find(([, g]) => g.folder === MAIN_GROUP_FOLDER)?.[0];
-                if (mainJid) {
-                  const notifyJid = getNotifyJid(project === 'lexios' ? 'lexios' : 'desktop', mainJid);
-                  await clawSend(notifyJid,
-                    `❌ *Task Failed* — will retry\n` +
-                    `*${taskId}*: ${taskDesc}\n` +
-                    `Agent: ${persona}\n` +
-                    `Error: ${output.error?.slice(0, 200) || 'container exited with error'}`,
-                  );
-                }
-              } catch { /* notification best effort */ }
+              if (desktopCompletions > 0) {
+                // Desktop Claude completed work — treat as success despite container failure
+                try {
+                  getDb().prepare(
+                    'UPDATE tasks SET status = ?, completed_at = ? WHERE id = ? AND status = ?',
+                  ).run('done', Date.now(), taskId, 'in_progress');
+                  autoDispatcher?.updateDispatchStatus(taskId, 'completed');
+                  logger.info({ taskId, desktopCompletions }, 'Task marked done (desktop_claude completed despite container failure)');
+                } catch { /* best effort */ }
+
+                try {
+                  const { getNotifyJid } = await import('./notify.js');
+                  const mainJid = Object.entries(registeredGroups)
+                    .find(([, g]) => g.folder === MAIN_GROUP_FOLDER)?.[0];
+                  if (mainJid) {
+                    const notifyJid = getNotifyJid(project !== 'nanoclaw' ? project : 'desktop', mainJid);
+                    await clawSend(notifyJid,
+                      `✅ *Task Done* (container timed out but work committed)\n` +
+                      `*${taskId}*: ${taskDesc}\n` +
+                      `Agent: ${persona} (${desktopCompletions} desktop runs)`,
+                    );
+                  }
+                } catch { /* notification best effort */ }
+              } else {
+                // No desktop_claude work done — reset to pending for retry
+                try {
+                  getDb().prepare('UPDATE tasks SET status = ?, assigned_agent = NULL WHERE id = ?')
+                    .run('pending', taskId);
+                  logger.info({ taskId }, 'Reset failed dispatch task to pending');
+                } catch { /* best effort */ }
+
+                // Send failure report
+                try {
+                  const { getNotifyJid } = await import('./notify.js');
+                  const mainJid = Object.entries(registeredGroups)
+                    .find(([, g]) => g.folder === MAIN_GROUP_FOLDER)?.[0];
+                  if (mainJid) {
+                    const notifyJid = getNotifyJid(project !== 'nanoclaw' ? project : 'desktop', mainJid);
+                    await clawSend(notifyJid,
+                      `❌ *Task Failed* — will retry\n` +
+                      `*${taskId}*: ${taskDesc}\n` +
+                      `Agent: ${persona}\n` +
+                      `Error: ${output.error?.slice(0, 200) || 'container exited with error'}`,
+                    );
+                  }
+                } catch { /* notification best effort */ }
+              }
             }
           }
         },

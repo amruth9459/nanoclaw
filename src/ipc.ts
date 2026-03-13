@@ -98,6 +98,21 @@ function isDuplicateOutgoing(jid: string, text: string): boolean {
 
 let ipcWatcherRunning = false;
 
+// ── Desktop Claude completion tracker ─────────────────────────────────
+// Tracks which groups had successful desktop_claude runs so failed containers
+// can still be marked as done (the work was committed even if the container timed out).
+const desktopClaudeCompletions = new Map<string, number>(); // groupFolder → count
+
+export function recordDesktopCompletion(groupFolder: string): void {
+  desktopClaudeCompletions.set(groupFolder, (desktopClaudeCompletions.get(groupFolder) || 0) + 1);
+}
+
+export function consumeDesktopCompletions(groupFolder: string): number {
+  const count = desktopClaudeCompletions.get(groupFolder) || 0;
+  if (count > 0) desktopClaudeCompletions.delete(groupFolder);
+  return count;
+}
+
 // ── Desktop Claude concurrency semaphore ──────────────────────────────
 // Serialize desktop_claude spawns to prevent FD exhaustion from parallel claude -p
 let activeDesktopClaude = 0;
@@ -382,7 +397,8 @@ export function startIpcWatcher(deps: IpcDeps): void {
                       });
 
                       const output = stdout || stderr || 'Completed with no output.';
-                      logger.info({ outputLen: output.length }, 'Desktop Claude Code completed');
+                      logger.info({ outputLen: output.length, sourceGroup }, 'Desktop Claude Code completed');
+                      recordDesktopCompletion(sourceGroup);
 
                       // ── Notify user via WhatsApp if git push detected ──
                       if (/git\s+push|pushed\s+to|->/.test(output)) {
