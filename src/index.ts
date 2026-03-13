@@ -29,6 +29,7 @@ import {
   writeTasksSnapshot,
 } from './container-runner.js';
 import { readEnvFile } from './env.js';
+import { generateFallbackResponse, isFallbackWorthy } from './host-fallback.js';
 import { cleanupOrphans, ensureContainerRuntimeRunning } from './container-runtime.js';
 import {
   createTask,
@@ -1017,6 +1018,26 @@ async function runAgent(
         { group: group.name, error: output.error },
         'Container agent error',
       );
+
+      // Host-side fallback: if the error looks like an API outage (not OAuth),
+      // try generating a response via an alternative model directly from the host
+      if (!isOAuthError(output.error) && isFallbackWorthy(output.error)) {
+        const fallback = await generateFallbackResponse(prompt, group.name);
+        if (fallback) {
+          const ch = findChannel(channels, chatJid);
+          if (ch?.isConnected()) {
+            const footer = `\n\n_[fallback: ${fallback.model}, ${Math.round(fallback.latencyMs / 1000)}s]_`;
+            await ch.sendMessage(chatJid, fallback.text + footer).catch(() => {});
+            logger.info(
+              { group: group.name, model: fallback.model, latencyMs: fallback.latencyMs },
+              'Sent fallback response to user',
+            );
+            await orchestrator.releaseAgent(agentId, 'completed');
+            return 'success';
+          }
+        }
+      }
+
       await orchestrator.releaseAgent(agentId, 'error');
       return 'error';
     }
@@ -1025,6 +1046,26 @@ async function runAgent(
     return 'success';
   } catch (err) {
     logger.error({ group: group.name, err }, 'Agent error');
+
+    // Try host-side fallback for caught exceptions too
+    const errMsg = err instanceof Error ? err.message : String(err);
+    if (isFallbackWorthy(errMsg)) {
+      const fallback = await generateFallbackResponse(prompt, group.name);
+      if (fallback) {
+        const ch = findChannel(channels, chatJid);
+        if (ch?.isConnected()) {
+          const footer = `\n\n_[fallback: ${fallback.model}, ${Math.round(fallback.latencyMs / 1000)}s]_`;
+          await ch.sendMessage(chatJid, fallback.text + footer).catch(() => {});
+          logger.info(
+            { group: group.name, model: fallback.model },
+            'Sent fallback response after caught exception',
+          );
+          await orchestrator.releaseAgent(agentId, 'completed');
+          return 'success';
+        }
+      }
+    }
+
     await orchestrator.releaseAgent(agentId, 'error');
     return 'error';
   }

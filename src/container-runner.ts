@@ -327,7 +327,8 @@ function readSecrets(): Record<string, string> {
   // so container sessions are covered by the Pro subscription (no API billing).
   // API key is still used host-side by judge-system.ts and semantic-index.ts.
   const fromEnvFile = readEnvFile(['CLAUDE_CODE_OAUTH_TOKEN',
-    'CLAW_EMAIL_APP_PASSWORD', 'CLAW_REDDIT_PASS', 'CLAW_REDDIT_CLIENT_SECRET']);
+    'CLAW_EMAIL_APP_PASSWORD', 'CLAW_REDDIT_PASS', 'CLAW_REDDIT_CLIENT_SECRET',
+    'OPENAI_API_KEY', 'GOOGLE_API_KEY']);
   // Also pick up runtime values (set via process.env / plist)
   const extras: Record<string, string> = {};
   if (CLAW_EMAIL_APP_PASSWORD) extras['CLAW_EMAIL_APP_PASSWORD'] = CLAW_EMAIL_APP_PASSWORD;

@@ -282,7 +282,7 @@ export function startIpcWatcher(deps: IpcDeps): void {
                       return;
                     }
                     try {
-                      const { execFile, execSync } = await import('child_process');
+                      const { spawn } = await import('child_process');
                       const prompt = data.prompt as string;
                       const rawWorkdir = (data.workdir as string) || capturedConfig.workdir;
                       // Expand ~ to home directory (container sends ~/Lexios which path.resolve won't expand)
@@ -310,9 +310,7 @@ export function startIpcWatcher(deps: IpcDeps): void {
                         cliArgs.push('--max-budget-usd', String(maxBudget));
                       }
 
-                      // Use wrapper script to fully isolate from parent Claude Code env
-                      const claudeWrapper = path.join(process.cwd(), 'scripts', 'desktop-claude.sh');
-                      const claudeBin = fs.existsSync(claudeWrapper) ? claudeWrapper : (process.env.CLAUDE_BIN || '/opt/homebrew/bin/claude');
+                      const claudeBin = process.env.CLAUDE_BIN || '/opt/homebrew/bin/claude';
                       const cleanEnv = (() => {
                         const e = { ...process.env };
                         delete e.CLAUDECODE;              // Must delete — even '' blocks nested sessions
@@ -322,67 +320,65 @@ export function startIpcWatcher(deps: IpcDeps): void {
                         return e;
                       })();
 
-                      const STALL_CHECK_MS = 120_000;    // 2 min — if no TCP by then, it's stalled
-                      const OVERALL_TIMEOUT_MS = 20 * 60 * 1000; // 20 min
-                      const MAX_STALL_RETRIES = 1;
-
-                      // ── Spawn with stall detection and retry ──
-                      const runClaude = (): Promise<{ stdout: string; stderr: string }> => {
-                        return new Promise((resolve, reject) => {
-                          const child = execFile(
-                            claudeBin, cliArgs,
-                            { cwd: resolved, timeout: OVERALL_TIMEOUT_MS, maxBuffer: 10 * 1024 * 1024, env: cleanEnv },
-                            (error, stdout, stderr) => {
-                              clearTimeout(stallTimer);
-                              if (error) {
-                                reject(Object.assign(error, { stdout, stderr }));
-                              } else {
-                                resolve({ stdout: stdout || '', stderr: stderr || '' });
-                              }
-                            },
-                          );
-
-                          // Stall detection: kill if no TCP connections after 2 minutes
-                          const stallTimer = setTimeout(() => {
-                            try {
-                              const lsofOut = execSync(`lsof -iTCP -a -p ${child.pid} 2>/dev/null`, { encoding: 'utf-8' });
-                              if (!lsofOut.includes('ESTABLISHED')) {
-                                logger.warn({ pid: child.pid }, 'desktop_claude stall detected (no TCP after 2 min) — killing');
-                                child.kill('SIGTERM');
-                              }
-                            } catch {
-                              // lsof returned nothing = no TCP connections = stalled
-                              logger.warn({ pid: child.pid }, 'desktop_claude stall detected (no connections) — killing');
-                              child.kill('SIGTERM');
-                            }
-                          }, STALL_CHECK_MS);
-                        });
-                      };
-
                       logger.info({ prompt: prompt.slice(0, 200), workdir: resolved, maxBudget: maxBudget || 'unlimited' }, 'Spawning desktop Claude Code');
 
-                      let lastErr: unknown;
-                      let stdout = '';
-                      let stderr = '';
-                      for (let attempt = 0; attempt <= MAX_STALL_RETRIES; attempt++) {
-                        try {
-                          if (attempt > 0) {
-                            logger.info({ attempt }, 'Retrying desktop_claude after stall');
-                            await new Promise(r => setTimeout(r, 3000)); // Brief delay before retry
-                          }
-                          ({ stdout, stderr } = await runClaude());
-                          lastErr = null;
-                          break;
-                        } catch (err: unknown) {
-                          lastErr = err;
-                          const execErr = err as { signal?: string; killed?: boolean };
-                          // Only retry if killed by our stall detector (SIGTERM), not other errors
-                          const wasStallKill = execErr.signal === 'SIGTERM' || execErr.killed;
-                          if (!wasStallKill || attempt >= MAX_STALL_RETRIES) break;
-                        }
-                      }
+                      const OVERALL_TIMEOUT_MS = 20 * 60 * 1000; // 20 min
 
-                      if (lastErr) throw lastErr;
+                      // ── Spawn with stdin closed ──
+                      // CRITICAL: stdin must be 'ignore' (not pipe). Claude Code CLI stalls
+                      // indefinitely when stdin is a pipe from Node.js execFile/spawn.
+                      const { stdout, stderr } = await new Promise<{ stdout: string; stderr: string }>((resolve, reject) => {
+                        const child = spawn(claudeBin, cliArgs, {
+                          cwd: resolved,
+                          env: cleanEnv,
+                          stdio: ['ignore', 'pipe', 'pipe'],  // stdin=closed, stdout/stderr=captured
+                        });
+
+                        let stdoutBuf = '';
+                        let stderrBuf = '';
+                        let outputSize = 0;
+                        const MAX_OUTPUT = 10 * 1024 * 1024; // 10MB cap
+
+                        child.stdout!.on('data', (chunk: Buffer) => {
+                          if (outputSize < MAX_OUTPUT) {
+                            stdoutBuf += chunk.toString();
+                            outputSize += chunk.length;
+                          }
+                        });
+                        child.stderr!.on('data', (chunk: Buffer) => {
+                          if (outputSize < MAX_OUTPUT) {
+                            stderrBuf += chunk.toString();
+                            outputSize += chunk.length;
+                          }
+                        });
+
+                        const killTimer = setTimeout(() => {
+                          logger.warn({ pid: child.pid }, 'desktop_claude overall timeout — killing');
+                          child.kill('SIGTERM');
+                        }, OVERALL_TIMEOUT_MS);
+
+                        child.on('close', (code, signal) => {
+                          clearTimeout(killTimer);
+                          if (code === 0) {
+                            resolve({ stdout: stdoutBuf, stderr: stderrBuf });
+                          } else {
+                            const err: any = new Error(`claude -p exited with code ${code}${signal ? ` (${signal})` : ''}`);
+                            err.code = code;
+                            err.signal = signal;
+                            err.killed = signal === 'SIGTERM' || signal === 'SIGKILL';
+                            err.stdout = stdoutBuf;
+                            err.stderr = stderrBuf;
+                            reject(err);
+                          }
+                        });
+
+                        child.on('error', (err: any) => {
+                          clearTimeout(killTimer);
+                          err.stdout = stdoutBuf;
+                          err.stderr = stderrBuf;
+                          reject(err);
+                        });
+                      });
 
                       const output = stdout || stderr || 'Completed with no output.';
                       logger.info({ outputLen: output.length }, 'Desktop Claude Code completed');

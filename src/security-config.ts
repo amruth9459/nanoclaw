@@ -30,9 +30,9 @@ export const REMOTE_SHELL_ENABLED = secVal('NANOCLAW_REMOTE_SHELL_ENABLED') === 
 /**
  * Command whitelist mode
  * When true, only preset commands are allowed (no custom commands)
- * Set NANOCLAW_REMOTE_SHELL_WHITELIST_ONLY=1 for maximum security
+ * Default: ON (whitelist-only). Set NANOCLAW_REMOTE_SHELL_WHITELIST_ONLY=0 to allow custom commands.
  */
-export const REMOTE_SHELL_WHITELIST_ONLY = secVal('NANOCLAW_REMOTE_SHELL_WHITELIST_ONLY') === '1';
+export const REMOTE_SHELL_WHITELIST_ONLY = secVal('NANOCLAW_REMOTE_SHELL_WHITELIST_ONLY') !== '0';
 
 /**
  * Require approval for remote shell commands

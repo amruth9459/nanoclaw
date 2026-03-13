@@ -36,6 +36,61 @@ import { getIndexStats } from './semantic-index.js';
 const PORT = parseInt(process.env.DASHCLAW_PORT || '8080', 10);
 const LOG_PATH = path.join(process.cwd(), 'logs', 'nanoclaw.log');
 
+// ── Rate Limiter ─────────────────────────────────────────────────────────────
+
+class RateLimiter {
+  private requests = new Map<string, number[]>();
+  private readonly limit: number;
+  private readonly windowMs: number;
+
+  constructor(limit: number, windowMs: number) {
+    this.limit = limit;
+    this.windowMs = windowMs;
+  }
+
+  check(jid: string): { allowed: boolean; remaining: number; resetMs: number } {
+    const now = Date.now();
+    const cutoff = now - this.windowMs;
+
+    const timestamps = (this.requests.get(jid) || []).filter(t => t > cutoff);
+
+    if (timestamps.length >= this.limit) {
+      const oldestTs = timestamps[0];
+      return {
+        allowed: false,
+        remaining: 0,
+        resetMs: oldestTs + this.windowMs - now,
+      };
+    }
+
+    timestamps.push(now);
+    this.requests.set(jid, timestamps);
+
+    return {
+      allowed: true,
+      remaining: this.limit - timestamps.length,
+      resetMs: this.windowMs,
+    };
+  }
+
+  cleanup(): void {
+    const now = Date.now();
+    const cutoff = now - this.windowMs;
+    for (const [jid, timestamps] of this.requests.entries()) {
+      const filtered = timestamps.filter(t => t > cutoff);
+      if (filtered.length === 0) {
+        this.requests.delete(jid);
+      } else {
+        this.requests.set(jid, filtered);
+      }
+    }
+  }
+}
+
+// 5 messages per minute per JID
+const sendRateLimiter = new RateLimiter(5, 60_000);
+setInterval(() => sendRateLimiter.cleanup(), 5 * 60_000);
+
 // ── Helpers ────────────────────────────────────────────────────────────────────
 
 function readLogTail(n = 200): string[] {
@@ -1405,11 +1460,51 @@ export function startDashboard(queue: GroupQueue, sendFn?: (jid: string, text: s
       req.on('end', async () => {
         try {
           const { jid, message } = JSON.parse(body);
-          if (!jid || !message || !sendFn) { res.writeHead(400); res.end(JSON.stringify({ error: 'missing jid/message or sendFn not configured' })); return; }
+
+          if (!jid || !message) {
+            res.writeHead(400, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ error: 'missing jid or message' }));
+            return;
+          }
+
+          // Security: JID must be a registered group
+          const registeredGroups = getAllRegisteredGroups();
+          if (!registeredGroups[jid]) {
+            logger.warn({ jid, remoteAddr: req.socket.remoteAddress }, 'SECURITY: /api/send attempted with unregistered JID');
+            res.writeHead(403, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ error: 'jid not registered' }));
+            return;
+          }
+
+          // Security: rate limit per JID
+          const rateLimitResult = sendRateLimiter.check(jid);
+          if (!rateLimitResult.allowed) {
+            const retryAfterSec = Math.ceil(rateLimitResult.resetMs / 1000);
+            logger.warn({ jid, remaining: rateLimitResult.remaining }, 'SECURITY: /api/send rate limit exceeded');
+            res.writeHead(429, {
+              'Content-Type': 'application/json',
+              'Retry-After': String(retryAfterSec),
+            });
+            res.end(JSON.stringify({ error: 'rate limit exceeded', retryAfterSec }));
+            return;
+          }
+
+          if (!sendFn) {
+            res.writeHead(500, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ error: 'sendFn not configured' }));
+            return;
+          }
+
           await sendFn(jid, message);
+          logger.info({ jid, remaining: rateLimitResult.remaining }, '/api/send message sent');
+
           res.writeHead(200, { 'Content-Type': 'application/json' });
-          res.end(JSON.stringify({ ok: true }));
-        } catch (err) { res.writeHead(500); res.end(JSON.stringify({ error: String(err) })); }
+          res.end(JSON.stringify({ ok: true, remaining: rateLimitResult.remaining }));
+        } catch (err) {
+          logger.error({ error: err }, '/api/send error');
+          res.writeHead(500, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ error: String(err) }));
+        }
       });
       return;
     }
