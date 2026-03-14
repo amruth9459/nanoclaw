@@ -1200,7 +1200,7 @@ export function getKanbanItems(project: string): KanbanItem[] {
     }>;
     for (const t of taskRows) {
       const statusMap: Record<string, 'todo' | 'in_progress' | 'done'> = {
-        pending: 'todo', in_progress: 'in_progress', completed: 'done', blocked: 'todo',
+        pending: 'todo', in_progress: 'in_progress', completed: 'done', done: 'done', blocked: 'todo',
       };
       const src = t.source || 'agent';
       items.push({

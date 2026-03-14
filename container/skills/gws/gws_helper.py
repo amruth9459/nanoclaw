@@ -224,6 +224,173 @@ def gmail_categorize(args):
     }))
 
 
+def keep_list_notes(args):
+    """List Google Keep notes with optional label filter."""
+    from googleapiclient.discovery import build
+    creds = get_credentials()
+    service = build('keep', 'v1', credentials=creds)
+
+    filter_str = ''
+    if hasattr(args, 'label') and args.label:
+        filter_str = f'labels.name = "{args.label}"'
+
+    params = {'pageSize': int(args.max_results)}
+    if filter_str:
+        params['filter'] = filter_str
+
+    results = service.notes().list(**params).execute()
+    notes = results.get('notes', [])
+
+    output = []
+    for note in notes:
+        if not args.archived and note.get('trashed'):
+            continue
+        output.append({
+            "name": note.get('name', ''),
+            "title": note.get('title', '(untitled)'),
+            "createTime": note.get('createTime', ''),
+            "updateTime": note.get('updateTime', ''),
+            "trashed": note.get('trashed', False),
+        })
+
+    print(json.dumps({"notes": output, "total": len(output)}))
+
+
+def keep_get_note(args):
+    """Get full content of a Google Keep note by ID."""
+    from googleapiclient.discovery import build
+    creds = get_credentials()
+    service = build('keep', 'v1', credentials=creds)
+
+    note_id = args.note_id
+    if not note_id.startswith('notes/'):
+        note_id = f'notes/{note_id}'
+
+    note = service.notes().get(name=note_id).execute()
+
+    # Extract text content from body
+    body = note.get('body', {})
+    content_type = 'text'
+    text_content = ''
+    items = []
+
+    if 'text' in body:
+        text_content = body['text'].get('text', '')
+    elif 'list' in body:
+        content_type = 'list'
+        for item in body['list'].get('listItems', []):
+            items.append({
+                "text": item.get('text', {}).get('text', ''),
+                "checked": item.get('checked', False),
+            })
+
+    output = {
+        "name": note.get('name', ''),
+        "title": note.get('title', '(untitled)'),
+        "content_type": content_type,
+        "createTime": note.get('createTime', ''),
+        "updateTime": note.get('updateTime', ''),
+        "trashed": note.get('trashed', False),
+    }
+
+    if content_type == 'text':
+        output["text"] = text_content
+    else:
+        output["items"] = items
+
+    print(json.dumps(output))
+
+
+def keep_list_items(args):
+    """Extract task items from a Google Keep list note."""
+    from googleapiclient.discovery import build
+    creds = get_credentials()
+    service = build('keep', 'v1', credentials=creds)
+
+    note_id = args.note_id
+    if not note_id.startswith('notes/'):
+        note_id = f'notes/{note_id}'
+
+    note = service.notes().get(name=note_id).execute()
+    body = note.get('body', {})
+
+    if 'list' not in body:
+        print(json.dumps({"error": "Note is not a list/checklist", "note_title": note.get('title', '')}))
+        return
+
+    unchecked_only = args.unchecked_only.lower() == 'true' if hasattr(args, 'unchecked_only') else True
+    items = []
+    for item in body['list'].get('listItems', []):
+        checked = item.get('checked', False)
+        if unchecked_only and checked:
+            continue
+        items.append({
+            "text": item.get('text', {}).get('text', ''),
+            "checked": checked,
+        })
+
+    print(json.dumps({
+        "note_title": note.get('title', '(untitled)'),
+        "items": items,
+        "total": len(items),
+    }))
+
+
+def keep_search(args):
+    """Search Google Keep notes by text content."""
+    from googleapiclient.discovery import build
+    creds = get_credentials()
+    service = build('keep', 'v1', credentials=creds)
+
+    # Keep API doesn't have a direct search — list all and filter client-side
+    all_notes = []
+    page_token = None
+    while True:
+        params = {'pageSize': 100}
+        if page_token:
+            params['pageToken'] = page_token
+        results = service.notes().list(**params).execute()
+        all_notes.extend(results.get('notes', []))
+        page_token = results.get('nextPageToken')
+        if not page_token:
+            break
+
+    query_lower = args.query.lower()
+    max_results = int(args.max_results)
+    matched = []
+
+    for note in all_notes:
+        if note.get('trashed'):
+            continue
+
+        title = note.get('title', '')
+        body = note.get('body', {})
+        body_text = ''
+        if 'text' in body:
+            body_text = body['text'].get('text', '')
+        elif 'list' in body:
+            body_text = ' '.join(
+                item.get('text', {}).get('text', '')
+                for item in body['list'].get('listItems', [])
+            )
+
+        if query_lower in title.lower() or query_lower in body_text.lower():
+            matched.append({
+                "name": note.get('name', ''),
+                "title": title or '(untitled)',
+                "snippet": (body_text[:200] + '...') if len(body_text) > 200 else body_text,
+                "updateTime": note.get('updateTime', ''),
+            })
+            if len(matched) >= max_results:
+                break
+
+    print(json.dumps({"results": matched, "total": len(matched)}))
+
+
+# TODO Phase 2: keep_check_item(args) — toggle checklist item
+# TODO Phase 2: keep_add_item(args) — add item to checklist note
+
+
 MAX_BATCH = 100
 
 
