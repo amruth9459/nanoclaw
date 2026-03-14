@@ -1,11 +1,47 @@
 # NanoClaw — Daily Build Log
 
 *Living document — auto-generated from git history*
-*Last generated: 2026-03-13*
+*Last generated: 2026-03-14*
 
-**308 total commits** (203 meaningful) | 2026-01-31 to 2026-03-12
+**338 total commits** (208 meaningful) | 2026-01-31 to 2026-03-13
 
 ---
+
+## 2026-03-13
+
+### What Changed
+- Add OAuth token refresh, Apple Container snapshot pruning, spec types
+- Add container heartbeat to prevent timeout during long extractions; increase desktop_claude limits
+- Add host-side fallback and security hardening
+- [Agent] nc-sec-09: Implement R2 write-only backup token
+- [Agent] nc-sec-14: Enable macOS firewall + stealth mode
+- (+25 auto-backup commits)
+
+### Files (26 changed)
+- .claude/settings.local.json
+- container/Dockerfile
+- container/agent-runner/src/index.ts
+- container/agent-runner/src/ipc-mcp-stdio.ts
+- container/skills/lexios/types.json
+- docs/DEVLOG.md
+- docs/NANOCLAW_BUILD_LOG.md
+- docs/R2_BACKUP_SECURITY.md
+- scripts/backup.sh
+- scripts/desktop-claude.sh
+- scripts/verify-r2-writeonly.sh
+- security/enable-firewall.sh
+- security/firewall-config.md
+- src/__tests__/rate-limiter.test.ts
+- src/auto-dispatch.ts
+- src/container-runner.ts
+- src/container-runtime.ts
+- src/dashboard.ts
+- src/db.ts
+- src/host-fallback.ts
+- ... and 6 more
+
+### Stats
+- 2401 insertions, 183 deletions
 
 ## 2026-03-12
 
