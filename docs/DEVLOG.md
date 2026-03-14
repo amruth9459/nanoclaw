@@ -5,6 +5,49 @@
 
 ---
 
+### 2026-03-14 11:36
+
+**Areas:** config, hooks
+**Files (3):** .claude/hooks/memory-bridge.sh, .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, CLAUDE.md
+**Diff:** +37 -0 across 1 files
+
+### 2026-03-14 — Lexios Documentation Update Session
+
+**Scope:** Updated all Lexios documentation to reflect current project state (v1.0.0).
+
+**What changed:**
+- **README.md**: Fixed extraction type count (105→121), domain count (6→11), CLI commands (30→35). Backend/frontend descriptions updated from "WIP" to full production descriptions. Added Testing section documenting 1,700 unit tests + browser E2E (29 tests) + engine E2E (16 tests).
+- **ROADMAP.md**: Phase 1 and 2 completion status updated from "~95%" to "DONE". Build Order Summary type count fixed to "121 types, 11 domains".
+- **docs/LEXIOS_CHANGELOG.md**: Added v1.0.0 entry covering complete test coverage and E2E verification with test result tables.
+- **docs/README.md**: Full rewrite — was describing a phantom architecture (FastAPI, Celery, Redis, 97 types, 7 MCP servers). Now matches actual system (Flask, PostgreSQL, 121 types, 5 MCP servers, 35 CLI commands).
+
+**CI:** Run #56 green (23s). Pushed to `amruth9459/Lexios-NanoClaw`.
+
+---
+
+### 2026-03-14 11:35
+
+**Areas:** config, hooks
+**Files (3):** .claude/hooks/memory-bridge.sh, .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, CLAUDE.md
+**Diff:** +17 -0 across 1 files
+
+### 2026-03-14 11:35
+
+**Areas:** config, hooks
+**Files (3):** .claude/hooks/memory-bridge.sh, .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, CLAUDE.md
+**Diff:** +11 -0 across 1 files
+
+### 2026-03-14 11:34
+
+**Areas:** config, hooks
+**Files (3):** .claude/hooks/memory-bridge.sh, .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, CLAUDE.md
+**Diff:** +5 -0 across 1 files
+
+### 2026-03-14 11:27
+
+**Areas:** config, hooks
+**Files (3):** .claude/hooks/memory-bridge.sh, .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, CLAUDE.md
+
 ### 2026-03-14 11:26
 
 **Areas:** config, hooks
