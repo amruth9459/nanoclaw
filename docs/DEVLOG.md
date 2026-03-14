@@ -5,6 +5,23 @@
 
 ---
 
+### 2026-03-14 11:26
+
+**Areas:** config, hooks
+**Files (3):** .claude/hooks/memory-bridge.sh, .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, CLAUDE.md
+**Diff:** +11 -0 across 1 files
+
+### 2026-03-14 11:26
+
+**Areas:** config, hooks
+**Files (3):** .claude/hooks/memory-bridge.sh, .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, CLAUDE.md
+**Diff:** +5 -0 across 1 files
+
+### 2026-03-14 11:24
+
+**Areas:** config, hooks
+**Files (3):** .claude/hooks/memory-bridge.sh, .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, CLAUDE.md
+
 ### 2026-03-14 11:13
 
 **Areas:** config, hooks
@@ -20,6 +37,37 @@
 
 **Areas:** config, hooks
 **Files (3):** .claude/hooks/memory-bridge.sh, .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, CLAUDE.md
+
+### 2026-03-14 — Lexios Browser & Engine E2E Testing
+
+**Scope:** Full end-to-end testing as a real user — browser UI + extraction engines
+**Result:** Browser 29/29, Engines 16/16, CI green (run #54)
+
+Tested the entire Lexios platform end-to-end with Playwright browser automation and a real construction PDF (House-Floor-Plans.pdf, Habitat for Humanity, 8-page drawing set).
+
+**Browser E2E (29/29 passed, 15 screenshots):**
+- Full user cycle: register → login → projects dashboard → new application → upload document → billing → pricing
+- API endpoints: health, stats, auth, permits, documents, CEO dashboard (all 200)
+- Error handling: bad token → 401, empty login → 400, unknown route → 404
+- Both interfaces: applicant portal (port 3000) + Lexios Serve upload page (port 5001)
+- Gov portal, setup wizard (4-step), interaction logs all verified
+
+**Engine E2E (16/16 passed on fresh PDF):**
+- Prep: 8 pages converted (9.3s)
+- Classify: `drawing`, confidence 0.8
+- Page classification: floor_plan (×2), elevation, section, cover, structural (×3) — via local Ollama qwen3-vl
+- Extract: 30 elements across 9 categories via Claude vision (9 rooms, 4 doors, 3 windows, 6 dimensions, title block, stairs, foundation)
+- Conflicts: 12 schedule/plan mismatches detected
+- Plausibility: 4 height range flags
+- Takeoff: 1,222 sqft total (914 1st floor + 308 2nd floor)
+- Entity Linker: 17 entities ("Kitchen" → KITCHEN, "A-101" → sheet ref)
+- Spatial: 8 clashes, Store: 30 entities persisted to SQLite
+- All other engines (crosslink, compliance, xref, diff, CSI, report, i18n) operational
+
+**Files:** `tests/browser_e2e.py`, `tests/engine_e2e.py`, 15 screenshots in `tests/screenshots/`
+**Commit:** `4495a96` pushed to amruth9459/Lexios-NanoClaw, CI green
+
+---
 
 ### 2026-03-14 — Lexios Comprehensive Test Suite
 
