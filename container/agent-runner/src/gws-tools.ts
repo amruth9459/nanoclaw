@@ -1,7 +1,8 @@
 /**
  * Google Workspace MCP tools — registered conditionally for main group.
  * Provides gmail_search, gmail_send, calendar_events, drive_search,
- * gmail_categorize (read-only), and gmail_cleanup (HITL-gated via IPC).
+ * gmail_categorize (read-only), gmail_cleanup (HITL-gated via IPC),
+ * and Google Keep read-only tools (keep_list_notes, keep_get_note, keep_list_items, keep_search).
  * Shells out to a Python helper that uses Google API client with OAuth tokens.
  */
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
@@ -117,6 +118,82 @@ Requires Google Workspace OAuth setup on the host.`,
       return { content: [{ type: 'text' as const, text: result }] };
     },
   );
+
+  // --- Google Keep tools (Phase 1: read-only) ---
+
+  server.tool(
+    'keep_list_notes',
+    `List Google Keep notes. Optionally filter by label. Returns note IDs, titles, and timestamps.
+Requires Google Workspace OAuth setup with Keep API scope.`,
+    {
+      max_results: z.number().int().min(1).max(100).default(20).describe('Maximum number of notes to return'),
+      label: z.string().optional().describe('Filter by label name'),
+      archived: z.boolean().default(false).describe('Include trashed/archived notes'),
+    },
+    async (args) => {
+      const params: Record<string, string> = {
+        max_results: String(args.max_results ?? 20),
+        archived: String(args.archived ?? false),
+      };
+      if (args.label) params.label = args.label;
+      const result = await runGwsHelper('keep_list_notes', params);
+      return { content: [{ type: 'text' as const, text: result }] };
+    },
+  );
+
+  server.tool(
+    'keep_get_note',
+    `Get full content of a Google Keep note by ID. Returns title, text content or checklist items.
+Note IDs are in format "notes/<id>" (as returned by keep_list_notes).
+Requires Google Workspace OAuth setup with Keep API scope.`,
+    {
+      note_id: z.string().describe('Note ID, e.g. "notes/abc123" or just "abc123"'),
+    },
+    async (args) => {
+      const result = await runGwsHelper('keep_get_note', {
+        note_id: args.note_id,
+      });
+      return { content: [{ type: 'text' as const, text: result }] };
+    },
+  );
+
+  server.tool(
+    'keep_list_items',
+    `Extract task/checklist items from a Google Keep list note. By default returns only unchecked items.
+Useful for getting TODO items from Keep checklists.
+Requires Google Workspace OAuth setup with Keep API scope.`,
+    {
+      note_id: z.string().describe('Note ID, e.g. "notes/abc123" or just "abc123"'),
+      unchecked_only: z.boolean().default(true).describe('Only return unchecked items (default: true)'),
+    },
+    async (args) => {
+      const result = await runGwsHelper('keep_list_items', {
+        note_id: args.note_id,
+        unchecked_only: String(args.unchecked_only ?? true),
+      });
+      return { content: [{ type: 'text' as const, text: result }] };
+    },
+  );
+
+  server.tool(
+    'keep_search',
+    `Search Google Keep notes by text content. Searches both titles and body text.
+Returns matching notes with snippets. Requires Google Workspace OAuth setup with Keep API scope.`,
+    {
+      query: z.string().describe('Search text to find in note titles and content'),
+      max_results: z.number().int().min(1).max(50).default(10).describe('Maximum number of results'),
+    },
+    async (args) => {
+      const result = await runGwsHelper('keep_search', {
+        query: args.query,
+        max_results: String(args.max_results ?? 10),
+      });
+      return { content: [{ type: 'text' as const, text: result }] };
+    },
+  );
+
+  // TODO Phase 2: keep_check_item — toggle checklist item (write operation, needs keep scope)
+  // TODO Phase 2: keep_add_item — add item to checklist note (write operation, needs keep scope)
 
   // --- Cleanup tools ---
 

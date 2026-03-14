@@ -476,6 +476,22 @@ def main():
     p_archive = subparsers.add_parser('gmail_batch_archive')
     p_archive.add_argument('--message_ids', required=True)
 
+    p_keep_list = subparsers.add_parser('keep_list_notes')
+    p_keep_list.add_argument('--max_results', default='20')
+    p_keep_list.add_argument('--label', default='')
+    p_keep_list.add_argument('--archived', default='false')
+
+    p_keep_get = subparsers.add_parser('keep_get_note')
+    p_keep_get.add_argument('--note_id', required=True)
+
+    p_keep_items = subparsers.add_parser('keep_list_items')
+    p_keep_items.add_argument('--note_id', required=True)
+    p_keep_items.add_argument('--unchecked_only', default='true')
+
+    p_keep_search = subparsers.add_parser('keep_search')
+    p_keep_search.add_argument('--query', required=True)
+    p_keep_search.add_argument('--max_results', default='10')
+
     args = parser.parse_args()
 
     if not args.action:
@@ -490,6 +506,10 @@ def main():
         'gmail_categorize': gmail_categorize,
         'gmail_batch_trash': gmail_batch_trash,
         'gmail_batch_archive': gmail_batch_archive,
+        'keep_list_notes': keep_list_notes,
+        'keep_get_note': keep_get_note,
+        'keep_list_items': keep_list_items,
+        'keep_search': keep_search,
     }
 
     try:
