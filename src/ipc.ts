@@ -23,11 +23,15 @@ import {
   deleteTask,
   getActiveTask,
   getAllBounties,
+  getNewSharedItemCount,
   getOrCreateEconomics,
+  getSharedItemById,
+  getSharedItems,
   getTaskById,
   getTasksForGroup,
   saveLearn,
   updateBountyStatus,
+  updateSharedItemStatus,
   updateTask,
   updateTaskEvaluation,
   updateTaskSubmission,
@@ -231,6 +235,7 @@ export function startIpcWatcher(deps: IpcDeps): void {
                 const CLAWWORK_BOUNTY_TYPES = new Set([
                   'clawwork_get_status', 'clawwork_decide_activity', 'clawwork_learn', 'learn', 'clawwork_submit_work',
                   'find_bounties', 'propose_bounty', 'submit_bounty',
+                  'task_tool', 'gmail_cleanup', 'shared_items',
                   'token_refresh',
                 ]);
                 if (data.type && CLAWWORK_BOUNTY_TYPES.has(data.type)) {
@@ -970,6 +975,68 @@ async function processClawworkMessage(
         syncKanbanFile();
       }
       logger.debug({ groupFolder, action: data.action }, 'TaskTool processed');
+      break;
+    }
+
+    // ── Shared Items Inbox ─────────────────────────────────────────
+    case 'shared_items': {
+      const action = data.action as string;
+      try {
+        switch (action) {
+          case 'list': {
+            const status = (data.status as string) || 'new';
+            const limit = typeof data.limit === 'number' ? data.limit : 20;
+            const items = getSharedItems(status, limit);
+            if (items.length === 0) {
+              if (responseFile) writeIpcResponse(responseFile, { result: `No ${status} items in your shared inbox.` });
+            } else {
+              const formatted = items.map((item, i) =>
+                `[${i + 1}] ${item.id}\n    Type: ${item.item_type} | Category: ${item.category} | Status: ${item.status}\n    Content: ${item.content.slice(0, 200)}${item.content.length > 200 ? '...' : ''}${item.url ? `\n    URL: ${item.url}` : ''}${item.notes ? `\n    Notes: ${item.notes}` : ''}\n    Created: ${item.created_at}`
+              ).join('\n\n');
+              if (responseFile) writeIpcResponse(responseFile, { result: `${items.length} ${status} item(s):\n\n${formatted}` });
+            }
+            break;
+          }
+          case 'get': {
+            const id = data.id as string;
+            if (!id) { if (responseFile) writeIpcResponse(responseFile, { error: 'Missing id' }); break; }
+            const item = getSharedItemById(id);
+            if (!item) { if (responseFile) writeIpcResponse(responseFile, { error: `Item not found: ${id}` }); break; }
+            if (responseFile) writeIpcResponse(responseFile, { result: JSON.stringify(item, null, 2) });
+            break;
+          }
+          case 'triage': {
+            const id = data.id as string;
+            const notes = data.notes as string | undefined;
+            if (!id) { if (responseFile) writeIpcResponse(responseFile, { error: 'Missing id' }); break; }
+            const ok = updateSharedItemStatus(id, 'triaged', notes);
+            if (responseFile) writeIpcResponse(responseFile, { result: ok ? `Item ${id} triaged.` : `Item not found: ${id}` });
+            break;
+          }
+          case 'act': {
+            const id = data.id as string;
+            const notes = data.notes as string | undefined;
+            if (!id) { if (responseFile) writeIpcResponse(responseFile, { error: 'Missing id' }); break; }
+            const ok = updateSharedItemStatus(id, 'acted_on', notes);
+            if (responseFile) writeIpcResponse(responseFile, { result: ok ? `Item ${id} marked as acted_on.` : `Item not found: ${id}` });
+            break;
+          }
+          case 'archive': {
+            const id = data.id as string;
+            if (!id) { if (responseFile) writeIpcResponse(responseFile, { error: 'Missing id' }); break; }
+            const ok = updateSharedItemStatus(id, 'archived');
+            if (responseFile) writeIpcResponse(responseFile, { result: ok ? `Item ${id} archived.` : `Item not found: ${id}` });
+            break;
+          }
+          default:
+            if (responseFile) writeIpcResponse(responseFile, { error: `Unknown action: ${action}` });
+        }
+      } catch (err) {
+        const errMsg = err instanceof Error ? err.message : String(err);
+        if (responseFile) writeIpcResponse(responseFile, { error: errMsg });
+        logger.error({ err, groupFolder, action }, 'shared_items handler failed');
+      }
+      logger.debug({ groupFolder, action }, 'shared_items processed');
       break;
     }
 

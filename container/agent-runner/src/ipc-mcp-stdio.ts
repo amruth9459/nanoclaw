@@ -871,6 +871,42 @@ Tasks support:
   },
 );
 
+// ── Shared Items Inbox ──────────────────────────────────────────────────────────
+
+server.tool(
+  'shared_items',
+  `Query and manage your shared items inbox. Items are auto-captured when the user shares links, images, documents, or strategic ideas via WhatsApp.
+
+Actions:
+- list: List items by status (default: "new"). Returns formatted list.
+- get: Get a single item's full details by ID.
+- triage: Mark an item as triaged — add notes describing what it is and what action to take.
+- act: Mark an item as acted_on (you've finished working on it).
+- archive: Dismiss/archive an item you don't need to act on.`,
+  {
+    action: z.enum(['list', 'get', 'triage', 'act', 'archive']).describe('Action to perform'),
+    id: z.string().optional().describe('Item ID (required for get, triage, act, archive)'),
+    status: z.string().optional().describe('Filter by status for list action (default: "new"). Options: new, triaged, acted_on, archived'),
+    notes: z.string().optional().describe('Notes to attach (for triage action — describe what it is and what to do)'),
+    limit: z.number().optional().describe('Max items to return for list (default: 20)'),
+  },
+  async (args) => {
+    const { responseFile } = writeClawworkRequest({
+      type: 'shared_items',
+      action: args.action,
+      id: args.id,
+      status: args.status,
+      notes: args.notes,
+      limit: args.limit,
+    });
+
+    const result = await pollResponse(responseFile, 10000);
+    if (!result) return { content: [{ type: 'text' as const, text: 'Error: shared_items request timed out' }], isError: true };
+    if (result.error) return { content: [{ type: 'text' as const, text: `Error: ${result.error}` }], isError: true };
+    return { content: [{ type: 'text' as const, text: String(result.result) }] };
+  },
+);
+
 // ── Desktop Claude Code remote control ─────────────────────────────────────────
 
 server.tool(

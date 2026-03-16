@@ -2456,3 +2456,30 @@ export function getNewSharedItemCount(): number {
   const row = db.prepare(`SELECT COUNT(*) as count FROM shared_items WHERE status = 'new'`).get() as any;
   return row?.count || 0;
 }
+
+/** Get a single shared item by ID. */
+export function getSharedItemById(id: string): SharedItem | undefined {
+  return db.prepare(`SELECT * FROM shared_items WHERE id = ?`).get(id) as SharedItem | undefined;
+}
+
+/** Update status and notes on a shared item. Returns true if a row was updated. */
+export function updateSharedItemStatus(id: string, status: string, notes?: string): boolean {
+  const now = new Date().toISOString();
+  const timestampCol = status === 'triaged' ? 'triaged_at' : status === 'acted_on' ? 'acted_on_at' : null;
+
+  const sets = ['status = ?'];
+  const params: unknown[] = [status];
+
+  if (notes !== undefined) {
+    sets.push('notes = ?');
+    params.push(notes);
+  }
+  if (timestampCol) {
+    sets.push(`${timestampCol} = ?`);
+    params.push(now);
+  }
+
+  params.push(id);
+  const result = db.prepare(`UPDATE shared_items SET ${sets.join(', ')} WHERE id = ?`).run(...params);
+  return result.changes > 0;
+}

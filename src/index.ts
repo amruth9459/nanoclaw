@@ -43,6 +43,7 @@ import {
   getMessagesSince,
   getNewMentions,
   getNewMessages,
+  getNewSharedItemCount,
   getOrCreateEconomics,
   getRouterState,
   initDatabase,
@@ -510,7 +511,16 @@ async function processGroupMessages(chatJid: string): Promise<boolean> {
         }
       } catch { /* KANBAN.md may not exist yet */ }
 
-      const combined = [activeWork, kanbanSummary, contextBlock].filter(Boolean).join('\n\n');
+      // Shared items inbox count
+      let sharedInboxNote = '';
+      try {
+        const newCount = getNewSharedItemCount();
+        if (newCount > 0) {
+          sharedInboxNote = `### Shared Inbox\n${newCount} unreviewed item${newCount !== 1 ? 's' : ''} (use \`shared_items\` tool to review and act on them)`;
+        }
+      } catch { /* table may not exist yet */ }
+
+      const combined = [activeWork, kanbanSummary, sharedInboxNote, contextBlock].filter(Boolean).join('\n\n');
       if (combined) {
         prompt = `<context>\n${combined}\n</context>\n\n${prompt}`;
       }
@@ -1618,6 +1628,45 @@ async function main(): Promise<void> {
           schedule_value: isBountyHunter ? '0 8 * * *' : '0 9 * * *',
         });
         logger.info({ taskId: t.id, type: isBountyHunter ? 'bounty-hunter' : 'biz-opps' }, 'Migrated task to daily cron');
+      }
+    }
+  }
+
+  // Auto-create shared-items-triage scheduled task if it doesn't exist
+  {
+    const existingTasks = getAllTasks();
+    const hasTriageTask = existingTasks.some(
+      t => t.status === 'active' && t.prompt.includes('SHARED_ITEMS_TRIAGE'),
+    );
+    if (!hasTriageTask) {
+      const mainEntry = Object.entries(registeredGroups).find(
+        ([, g]) => g.folder === MAIN_GROUP_FOLDER,
+      );
+      if (mainEntry) {
+        const [mainJid] = mainEntry;
+        createTask({
+          id: `shared-items-triage-${Date.now()}`,
+          group_folder: MAIN_GROUP_FOLDER,
+          chat_jid: mainJid,
+          prompt: `SHARED_ITEMS_TRIAGE — Do not remove this tag.
+
+Review your shared items inbox. Use the \`shared_items\` tool to list new items, triage each one (add notes on what it is and what action to take), then work on the highest-priority items.
+
+Steps:
+1. shared_items action=list status=new — see all unreviewed items
+2. For each item, shared_items action=triage with notes describing what it is and recommended action
+3. Work on the most important triaged items (research links, act on requests, etc.)
+4. Mark completed items with shared_items action=act
+5. Archive items that don't need action with shared_items action=archive
+6. Send a brief summary of what you reviewed and acted on via send_message`,
+          schedule_type: 'cron',
+          schedule_value: '0 9 * * *',
+          context_mode: 'group',
+          next_run: null,
+          status: 'active',
+          created_at: new Date().toISOString(),
+        });
+        logger.info('Created shared-items-triage scheduled task');
       }
     }
   }
