@@ -71,7 +71,9 @@ export class WhatsAppChannel implements Channel {
   private reconnectAttempts = 0;
   private reconnectTimer: ReturnType<typeof setTimeout> | null = null;
   private watchdogTimer: ReturnType<typeof setTimeout> | null = null;
+  private watchdogStrikes = 0;
   private static readonly WATCHDOG_MS = 3 * 60 * 1000; // 3 minutes — catch silent dead connections faster
+  private static readonly WATCHDOG_MAX_STRIKES = 3; // after 3 failed reconnects (~9 min), force-exit process
   // Stored so reconnect attempts can still resolve the original connect() Promise
   private connectResolve?: () => void;
   // Track when connection dropped to report downtime on reconnect
@@ -90,10 +92,27 @@ export class WhatsAppChannel implements Channel {
     });
   }
 
-  private resetWatchdog(): void {
+  /** Re-arm the watchdog timer. Only resets the strike counter when
+   *  called with realActivity=true (i.e. from messages.upsert). */
+  private resetWatchdog(realActivity = false): void {
     if (this.watchdogTimer) clearTimeout(this.watchdogTimer);
+    if (realActivity) this.watchdogStrikes = 0;
     this.watchdogTimer = setTimeout(() => {
-      logger.warn({ channel: this.name }, 'Watchdog: no WhatsApp activity for 10 min, forcing reconnect');
+      this.watchdogStrikes++;
+      if (this.watchdogStrikes >= WhatsAppChannel.WATCHDOG_MAX_STRIKES) {
+        // Known baileys bug: messages.upsert stops firing after hours while
+        // connection stays up. Socket reconnect within the same process doesn't
+        // fix it — only a full process restart does. Let launchd restart us.
+        logger.error(
+          { channel: this.name, strikes: this.watchdogStrikes },
+          'Watchdog: messages.upsert dead after multiple reconnects — forcing process restart',
+        );
+        process.exit(1);
+      }
+      logger.warn(
+        { channel: this.name, strike: this.watchdogStrikes },
+        `Watchdog: no WhatsApp activity for ${WhatsAppChannel.WATCHDOG_MS / 60000} min, forcing reconnect (strike ${this.watchdogStrikes}/${WhatsAppChannel.WATCHDOG_MAX_STRIKES})`,
+      );
       try { this.sock?.end(undefined); } catch {}
       this.connected = false;
       this.scheduleReconnect();
@@ -240,7 +259,7 @@ export class WhatsAppChannel implements Channel {
     this.sock.ev.on('creds.update', saveCreds);
 
     this.sock.ev.on('messages.upsert', async ({ messages }) => {
-      this.resetWatchdog(); // any incoming traffic = connection is alive
+      this.resetWatchdog(true); // real message activity = connection is alive
       for (const msg of messages) {
         if (!msg.message) continue;
         const rawJid = msg.key.remoteJid;
