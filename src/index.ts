@@ -685,7 +685,7 @@ async function processGroupMessages(chatJid: string): Promise<boolean> {
   }
 
   // Auto-capture shared items (links, media, strategic thinking)
-  for (const msg of messages) {
+  for (const msg of missedMessages) {
     if (msg.is_from_me) continue;
     try {
       const items = detectSharedItems(msg);
