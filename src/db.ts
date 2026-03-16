@@ -351,6 +351,32 @@ function createSchema(database: Database.Database): void {
     CREATE INDEX IF NOT EXISTS idx_aqr_group ON agent_quality_reviews(group_id);
     CREATE INDEX IF NOT EXISTS idx_aqr_created ON agent_quality_reviews(created_at);
   `);
+
+  // Shared items inbox — auto-captures links, media, research, and requests
+  // the user shares so nothing falls through the cracks.
+  database.exec(`
+    CREATE TABLE IF NOT EXISTS shared_items (
+      id TEXT PRIMARY KEY,
+      item_type TEXT NOT NULL,
+      content TEXT NOT NULL,
+      url TEXT,
+      sender TEXT,
+      sender_name TEXT,
+      chat_jid TEXT,
+      message_id TEXT,
+      media_path TEXT,
+      media_type TEXT,
+      category TEXT DEFAULT 'uncategorized',
+      status TEXT NOT NULL DEFAULT 'new',
+      created_at TEXT NOT NULL,
+      triaged_at TEXT,
+      acted_on_at TEXT,
+      notes TEXT
+    );
+    CREATE INDEX IF NOT EXISTS idx_shared_items_status ON shared_items(status);
+    CREATE INDEX IF NOT EXISTS idx_shared_items_type ON shared_items(item_type);
+    CREATE INDEX IF NOT EXISTS idx_shared_items_created ON shared_items(created_at);
+  `);
 }
 
 /** Get the main database handle (must be called after initDatabase) */
@@ -2252,4 +2278,181 @@ export function syncKanbanFile(): void {
   } catch (err) {
     logger.warn({ err }, 'Failed to sync KANBAN.md');
   }
+}
+
+// ─── Shared Items Inbox ───────────────────────────────────────────────
+
+const URL_REGEX = /https?:\/\/[^\s<>"{}|\\^`\[\]]+/g;
+
+export interface SharedItem {
+  id: string;
+  item_type: 'link' | 'media' | 'research' | 'request' | 'strategic' | 'document';
+  content: string;
+  url: string | null;
+  sender: string | null;
+  sender_name: string | null;
+  chat_jid: string | null;
+  message_id: string | null;
+  media_path: string | null;
+  media_type: string | null;
+  category: string;
+  status: 'new' | 'triaged' | 'acted_on' | 'archived';
+  created_at: string;
+  triaged_at: string | null;
+  acted_on_at: string | null;
+  notes: string | null;
+}
+
+/** Detect whether an incoming message contains a shared item worth tracking. */
+export function detectSharedItems(msg: {
+  id: string;
+  content: string;
+  sender: string;
+  sender_name: string;
+  chat_jid: string;
+  timestamp: string;
+  is_from_me?: boolean;
+  media_type?: string | null;
+  media_path?: string | null;
+}): SharedItem[] {
+  if (msg.is_from_me) return [];
+
+  const content = msg.content || '';
+  // Skip very short messages and quoted-only replies
+  if (content.length < 5 && !msg.media_type) return [];
+  // Skip messages that are just quotes (start with ">")
+  const cleaned = content.replace(/^>.*\n?/gm, '').trim();
+
+  const items: SharedItem[] = [];
+  const now = new Date().toISOString();
+
+  // 1. Links/URLs
+  const urls = content.match(URL_REGEX) || [];
+  for (const url of urls) {
+    // Categorize by domain
+    let category = 'uncategorized';
+    if (/github\.com/.test(url)) category = 'github';
+    else if (/arxiv\.org/.test(url)) category = 'research-paper';
+    else if (/medium\.com|venturebeat|blog/.test(url)) category = 'article';
+    else if (/producthunt\.com|share\.google/.test(url)) category = 'product';
+    else if (/x\.com|twitter\.com/.test(url)) category = 'social';
+    else category = 'link';
+
+    items.push({
+      id: `si_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
+      item_type: 'link',
+      content: cleaned.slice(0, 500),
+      url,
+      sender: msg.sender,
+      sender_name: msg.sender_name,
+      chat_jid: msg.chat_jid,
+      message_id: msg.id,
+      media_path: null,
+      media_type: null,
+      category,
+      status: 'new',
+      created_at: msg.timestamp,
+      triaged_at: null,
+      acted_on_at: null,
+      notes: null,
+    });
+  }
+
+  // 2. Media (images, documents, audio)
+  if (msg.media_type && msg.media_path) {
+    const mediaCategory = msg.media_type === 'document' ? 'document'
+      : msg.media_type === 'image' ? 'image'
+      : msg.media_type === 'audio' ? 'voice-note'
+      : 'media';
+
+    items.push({
+      id: `si_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
+      item_type: msg.media_type === 'document' ? 'document' : 'media',
+      content: cleaned.slice(0, 500) || `[${msg.media_type}]`,
+      url: null,
+      sender: msg.sender,
+      sender_name: msg.sender_name,
+      chat_jid: msg.chat_jid,
+      message_id: msg.id,
+      media_path: msg.media_path,
+      media_type: msg.media_type,
+      category: mediaCategory,
+      status: 'new',
+      created_at: msg.timestamp,
+      triaged_at: null,
+      acted_on_at: null,
+      notes: null,
+    });
+  }
+
+  // 3. Strategic / request messages (no links, no media, but substantial)
+  if (items.length === 0 && cleaned.length >= 80) {
+    // Detect strategic thinking or requests
+    const isRequest = /\b(i want|i need|can you|please|help me|set up|add|build|create|implement|research|figure out|how (do|can) (we|i))\b/i.test(cleaned);
+    const isStrategic = /\b(strategy|vision|architecture|indispensable|moat|competitive|horizon|value prop|reframe|pivot|business model)\b/i.test(cleaned);
+
+    if (isRequest || isStrategic) {
+      items.push({
+        id: `si_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
+        item_type: isStrategic ? 'strategic' : 'request',
+        content: cleaned.slice(0, 500),
+        url: null,
+        sender: msg.sender,
+        sender_name: msg.sender_name,
+        chat_jid: msg.chat_jid,
+        message_id: msg.id,
+        media_path: null,
+        media_type: null,
+        category: isStrategic ? 'strategic' : 'request',
+        status: 'new',
+        created_at: msg.timestamp,
+        triaged_at: null,
+        acted_on_at: null,
+        notes: null,
+      });
+    }
+  }
+
+  return items;
+}
+
+/** Store a shared item. Deduplicates by message_id + url. */
+export function storeSharedItem(item: SharedItem): boolean {
+  try {
+    // Dedup: skip if same message_id + url already exists
+    const existing = db.prepare(
+      `SELECT id FROM shared_items WHERE message_id = ? AND (url = ? OR (url IS NULL AND ? IS NULL))`
+    ).get(item.message_id, item.url, item.url) as any;
+    if (existing) return false;
+
+    db.prepare(`
+      INSERT INTO shared_items (
+        id, item_type, content, url, sender, sender_name, chat_jid,
+        message_id, media_path, media_type, category, status, created_at
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `).run(
+      item.id, item.item_type, item.content, item.url, item.sender,
+      item.sender_name, item.chat_jid, item.message_id, item.media_path,
+      item.media_type, item.category, item.status, item.created_at,
+    );
+    return true;
+  } catch (err) {
+    logger.warn({ err, itemId: item.id }, 'Failed to store shared item');
+    return false;
+  }
+}
+
+/** Get shared items by status. */
+export function getSharedItems(status?: string, limit = 50): SharedItem[] {
+  const query = status
+    ? `SELECT * FROM shared_items WHERE status = ? ORDER BY created_at DESC LIMIT ?`
+    : `SELECT * FROM shared_items ORDER BY created_at DESC LIMIT ?`;
+  const params = status ? [status, limit] : [limit];
+  return db.prepare(query).all(...params) as SharedItem[];
+}
+
+/** Get count of new (unprocessed) shared items. */
+export function getNewSharedItemCount(): number {
+  const row = db.prepare(`SELECT COUNT(*) as count FROM shared_items WHERE status = 'new'`).get() as any;
+  return row?.count || 0;
 }

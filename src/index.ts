@@ -54,6 +54,8 @@ import {
   storeMessage,
   createClawworkTask,
   createTaskRecord,
+  detectSharedItems,
+  storeSharedItem,
   getChatChannel,
   updateTask,
 } from './db.js';
@@ -679,6 +681,21 @@ async function processGroupMessages(chatJid: string): Promise<boolean> {
       } catch (err) {
         logger.warn({ err }, 'Failed to auto-capture user task');
       }
+    }
+  }
+
+  // Auto-capture shared items (links, media, strategic thinking)
+  for (const msg of messages) {
+    if (msg.is_from_me) continue;
+    try {
+      const items = detectSharedItems(msg);
+      for (const item of items) {
+        if (storeSharedItem(item)) {
+          logger.info({ itemId: item.id, type: item.item_type, category: item.category }, 'Auto-captured shared item');
+        }
+      }
+    } catch (err) {
+      logger.warn({ err }, 'Failed to auto-capture shared item');
     }
   }
 
