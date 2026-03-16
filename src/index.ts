@@ -1632,6 +1632,41 @@ async function main(): Promise<void> {
     }
   }
 
+  // Load integrations and initialize their DB schemas
+  await loadIntegrations();
+  {
+    const { getDb } = await import('./db.js');
+    const mainDb = getDb();
+    for (const integration of getIntegrations()) {
+      integration.initDatabase(mainDb);
+      logger.info({ name: integration.name }, 'Integration DB initialized');
+    }
+  }
+
+  // Load integration learnings into hot cache
+  for (const integration of getIntegrations()) {
+    const learningsPath = integration.getLearningsPath?.();
+    if (learningsPath) codedContext.loadLearningsFromFile(learningsPath);
+  }
+
+  // Initialize persona registry (scans ~/.claude/agents/)
+  try {
+    const { getDb } = await import('./db.js');
+    personaRegistry = new PersonaRegistry(getDb());
+    personaRegistry.initSchema();
+    const count = await personaRegistry.scan();
+    const embedded = await personaRegistry.embedPersonas();
+    logger.info({ count, embedded }, 'Persona registry loaded with embeddings');
+  } catch (err) {
+    logger.warn({ err }, 'Persona registry init failed — auto-dispatch disabled');
+  }
+
+  // Sync kanban board to file for cross-agent visibility
+  try { const { syncKanbanFile } = await import('./db.js'); syncKanbanFile(); } catch { /* best-effort */ }
+  orchestrator = new ResourceOrchestrator(path.join(STORE_DIR, 'resources.db'));
+  logger.info('ResourceOrchestrator initialized');
+  loadState();
+
   // Auto-create shared-items-triage scheduled task if it doesn't exist
   {
     const existingTasks = getAllTasks();
@@ -1670,41 +1705,6 @@ Steps:
       }
     }
   }
-
-  // Load integrations and initialize their DB schemas
-  await loadIntegrations();
-  {
-    const { getDb } = await import('./db.js');
-    const mainDb = getDb();
-    for (const integration of getIntegrations()) {
-      integration.initDatabase(mainDb);
-      logger.info({ name: integration.name }, 'Integration DB initialized');
-    }
-  }
-
-  // Load integration learnings into hot cache
-  for (const integration of getIntegrations()) {
-    const learningsPath = integration.getLearningsPath?.();
-    if (learningsPath) codedContext.loadLearningsFromFile(learningsPath);
-  }
-
-  // Initialize persona registry (scans ~/.claude/agents/)
-  try {
-    const { getDb } = await import('./db.js');
-    personaRegistry = new PersonaRegistry(getDb());
-    personaRegistry.initSchema();
-    const count = await personaRegistry.scan();
-    const embedded = await personaRegistry.embedPersonas();
-    logger.info({ count, embedded }, 'Persona registry loaded with embeddings');
-  } catch (err) {
-    logger.warn({ err }, 'Persona registry init failed — auto-dispatch disabled');
-  }
-
-  // Sync kanban board to file for cross-agent visibility
-  try { const { syncKanbanFile } = await import('./db.js'); syncKanbanFile(); } catch { /* best-effort */ }
-  orchestrator = new ResourceOrchestrator(path.join(STORE_DIR, 'resources.db'));
-  logger.info('ResourceOrchestrator initialized');
-  loadState();
 
   // Initialize enrichment/monitoring layers (non-blocking)
   try {
