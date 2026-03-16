@@ -1,11 +1,26 @@
 # NanoClaw — Daily Build Log
 
 *Living document — auto-generated from git history*
-*Last generated: 2026-03-15*
+*Last generated: 2026-03-16*
 
-**362 total commits** (214 meaningful) | 2026-01-31 to 2026-03-14
+**390 total commits** (212 meaningful) | 2026-01-31 to 2026-03-15
 
 ---
+
+## 2026-03-15
+
+### What Changed
+- Remove tracked pycache and test script
+- (+31 auto-backup commits)
+
+### Files (4 changed)
+- docs/DEVLOG.md
+- docs/NANOCLAW_BUILD_LOG.md
+- scripts/__pycache__/lexios-eval.cpython-313.pyc
+- scripts/test-lexios.sh
+
+### Stats
+- 602 insertions, 531 deletions
 
 ## 2026-03-14
 
@@ -39,12 +54,11 @@
 - [Agent] nc-sec-14: Enable macOS firewall + stealth mode
 - (+25 auto-backup commits)
 
-### Files (26 changed)
+### Files (25 changed)
 - .claude/settings.local.json
 - container/Dockerfile
 - container/agent-runner/src/index.ts
 - container/agent-runner/src/ipc-mcp-stdio.ts
-- container/skills/lexios/types.json
 - docs/DEVLOG.md
 - docs/NANOCLAW_BUILD_LOG.md
 - docs/R2_BACKUP_SECURITY.md
@@ -60,10 +74,11 @@
 - src/dashboard.ts
 - src/db.ts
 - src/host-fallback.ts
-- ... and 6 more
+- src/index.ts
+- ... and 5 more
 
 ### Stats
-- 2401 insertions, 183 deletions
+- 2362 insertions, 176 deletions
 
 ## 2026-03-12
 
@@ -73,16 +88,11 @@
 - Fix ENFILE file table overflow: cleanup stopped containers and remove leaked VMs
 - (+15 auto-backup commits)
 
-### Files (20 changed)
-- container/skills/lexios-ifc.py
-- container/skills/lexios-sandbox.md
-- container/skills/lexios/SKILL.md
+### Files (15 changed)
 - docs/DEVLOG.md
 - docs/NANOCLAW_BUILD_LOG.md
-- groups/lexios-template/CLAUDE.md
 - package-lock.json
 - package.json
-- scripts/lexios-eval.py
 - scripts/test-lexios.sh
 - src/auto-dispatch.ts
 - src/container-runner.ts
@@ -96,7 +106,7 @@
 - src/semantic-index.ts
 
 ### Stats
-- 3723 insertions, 227 deletions
+- 1714 insertions, 177 deletions
 
 ## 2026-03-11
 
@@ -104,7 +114,7 @@
 - Auto-dispatch, dependency inference, task completion loop, infrastructure fixes
 - (+10 auto-backup commits)
 
-### Files (49 changed)
+### Files (47 changed)
 - .claude/hooks/memory-bridge.sh
 - .claude/hooks/whatsapp-sync.sh
 - .githooks/no-lexios-in-core.sh
@@ -115,7 +125,6 @@
 - container/agent-runner/src/lexios-tools.ts
 - container/agent-runner/src/safety-pulse.ts
 - container/skills/gws/gws_helper.py
-- container/skills/lexios/requirements.txt
 - docs/DEVLOG.md
 - docs/NANOCLAW_BUILD_LOG.md
 - package-lock.json
@@ -123,12 +132,13 @@
 - scripts/backup.sh
 - scripts/generate-build-log.py
 - scripts/generate-contingency.sh
-- scripts/lexios-eval.py
 - scripts/migrate-to-mac-studio.sh
-- ... and 29 more
+- scripts/reconcile-tasks.py
+- scripts/restore.sh
+- ... and 27 more
 
 ### Stats
-- 3535 insertions, 2060 deletions
+- 3533 insertions, 1060 deletions
 
 ## 2026-03-10
 
@@ -224,18 +234,17 @@
 ## 2026-03-04
 
 ### What Changed
-- 5 auto-backup commits (incremental saves)
+- 4 auto-backup commits (incremental saves)
 
-### Files (6 changed)
+### Files (5 changed)
 - config/router-config.json
 - docs/LEXIOS_BUILD_LOG.md
 - docs/NANOCLAW_BUILD_LOG.md
 - docs/NANOCLAW_CHANGELOG.md
 - docs/NANOCLAW_PLATFORM.md
-- groups/lexios-template/CLAUDE.md
 
 ### Stats
-- 46 insertions, 411 deletions
+- 46 insertions, 219 deletions
 
 ## 2026-03-03
 
@@ -245,31 +254,31 @@
 - Add memory bridge hook, update-docs script, and gitignore cleanup
 - (+1 auto-backup commits)
 
-### Files (33 changed)
+### Files (25 changed)
 - .claude/hooks/memory-bridge.sh
 - .gitignore
 - CLAUDE.md
 - container/Dockerfile
 - container/agent-runner/src/ipc-mcp-stdio.ts
-- container/skills/lexios-dxf.py
-- container/skills/lexios/SKILL.md
-- container/skills/lexios/conflicts.py
-- container/skills/lexios/diff.py
-- container/skills/lexios/post-extract.py
-- container/skills/lexios/query.py
-- container/skills/lexios/takeoff.py
 - docs/LEXIOS_BUILD_LOG.md
 - docs/NANOCLAW_BUILD_LOG.md
 - scripts/backup.sh
-- scripts/lexios-eval.py
 - scripts/update-docs.py
 - src/channels/whatsapp.ts
 - src/config.ts
 - src/container-runner.ts
-- ... and 13 more
+- src/dashboard.ts
+- src/db.ts
+- src/index.ts
+- src/integration-loader.ts
+- src/integration-types.ts
+- src/ipc.ts
+- src/lexios-customer.ts
+- src/lexios-security.ts
+- ... and 5 more
 
 ### Stats
-- 3228 insertions, 2690 deletions
+- 2271 insertions, 2038 deletions
 
 ## 2026-03-02
 
@@ -277,16 +286,13 @@
 - Add comprehensive API cost tracking, Lexios metrics dashboard, and platform docs
 - (+13 auto-backup commits)
 
-### Files (26 changed)
+### Files (23 changed)
 - .claude/hooks/whatsapp-sync.sh
 - .claude/settings.local.json
-- LEXIOS_INVESTOR_DEFENSE.md
 - container/Dockerfile
 - container/agent-runner/src/ifc-mcp-server.py
 - container/agent-runner/src/index.ts
 - container/agent-runner/src/ipc-mcp-stdio.ts
-- container/skills/lexios-ifc.py
-- container/skills/lexios/SKILL.md
 - docs/NANOCLAW_CHANGELOG.md
 - docs/NANOCLAW_PLATFORM.md
 - groups/main/CLAUDE.md
@@ -298,10 +304,13 @@
 - src/group-queue.ts
 - src/index.ts
 - src/integrations/fieldy-integration.ts
-- ... and 6 more
+- src/ipc.ts
+- src/judge-system.ts
+- src/mcp/tools/task-tool.ts
+- ... and 3 more
 
 ### Stats
-- 4790 insertions, 214 deletions
+- 3443 insertions, 195 deletions
 
 ## 2026-03-01
 
@@ -317,11 +326,8 @@
 - Skip context enrichment for guest sessions to prevent personal info leakage
 - (+6 auto-backup commits)
 
-### Files (85 changed)
+### Files (75 changed)
 - .../agent-runner/src/goal-classifier-prompt.ts
-- .../permit-sonoma-bpc022.ground-truth.json
-- .../permit-sonoma-bpc022/sample-blueprint.pdf
-- .../sample-blueprint.ground-truth.json
 - .claude/settings.local.json
 - .claude/worktrees/eloquent-vaughan
 - .gitignore
@@ -333,15 +339,18 @@
 - container/agent-runner/src/safety-pulse.ts
 - container/skills/batch/SKILL.md
 - container/skills/frontend-design/SKILL.md
-- container/skills/lexios-dxf.py
-- container/skills/lexios-prep.sh
-- container/skills/lexios/SKILL.md
-- container/skills/lexios/query-classifier.py
 - container/skills/simplify/SKILL.md
-- ... and 65 more
+- groups/main/CLAUDE.md
+- package-lock.json
+- package.json
+- scripts/__pycache__/lexios-eval.cpython-313.pyc
+- scripts/backup.sh
+- scripts/diagnose-whatsapp.sh
+- scripts/export-for-migration.sh
+- ... and 55 more
 
 ### Stats
-- 21034 insertions, 3818 deletions
+- 19905 insertions, 3713 deletions
 
 ## 2026-02-28
 
@@ -361,26 +370,19 @@
 ## 2026-02-27
 
 ### What Changed
-- Expand Lexios extraction from 9 to 101 types across 5 domains
-- Revert "Expand Lexios extraction from 9 to 101 types across 5 domains"
-- Reapply "Expand Lexios extraction from 9 to 101 types across 5 domains"
 - Add Lexios vs NanoClaw distinction to agent instructions
 - Exclude untracked src/integrations and src/router from build
 - Mount Lexios repo into main container at /workspace/lexios
 - Add context-aware ack emojis based on message content
 
-### Files (8 changed)
-- container/skills/lexios/SKILL.md
-- container/skills/lexios/TRAIN.md
-- container/skills/lexios/types.json
+### Files (4 changed)
 - groups/main/CLAUDE.md
-- scripts/lexios-eval.py
 - src/container-runner.ts
 - src/index.ts
 - tsconfig.json
 
 ### Stats
-- 5260 insertions, 2605 deletions
+- 130 insertions, 40 deletions
 
 ## 2026-02-26
 
