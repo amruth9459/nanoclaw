@@ -1,11 +1,30 @@
 # NanoClaw — Daily Build Log
 
 *Living document — auto-generated from git history*
-*Last generated: 2026-03-16*
+*Last generated: 2026-03-17*
 
-**390 total commits** (212 meaningful) | 2026-01-31 to 2026-03-15
+**414 total commits** (212 meaningful) | 2026-01-31 to 2026-03-16
 
 ---
+
+## 2026-03-16
+
+### What Changed
+- 24 auto-backup commits (incremental saves)
+
+### Files (9 changed)
+- container/agent-runner/src/ipc-mcp-stdio.ts
+- docs/DEVLOG.md
+- docs/NANOCLAW_BUILD_LOG.md
+- groups/main/CLAUDE.md
+- scripts/backfill-shared-items.ts
+- src/channels/whatsapp.ts
+- src/db.ts
+- src/index.ts
+- src/ipc.ts
+
+### Stats
+- 999 insertions, 167 deletions
 
 ## 2026-03-15
 
