@@ -13,7 +13,7 @@ import sqlite3
 import re
 import sys
 from pathlib import Path
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 import os
 
@@ -24,7 +24,7 @@ _IPC_ROOT  = Path(os.environ.get("NANOCLAW_IPC_DIR", "/workspace/ipc/tasks"))
 
 DB_PATH    = _HOST_ROOT / "store/messages.db"
 STATE_FILE = _GROUP_DIR / "consolidation_state.json"
-MEMORY_MD  = _HOST_ROOT / "groups/main/MEMORY.md"
+MEMORY_MD  = _GROUP_DIR / "MEMORY.md"
 IPC_DIR    = _IPC_ROOT
 MAIN_JID   = "120363427991119489@g.us"
 
@@ -82,7 +82,7 @@ def get_user_messages(since: str | None) -> list[dict]:
 # ── analysis ──────────────────────────────────────────────────────────────────
 
 def extract_requests(messages: list[dict]) -> list[str]:
-    """Pull out lines that look like actionable requests."""
+    """Pull out user request lines, skipping quoted WhatsApp replies."""
     REQUEST_PATTERNS = re.compile(
         r'\b(can you|please|could you|need to|want to|add|fix|build|'
         r'create|update|remind|schedule|set up|integrate|connect|enable)\b',
@@ -90,9 +90,10 @@ def extract_requests(messages: list[dict]) -> list[str]:
     )
     found = []
     for m in messages:
-        content = m["content"].strip()
+        # Strip quoted lines (lines starting with ">") from WhatsApp replies
+        lines = [l for l in m["content"].splitlines() if not l.strip().startswith('>')]
+        content = ' '.join(lines).strip()
         if content and REQUEST_PATTERNS.search(content):
-            # Trim to first 120 chars so it's readable
             snippet = content[:120].replace('\n', ' ')
             if len(content) > 120:
                 snippet += '…'
@@ -112,7 +113,9 @@ def extract_topics(messages: list[dict]) -> list[str]:
     }
     freq: dict[str, int] = {}
     for m in messages:
-        words = re.findall(r'\b[a-z]{4,}\b', m["content"].lower())
+        # Skip quoted lines
+        lines = [l for l in m["content"].splitlines() if not l.strip().startswith('>')]
+        words = re.findall(r'\b[a-z]{4,}\b', ' '.join(lines).lower())
         for w in words:
             if w not in STOPWORDS:
                 freq[w] = freq.get(w, 0) + 1
