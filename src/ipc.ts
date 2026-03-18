@@ -540,6 +540,55 @@ export function startIpcWatcher(deps: IpcDeps): void {
                   continue;
                 }
 
+                // ── Ollama Query ───────────────────────────────────────────
+                if (data.type === 'ollama_query' && data.model && data.prompt) {
+                  const responseFile = data.responseFile ? toHostIpcPath(data.responseFile as string, sourceGroup) : undefined;
+                  const model = data.model as string;
+                  const prompt = data.prompt as string;
+                  const images = data.images as string[] | undefined; // base64-encoded images
+                  const systemPrompt = data.system as string | undefined;
+
+                  try {
+                    const messages: Array<{ role: string; content: string | Array<{ type: string; text?: string; image_url?: { url: string } }> }> = [];
+                    if (systemPrompt) {
+                      messages.push({ role: 'system', content: systemPrompt });
+                    }
+                    if (images && images.length > 0) {
+                      // Multimodal: interleave images + text
+                      const content: Array<{ type: string; text?: string; image_url?: { url: string } }> = [];
+                      for (const img of images) {
+                        content.push({ type: 'image_url', image_url: { url: img.startsWith('data:') ? img : `data:image/jpeg;base64,${img}` } });
+                      }
+                      content.push({ type: 'text', text: prompt });
+                      messages.push({ role: 'user', content });
+                    } else {
+                      messages.push({ role: 'user', content: prompt });
+                    }
+
+                    const res = await fetch('http://127.0.0.1:11434/api/chat', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({ model, messages, stream: false }),
+                    });
+
+                    if (!res.ok) {
+                      const errText = await res.text();
+                      if (responseFile) writeIpcResponse(responseFile, { error: `Ollama error ${res.status}: ${errText.slice(0, 500)}` });
+                    } else {
+                      const result = await res.json() as { message?: { content?: string }; error?: string };
+                      const text = result.message?.content ?? result.error ?? 'No response';
+                      if (responseFile) writeIpcResponse(responseFile, { response: text, model });
+                    }
+                  } catch (err) {
+                    const errMsg = err instanceof Error ? err.message : String(err);
+                    logger.error({ model, sourceGroup, err: errMsg }, 'Ollama query failed');
+                    if (responseFile) writeIpcResponse(responseFile, { error: `Ollama unavailable: ${errMsg}` });
+                  }
+
+                  fs.unlinkSync(filePath);
+                  continue;
+                }
+
                 if (data.type === 'react' && data.chatJid && data.messageId && data.emoji) {
                   // Authorization: non-main groups can only react in their own JID
                   const reactTargetGroup = registeredGroups[data.chatJid as string];
