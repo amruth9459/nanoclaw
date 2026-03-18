@@ -9,7 +9,11 @@
       "WebSearch",
       "Bash(./integrations/nanoclaw/sync.sh:*)",
       "Bash(cloudflared tunnel:*)",
-      "Skill(agent-browser)"
+      "Skill(agent-browser)",
+      "WebFetch(domain:hub.docker.com)",
+      "WebFetch(domain:www.npmjs.com)",
+      "WebFetch(domain:pypi.org)",
+      "WebFetch(domain:lexios.ai)"
     ]
   }
 }

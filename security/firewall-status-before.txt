@@ -1,0 +1,6 @@
+=== Current Firewall Configuration ===
+Firewall is disabled. (State = 0)
+Firewall stealth mode is off
+Automatically allow built-in signed software ENABLED.
+Automatically allow downloaded signed software ENABLED.
+usage: /usr/libexec/ApplicationFirewall/socketfilterfw [-h] [--getglobalstate] [--setglobalstate on | off] [--getblockall] [--setblockall on | off] [--listapps] [--getappblocked <path>] [--blockapp <path>] [--unblockapp <path>] [--add <path>] [--remove <path>] [--getallowsigned] [--setallowsigned on | off] [--setallowsignedapp on | off] [--getstealthmode] [--setstealthmode on | off]

@@ -28,6 +28,11 @@ src/integrations/lexios/
 *.keys.json
 .env
 
+# OAuth tokens (Google Workspace, etc.)
+**/tokens/token.json
+**/tokens/credentials.json
+gws/tokens/
+
 # Python
 __pycache__/
 *.pyc
