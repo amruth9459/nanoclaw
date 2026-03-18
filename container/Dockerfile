@@ -79,6 +79,10 @@ RUN mkdir -p /workspace/gws
 COPY skills/gws/gws_helper.py /workspace/gws/gws_helper.py
 RUN chmod +x /workspace/gws/gws_helper.py
 
+# Install Ollama query script (queries host Ollama via IPC)
+COPY skills/ollama-query.sh /usr/local/bin/ollama-query
+RUN chmod +x /usr/local/bin/ollama-query
+
 # Create workspace directories
 RUN mkdir -p /workspace/group /workspace/global /workspace/extra /workspace/ipc/messages /workspace/ipc/tasks /workspace/ipc/input
 
