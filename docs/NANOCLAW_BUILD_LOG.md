@@ -1,11 +1,30 @@
 # NanoClaw — Daily Build Log
 
 *Living document — auto-generated from git history*
-*Last generated: 2026-03-17*
+*Last generated: 2026-03-18*
 
-**414 total commits** (212 meaningful) | 2026-01-31 to 2026-03-16
+**424 total commits** (212 meaningful) | 2026-01-31 to 2026-03-17
 
 ---
+
+## 2026-03-17
+
+### What Changed
+- 10 auto-backup commits (incremental saves)
+
+### Files (9 changed)
+- container/Dockerfile
+- container/skills/gws/oauth_setup.py
+- container/skills/gws/tokens/credentials.json
+- container/skills/gws/tokens/token.json
+- container/skills/ollama-query.sh
+- container/skills/ollama/SKILL.md
+- docs/DEVLOG.md
+- docs/NANOCLAW_BUILD_LOG.md
+- src/ipc.ts
+
+### Stats
+- 595 insertions, 2 deletions
 
 ## 2026-03-16
 
