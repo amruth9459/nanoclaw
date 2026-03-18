@@ -1791,7 +1791,7 @@ Steps:
       const mainJid = Object.entries(registeredGroups)
         .find(([, g]) => g.folder === MAIN_GROUP_FOLDER)?.[0];
       if (mainJid) {
-        clawSend(mainJid, `📶 Back online (was unreachable for ${duration})`).catch(() => {});
+        clawSend(DESKTOP_NOTIFY_JID || mainJid, `📶 Back online (was unreachable for ${duration})`).catch(() => {});
       }
       logger.warn({ downMs }, 'WhatsApp reconnected after outage');
     },
@@ -2136,11 +2136,11 @@ Steps:
             const { getNotifyJid } = await import('./notify.js');
             const summary = breadcrumb.summary || 'Agent deployed code changes';
             // Match summary to integration notify topics
-            let topic: string = 'general';
+            let topic: string = 'desktop';
             const summaryLower = summary.toLowerCase();
             for (const integ of getIntegrations()) {
               if (integ.notifyTopics && summaryLower.includes(integ.name)) {
-                topic = Object.keys(integ.notifyTopics)[0] || 'general';
+                topic = Object.keys(integ.notifyTopics)[0] || 'desktop';
                 break;
               }
             }

@@ -973,7 +973,8 @@ async function processClawworkMessage(
 
       const reasonLine = reason ? `\nReason: ${reason}` : '';
       const msg = BountyGate.formatProposalMessage(bountyObj, token) + reasonLine;
-      await deps.sendMessage(mainJid, msg);
+      const { getNotifyJid: _getNotifyJid1 } = await import('./notify.js');
+      await deps.sendMessage(_getNotifyJid1('desktop', mainJid), msg);
 
       if (responseFile) writeIpcResponse(responseFile, { proposed: true, token });
       logger.info({ groupFolder, bountyId, token }, 'Bounty: propose_bounty processed');
@@ -998,7 +999,8 @@ async function processClawworkMessage(
         const prLine = prUrl ? `\nPR: ${prUrl}` : '';
         const summaryLine = workSummary ? `\nSummary: ${workSummary.slice(0, 200)}` : '';
         const paypalLine = PAYPAL_EMAIL ? `\nPayPal: ${PAYPAL_EMAIL}` : '';
-        await deps.sendMessage(mainJid,
+        const { getNotifyJid: _getNotifyJid2 } = await import('./notify.js');
+        await deps.sendMessage(_getNotifyJid2('desktop', mainJid),
           `📤 *Bounty Submitted*\nID: ${bountyId}${prLine}${summaryLine}${paypalLine}`,
         ).catch(err => logger.warn({ err }, 'Failed to notify bounty submission'));
       }
@@ -1125,7 +1127,8 @@ async function processClawworkMessage(
           { action, messageIds, summary, breakdown, groupFolder },
           token,
         );
-        await deps.sendMessage(mainJid, msg);
+        const { getNotifyJid: _getNotifyJid3 } = await import('./notify.js');
+        await deps.sendMessage(_getNotifyJid3('desktop', mainJid), msg);
 
         if (responseFile) writeIpcResponse(responseFile, { status: 'pending_approval', token });
         logger.info({ groupFolder, action, count: messageIds.length, token }, 'Gmail cleanup proposal sent');
