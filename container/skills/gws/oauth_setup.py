@@ -21,13 +21,16 @@ TOKEN_DIR = os.path.join(SCRIPT_DIR, 'tokens')
 CREDENTIALS_PATH = os.path.join(TOKEN_DIR, 'credentials.json')
 TOKEN_PATH = os.path.join(TOKEN_DIR, 'token.json')
 
+# Minimal scopes — least privilege:
+#   gmail.modify: read, send, trash, archive (no permanent delete; subsumes gmail.send + gmail.readonly)
+#   calendar.readonly: read-only calendar access
+#   drive.readonly: read-only file listing/search
+#   keep.readonly: read-only notes (Phase 1)
 SCOPES = [
     'https://www.googleapis.com/auth/gmail.modify',
-    'https://www.googleapis.com/auth/gmail.send',
-    'https://www.googleapis.com/auth/gmail.readonly',
     'https://www.googleapis.com/auth/calendar.readonly',
     'https://www.googleapis.com/auth/drive.readonly',
-    'https://www.googleapis.com/auth/keep',
+    'https://www.googleapis.com/auth/keep.readonly',
 ]
 
 

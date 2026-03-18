@@ -46,9 +46,17 @@ def get_credentials():
     creds = Credentials.from_authorized_user_file(token_path)
 
     if creds and creds.expired and creds.refresh_token:
-        creds.refresh(Request())
-        with open(token_path, 'w') as f:
-            f.write(creds.to_json())
+        try:
+            creds.refresh(Request())
+            # Try to persist refreshed token (may fail on read-only mount)
+            try:
+                with open(token_path, 'w') as f:
+                    f.write(creds.to_json())
+            except OSError:
+                pass  # Read-only mount — token refreshed in memory, will expire again
+        except Exception:
+            print(json.dumps({"error": "OAuth token expired and refresh failed. Re-run OAuth setup on host."}))
+            sys.exit(1)
 
     return creds
 
@@ -515,7 +523,13 @@ def main():
     try:
         actions[args.action](args)
     except Exception as e:
-        print(json.dumps({"error": str(e)}))
+        # Sanitize error message to prevent leaking client_secret or tokens
+        msg = str(e)
+        for sensitive_pattern in ['client_secret', 'refresh_token', 'access_token', 'ya29.']:
+            if sensitive_pattern in msg:
+                msg = f"Google API error (details redacted for security). Action: {args.action}"
+                break
+        print(json.dumps({"error": msg}))
         sys.exit(1)
 
 
