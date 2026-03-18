@@ -18,6 +18,7 @@ groups/main/*
 groups/global/*
 groups/lexios-template/*
 !groups/main/CLAUDE.md
+!groups/main/memory_consolidation_agent.py
 !groups/global/CLAUDE.md
 !groups/lexios-template/CLAUDE.md
 
