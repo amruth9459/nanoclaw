@@ -1,9 +1,9 @@
 # NanoClaw — Daily Build Log
 
 *Living document — auto-generated from git history*
-*Last generated: 2026-03-18*
+*Last generated: 2026-03-19*
 
-**435 total commits** (216 meaningful) | 2026-01-31 to 2026-03-18
+**449 total commits** (218 meaningful) | 2026-01-31 to 2026-03-18
 
 ---
 
@@ -14,9 +14,11 @@
 - [Agent] task_1773708446839_skills: Deep analysis of Anthropic official skills spec
 - [Agent] task_1773708188175_consol: Wire up memory consolidation as scheduled task
 - [Agent] task_1773708446839_sec10: Create NanoClaw security hardening checklist
-- (+7 auto-backup commits)
+- [Agent] task_1773878231235_cw9vik6: A2A protocol evaluation vs TeamCreate/SendMessage
+- [Agent] task_1773878234290_7sn0img: Technical assessment of A2UI vs pixel canvas for office dashboard
+- (+19 auto-backup commits)
 
-### Files (15 changed)
+### Files (19 changed)
 - .claude/settings.local.json
 - .claude/worktrees/eloquent-vaughan
 - .gitignore
@@ -27,14 +29,18 @@
 - docs/DEVLOG.md
 - docs/NANOCLAW_BUILD_LOG.md
 - docs/NANOCLAW_HARDENING_CHECKLIST.md
+- docs/a2a-evaluation.md
+- groups/main/A2UI_Technical_Assessment.md
 - groups/main/LEXIOS_KG_ARCHITECTURE_ANALYSIS.md
 - groups/main/memory_consolidation_agent.py
 - gws/README.md
 - gws/setup_oauth.py
 - security/firewall-status-before.txt
+- src/index.ts
+- src/ipc.ts
 
 ### Stats
-- 2689 insertions, 13 deletions
+- 4029 insertions, 420 deletions
 
 ## 2026-03-17
 
