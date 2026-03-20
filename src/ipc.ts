@@ -241,6 +241,7 @@ export function startIpcWatcher(deps: IpcDeps): void {
                   'find_freelance_gigs', 'propose_deliverable',
                   'task_tool', 'gmail_cleanup', 'shared_items',
                   'token_refresh',
+                  'generate_safety_brief', 'monitoring_log',
                 ]);
                 if (data.type && CLAWWORK_BOUNTY_TYPES.has(data.type)) {
                   await processClawworkMessage(data, sourceGroup, messagesDir, deps);
@@ -1111,6 +1112,53 @@ async function processClawworkMessage(
         syncKanbanFile();
       }
       logger.debug({ groupFolder, action: data.action }, 'TaskTool processed');
+      break;
+    }
+
+    // ── Agent Monitoring ─────────────────────────────────────────
+    case 'generate_safety_brief': {
+      try {
+        const { generateDailySafetyBrief } = await import('./agent-monitoring-system.js');
+        const brief = await generateDailySafetyBrief(data.date as string | undefined);
+        if (responseFile) writeIpcResponse(responseFile, { brief });
+      } catch (err) {
+        const errMsg = err instanceof Error ? err.message : String(err);
+        if (responseFile) writeIpcResponse(responseFile, { error: errMsg });
+        logger.error({ err, groupFolder }, 'generate_safety_brief failed');
+      }
+      break;
+    }
+
+    case 'monitoring_log': {
+      try {
+        const { logAction, detectSelfModification, detectIntentDrift } = await import('./agent-monitoring-system.js');
+
+        // Log the action to the database
+        logAction({
+          timestamp: data.timestamp as string || new Date().toISOString(),
+          action_type: data.action_type as 'bash' | 'file_edit' | 'mcp_call' | 'agent_spawn' | 'api_call',
+          command: data.command as string | undefined,
+          file_path: data.file_path as string | undefined,
+          risk_score: data.risk_score as number || 0,
+          flagged: data.flagged as boolean || false,
+          flag_reason: data.flag_reason as string | undefined,
+          group_folder: groupFolder,
+          task_id: data.task_id as string | undefined,
+        });
+
+        // Handle self-modification detection
+        if (data.is_self_modification && data.file_path) {
+          detectSelfModification(data.file_path as string, groupFolder, data.task_id as string | undefined);
+        }
+
+        // Handle intent drift signals embedded in monitoring logs
+        if (data.command && (data.command as string).startsWith('[INTENT_DRIFT]') && data.task_id) {
+          const observed = (data.command as string).replace('[INTENT_DRIFT] ', '');
+          detectIntentDrift(data.task_id as string, observed);
+        }
+      } catch (err) {
+        logger.error({ err, groupFolder }, 'monitoring_log handler failed');
+      }
       break;
     }
 

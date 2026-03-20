@@ -6,6 +6,7 @@ import { ASSISTANT_NAME, DATA_DIR, GROUPS_DIR, INITIAL_BALANCE, MAIN_GROUP_FOLDE
 import { NewMessage, RegisteredGroup, ScheduledTask, TaskRunLog } from './types.js';
 import { logger } from './logger.js';
 import { getIntegrations } from './integration-loader.js';
+import { initMonitoringSchema } from './agent-monitoring-system.js';
 
 let db: Database.Database;
 
@@ -397,6 +398,7 @@ export function initDatabase(): void {
   db.pragma('busy_timeout = 5000');
 
   createSchema(db);
+  initMonitoringSchema(db);
 
   // Migrate from JSON files if they exist
   migrateJsonState();

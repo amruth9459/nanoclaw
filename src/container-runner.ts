@@ -30,6 +30,7 @@ import { validateAdditionalMounts } from './mount-security.js';
 import { getIntegrations } from './integration-loader.js';
 import type { NanoClawIntegration } from './integration-types.js';
 import { RegisteredGroup } from './types.js';
+import { checkResourceUsage } from './agent-monitoring-system.js';
 
 // Sentinel markers for robust output parsing (must match agent-runner)
 const OUTPUT_START_MARKER = '---NANOCLAW_OUTPUT_START---';
@@ -523,6 +524,10 @@ export async function runContainerAgent(
     let newSessionId: string | undefined;
     let outputChain = Promise.resolve();
 
+    // Resource tracking for agent monitoring
+    let totalSpendUsd = 0;
+    let outputCount = 0;
+
     container.stdout.on('data', (data) => {
       const chunk = data.toString();
 
@@ -571,6 +576,21 @@ export async function runContainerAgent(
             // Call onOutput for all markers (including null results)
             // so idle timers start even for "silent" query completions.
             outputChain = outputChain.then(() => onOutput(parsed));
+
+            // Resource tracking: accumulate spend and check limits
+            if (parsed.usage) {
+              // Approximate cost: $3/MTok input, $15/MTok output (Sonnet pricing)
+              const inputCost = (parsed.usage.inputTokens / 1_000_000) * 3;
+              const outputCost = (parsed.usage.outputTokens / 1_000_000) * 15;
+              totalSpendUsd += inputCost + outputCost;
+            }
+            outputCount++;
+            const taskId = input.designation || 'agent';
+            checkResourceUsage(taskId, {
+              agentSpawnCount: outputCount,
+              totalSpendUsd,
+              apiCallCount: outputCount,
+            });
           } catch (err) {
             logger.warn(
               { group: group.name, error: err },

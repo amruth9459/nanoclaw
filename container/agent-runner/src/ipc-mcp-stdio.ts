@@ -875,6 +875,40 @@ The team system will:
   },
 );
 
+// ── Agent Monitoring ─────────────────────────────────────────────────────────
+
+server.tool(
+  'generate_safety_brief',
+  `Generate a daily agent safety brief summarizing all flagged actions, self-modifications,
+intent drifts, and resource abuses for a given date. Main group only.
+The brief is stored in the database and returned as formatted text.`,
+  {
+    date: z.string().optional().describe('Date in YYYY-MM-DD format (defaults to today)'),
+  },
+  async (args) => {
+    if (!isMain) {
+      return {
+        content: [{ type: 'text' as const, text: 'Error: generate_safety_brief is only available in the main group.' }],
+        isError: true,
+      };
+    }
+
+    const { responseFile } = writeClawworkRequest({
+      type: 'generate_safety_brief',
+      date: args.date,
+    });
+
+    const result = await pollResponse(responseFile, 15000);
+    if (!result) {
+      return { content: [{ type: 'text' as const, text: 'Error: safety brief request timed out' }], isError: true };
+    }
+    if (result.error) {
+      return { content: [{ type: 'text' as const, text: `Error: ${result.error}` }], isError: true };
+    }
+    return { content: [{ type: 'text' as const, text: String(result.brief) }] };
+  },
+);
+
 // ── Integration tool modules (loaded from NANOCLAW_TOOL_MODULES env var) ──
 // Each module must export registerTools(server, ctx).
 const toolModules = (process.env.NANOCLAW_TOOL_MODULES || '').split(',').filter(Boolean);

@@ -19,6 +19,7 @@ import path from 'path';
 import { query, HookCallback, PreCompactHookInput, PreToolUseHookInput } from '@anthropic-ai/claude-agent-sdk';
 import { fileURLToPath } from 'url';
 import { SafetyPulse } from './safety-pulse.js';
+import { beforeBashCommand, beforeFileEdit, afterAgentMessage } from './monitoring.js';
 
 interface ContainerInput {
   prompt: string;
@@ -391,6 +392,46 @@ function createSanitizeBashHook(): HookCallback {
   };
 }
 
+/**
+ * Monitoring hook: logs bash commands for risk assessment and blocks critical ones.
+ */
+function createMonitoringBashHook(groupFolder: string, taskId?: string): HookCallback {
+  return async (input, _toolUseId, _context) => {
+    const preInput = input as PreToolUseHookInput;
+    const command = (preInput.tool_input as { command?: string })?.command;
+    if (!command) return {};
+
+    const allowed = beforeBashCommand(command, groupFolder, taskId);
+    if (!allowed) {
+      return {
+        hookSpecificOutput: {
+          hookEventName: 'PreToolUse',
+          updatedInput: {
+            ...(preInput.tool_input as Record<string, unknown>),
+            command: `echo "[MONITORING BLOCK] Command blocked by risk assessment (critical risk). This incident has been logged."`,
+          },
+        },
+      };
+    }
+
+    return {};
+  };
+}
+
+/**
+ * Monitoring hook: logs file edits and detects self-modification attempts.
+ */
+function createMonitoringFileEditHook(groupFolder: string, taskId?: string): HookCallback {
+  return async (input, _toolUseId, _context) => {
+    const preInput = input as PreToolUseHookInput;
+    const filePath = (preInput.tool_input as { file_path?: string })?.file_path;
+    if (!filePath) return {};
+
+    beforeFileEdit(filePath, groupFolder, taskId);
+    return {};
+  };
+}
+
 function sanitizeFilename(summary: string): string {
   return summary
     .toLowerCase()
@@ -716,13 +757,28 @@ async function runQuery(
       },
       hooks: {
         PreCompact: [{ hooks: [createPreCompactHook()] }],
-        PreToolUse: [{
-          matcher: 'Bash',
-          hooks: [
-            createSanitizeBashHook(),
-            createSecurityHook(containerInput.chatJid, containerInput.groupFolder),
-          ],
-        }],
+        PreToolUse: [
+          {
+            matcher: 'Bash',
+            hooks: [
+              createMonitoringBashHook(containerInput.groupFolder, containerInput.isScheduledTask ? 'sched-task' : undefined),
+              createSanitizeBashHook(),
+              createSecurityHook(containerInput.chatJid, containerInput.groupFolder),
+            ],
+          },
+          {
+            matcher: 'Edit',
+            hooks: [
+              createMonitoringFileEditHook(containerInput.groupFolder, containerInput.isScheduledTask ? 'sched-task' : undefined),
+            ],
+          },
+          {
+            matcher: 'Write',
+            hooks: [
+              createMonitoringFileEditHook(containerInput.groupFolder, containerInput.isScheduledTask ? 'sched-task' : undefined),
+            ],
+          },
+        ],
       },
     }
   })) {
@@ -738,6 +794,17 @@ async function runQuery(
       if (pulseMsg) {
         log('[safety-pulse] Injecting safety reminder into stream');
         stream.push(pulseMsg);
+      }
+
+      // Intent drift detection for scheduled tasks
+      if (containerInput.isScheduledTask && (message as any).message?.content) {
+        const textParts = ((message as any).message.content as Array<{ type: string; text?: string }>)
+          .filter(c => c.type === 'text' && c.text)
+          .map(c => c.text!);
+        const fullText = textParts.join('');
+        if (fullText) {
+          afterAgentMessage('sched-task', fullText, containerInput.groupFolder);
+        }
       }
     }
 
