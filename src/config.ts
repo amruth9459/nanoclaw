@@ -157,3 +157,6 @@ export const CLAW_REDDIT_CLIENT_SECRET = process.env.CLAW_REDDIT_CLIENT_SECRET |
 
 // Notification routing — topic-specific WhatsApp groups
 export const DESKTOP_NOTIFY_JID = process.env.NANOCLAW_DESKTOP_NOTIFY_JID || '120363408175994341@g.us';
+
+// Freelance agent — Ishita's dedicated WhatsApp group JID
+export const FREELANCE_AGENT_JID = process.env.NANOCLAW_FREELANCE_AGENT_JID || '';

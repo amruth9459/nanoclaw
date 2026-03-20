@@ -19,6 +19,7 @@ import {
   WA2_ENABLED,
   WARMUP_ON_START,
   DESKTOP_NOTIFY_JID,
+  FREELANCE_AGENT_JID,
 } from './config.js';
 import { WhatsAppChannel } from './channels/whatsapp.js';
 import {
@@ -77,6 +78,7 @@ import { initNotificationRouter } from './notification-router.js';
 import { ResourceOrchestrator, AgentPriority } from './resource-orchestrator.js';
 import { BountyGate } from './bounty-gate.js';
 import { CleanupGate } from './cleanup-gate.js';
+import { DeliverableGate } from './deliverable-gate.js';
 import { GroupQueue } from './group-queue.js';
 import { HitlGate } from './hitl.js';
 import { startIpcWatcher } from './ipc.js';
@@ -108,6 +110,7 @@ const queue = new GroupQueue();
 const hitlGate = new HitlGate();
 const bountyGate = new BountyGate();
 const cleanupGate = new CleanupGate();
+const deliverableGate = new DeliverableGate();
 let orchestrator: ResourceOrchestrator;
 let router: UniversalRouter;
 let responseTimeManager: ResponseTimeManager;
@@ -139,6 +142,16 @@ function loadState(): void {
       trigger: '@__notify_only__',
       added_at: new Date().toISOString(),
       requiresTrigger: true,
+    });
+  }
+  // Auto-register freelance agent group
+  if (FREELANCE_AGENT_JID && !registeredGroups[FREELANCE_AGENT_JID]) {
+    registerGroup(FREELANCE_AGENT_JID, {
+      name: 'ishita-freelance',
+      folder: 'ishita-freelance',
+      trigger: `@${ASSISTANT_NAME}`,
+      added_at: new Date().toISOString(),
+      requiresTrigger: false,
     });
   }
   // Auto-register integration groups
@@ -1196,6 +1209,21 @@ async function startMessageLoop(): Promise<void> {
               }
             }
           }
+          // DeliverableGate: handle approve-delivery / reject-delivery from any group
+          for (const msg of groupMessages) {
+            if (msg.sender === ASSISTANT_NAME) continue;
+            deliverableGate.tryHandleApproval(
+              msg.content,
+              (_token, deliverable) => {
+                channel.sendMessage(chatJid, `✅ Delivery approved: ${deliverable.gigTitle}\nProceeding to deliver to client.`).catch(() => {});
+              },
+              (_token, deliverable) => {
+                channel.sendMessage(chatJid, `❌ Delivery rejected: ${deliverable.gigTitle}`).catch(() => {});
+              },
+            ).catch((err) =>
+              logger.warn({ err }, 'DeliverableGate approval handling error'),
+            );
+          }
           const needsTrigger = !isMainGroup && group.requiresTrigger !== false;
 
           // For non-main groups, only act on trigger messages.
@@ -1610,6 +1638,102 @@ The first $149 sale is the proof of concept. Then you scale.`;
   );
 }
 
+/**
+ * Ensure a freelance agent scheduled task exists for the ishita-freelance group.
+ * Runs 3x daily to hunt, apply, execute, and report on freelance gigs.
+ */
+function ensureFreelanceAgentTask(): void {
+  if (!FREELANCE_AGENT_JID) return;
+
+  const freelanceFolder = 'ishita-freelance';
+  const existingTasks = getAllTasks();
+  const alreadyExists = existingTasks.some(
+    (t) =>
+      t.group_folder === freelanceFolder &&
+      t.status === 'active' &&
+      t.prompt.includes('FREELANCE_AGENT_TASK'),
+  );
+  if (alreadyExists) {
+    logger.info('Freelance agent scheduled task already exists');
+    return;
+  }
+
+  const prompt = `FREELANCE_AGENT_TASK — Do not remove this tag.
+
+You are a freelance agent for Ishita. Your mission: find freelance work, apply, complete it, and earn $3,000/month.
+
+═══════════════════════════════════════════════════════════════════
+WORKFLOW
+═══════════════════════════════════════════════════════════════════
+
+1. HUNT (40% of session time)
+   - Call find_freelance_gigs to scan Reddit r/forhire, Freelancer.com, Algora, GitHub
+   - Also call find_bounties for open-source bounties
+   - Filter for: software development, writing, data/research tasks
+   - Prioritize by: reward amount, feasibility, time-to-complete
+
+2. APPLY (30% of session time)
+   - For Reddit gigs: draft a reply via agent-browser (be professional, specific about skills)
+   - For GitHub bounties: fork the repo, start working, comment on the issue
+   - For Freelancer.com gigs: draft application text (account setup needed first)
+   - Send Ishita a summary of all applications via send_message
+
+3. EXECUTE (20% of session time)
+   - Work on any accepted/in-progress gigs
+   - Create deliverables in /workspace/group/deliverables/
+   - When work is complete, call propose_deliverable — NEVER deliver without approval
+
+4. REPORT (10% of session time)
+   - send_message with: gigs found, applications sent, work status, earnings update
+
+═══════════════════════════════════════════════════════════════════
+SAFETY RULES
+═══════════════════════════════════════════════════════════════════
+
+- NEVER share personal information (address, phone, SSN, bank details)
+- NEVER deliver work without going through propose_deliverable approval gate
+- NEVER spend money or commit to paid services
+- NEVER misrepresent capabilities — be honest about being an AI assistant
+- NEVER accept gigs that involve illegal activity, academic fraud, or deception
+
+═══════════════════════════════════════════════════════════════════
+BOOTSTRAP (NO ACCOUNTS YET)
+═══════════════════════════════════════════════════════════════════
+
+Focus on platforms that don't require accounts first:
+- Reddit r/forhire (browsing is public)
+- GitHub bounties (existing token available)
+- Open-source contributions
+
+Send Ishita a prioritized list of platforms needing account setup:
+1. GitHub (for bounties and open-source work)
+2. Freelancer.com (largest freelance marketplace)
+3. Upwork (highest quality gigs)
+
+As accounts are created, expand your reach.
+
+TOOLS: find_freelance_gigs, find_bounties, propose_bounty, propose_deliverable, submit_bounty, send_message, agent-browser, Bash`;
+
+  const taskId = `freelance-agent-${Date.now()}`;
+  createTask({
+    id: taskId,
+    group_folder: freelanceFolder,
+    chat_jid: FREELANCE_AGENT_JID,
+    prompt,
+    schedule_type: 'cron',
+    schedule_value: '0 7,12,18 * * *', // 3x daily: 7 AM, noon, 6 PM
+    context_mode: 'group',
+    next_run: new Date(Date.now() + 120000).toISOString(), // first run in 2 minutes
+    status: 'active',
+    created_at: new Date().toISOString(),
+  });
+
+  logger.info(
+    { taskId, cron: '0 7,12,18 * * *', jid: FREELANCE_AGENT_JID },
+    'Freelance agent scheduled task created (3x daily)',
+  );
+}
+
 async function main(): Promise<void> {
   ensureContainerSystemRunning();
   initDatabase();
@@ -1960,6 +2084,7 @@ Steps:
     hitlGate,
     bountyGate,
     cleanupGate,
+    deliverableGate,
     getMainGroupJid: () =>
       Object.entries(registeredGroups).find(
         ([, g]) => g.folder === MAIN_GROUP_FOLDER,
@@ -1969,6 +2094,7 @@ Steps:
   queue.setProcessMessagesFn(processGroupMessages);
   recoverPendingMessages();
   ensureBountyHunterTask();
+  ensureFreelanceAgentTask();
 
   // Initialize auto-dispatcher (requires persona registry + queue + container spawning)
   if (personaRegistry) {

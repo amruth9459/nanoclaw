@@ -37,9 +37,10 @@ import {
   updateTaskSubmission,
 } from './db.js';
 import { evaluateWork } from './clawwork.js';
-import { Bounty, findBounties } from './bounty-hunter.js';
+import { Bounty, findBounties, findFreelanceGigs } from './bounty-hunter.js';
 import { BountyGate } from './bounty-gate.js';
 import { CleanupGate } from './cleanup-gate.js';
+import { DeliverableGate } from './deliverable-gate.js';
 import { learnFact } from './context/index.js';
 import { readEnvFile } from './env.js';
 import { getSurvivalTier } from './economics.js';
@@ -69,6 +70,8 @@ export interface IpcDeps {
   bountyGate?: BountyGate;
   /** Cleanup gate — HITL approval for Gmail cleanup operations */
   cleanupGate?: CleanupGate;
+  /** Deliverable gate — HITL approval for freelance deliverables */
+  deliverableGate?: DeliverableGate;
   /** Returns the JID of the main group (used for HITL notifications) */
   getMainGroupJid?: () => string | undefined;
   /**
@@ -235,6 +238,7 @@ export function startIpcWatcher(deps: IpcDeps): void {
                 const CLAWWORK_BOUNTY_TYPES = new Set([
                   'clawwork_get_status', 'clawwork_decide_activity', 'clawwork_learn', 'learn', 'clawwork_submit_work',
                   'find_bounties', 'propose_bounty', 'submit_bounty',
+                  'find_freelance_gigs', 'propose_deliverable',
                   'task_tool', 'gmail_cleanup', 'shared_items',
                   'token_refresh',
                 ]);
@@ -1012,6 +1016,87 @@ async function processClawworkMessage(
         });
       }
       logger.info({ groupFolder, bountyId }, 'Bounty: submit_bounty processed');
+      break;
+    }
+
+    // ── Freelance Gig IPC handlers ──────────────────────────────────
+
+    case 'find_freelance_gigs': {
+      const limit = typeof data.limit === 'number' ? data.limit : 30;
+      const gigs = await findFreelanceGigs(limit);
+      // Store gigs in bounty_opportunities table for reference
+      for (const b of gigs) {
+        try {
+          createBountyOpportunity({
+            id: b.id,
+            group_id: groupFolder,
+            platform: b.platform,
+            title: b.title,
+            url: b.url,
+            reward_usd: b.reward_usd,
+            reward_raw: b.reward_raw,
+            description: b.description,
+          });
+        } catch { /* duplicate — already stored */ }
+      }
+      if (responseFile) {
+        writeIpcResponse(responseFile, { bounties: gigs.map(b => ({
+          id: b.id,
+          platform: b.platform,
+          title: b.title,
+          url: b.url,
+          reward_usd: b.reward_usd,
+          reward_raw: b.reward_raw,
+          description: b.description,
+          repo: b.repo,
+        })) });
+      }
+      logger.info({ groupFolder, count: gigs.length }, 'Freelance: find_freelance_gigs processed');
+      break;
+    }
+
+    case 'propose_deliverable': {
+      const gigId = data.gig_id as string;
+      const gigTitle = data.gig_title as string;
+      const workSummary = data.work_summary as string;
+      const clientInfo = data.client_info as string | undefined;
+      const deliverablePath = data.deliverable_path as string | undefined;
+
+      if (!gigId || !gigTitle || !workSummary) {
+        if (responseFile) writeIpcResponse(responseFile, { error: 'Missing required fields: gig_id, gig_title, work_summary' });
+        break;
+      }
+
+      if (!deps.deliverableGate) {
+        if (responseFile) writeIpcResponse(responseFile, { error: 'DeliverableGate not configured' });
+        break;
+      }
+
+      // Find the freelance group's JID to send notification there
+      const allGroups = deps.registeredGroups();
+      const freelanceEntry = Object.entries(allGroups).find(([, g]) => g.folder === groupFolder);
+      const notifyJid = freelanceEntry?.[0] || deps.getMainGroupJid?.();
+      if (!notifyJid) {
+        if (responseFile) writeIpcResponse(responseFile, { error: 'No JID available for notifications' });
+        break;
+      }
+
+      const token = deps.deliverableGate.proposeDeliverable(
+        gigId,
+        gigTitle,
+        workSummary,
+        groupFolder,
+        () => { updateBountyStatus(gigId, 'approved'); },
+        () => { updateBountyStatus(gigId, 'rejected'); },
+        clientInfo,
+        deliverablePath,
+      );
+
+      const msg = DeliverableGate.formatProposalMessage(gigId, gigTitle, workSummary, token, clientInfo, deliverablePath);
+      await deps.sendMessage(notifyJid, msg);
+
+      if (responseFile) writeIpcResponse(responseFile, { proposed: true, token });
+      logger.info({ groupFolder, gigId, token }, 'Freelance: propose_deliverable processed');
       break;
     }
 

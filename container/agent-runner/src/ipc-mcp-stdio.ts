@@ -679,6 +679,71 @@ Include your work summary and any PR/patch URLs. The host will update the bounty
   },
 );
 
+// ── Freelance gig tools ────────────────────────────────────────────────────────
+
+server.tool(
+  'find_freelance_gigs',
+  `Find freelance gigs from Reddit r/forhire, Freelancer.com, Algora, and GitHub.
+Returns gigs sorted by reward (highest first). Broader than find_bounties — includes paid freelance work, not just open-source bounties.
+Each gig has an id, platform, title, url, reward_usd, and description.
+Use the id when calling propose_deliverable to submit completed work for approval.`,
+  {
+    limit: z.number().int().min(1).max(50).default(30).describe('Maximum number of gigs to return'),
+  },
+  async (args) => {
+    const { responseFile } = writeBountyRequest({ type: 'find_freelance_gigs', limit: args.limit ?? 30 });
+    const result = await pollResponse(responseFile, 30000);
+    if (!result) {
+      return { content: [{ type: 'text' as const, text: 'Error: find_freelance_gigs request timed out (30s)' }], isError: true };
+    }
+    if (result.error) {
+      return { content: [{ type: 'text' as const, text: `Error: ${result.error}` }], isError: true };
+    }
+    const bounties = result.bounties as Array<Record<string, unknown>>;
+    if (!bounties || bounties.length === 0) {
+      return { content: [{ type: 'text' as const, text: 'No freelance gigs found.' }] };
+    }
+    const formatted = bounties.map((b, i) =>
+      `[${i + 1}] ${b.platform} | ${b.title}\n    Reward: ${b.reward_usd != null ? `$${b.reward_usd}` : b.reward_raw} | ID: ${b.id}\n    URL: ${b.url}${b.description ? `\n    ${String(b.description).slice(0, 150)}...` : ''}`
+    ).join('\n\n');
+    return { content: [{ type: 'text' as const, text: formatted }] };
+  },
+);
+
+server.tool(
+  'propose_deliverable',
+  `Submit completed freelance work for user approval before delivering to the client.
+The user will receive a WhatsApp message with the work summary and can reply "approve-delivery <token>" or "reject-delivery <token>".
+NEVER deliver work to a client without approval through this gate.`,
+  {
+    gig_id: z.string().describe('The gig ID (e.g. "reddit:abc123", "freelancer:456")'),
+    gig_title: z.string().describe('Title of the gig/project'),
+    work_summary: z.string().describe('Summary of the completed work — what was done, quality notes, anything the reviewer should know'),
+    client_info: z.string().optional().describe('Client username, contact info, or platform profile'),
+    deliverable_path: z.string().optional().describe('Path to the deliverable file in the container (e.g. /workspace/group/deliverables/report.pdf)'),
+  },
+  async (args) => {
+    const { responseFile } = writeBountyRequest({
+      type: 'propose_deliverable',
+      gig_id: args.gig_id,
+      gig_title: args.gig_title,
+      work_summary: args.work_summary,
+      client_info: args.client_info,
+      deliverable_path: args.deliverable_path,
+    });
+    const result = await pollResponse(responseFile, 15000);
+    if (!result) {
+      return { content: [{ type: 'text' as const, text: 'Error: propose_deliverable request timed out' }], isError: true };
+    }
+    if (result.error) {
+      return { content: [{ type: 'text' as const, text: `Error: ${result.error}` }], isError: true };
+    }
+    return {
+      content: [{ type: 'text' as const, text: `Deliverable proposed (token: ${result.token}). Waiting for user approval via WhatsApp. Do NOT deliver to client until approved.` }],
+    };
+  },
+);
+
 server.tool(
   'remote_shell',
   `Execute a command on the Mac host from WhatsApp. Use this when the user asks you to run something on their computer remotely.

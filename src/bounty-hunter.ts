@@ -7,8 +7,8 @@ import { GITHUB_TOKEN } from './config.js';
 import { logger } from './logger.js';
 
 export interface Bounty {
-  id: string;            // 'algora:12345' or 'github:98765'
-  platform: 'algora' | 'github';
+  id: string;            // 'algora:12345' or 'github:98765' or 'reddit:abc123'
+  platform: 'algora' | 'github' | 'reddit' | 'freelancer';
   title: string;
   url: string;
   reward_usd: number | null;
@@ -192,6 +192,121 @@ export function getHuntrBountyInfo(): Bounty[] {
       description: 'Anthropic pays for novel universal jailbreaks and safety vulnerabilities in Claude models. Highest tier: $35,000 for novel universal jailbreak. Focus on finding inputs that cause consistently unsafe outputs across model versions.',
     },
   ];
+}
+
+/** Fetch [HIRING] posts from r/forhire via Reddit's public JSON API */
+export async function findRedditGigs(limit = 20): Promise<Bounty[]> {
+  try {
+    const res = await fetch(
+      `https://www.reddit.com/r/forhire/search.json?q=flair%3A%22Hiring%22&restrict_sr=on&sort=new&limit=${limit}`,
+      { headers: { 'User-Agent': 'NanoClaw/1.0' }, signal: AbortSignal.timeout(15000) },
+    );
+    if (!res.ok) {
+      logger.warn({ status: res.status }, 'Reddit r/forhire API returned non-200');
+      return [];
+    }
+    const raw = await res.json() as { data?: { children?: Array<{ data: Record<string, unknown> }> } };
+    const posts = raw.data?.children ?? [];
+    const items: Bounty[] = [];
+
+    for (const { data: post } of posts) {
+      const title = String(post.title ?? '');
+      const id = String(post.id ?? Math.random());
+      const dollarMatch = title.match(/\$\s?(\d[\d,]*(?:\.\d+)?)/);
+      const rewardUsd = dollarMatch ? parseFloat(dollarMatch[1].replace(/,/g, '')) : null;
+
+      items.push({
+        id: `reddit:${id}`,
+        platform: 'reddit',
+        title,
+        url: `https://www.reddit.com${post.permalink ?? `/r/forhire/comments/${id}`}`,
+        reward_usd: rewardUsd,
+        reward_raw: dollarMatch ? dollarMatch[0] : 'see post',
+        description: String(post.selftext ?? '').slice(0, 500),
+      });
+    }
+    logger.info({ count: items.length }, 'Reddit r/forhire gigs fetched');
+    return items;
+  } catch (err) {
+    logger.warn({ err }, 'findRedditGigs failed');
+    return [];
+  }
+}
+
+/** Fetch active projects from Freelancer.com public API */
+export async function findFreelancerGigs(limit = 20): Promise<Bounty[]> {
+  try {
+    const res = await fetch(
+      `https://www.freelancer.com/api/projects/0.1/projects/active/?compact=true&limit=${limit}&job_details=true&sort_field=submitdate&sort_direction=desc`,
+      { headers: { 'Accept': 'application/json' }, signal: AbortSignal.timeout(15000) },
+    );
+    if (!res.ok) {
+      logger.warn({ status: res.status }, 'Freelancer.com API returned non-200');
+      return [];
+    }
+    const raw = await res.json() as { result?: { projects?: Record<string, unknown>[] } };
+    const projects = raw.result?.projects ?? [];
+    const items: Bounty[] = [];
+
+    for (const proj of projects) {
+      const id = String(proj.id ?? Math.random());
+      const budget = proj.budget as { maximum?: number; minimum?: number } | undefined;
+      const rewardUsd = budget?.maximum ?? budget?.minimum ?? null;
+
+      items.push({
+        id: `freelancer:${id}`,
+        platform: 'freelancer',
+        title: String(proj.title ?? 'Untitled'),
+        url: `https://www.freelancer.com/projects/${proj.seo_url ?? id}`,
+        reward_usd: rewardUsd,
+        reward_raw: rewardUsd != null ? `$${rewardUsd}` : 'see project',
+        description: String(proj.preview_description ?? proj.description ?? '').slice(0, 500),
+      });
+    }
+    logger.info({ count: items.length }, 'Freelancer.com gigs fetched');
+    return items;
+  } catch (err) {
+    logger.warn({ err }, 'findFreelancerGigs failed');
+    return [];
+  }
+}
+
+/** Aggregate all freelance gig sources (Reddit, Freelancer, Algora, GitHub, Huntr) */
+export async function findFreelanceGigs(limit = 30): Promise<Bounty[]> {
+  const [reddit, freelancer, algora, github] = await Promise.allSettled([
+    findRedditGigs(limit),
+    findFreelancerGigs(limit),
+    findAlgoraBounties(limit),
+    findGithubBounties(limit),
+  ]);
+
+  const huntr = getHuntrBountyInfo();
+
+  const all: Bounty[] = [
+    ...(reddit.status === 'fulfilled' ? reddit.value : []),
+    ...(freelancer.status === 'fulfilled' ? freelancer.value : []),
+    ...(algora.status === 'fulfilled' ? algora.value : []),
+    ...(github.status === 'fulfilled' ? github.value : []),
+    ...huntr,
+  ];
+
+  // Deduplicate by id
+  const seen = new Set<string>();
+  const deduped = all.filter(b => {
+    if (seen.has(b.id)) return false;
+    seen.add(b.id);
+    return true;
+  });
+
+  // Sort by reward descending (null rewards go to the bottom)
+  deduped.sort((a, b) => {
+    if (a.reward_usd === null && b.reward_usd === null) return 0;
+    if (a.reward_usd === null) return 1;
+    if (b.reward_usd === null) return -1;
+    return b.reward_usd - a.reward_usd;
+  });
+
+  return deduped.slice(0, limit);
 }
 
 /** Merge all bounty sources, sorted by reward (highest first) */
