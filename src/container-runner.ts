@@ -327,7 +327,7 @@ function readSecrets(): Record<string, string> {
   // NOTE: ANTHROPIC_API_KEY intentionally NOT passed to containers — use OAuth only
   // so container sessions are covered by the Pro subscription (no API billing).
   // API key is still used host-side by judge-system.ts and semantic-index.ts.
-  const fromEnvFile = readEnvFile(['CLAUDE_CODE_OAUTH_TOKEN',
+  const fromEnvFile = readEnvFile(['CLAUDE_CODE_OAUTH_TOKEN', 'ANTHROPIC_API_KEY',
     'CLAW_EMAIL_APP_PASSWORD', 'CLAW_REDDIT_PASS', 'CLAW_REDDIT_CLIENT_SECRET',
     'OPENAI_API_KEY', 'GOOGLE_API_KEY']);
   // Also pick up runtime values (set via process.env / plist)
