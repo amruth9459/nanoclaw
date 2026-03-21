@@ -188,6 +188,7 @@ export class AutoDispatcher {
       WHERE t.status IN ('todo', 'pending')
         AND (t.assigned_agent IS NULL OR t.assigned_agent = '')
         AND t.project = ?
+        AND t.description NOT LIKE '[Human Action]%'
         AND NOT EXISTS (
           SELECT 1 FROM json_each(
             CASE

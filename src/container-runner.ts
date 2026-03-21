@@ -70,6 +70,13 @@ export interface ContainerInput {
   personaContent?: string;
   /** Kanban task ID for dispatch status tracking */
   dispatchTaskId?: string;
+  /** Personality tuning params (Phase 2 Karpathy). Injected into system prompt. */
+  personalityParams?: {
+    tone: 'concise' | 'balanced' | 'verbose';
+    verbosity: number;
+    creativity: number;
+    formality: 'casual' | 'professional' | 'formal';
+  };
 }
 
 export interface ContainerOutput {

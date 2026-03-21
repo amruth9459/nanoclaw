@@ -91,6 +91,7 @@ import { Channel, NewMessage, RegisteredGroup } from './types.js';
 import { logger } from './logger.js';
 import { PersonaRegistry } from './persona-registry.js';
 import { AutoDispatcher } from './auto-dispatch.js';
+import { getPersonalityParams } from './personality-tuner.js';
 
 // Re-export for backwards compatibility during refactor
 export { escapeXml, formatMessages } from './router.js';
@@ -952,6 +953,9 @@ async function runAgent(
     // Snapshot the current token so we can detect if .env was updated between attempts
     let lastTokenPrefix = readEnvFile(['CLAUDE_CODE_OAUTH_TOKEN']).CLAUDE_CODE_OAUTH_TOKEN?.slice(0, 20);
 
+    // Resolve personality params for this group (Phase 2 Karpathy tuning)
+    const personalityParams = getPersonalityParams(group.folder) ?? undefined;
+
     const output = await runContainerAgent(
       group,
       {
@@ -968,6 +972,7 @@ async function runAgent(
           reasoning: routingDecisionHint.reasoning,
         } : undefined,
         maxTurns,
+        personalityParams,
       },
       (proc, containerName) => {
         queue.registerProcess(chatJid, proc, containerName, group.folder);

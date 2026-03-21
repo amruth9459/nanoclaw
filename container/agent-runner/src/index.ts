@@ -33,6 +33,13 @@ interface ContainerInput {
   personaId?: string;
   /** Full persona markdown content (read from ~/.claude/agents/ on host) */
   personaContent?: string;
+  /** Personality tuning params (Phase 2 Karpathy). Injected into system prompt. */
+  personalityParams?: {
+    tone: 'concise' | 'balanced' | 'verbose';
+    verbosity: number;
+    creativity: number;
+    formality: 'casual' | 'professional' | 'formal';
+  };
 }
 
 interface ContainerOutput {
@@ -691,6 +698,48 @@ async function runQuery(
     globalClaudeMd = (globalClaudeMd || '') + identityBlock;
   }
 
+  // Build personality tuning prompt block (Phase 2 Karpathy)
+  let personalityPrompt: string | undefined;
+  if (containerInput.personalityParams) {
+    const p = containerInput.personalityParams;
+    const lines = ['', '## Communication Style', ''];
+
+    // Tone
+    if (p.tone === 'concise') {
+      lines.push('- Be concise and direct. Minimize filler words. Get to the point quickly.');
+    } else if (p.tone === 'verbose') {
+      lines.push('- Be thorough and detailed. Explain your reasoning step by step. Provide context and examples.');
+    } else {
+      lines.push('- Balance brevity with clarity. Include necessary context without over-explaining.');
+    }
+
+    // Verbosity scale
+    if (p.verbosity <= 3) {
+      lines.push('- Keep responses short. Use bullet points. Omit obvious details.');
+    } else if (p.verbosity >= 8) {
+      lines.push('- Provide comprehensive responses with detailed explanations, examples, and edge cases.');
+    }
+
+    // Creativity
+    if (p.creativity <= 3) {
+      lines.push('- Stick to conventional, well-established approaches. Avoid novel or experimental solutions.');
+    } else if (p.creativity >= 8) {
+      lines.push('- Think creatively. Consider unconventional approaches and novel solutions when appropriate.');
+    }
+
+    // Formality
+    if (p.formality === 'casual') {
+      lines.push('- Use a casual, conversational tone. Keep it friendly and approachable.');
+    } else if (p.formality === 'formal') {
+      lines.push('- Use formal, professional language. Be precise and structured in your communication.');
+    } else {
+      lines.push('- Maintain a professional but approachable tone.');
+    }
+
+    personalityPrompt = lines.join('\n');
+    log(`Personality tuning active: tone=${p.tone} verbosity=${p.verbosity} creativity=${p.creativity} formality=${p.formality}`);
+  }
+
   // Prompt caching configuration
   const enableCaching = process.env.NANOCLAW_ENABLE_PROMPT_CACHING !== '0';
 
@@ -718,8 +767,8 @@ async function runQuery(
       resume: sessionId,
       resumeSessionAt: resumeAt,
       ...(containerInput.maxTurns ? { maxTurns: containerInput.maxTurns } : {}),
-      systemPrompt: (globalClaudeMd || personaMd)
-        ? { type: 'preset' as const, preset: 'claude_code' as const, append: [personaMd, globalClaudeMd].filter(Boolean).join('\n\n') }
+      systemPrompt: (globalClaudeMd || personaMd || personalityPrompt)
+        ? { type: 'preset' as const, preset: 'claude_code' as const, append: [personaMd, globalClaudeMd, personalityPrompt].filter(Boolean).join('\n\n') }
         : undefined,
       allowedTools: [
         'Bash',
