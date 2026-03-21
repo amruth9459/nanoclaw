@@ -67,3 +67,12 @@ export {
   authorizeAction,
   getCachedTrustScore,
 } from './trust-scoring.js';
+
+export {
+  processIdentityIpc,
+  signOutgoingMessage,
+  verifyIncomingMessage,
+  recordUnsignedMessage,
+  ensureAgentIdentity,
+  getIdentitySafetyFindings,
+} from './ipc-handlers.js';

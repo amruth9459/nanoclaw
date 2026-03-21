@@ -173,7 +173,7 @@ export async function verifyChain(agentId: string): Promise<{ valid: boolean; br
 export function getChain(agentId: string): EvidenceRecord[] {
   const db = getDb();
   const rows = db.prepare(
-    'SELECT * FROM evidence_chain WHERE agent_id = ? ORDER BY timestamp ASC'
+    'SELECT * FROM evidence_chain WHERE agent_id = ? ORDER BY rowid ASC'
   ).all(agentId) as EvidenceRow[];
   return rows.map(rowToRecord);
 }
@@ -199,7 +199,7 @@ export function getOutcomes(agentId: string): { succeeded: number; total: number
 function getLatestHash(agentId: string): string {
   const db = getDb();
   const row = db.prepare(
-    'SELECT record_hash FROM evidence_chain WHERE agent_id = ? ORDER BY timestamp DESC LIMIT 1'
+    'SELECT record_hash FROM evidence_chain WHERE agent_id = ? ORDER BY rowid DESC LIMIT 1'
   ).get(agentId) as { record_hash: string } | undefined;
   return row?.record_hash ?? GENESIS_HASH;
 }

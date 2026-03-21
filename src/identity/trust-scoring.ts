@@ -67,7 +67,7 @@ export async function computeTrustScore(agentId: string): Promise<AgentTrustScor
   const outcomes = getOutcomes(agentId);
   if (outcomes.total > 0) {
     const failureRate = 1.0 - (outcomes.succeeded / outcomes.total);
-    factors.outcome_reliability = -(failureRate * OUTCOME_FAILURE_WEIGHT);
+    factors.outcome_reliability = -(failureRate * OUTCOME_FAILURE_WEIGHT) || 0;
     score += factors.outcome_reliability;
   }
 
@@ -128,7 +128,7 @@ export async function authorizeAction(agentId: string, action: string): Promise<
   }
 
   // Check credential expiry
-  if (new Date(identity.expires_at) < new Date()) {
+  if (new Date(identity.expires_at) <= new Date()) {
     return { authorized: false, reason: 'credential_expired' };
   }
 

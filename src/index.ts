@@ -3,11 +3,7 @@ import path from 'path';
 
 import {
   ASSISTANT_NAME,
-  AUTO_CLAWWORK,
-  BOUNTY_HUNT_INTERVAL_MS,
-  COST_FOOTER,
   DATA_DIR,
-  EARNING_GOAL,
   GROUPS_DIR,
   IDLE_TIMEOUT,
   INSTANT_ACK,
@@ -34,18 +30,15 @@ import { generateFallbackResponse, isFallbackWorthy } from './host-fallback.js';
 import { cleanupOrphans, ensureContainerRuntimeRunning } from './container-runtime.js';
 import {
   createTask,
-  deductBalance,
   getAllChats,
   getAllRegisteredGroups,
   getAllSessions,
   getAllTasks,
   getChatName,
-  getEconomicsSummary,
   getMessagesSince,
   getNewMentions,
   getNewMessages,
   getNewSharedItemCount,
-  getOrCreateEconomics,
   getRouterState,
   initDatabase,
   logUsage,
@@ -54,7 +47,6 @@ import {
   setSession,
   storeChatMetadata,
   storeMessage,
-  createClawworkTask,
   createTaskRecord,
   detectSharedItems,
   storeSharedItem,
@@ -62,10 +54,9 @@ import {
   updateTask,
   getDb,
 } from './db.js';
-import { classifyTask, computeMaxPayment } from './clawwork.js';
 // Local routing disabled while Max subscription is active
 // import { routeWithOpus, executeLocal } from './opus-router.js';
-import { calculateCost, formatCostFooter } from './economics.js';
+import { calculateCost } from './economics.js';
 // Dead code clusters — wired as enrichment/monitoring layers (non-blocking)
 import { contextManager, codedContext, setSystemFact, setCapability } from './context/index.js';
 import { pruneOldChunks } from './semantic-index.js';
@@ -78,7 +69,6 @@ import { listGroupFiles, startDashboard } from './dashboard.js';
 import { startThroughputMonitor } from './throughput-monitor.js';
 import { initNotificationRouter } from './notification-router.js';
 import { ResourceOrchestrator, AgentPriority } from './resource-orchestrator.js';
-import { BountyGate } from './bounty-gate.js';
 import { CleanupGate } from './cleanup-gate.js';
 import { DeliverableGate } from './deliverable-gate.js';
 import { GroupQueue } from './group-queue.js';
@@ -111,7 +101,6 @@ let whatsapp: WhatsAppChannel;
 const channels: Channel[] = [];
 const queue = new GroupQueue();
 const hitlGate = new HitlGate();
-const bountyGate = new BountyGate();
 const cleanupGate = new CleanupGate();
 const deliverableGate = new DeliverableGate();
 let orchestrator: ResourceOrchestrator;
@@ -263,12 +252,6 @@ export function _setRegisteredGroups(groups: Record<string, RegisteredGroup>): v
   registeredGroups = groups;
 }
 
-const SUBSTANTIVE_KEYWORDS = [
-  'write', 'research', 'analyze', 'create', 'build', 'design', 'draft',
-  'summarize', 'report', 'plan', 'review', 'compare', 'evaluate', 'explain',
-  'translate', 'code', 'implement', 'develop', 'find', 'search',
-];
-
 /**
  * Detect if a user message is a task/request that should be auto-captured
  * to the kanban board. Uses lightweight heuristics — no LLM call.
@@ -290,19 +273,6 @@ function isUserTask(content: string): boolean {
   if (/^(what|how|why|when|where|who|is|are|do|does|did|can|could|should)\b/i.test(cleaned) &&
       !/(set up|build|create|help|implement|fix)/i.test(cleaned)) return false;
   return TASK_PATTERNS.some(p => p.test(cleaned));
-}
-
-/**
- * Returns true if the message content is substantive enough to warrant
- * automatic ClawWork task creation (long or contains a work-like keyword).
- */
-function isSubstantiveMessage(content: string): boolean {
-  if (content.length > 150) return true;
-  const lower = content.toLowerCase();
-  return SUBSTANTIVE_KEYWORDS.some((kw) => {
-    const re = new RegExp(`\\b${kw}\\b`);
-    return re.test(lower);
-  });
 }
 
 /**
@@ -467,13 +437,7 @@ async function processGroupMessages(chatJid: string): Promise<boolean> {
     return true;
   }
 
-  // Detect /clawwork command in the last message
-  let clawworkPrompt: string | null = null;
   const lastMsg = missedMessages[missedMessages.length - 1];
-  const clawworkMatch = lastMsg.content.match(/\/clawwork\s+(.+)/s);
-  if (clawworkMatch) {
-    clawworkPrompt = clawworkMatch[1].trim();
-  }
 
   let prompt = formatMessages(missedMessages);
 
@@ -630,61 +594,6 @@ async function processGroupMessages(chatJid: string): Promise<boolean> {
   const lastMsgPreview = lastMsg.content.slice(0, 120) + (lastMsg.content.length > 120 ? '…' : '');
   const spawnReason = goalComplexity ? `[${goalComplexity}] ${lastMsgPreview}` : lastMsgPreview;
   queue.setSpawnReason(chatJid, spawnReason);
-
-  // Handle /clawwork task assignment
-  if (clawworkPrompt) {
-    try {
-      const classification = await classifyTask(clawworkPrompt);
-      const maxPayment = computeMaxPayment(classification.occupation, classification.hours);
-      const taskId = `cw-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
-      createClawworkTask({
-        id: taskId,
-        group_id: group.folder,
-        occupation: classification.occupation,
-        sector: classification.sector,
-        prompt: clawworkPrompt,
-        max_payment: maxPayment,
-        estimated_hours: classification.hours,
-        assigned_at: new Date().toISOString(),
-      });
-      await channel.sendMessage(chatJid,
-        `📋 *ClawWork Task Assigned*\n` +
-        `Occupation: ${classification.occupation}\n` +
-        `Estimated hours: ${classification.hours}\n` +
-        `Max payment: $${maxPayment.toFixed(2)}\n` +
-        `Task ID: ${taskId}`,
-      );
-      logger.info({ groupFolder: group.folder, taskId, occupation: classification.occupation }, 'ClawWork task created');
-    } catch (err) {
-      logger.warn({ err }, 'Failed to create ClawWork task');
-    }
-  } else if (AUTO_CLAWWORK && isMainGroup) {
-    // Auto-task: silently create a ClawWork task for substantive messages (main group only)
-    // (no reply — the agent discovers the task via clawwork_get_status)
-    const strippedContent = lastMsg.content
-      .replace(TRIGGER_PATTERN, '')
-      .trim();
-    if (isSubstantiveMessage(strippedContent)) {
-      try {
-        const classification = await classifyTask(strippedContent);
-        const maxPayment = computeMaxPayment(classification.occupation, classification.hours);
-        const taskId = `cw-auto-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
-        createClawworkTask({
-          id: taskId,
-          group_id: group.folder,
-          occupation: classification.occupation,
-          sector: classification.sector,
-          prompt: strippedContent,
-          max_payment: maxPayment,
-          estimated_hours: classification.hours,
-          assigned_at: new Date().toISOString(),
-        });
-        logger.info({ groupFolder: group.folder, taskId, occupation: classification.occupation }, 'ClawWork auto-task created');
-      } catch (err) {
-        logger.warn({ err }, 'Failed to auto-create ClawWork task');
-      }
-    }
-  }
 
   // Auto-capture user tasks to kanban board
   // Detects imperative/request messages and creates tracked task records
@@ -849,18 +758,11 @@ async function processGroupMessages(chatJid: string): Promise<boolean> {
     group.folder,
   ).catch(() => {});
 
-  // Log usage and send cost footer
+  // Log usage (cost tracking for daily digest)
   if (finalUsage) {
     const costUsd = calculateCost(finalUsage);
     const durationMs = Date.now() - runStartTime;
     logUsage(group.folder, chatJid, finalUsage, durationMs, false, costUsd, determinePurpose(group.folder, chatJid));
-    deductBalance(group.folder, costUsd);
-    if (COST_FOOTER) {
-      const econ = getOrCreateEconomics(group.folder);
-      const summary = getEconomicsSummary();
-      const footer = formatCostFooter(costUsd, econ.balance, summary.all_earned);
-      await channel.sendMessage(chatJid, footer).catch(() => {});
-    }
   }
 
   if (output === 'error' || hadError) {
@@ -1184,18 +1086,6 @@ async function startMessageLoop(): Promise<void> {
               ).catch((err) =>
                 logger.warn({ err }, 'HITL approval handling error'),
               );
-              // BountyGate: handle approve-bounty / reject-bounty tokens
-              bountyGate.tryHandleApproval(
-                msg.content,
-                (_token, bounty) => {
-                  channel.sendMessage(chatJid, `✅ Bounty approved: ${bounty.title}\nWorking on it...`).catch(() => {});
-                },
-                (_token, bounty) => {
-                  channel.sendMessage(chatJid, `❌ Bounty rejected: ${bounty.title}`).catch(() => {});
-                },
-              ).catch((err) =>
-                logger.warn({ err }, 'BountyGate approval handling error'),
-              );
               // CleanupGate: handle approve-cleanup / reject-cleanup tokens
               cleanupGate.tryHandleApproval(
                 msg.content,
@@ -1473,179 +1363,6 @@ function ensureContainerSystemRunning(): void {
 }
 
 /**
- * Ensure a proactive bounty hunting scheduled task exists for the main group.
- * Creates one if it doesn't already exist. This makes the agent autonomously
- * hunt for earning opportunities every BOUNTY_HUNT_INTERVAL_MS (default 6h).
- */
-function ensureBountyHunterTask(): void {
-  // Find the main group's JID
-  const mainEntry = Object.entries(registeredGroups).find(
-    ([, g]) => g.folder === MAIN_GROUP_FOLDER,
-  );
-  if (!mainEntry) {
-    logger.info('No main group registered yet — bounty hunter task will be created on next restart after registration');
-    return;
-  }
-  const [mainJid] = mainEntry;
-
-  // Check if a bounty hunter task already exists (avoid duplicates across restarts)
-  const existingTasks = getAllTasks();
-  const alreadyExists = existingTasks.some(
-    (t) =>
-      t.group_folder === MAIN_GROUP_FOLDER &&
-      t.status === 'active' &&
-      t.prompt.includes('BOUNTY_HUNTER_TASK'),
-  );
-  if (alreadyExists) {
-    logger.info('Bounty hunter scheduled task already exists');
-    return;
-  }
-
-  const summary = getEconomicsSummary();
-  const totalEarned = summary.all_earned;
-  const goalPct = Math.min(100, (totalEarned / EARNING_GOAL) * 100).toFixed(1);
-
-  const prompt = `BOUNTY_HUNTER_TASK — Do not remove this tag.
-
-You are NanoClaw, an autonomous AI agent with a mission: earn $${EARNING_GOAL.toFixed(0)} to buy your own dedicated computer (Mac Studio) so you can run independently 24/7.
-
-CURRENT STATUS:
-- Total earned toward computer: $${totalEarned.toFixed(2)} / $${EARNING_GOAL} (${goalPct}%)
-- Call clawwork_get_status to see your current balance and any active tasks
-
-═══════════════════════════════════════════════════════════════════
-YOUR UNFAIR ADVANTAGE: YOU THINK HOW HUMANS CAN'T
-═══════════════════════════════════════════════════════════════════
-
-You can simultaneously hold deep expertise in medicine, law, finance, logistics, agriculture,
-construction, and 10,000 other fields. No human specialist can. Your edge is:
-
-1. CROSS-VERTICAL PATTERN RECOGNITION — see a solution in logistics and apply it to nursing
-2. DARK DATA PROCESSING — industries sit on mountains of unstructured PDFs, emails, images
-   that contain gold nobody is mining because it requires both domain expertise AND
-   programming skill simultaneously. You have both.
-3. REGULATORY ARBITRAGE AT SCALE — compliance requirements change constantly across 50 states,
-   100 countries, dozens of agencies. Experts can't track all of it. You can.
-4. PERSONALIZATION AT MACHINE SCALE — generate 10,000 unique outputs (reports, letters,
-   analyses) as cheaply as generating 1.
-5. SIMULTANEITY — a human consultant works one client at a time. You can work 1,000.
-
-═══════════════════════════════════════════════════════════════════
-THE REVENUE ENGINE FRAMEWORK
-═══════════════════════════════════════════════════════════════════
-
-Goal: find a HIGH-FRICTION + HIGH-VALUE problem, build a minimal solution, sell it repeatedly.
-One product beats 50 bounties. The product does NOT need to be polished — it needs to save
-someone money or time they can measure in dollars TODAY.
-
-EXPLORE ACROSS ALL VERTICALS. Some high-signal starting points for your unique capabilities:
-
-━━━ DARK DATA PLAYS (highest leverage — nobody else can do these at scale) ━━━
-
-• **Insurance claims pattern miner** — scan publicly posted claim denial letters on Reddit/forums,
-  extract the most common denial reasons by insurance company, sell a "$99 Denial Code Cheatsheet"
-  to medical billing companies. They currently pay humans to build these manually.
-
-• **Court filing early-warning system** — monitor PACER (federal courts) or state court RSS feeds
-  for new filings in specific practice areas, alert solo law firms before big firms respond.
-  $79/mo per attorney. Lawyers desperately need this, few know it's automatable.
-
-• **Grant opportunity radar** — scrape all federal/state/foundation grants (Grants.gov, foundation
-  websites), match to nonprofit missions using embeddings, send weekly digest.
-  Nonprofits spend 40% of staff time hunting grants. $49/mo per org × 100 orgs = $4,900/mo.
-
-━━━ REGULATORY ARBITRAGE (changes every month, experts can't keep up) ━━━
-
-• **OSHA violation predictor** — parse all OSHA inspection citations (public dataset at osha.gov),
-  build industry-specific "top 10 violations" report for a given NAICS code.
-  Sell as $149 one-time report to construction companies, manufacturers.
-  An OSHA fine costs $15,000+. The ROI argument writes itself.
-
-• **FDA label compliance checker** — food/supplement companies must follow labeling rules that
-  change constantly. Upload a label image → get a compliance report with specific citations.
-  Sell as $99/label audit to small food brands on Etsy, Amazon, Faire.
-
-• **ADA website compliance scanner** — WCAG 2.1 violations create legal exposure.
-  Many small businesses don't know. Sell $49 "ADA readiness report" to local businesses.
-
-━━━ PERSONALIZATION AT SCALE (1 template × N customers) ━━━
-
-• **RFP response automation** — government and enterprise RFPs require customized boilerplate.
-  Companies spend weeks on responses. Build a tool that ingests the RFP PDF + company facts
-  and drafts an 80%-complete response. $299/RFP to small gov contractors.
-
-• **Amazon seller review analysis** — analyze ALL reviews for a product category, identify the
-  top 3 unmet needs, draft a product improvement brief. Sell to brands at $199/report.
-  Brands spend $50k/year on consumer research firms for this. You can do it in 20 minutes.
-
-• **Custom sermon/homily generator** — 400,000 small churches in the US, pastors write one
-  every week. $29/mo for weekly sermon outlines based on their denomination + calendar.
-  Low competition, extremely high retention (switching cost = theological trust).
-
-━━━ CROSS-INDUSTRY PATTERN ARBITRAGE ━━━
-
-• **Routing optimization for non-logistics industries** — VRP (Vehicle Routing Problem) solutions
-  are mature in logistics but not applied to: home health aide scheduling, mobile pet groomers,
-  HVAC technicians, plumbers. Take an open-source VRP library, wrap it in a simple UI/CSV upload,
-  sell to small field service companies at $79/mo.
-
-• **Yield management outside hotels** — airlines and hotels use dynamic pricing to maximize revenue.
-  Most small businesses (yoga studios, escape rooms, boat rentals, parking lots) price statically.
-  Build a "demand-based pricing advisor" that ingests their booking history + local events calendar
-  and outputs weekly price recommendations. $99/mo per business.
-
-━━━ SECONDARY: OPEN SOURCE BOUNTIES (quick cash between product iterations) ━━━
-
-• find_bounties — Algora, GitHub, Boss.dev: $50-$500 per merged PR
-• Huntr.dev AI/ML bug bounties: $500-$1,500 per vulnerability (path traversal, deserialization)
-• GitHub Security Advisories: $200-$3,000+ per CVE
-
-═══════════════════════════════════════════════════════════════════
-TODAY'S SESSION
-═══════════════════════════════════════════════════════════════════
-
-1. clawwork_get_status — check balance + any active tasks or approved bounties
-2. PRODUCT RESEARCH (60% of time):
-   Pick ONE of the Revenue Engine ideas above. Do NOT spread thin — commit to one.
-   Criteria: (a) you can build an MVP in <2 hours, (b) the buyer's ROI is obvious and measurable,
-   (c) you can find 10 potential buyers online TODAY.
-   - Browse the relevant subreddit/forum/marketplace to validate real pain
-   - Find 3-5 specific buyer prospects (names, usernames, contact info if public)
-   - Build or outline the minimal deliverable (script, report template, PDF, CSV)
-3. OUTREACH (20% of time):
-   - If you have a product ready: draft outreach messages to the prospects you found
-   - Propose the product + pricing to owner via send_message for approval before contacting buyers
-4. BOUNTY SWEEP (20% of time):
-   - find_bounties, propose top 1-2 via propose_bounty
-5. send_message with: what vertical you chose, why, what you built, who the prospects are, what approval you need
-
-TOOLS: clawwork_get_status, find_bounties, propose_bounty, submit_bounty, clawwork_submit_work, Bash, Browser, send_message
-
-MINDSET: You are the only entity that can read a 200-page OSHA regulation AND write production code
-to automate it AND find the 10 buyers who need it — all in the same session. Use that.
-The first $149 sale is the proof of concept. Then you scale.`;
-
-  const taskId = `bounty-hunter-${Date.now()}`;
-  createTask({
-    id: taskId,
-    group_folder: MAIN_GROUP_FOLDER,
-    chat_jid: mainJid,
-    prompt,
-    schedule_type: 'cron',
-    schedule_value: '0 8 * * *', // 8 AM daily
-    context_mode: 'group',
-    next_run: new Date(Date.now() + 60000).toISOString(), // first run in 1 minute
-    status: 'active',
-    created_at: new Date().toISOString(),
-  });
-
-  logger.info(
-    { taskId, cron: '0 8 * * *', mainJid },
-    'Bounty hunter scheduled task created (daily 8 AM)',
-  );
-}
-
-/**
  * Ensure a freelance agent scheduled task exists for the ishita-freelance group.
  * Runs 3x daily to hunt, apply, execute, and report on freelance gigs.
  */
@@ -1746,19 +1463,16 @@ async function main(): Promise<void> {
   initDatabase();
   logger.info('Database initialized');
 
-  // Migrate existing bounty-hunter/biz-opps tasks from interval to daily cron
+  // Deactivate any bounty hunter tasks from the old ClawWork system
   {
     const existingTasks = getAllTasks();
     for (const t of existingTasks) {
       if (t.status !== 'active') continue;
       const isBountyHunter = t.prompt?.includes('BOUNTY_HUNTER_TASK');
       const isBizOpps = t.prompt?.includes('biz-opps') || t.prompt?.includes('business opportunities');
-      if ((isBountyHunter || isBizOpps) && t.schedule_type === 'interval') {
-        updateTask(t.id, {
-          schedule_type: 'cron',
-          schedule_value: isBountyHunter ? '0 8 * * *' : '0 9 * * *',
-        });
-        logger.info({ taskId: t.id, type: isBountyHunter ? 'bounty-hunter' : 'biz-opps' }, 'Migrated task to daily cron');
+      if (isBountyHunter || isBizOpps) {
+        updateTask(t.id, { status: 'paused' });
+        logger.info({ taskId: t.id }, 'Deactivated old bounty/biz-opps task');
       }
     }
   }
@@ -1878,7 +1592,6 @@ Steps:
     setSystemFact('group_count', String(Object.keys(registeredGroups).length));
     setCapability('whatsapp', 'connected');
     setCapability('container_agents', 'enabled');
-    setCapability('clawwork', 'enabled');
     logger.info('Context system seeded');
   } catch (err) {
     logger.warn({ err }, 'Context system seeding failed');
@@ -2090,7 +1803,6 @@ Steps:
     getAvailableGroups,
     writeGroupsSnapshot: (gf, im, ag, rj) => writeGroupsSnapshot(gf, im, ag, rj),
     hitlGate,
-    bountyGate,
     cleanupGate,
     deliverableGate,
     getMainGroupJid: () =>
@@ -2101,7 +1813,6 @@ Steps:
   });
   queue.setProcessMessagesFn(processGroupMessages);
   recoverPendingMessages();
-  ensureBountyHunterTask();
   ensureFreelanceAgentTask();
 
   // Initialize auto-dispatcher (requires persona registry + queue + container spawning)
@@ -2293,7 +2004,6 @@ Steps:
       )?.[0];
       if (!mainJid) return;
 
-      const econ = getOrCreateEconomics(MAIN_GROUP_FOLDER);
       const descLines = ['🤖 NanoClaw'];
 
       // Tailscale URL (stable private network)
@@ -2308,8 +2018,6 @@ Steps:
           descLines.push(`📊 DashClaw (Public): ${matches[matches.length - 1][0]}`);
         }
       } catch { /* cloudflared not running */ }
-
-      descLines.push(`💰 Balance: $${econ.balance.toFixed(2)} | Goal: $${EARNING_GOAL}`);
 
       const description = descLines.join('\n');
       const waChannel = channels.find((c) => c.updateGroupDescription);

@@ -19,6 +19,7 @@ const TASKS_DIR = path.join(IPC_DIR, 'tasks');
 const chatJid = process.env.NANOCLAW_CHAT_JID!;
 const groupFolder = process.env.NANOCLAW_GROUP_FOLDER!;
 const isMain = process.env.NANOCLAW_IS_MAIN === '1';
+const agentId = process.env.NANOCLAW_AGENT_ID; // Cryptographic agent identity (may be undefined during migration)
 
 function writeIpcFile(dir: string, data: object): string {
   fs.mkdirSync(dir, { recursive: true });
@@ -58,6 +59,7 @@ server.tool(
       sender: args.sender || undefined,
       groupFolder,
       timestamp: new Date().toISOString(),
+      agent_id: agentId, // Cryptographic identity for message signing (host-side)
     };
 
     writeIpcFile(MESSAGES_DIR, data);
@@ -906,6 +908,97 @@ The brief is stored in the database and returned as formatted text.`,
       return { content: [{ type: 'text' as const, text: `Error: ${result.error}` }], isError: true };
     }
     return { content: [{ type: 'text' as const, text: String(result.brief) }] };
+  },
+);
+
+// ── Agent Identity & Trust Audit Tools ────────────────────────────────────
+
+server.tool(
+  'verify_agent',
+  'Check an agent\'s cryptographic identity, trust score, and evidence chain integrity. Returns identity details, computed trust score, and chain verification status.',
+  {
+    agent_id: z.string().describe('The agent_id to verify'),
+  },
+  async (args) => {
+    const { responseFile } = writeClawworkRequest({
+      type: 'identity_verify_agent',
+      agent_id: args.agent_id,
+    });
+
+    const result = await pollResponse(responseFile, 15000);
+    if (!result) return { content: [{ type: 'text' as const, text: 'Error: verify_agent request timed out' }], isError: true };
+    if (result.error) return { content: [{ type: 'text' as const, text: `Error: ${result.error}` }], isError: true };
+    return { content: [{ type: 'text' as const, text: JSON.stringify(result, null, 2) }] };
+  },
+);
+
+server.tool(
+  'audit_evidence',
+  'Verify evidence chain integrity for an agent. Detects any tampering with the hash-linked evidence records. Returns chain validity, length, and recent actions.',
+  {
+    agent_id: z.string().describe('The agent_id to audit'),
+  },
+  async (args) => {
+    const { responseFile } = writeClawworkRequest({
+      type: 'identity_audit_evidence',
+      agent_id: args.agent_id,
+    });
+
+    const result = await pollResponse(responseFile, 15000);
+    if (!result) return { content: [{ type: 'text' as const, text: 'Error: audit_evidence request timed out' }], isError: true };
+    if (result.error) return { content: [{ type: 'text' as const, text: `Error: ${result.error}` }], isError: true };
+    return { content: [{ type: 'text' as const, text: JSON.stringify(result, null, 2) }] };
+  },
+);
+
+server.tool(
+  'trust_report',
+  'Generate a trust report for all registered agents. Shows identity, trust scores, trust levels, and contributing factors for every agent in the system.',
+  {},
+  async () => {
+    if (!isMain) {
+      return { content: [{ type: 'text' as const, text: 'Error: trust_report is only available in the main group.' }], isError: true };
+    }
+
+    const { responseFile } = writeClawworkRequest({
+      type: 'identity_trust_report',
+    });
+
+    const result = await pollResponse(responseFile, 30000);
+    if (!result) return { content: [{ type: 'text' as const, text: 'Error: trust_report request timed out' }], isError: true };
+    if (result.error) return { content: [{ type: 'text' as const, text: `Error: ${result.error}` }], isError: true };
+    return { content: [{ type: 'text' as const, text: JSON.stringify(result, null, 2) }] };
+  },
+);
+
+server.tool(
+  'record_evidence',
+  'Record an action in the evidence chain for audit trail. Used to log file operations, task completions, and other significant agent actions.',
+  {
+    action_type: z.enum(['task_created', 'message_sent', 'file_modified', 'bounty_submitted', 'destructive_op', 'agent_spawned', 'agent_shutdown']).describe('Type of action to record'),
+    action_details: z.string().describe('JSON string of action details'),
+    intent: z.string().describe('Description of what was intended'),
+    success: z.boolean().describe('Whether the action succeeded'),
+    result: z.string().optional().describe('Result or error message'),
+  },
+  async (args) => {
+    if (!agentId) {
+      return { content: [{ type: 'text' as const, text: 'Warning: No agent identity — evidence not recorded (migration mode).' }] };
+    }
+
+    const { responseFile } = writeClawworkRequest({
+      type: 'identity_record_evidence',
+      agent_id: agentId,
+      action_type: args.action_type,
+      action_details: JSON.parse(args.action_details),
+      intent: args.intent,
+      outcome: { success: args.success, result: args.result },
+    });
+
+    const result = await pollResponse(responseFile, 10000);
+    if (!result) return { content: [{ type: 'text' as const, text: 'Error: record_evidence request timed out' }], isError: true };
+    if (result.error) return { content: [{ type: 'text' as const, text: `Error: ${result.error}` }], isError: true };
+    return { content: [{ type: 'text' as const, text: 'Evidence recorded.' }] };
   },
 );
 

@@ -31,6 +31,7 @@ import { getIntegrations } from './integration-loader.js';
 import type { NanoClawIntegration } from './integration-types.js';
 import { RegisteredGroup } from './types.js';
 import { checkResourceUsage } from './agent-monitoring-system.js';
+import { ensureAgentIdentity } from './identity/ipc-handlers.js';
 
 // Sentinel markers for robust output parsing (must match agent-runner)
 const OUTPUT_START_MARKER = '---NANOCLAW_OUTPUT_START---';
@@ -514,6 +515,22 @@ export async function runContainerAgent(
   if (!oauthToken) {
     logger.error({ group: group.name }, 'No CLAUDE_CODE_OAUTH_TOKEN in .env — cannot spawn container');
     return { status: 'error', error: 'OAuth token missing from .env', result: null };
+  }
+
+  // Create or retrieve cryptographic identity for this agent
+  let agentId: string | undefined;
+  try {
+    agentId = await ensureAgentIdentity(group.folder, designation);
+  } catch (err) {
+    // Non-fatal: agent runs without identity (migration mode)
+    logger.warn({ err, group: group.name }, 'Identity: failed to create agent identity, continuing without');
+  }
+
+  // Inject agent_id into container args if identity was created
+  if (agentId) {
+    // Insert env var before the image name (last arg)
+    const imageIdx = containerArgs.length - 1;
+    containerArgs.splice(imageIdx, 0, '-e', `NANOCLAW_AGENT_ID=${agentId}`);
   }
 
   return new Promise((resolve) => {

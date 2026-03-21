@@ -119,42 +119,6 @@ export const MEDIA_RETENTION_DAYS = parseInt(
   10,
 ); // 30 days default
 
-// Economics / ClawWork settings
-export const INITIAL_BALANCE = parseFloat(process.env.NANOCLAW_INITIAL_BALANCE || '1000');
-export const TOKEN_PRICE_INPUT = parseFloat(process.env.NANOCLAW_TOKEN_PRICE_INPUT || '3.0');
-export const TOKEN_PRICE_OUTPUT = parseFloat(process.env.NANOCLAW_TOKEN_PRICE_OUTPUT || '15.0');
-export const TOKEN_PRICE_CACHE_READ = parseFloat(process.env.NANOCLAW_TOKEN_PRICE_CACHE_READ || '0.30');
-export const TOKEN_PRICE_CACHE_WRITE = parseFloat(process.env.NANOCLAW_TOKEN_PRICE_CACHE_WRITE || '3.75');
-export const COST_FOOTER = process.env.NANOCLAW_COST_FOOTER !== '0'; // on by default
-
-// Auto-task creation: automatically create ClawWork tasks for substantive @Claw messages
-export const AUTO_CLAWWORK = process.env.NANOCLAW_AUTO_CLAWWORK !== '0'; // on by default
-
-// Bounty hunting
-export const PAYPAL_EMAIL = process.env.NANOCLAW_PAYPAL_EMAIL || '';
-export const GITHUB_TOKEN = process.env.NANOCLAW_GITHUB_TOKEN || '';
-
-// Earning goal: target amount in USD
-// $5000 for Mac Studio + $250 already spent (Claude Max + extra usage) = $5250 total
-export const EARNING_GOAL = parseFloat(process.env.NANOCLAW_EARNING_GOAL || '5250');
-
-// How often the agent auto-hunts for opportunities (default: every 24 hours)
-export const BOUNTY_HUNT_INTERVAL_MS = parseInt(
-  process.env.NANOCLAW_BOUNTY_HUNT_INTERVAL_MS || String(24 * 60 * 60 * 1000),
-  10,
-);
-
-// Claw's outreach identity — separate from the owner's personal accounts
-// Set these in .env and plist. The agent uses them for cold outreach,
-// Reddit posts, and any external-facing communication.
-export const CLAW_NAME = process.env.CLAW_NAME || '';
-export const CLAW_EMAIL = process.env.CLAW_EMAIL || '';
-export const CLAW_EMAIL_APP_PASSWORD = process.env.CLAW_EMAIL_APP_PASSWORD || '';
-export const CLAW_REDDIT_USER = process.env.CLAW_REDDIT_USER || '';
-export const CLAW_REDDIT_PASS = process.env.CLAW_REDDIT_PASS || '';
-export const CLAW_REDDIT_CLIENT_ID = process.env.CLAW_REDDIT_CLIENT_ID || '';
-export const CLAW_REDDIT_CLIENT_SECRET = process.env.CLAW_REDDIT_CLIENT_SECRET || '';
-
 // Notification routing — topic-specific WhatsApp groups
 export const DESKTOP_NOTIFY_JID = process.env.NANOCLAW_DESKTOP_NOTIFY_JID || '120363408175994341@g.us';
 

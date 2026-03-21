@@ -10,45 +10,33 @@ import {
   GROUPS_DIR,
   IPC_POLL_INTERVAL,
   MAIN_GROUP_FOLDER,
-  PAYPAL_EMAIL,
   STORE_DIR,
   TIMEZONE,
 } from './config.js';
 import { getIntegrations } from './integration-loader.js';
 import { AvailableGroup } from './container-runner.js';
 import {
-  addEarnings,
-  createBountyOpportunity,
   createTask,
   deleteTask,
-  getActiveTask,
-  getAllBounties,
   getNewSharedItemCount,
-  getOrCreateEconomics,
   getSharedItemById,
   getSharedItems,
   getTaskById,
   getTasksForGroup,
   saveLearn,
-  updateBountyStatus,
   updateSharedItemStatus,
   updateTask,
-  updateTaskEvaluation,
-  updateTaskSubmission,
 } from './db.js';
-import { evaluateWork } from './clawwork.js';
-import { Bounty, findBounties, findFreelanceGigs } from './bounty-hunter.js';
-import { BountyGate } from './bounty-gate.js';
 import { CleanupGate } from './cleanup-gate.js';
 import { DeliverableGate } from './deliverable-gate.js';
 import { learnFact } from './context/index.js';
 import { readEnvFile } from './env.js';
-import { getSurvivalTier } from './economics.js';
 import { HitlGate } from './hitl.js';
 import { getIntegration } from './integration-loader.js';
 import { logger } from './logger.js';
 import { indexDocument, semanticSearch } from './semantic-index.js';
 import { RegisteredGroup } from './types.js';
+import { processIdentityIpc, signOutgoingMessage, recordUnsignedMessage } from './identity/ipc-handlers.js';
 
 export interface IpcDeps {
   sendMessage: (jid: string, text: string) => Promise<void>;
@@ -66,8 +54,6 @@ export interface IpcDeps {
   ) => void;
   /** HITL gate — intercepts sends to unregistered JIDs */
   hitlGate?: HitlGate;
-  /** Bounty gate — HITL approval for bounty proposals */
-  bountyGate?: BountyGate;
   /** Cleanup gate — HITL approval for Gmail cleanup operations */
   cleanupGate?: CleanupGate;
   /** Deliverable gate — HITL approval for freelance deliverables */
@@ -234,16 +220,29 @@ export function startIpcWatcher(deps: IpcDeps): void {
               try {
                 const data = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
 
-                // ── ClawWork + Bounty IPC handlers ─────────────────────────
-                const CLAWWORK_BOUNTY_TYPES = new Set([
-                  'clawwork_get_status', 'clawwork_decide_activity', 'clawwork_learn', 'learn', 'clawwork_submit_work',
-                  'find_bounties', 'propose_bounty', 'submit_bounty',
-                  'find_freelance_gigs', 'propose_deliverable',
+                // ── IPC handlers ────────────────────────────────────────────
+                const IPC_TYPES = new Set([
+                  'learn',
+                  'propose_deliverable',
                   'task_tool', 'gsd_tool', 'gmail_cleanup', 'shared_items',
                   'token_refresh',
                   'generate_safety_brief', 'monitoring_log',
                 ]);
-                if (data.type && CLAWWORK_BOUNTY_TYPES.has(data.type)) {
+
+                // ── Identity IPC handlers ─────────────────────────────────
+                const IDENTITY_IPC_TYPES = new Set([
+                  'identity_create', 'identity_verify_agent',
+                  'identity_audit_evidence', 'identity_trust_report',
+                  'identity_record_evidence',
+                ]);
+                if (data.type && IDENTITY_IPC_TYPES.has(data.type)) {
+                  const rawResponseFile = data.responseFile as string | undefined;
+                  const identityResponseFile = rawResponseFile ? toHostIpcPath(rawResponseFile, sourceGroup) : undefined;
+                  await processIdentityIpc(data, sourceGroup, identityResponseFile);
+                  fs.unlinkSync(filePath);
+                  continue;
+                }
+                if (data.type && IPC_TYPES.has(data.type)) {
                   await processClawworkMessage(data, sourceGroup, messagesDir, deps);
                   fs.unlinkSync(filePath);
                   continue;
@@ -650,10 +649,24 @@ export function startIpcWatcher(deps: IpcDeps): void {
                       fs.unlinkSync(filePath);
                       continue;
                     }
+
+                    // Identity layer: sign outgoing message if agent_id present
+                    const agentId = data.agent_id as string | undefined;
+                    if (agentId) {
+                      try {
+                        await signOutgoingMessage(agentId, data.text as string, data.chatJid as string);
+                      } catch (err) {
+                        logger.warn({ err, agentId, sourceGroup }, 'Identity: failed to sign outgoing message');
+                      }
+                    } else {
+                      // Migration mode: record unsigned message
+                      recordUnsignedMessage(sourceGroup, data.text as string, data.chatJid as string).catch(() => {});
+                    }
+
                     await deps.sendMessage(data.chatJid, data.text);
                     deps.onAgentSendMessage?.(data.chatJid);
                     logger.info(
-                      { chatJid: data.chatJid, sourceGroup },
+                      { chatJid: data.chatJid, sourceGroup, signed: !!agentId },
                       'IPC message sent',
                     );
                   } else {
@@ -1128,8 +1141,21 @@ async function processClawworkMessage(
     case 'generate_safety_brief': {
       try {
         const { generateDailySafetyBrief } = await import('./agent-monitoring-system.js');
+        const { getIdentitySafetyFindings } = await import('./identity/ipc-handlers.js');
         const brief = await generateDailySafetyBrief(data.date as string | undefined);
-        if (responseFile) writeIpcResponse(responseFile, { brief });
+
+        // Append identity layer findings
+        let identitySection = '';
+        try {
+          const findings = await getIdentitySafetyFindings();
+          if (findings.length > 0) {
+            identitySection = '\n\n## Agent Identity & Trust\n' + findings.map(f => `- ${f}`).join('\n');
+          }
+        } catch (err) {
+          identitySection = '\n\n## Agent Identity & Trust\n- Error checking identity layer: ' + (err instanceof Error ? err.message : String(err));
+        }
+
+        if (responseFile) writeIpcResponse(responseFile, { brief: brief + identitySection });
       } catch (err) {
         const errMsg = err instanceof Error ? err.message : String(err);
         if (responseFile) writeIpcResponse(responseFile, { error: errMsg });
