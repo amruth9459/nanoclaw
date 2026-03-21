@@ -500,6 +500,15 @@ export async function runContainerAgent(
   const logsDir = path.join(GROUPS_DIR, group.folder, 'logs');
   fs.mkdirSync(logsDir, { recursive: true });
 
+  // Pre-flight: validate OAuth token before spawning container
+  // Prevents 401 storms that trigger rate limits on the token endpoint
+  const secrets = readSecrets();
+  const oauthToken = secrets['CLAUDE_CODE_OAUTH_TOKEN'];
+  if (!oauthToken) {
+    logger.error({ group: group.name }, 'No CLAUDE_CODE_OAUTH_TOKEN in .env — cannot spawn container');
+    return { status: 'error', error: 'OAuth token missing from .env', result: null };
+  }
+
   return new Promise((resolve) => {
     const container = spawn(CONTAINER_RUNTIME_BIN, containerArgs, {
       stdio: ['pipe', 'pipe', 'pipe'],
@@ -513,7 +522,7 @@ export async function runContainerAgent(
     let stderrTruncated = false;
 
     // Pass secrets via stdin (never written to disk or mounted as files)
-    input.secrets = readSecrets();
+    input.secrets = secrets;
     container.stdin.write(JSON.stringify(input));
     container.stdin.end();
     // Remove secrets from input so they don't appear in logs

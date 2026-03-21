@@ -27,14 +27,34 @@ if [ -z "$REFRESH_TOKEN" ]; then
   exit 1
 fi
 
-# Refresh the token
-RESPONSE=$(curl -sL -X POST "$TOKEN_ENDPOINT" \
-  -H "Content-Type: application/json" \
-  -d "{\"grant_type\":\"refresh_token\",\"refresh_token\":\"$REFRESH_TOKEN\",\"client_id\":\"$CLIENT_ID\"}" 2>&1)
+# Refresh the token (with retry on rate limit)
+MAX_RETRIES=4
+RETRY_DELAY=60
+for attempt in $(seq 1 $MAX_RETRIES); do
+  RESPONSE=$(curl -sL -X POST "$TOKEN_ENDPOINT" \
+    -H "Content-Type: application/json" \
+    -d "{\"grant_type\":\"refresh_token\",\"refresh_token\":\"$REFRESH_TOKEN\",\"client_id\":\"$CLIENT_ID\"}" 2>&1)
+
+  if echo "$RESPONSE" | python3 -c "import sys,json; d=json.load(sys.stdin); exit(0 if 'access_token' in d else 1)" 2>/dev/null; then
+    break
+  fi
+
+  if echo "$RESPONSE" | grep -q "rate_limit"; then
+    if [ "$attempt" -lt "$MAX_RETRIES" ]; then
+      log "Rate limited (attempt $attempt/$MAX_RETRIES) — retrying in ${RETRY_DELAY}s"
+      sleep "$RETRY_DELAY"
+      RETRY_DELAY=$((RETRY_DELAY * 2))
+      continue
+    fi
+  fi
+
+  log "ERROR: Refresh failed (attempt $attempt) — $(echo "$RESPONSE" | head -c 200)"
+  exit 1
+done
 
 # Parse response
 NEW_ACCESS=$(echo "$RESPONSE" | python3 -c "import sys,json; print(json.load(sys.stdin)['access_token'])" 2>/dev/null) || {
-  log "ERROR: Refresh failed — $(echo "$RESPONSE" | head -c 200)"
+  log "ERROR: Could not parse access_token from response"
   exit 1
 }
 
