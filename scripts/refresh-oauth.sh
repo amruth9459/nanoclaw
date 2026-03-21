@@ -12,7 +12,20 @@ CLIENT_ID="9d1c250a-e61b-44d9-88ed-5944d1962f5e"
 TOKEN_ENDPOINT="https://platform.claude.com/v1/oauth/token"
 KEYCHAIN_SERVICE="Claude Code-credentials"
 
+COOLDOWN_FILE="$NANOCLAW_DIR/logs/.oauth-cooldown"
+COOLDOWN_HOURS=3
+
 log() { echo "[$(date '+%Y-%m-%d %H:%M:%S')] $*" >> "$LOG_FILE"; }
+
+# Cooldown: skip if rate-limited recently (prevents spiral)
+if [ -f "$COOLDOWN_FILE" ]; then
+  cooldown_age=$(( ($(date +%s) - $(stat -f %m "$COOLDOWN_FILE" 2>/dev/null || echo 0)) / 3600 ))
+  if [ "$cooldown_age" -lt "$COOLDOWN_HOURS" ]; then
+    log "SKIP: in cooldown (${cooldown_age}h/${COOLDOWN_HOURS}h since last rate limit)"
+    exit 0
+  fi
+  rm -f "$COOLDOWN_FILE"
+fi
 
 # Get current refresh token from Keychain
 CREDS=$(security find-generic-password -s "$KEYCHAIN_SERVICE" -a "amrut" -w 2>/dev/null) || \
@@ -29,8 +42,8 @@ if [ -z "$REFRESH_TOKEN" ]; then
 fi
 
 # Refresh the token (with retry on rate limit)
-MAX_RETRIES=4
-RETRY_DELAY=60
+MAX_RETRIES=2
+RETRY_DELAY=120
 for attempt in $(seq 1 $MAX_RETRIES); do
   RESPONSE=$(curl -sL -X POST "$TOKEN_ENDPOINT" \
     -H "Content-Type: application/json" \
@@ -47,6 +60,10 @@ for attempt in $(seq 1 $MAX_RETRIES); do
       RETRY_DELAY=$((RETRY_DELAY * 2))
       continue
     fi
+    # All retries exhausted — set cooldown to prevent spiral
+    touch "$COOLDOWN_FILE"
+    log "ERROR: Rate limited after $MAX_RETRIES attempts — cooldown set for ${COOLDOWN_HOURS}h"
+    exit 1
   fi
 
   log "ERROR: Refresh failed (attempt $attempt) — $(echo "$RESPONSE" | head -c 200)"
