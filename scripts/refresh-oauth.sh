@@ -15,6 +15,7 @@ KEYCHAIN_SERVICE="Claude Code-credentials"
 log() { echo "[$(date '+%Y-%m-%d %H:%M:%S')] $*" >> "$LOG_FILE"; }
 
 # Get current refresh token from Keychain
+CREDS=$(security find-generic-password -s "$KEYCHAIN_SERVICE" -a "amrut" -w 2>/dev/null) || \
 CREDS=$(security find-generic-password -s "$KEYCHAIN_SERVICE" -w 2>/dev/null) || {
   log "ERROR: Cannot read Keychain credentials"
   exit 1
@@ -81,10 +82,10 @@ creds['claudeAiOauth']['expiresAt'] = $EXPIRES_AT
 new_creds = json.dumps(creds)
 
 # Delete old and add new
-subprocess.run(['security', 'delete-generic-password', '-s', '$KEYCHAIN_SERVICE'],
+subprocess.run(['security', 'delete-generic-password', '-s', '$KEYCHAIN_SERVICE', '-a', 'amrut'],
                capture_output=True)
 subprocess.run(['security', 'add-generic-password', '-s', '$KEYCHAIN_SERVICE',
-                '-a', '', '-w', new_creds, '-U'],
+                '-a', 'amrut', '-w', new_creds, '-U'],
                check=True)
 " 2>/dev/null && log "Updated Keychain" || log "WARNING: Keychain update failed (non-fatal)"
 
