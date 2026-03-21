@@ -55,7 +55,7 @@ export const IDLE_TIMEOUT = parseInt(
 ); // 30min default — how long to keep container alive after last result
 export const MAX_CONCURRENT_CONTAINERS = Math.max(
   1,
-  parseInt(process.env.MAX_CONCURRENT_CONTAINERS || '10', 10) || 10,
+  parseInt(process.env.MAX_CONCURRENT_CONTAINERS || '4', 10) || 4,
 );
 
 function escapeRegex(str: string): string {
