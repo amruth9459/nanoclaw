@@ -327,12 +327,12 @@ export class AutoDispatcher {
   }
 
   /** Dispatch a task to a persona */
-  private dispatch(
+  private async dispatch(
     task: { id: string; description: string; project?: string },
     match: PersonaMatch,
     groupJid: string,
     group: RegisteredGroup,
-  ): void {
+  ): Promise<void> {
     const now = new Date().toISOString();
     const { persona, confidence } = match;
 

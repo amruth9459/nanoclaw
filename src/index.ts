@@ -60,6 +60,7 @@ import {
   storeSharedItem,
   getChatChannel,
   updateTask,
+  getDb,
 } from './db.js';
 import { classifyTask, computeMaxPayment } from './clawwork.js';
 // Local routing disabled while Max subscription is active
@@ -2315,12 +2316,33 @@ Steps:
 
   // Pre-warm containers for registered groups after a short delay to let
   // WhatsApp finish its initial sync. Warmup is best-effort and non-blocking.
+  // Staggered to avoid rate-limiting the Claude API with concurrent requests.
   if (WARMUP_ON_START) {
-    setTimeout(() => {
+    setTimeout(async () => {
+      const WARMUP_STAGGER_MS = 15_000; // 15s between each warmup
+      const INACTIVE_DAYS = 7; // skip groups with no messages in 7+ days
+      const cutoff = new Date(Date.now() - INACTIVE_DAYS * 86_400_000).toISOString();
+
+      let delay = 0;
       for (const [chatJid, group] of Object.entries(registeredGroups)) {
-        // Skip warmup for dispatch-only groups (saves RAM for task slots)
         if (group.containerConfig?.noWarmup) continue;
-        queue.warmup(chatJid, () => warmupGroupContainer(chatJid));
+
+        // Skip warmup for groups with no recent inbound messages
+        try {
+          const row = getDb().prepare(
+            'SELECT MAX(timestamp) as last_msg FROM messages WHERE chat_jid = ? AND is_from_me = 0'
+          ).get(chatJid) as { last_msg: string | null } | undefined;
+          if (!row?.last_msg || row.last_msg < cutoff) {
+            logger.info({ group: group.name, lastMsg: row?.last_msg ?? 'never' }, 'Skipping warmup (inactive group)');
+            continue;
+          }
+        } catch { /* if DB check fails, warm up anyway */ }
+
+        const jid = chatJid; // capture for closure
+        setTimeout(() => {
+          queue.warmup(jid, () => warmupGroupContainer(jid));
+        }, delay);
+        delay += WARMUP_STAGGER_MS;
       }
     }, 30000); // 30s after startup — after WA initial sync settles
   }
