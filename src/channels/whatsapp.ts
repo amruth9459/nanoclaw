@@ -72,8 +72,8 @@ export class WhatsAppChannel implements Channel {
   private reconnectTimer: ReturnType<typeof setTimeout> | null = null;
   private watchdogTimer: ReturnType<typeof setTimeout> | null = null;
   private watchdogStrikes = 0;
-  private static readonly WATCHDOG_MS = 3 * 60 * 1000; // 3 minutes — catch silent dead connections faster
-  private static readonly WATCHDOG_MAX_STRIKES = 3; // after 3 failed reconnects (~9 min), force-exit process
+  private static readonly WATCHDOG_MS = 15 * 60 * 1000; // 15 minutes — allow quiet periods without false alarms
+  private static readonly WATCHDOG_MAX_STRIKES = 3; // after 3 failed reconnects (~45 min), force-exit process
   // Stored so reconnect attempts can still resolve the original connect() Promise
   private connectResolve?: () => void;
   // Track when connection dropped to report downtime on reconnect
@@ -434,6 +434,7 @@ export class WhatsAppChannel implements Channel {
     }
     try {
       await this.sock.sendMessage(jid, { text: prefixed });
+      this.resetWatchdog(true); // outgoing message proves connection is alive
       logger.info({ jid, length: prefixed.length }, 'Message sent');
     } catch (err) {
       // If send fails, queue it for retry on reconnect (transient during initial sync)
