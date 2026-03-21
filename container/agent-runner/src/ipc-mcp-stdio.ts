@@ -463,10 +463,8 @@ server.tool(
   },
 );
 
-// ── ClawWork tools ─────────────────────────────────────────────────────────────
-
-function writeClawworkRequest(data: object): { requestFile: string; responseFile: string } {
-  const requestId = `clawwork-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+function writeIpcRequest(data: object): { requestFile: string; responseFile: string } {
+  const requestId = `ipc-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
   const requestFile = path.join(MESSAGES_DIR, `${requestId}.json`);
   const responseFile = path.join(MESSAGES_DIR, `${requestId}.response.json`);
 
@@ -496,39 +494,6 @@ async function pollResponse(responseFile: string, timeoutMs: number): Promise<Re
 }
 
 server.tool(
-  'clawwork_get_status',
-  'Get your current economic status: balance, earnings, spending, survival tier, and active task.',
-  {},
-  async () => {
-    const { responseFile } = writeClawworkRequest({ type: 'clawwork_get_status' });
-    const result = await pollResponse(responseFile, 10000);
-    if (!result) {
-      return { content: [{ type: 'text' as const, text: 'Error: status request timed out' }], isError: true };
-    }
-    if (result.error) {
-      return { content: [{ type: 'text' as const, text: `Error: ${result.error}` }], isError: true };
-    }
-    const text = JSON.stringify(result, null, 2);
-    return { content: [{ type: 'text' as const, text }] };
-  },
-);
-
-server.tool(
-  'clawwork_decide_activity',
-  'Declare your chosen activity: work (complete assigned tasks for payment) or learn (study to improve skills). Records your decision for the economic system.',
-  {
-    activity: z.enum(['work', 'learn']).describe('Your chosen activity mode'),
-    reasoning: z.string().describe('Why you chose this activity'),
-  },
-  async (args) => {
-    writeClawworkRequest({ type: 'clawwork_decide_activity', activity: args.activity, reasoning: args.reasoning });
-    return {
-      content: [{ type: 'text' as const, text: `Activity set to "${args.activity}". ${args.reasoning}` }],
-    };
-  },
-);
-
-server.tool(
   'learn',
   'Record knowledge you have acquired. This persists to your group memory and helps you improve. Minimum 200 characters.',
   {
@@ -537,7 +502,7 @@ server.tool(
     domain: z.string().describe('Which project this learning applies to (e.g. "nanoclaw" or integration name)'),
   },
   async (args) => {
-    const { responseFile } = writeClawworkRequest({ type: 'learn', topic: args.topic, knowledge: args.knowledge, domain: args.domain });
+    const { responseFile } = writeIpcRequest({ type: 'learn', topic: args.topic, knowledge: args.knowledge, domain: args.domain });
     const result = await pollResponse(responseFile, 10000);
     if (!result) {
       return { content: [{ type: 'text' as const, text: 'Error: learn request timed out' }], isError: true };
@@ -548,167 +513,6 @@ server.tool(
     return {
       content: [{ type: 'text' as const, text: `Knowledge recorded: topic="${args.topic}", length=${args.knowledge.length} chars` }],
     };
-  },
-);
-
-server.tool(
-  'clawwork_submit_work',
-  'Submit completed work for evaluation and payment. You will receive a score (0.0–1.0) and payment if score ≥ 0.6.',
-  {
-    work_output: z.string().describe('Your completed work output'),
-    artifact_file_paths: z.array(z.string()).default([]).describe('Paths to any files you created as artifacts'),
-  },
-  async (args) => {
-    const { responseFile } = writeClawworkRequest({
-      type: 'clawwork_submit_work',
-      work_output: args.work_output,
-      artifact_file_paths: args.artifact_file_paths,
-    });
-    const result = await pollResponse(responseFile, 60000);
-    if (!result) {
-      return { content: [{ type: 'text' as const, text: 'Error: work evaluation timed out (60s)' }], isError: true };
-    }
-    if (result.error) {
-      return { content: [{ type: 'text' as const, text: `Error: ${result.error}` }], isError: true };
-    }
-    const text = result.accepted
-      ? `Work accepted! Score: ${result.evaluation_score}, Payment: $${result.payment}\nFeedback: ${result.feedback}`
-      : `Work not accepted (score: ${result.evaluation_score} < 0.6). No payment.\nFeedback: ${result.feedback}`;
-    return { content: [{ type: 'text' as const, text }] };
-  },
-);
-
-// ── Bounty hunting tools ───────────────────────────────────────────────────────
-
-function writeBountyRequest(data: object): { responseFile: string } {
-  const requestId = `bounty-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
-  const requestFile = path.join(MESSAGES_DIR, `${requestId}.json`);
-  const responseFile = path.join(MESSAGES_DIR, `${requestId}.response.json`);
-
-  const payload = { ...data, requestId, responseFile, groupFolder, timestamp: new Date().toISOString() };
-  const tmp = `${requestFile}.tmp`;
-  fs.writeFileSync(tmp, JSON.stringify(payload, null, 2));
-  fs.renameSync(tmp, requestFile);
-
-  return { responseFile };
-}
-
-server.tool(
-  'find_bounties',
-  `Find open bounties from Algora.io and GitHub. Returns a list of bounties sorted by reward (highest first).
-Each bounty has an id, platform, title, url, reward_usd, and repo.
-Use the id when calling propose_bounty to nominate one for approval.`,
-  {
-    limit: z.number().int().min(1).max(50).default(20).describe('Maximum number of bounties to return'),
-  },
-  async (args) => {
-    const { responseFile } = writeBountyRequest({ type: 'find_bounties', limit: args.limit ?? 20 });
-    const result = await pollResponse(responseFile, 30000);
-    if (!result) {
-      return { content: [{ type: 'text' as const, text: 'Error: find_bounties request timed out (30s)' }], isError: true };
-    }
-    if (result.error) {
-      return { content: [{ type: 'text' as const, text: `Error: ${result.error}` }], isError: true };
-    }
-    const bounties = result.bounties as Array<Record<string, unknown>>;
-    if (!bounties || bounties.length === 0) {
-      return { content: [{ type: 'text' as const, text: 'No bounties found.' }] };
-    }
-    const formatted = bounties.map((b, i) =>
-      `[${i + 1}] ${b.platform} | ${b.title}\n    Reward: ${b.reward_usd != null ? `$${b.reward_usd}` : b.reward_raw} | ID: ${b.id}\n    URL: ${b.url}${b.repo ? `\n    Repo: ${b.repo}` : ''}`
-    ).join('\n\n');
-    return { content: [{ type: 'text' as const, text: formatted }] };
-  },
-);
-
-server.tool(
-  'propose_bounty',
-  `Propose a bounty opportunity for the user to approve. The user will receive a WhatsApp message with the bounty details and approval token.
-Approval is asynchronous — the user replies "approve-bounty <token>" or "reject-bounty <token>".
-You must call find_bounties first to get valid bounty IDs.`,
-  {
-    bounty_id: z.string().describe('The bounty ID from find_bounties (e.g. "algora:12345")'),
-    reason: z.string().optional().describe('Why you recommend this bounty (skills match, reward amount, etc.)'),
-  },
-  async (args) => {
-    const { responseFile } = writeBountyRequest({
-      type: 'propose_bounty',
-      bounty_id: args.bounty_id,
-      reason: args.reason,
-    });
-    const result = await pollResponse(responseFile, 15000);
-    if (!result) {
-      return { content: [{ type: 'text' as const, text: 'Error: propose_bounty request timed out' }], isError: true };
-    }
-    if (result.error) {
-      return { content: [{ type: 'text' as const, text: `Error: ${result.error}` }], isError: true };
-    }
-    return {
-      content: [{ type: 'text' as const, text: `Bounty proposed (token: ${result.token}). Waiting for user approval via WhatsApp.` }],
-    };
-  },
-);
-
-server.tool(
-  'submit_bounty',
-  `Submit completed work for a bounty. Notifies the user and records PayPal email for payment.
-Include your work summary and any PR/patch URLs. The host will update the bounty status to "submitted".`,
-  {
-    bounty_id: z.string().describe('The bounty ID (e.g. "algora:12345")'),
-    work_summary: z.string().describe('Brief summary of the work completed'),
-    pr_url: z.string().optional().describe('URL to the pull request or patch'),
-    submission_notes: z.string().optional().describe('Any notes for the bounty provider'),
-  },
-  async (args) => {
-    const { responseFile } = writeBountyRequest({
-      type: 'submit_bounty',
-      bounty_id: args.bounty_id,
-      work_summary: args.work_summary,
-      pr_url: args.pr_url,
-      submission_notes: args.submission_notes,
-    });
-    const result = await pollResponse(responseFile, 20000);
-    if (!result) {
-      return { content: [{ type: 'text' as const, text: 'Error: submit_bounty request timed out' }], isError: true };
-    }
-    if (result.error) {
-      return { content: [{ type: 'text' as const, text: `Error: ${result.error}` }], isError: true };
-    }
-    const paypalLine = result.paypal_email ? `\nPayPal email for payment: ${result.paypal_email}` : '';
-    return {
-      content: [{ type: 'text' as const, text: `Bounty submitted successfully.${paypalLine}\nInclude your PayPal email in communications with the bounty provider.` }],
-    };
-  },
-);
-
-// ── Freelance gig tools ────────────────────────────────────────────────────────
-
-server.tool(
-  'find_freelance_gigs',
-  `Find freelance gigs from Reddit r/forhire, Freelancer.com, Algora, and GitHub.
-Returns gigs sorted by reward (highest first). Broader than find_bounties — includes paid freelance work, not just open-source bounties.
-Each gig has an id, platform, title, url, reward_usd, and description.
-Use the id when calling propose_deliverable to submit completed work for approval.`,
-  {
-    limit: z.number().int().min(1).max(50).default(30).describe('Maximum number of gigs to return'),
-  },
-  async (args) => {
-    const { responseFile } = writeBountyRequest({ type: 'find_freelance_gigs', limit: args.limit ?? 30 });
-    const result = await pollResponse(responseFile, 30000);
-    if (!result) {
-      return { content: [{ type: 'text' as const, text: 'Error: find_freelance_gigs request timed out (30s)' }], isError: true };
-    }
-    if (result.error) {
-      return { content: [{ type: 'text' as const, text: `Error: ${result.error}` }], isError: true };
-    }
-    const bounties = result.bounties as Array<Record<string, unknown>>;
-    if (!bounties || bounties.length === 0) {
-      return { content: [{ type: 'text' as const, text: 'No freelance gigs found.' }] };
-    }
-    const formatted = bounties.map((b, i) =>
-      `[${i + 1}] ${b.platform} | ${b.title}\n    Reward: ${b.reward_usd != null ? `$${b.reward_usd}` : b.reward_raw} | ID: ${b.id}\n    URL: ${b.url}${b.description ? `\n    ${String(b.description).slice(0, 150)}...` : ''}`
-    ).join('\n\n');
-    return { content: [{ type: 'text' as const, text: formatted }] };
   },
 );
 
@@ -725,7 +529,7 @@ NEVER deliver work to a client without approval through this gate.`,
     deliverable_path: z.string().optional().describe('Path to the deliverable file in the container (e.g. /workspace/group/deliverables/report.pdf)'),
   },
   async (args) => {
-    const { responseFile } = writeBountyRequest({
+    const { responseFile } = writeIpcRequest({
       type: 'propose_deliverable',
       gig_id: args.gig_id,
       gig_title: args.gig_title,
@@ -895,7 +699,7 @@ The brief is stored in the database and returned as formatted text.`,
       };
     }
 
-    const { responseFile } = writeClawworkRequest({
+    const { responseFile } = writeIpcRequest({
       type: 'generate_safety_brief',
       date: args.date,
     });
@@ -920,7 +724,7 @@ server.tool(
     agent_id: z.string().describe('The agent_id to verify'),
   },
   async (args) => {
-    const { responseFile } = writeClawworkRequest({
+    const { responseFile } = writeIpcRequest({
       type: 'identity_verify_agent',
       agent_id: args.agent_id,
     });
@@ -939,7 +743,7 @@ server.tool(
     agent_id: z.string().describe('The agent_id to audit'),
   },
   async (args) => {
-    const { responseFile } = writeClawworkRequest({
+    const { responseFile } = writeIpcRequest({
       type: 'identity_audit_evidence',
       agent_id: args.agent_id,
     });
@@ -960,7 +764,7 @@ server.tool(
       return { content: [{ type: 'text' as const, text: 'Error: trust_report is only available in the main group.' }], isError: true };
     }
 
-    const { responseFile } = writeClawworkRequest({
+    const { responseFile } = writeIpcRequest({
       type: 'identity_trust_report',
     });
 
@@ -986,7 +790,7 @@ server.tool(
       return { content: [{ type: 'text' as const, text: 'Warning: No agent identity — evidence not recorded (migration mode).' }] };
     }
 
-    const { responseFile } = writeClawworkRequest({
+    const { responseFile } = writeIpcRequest({
       type: 'identity_record_evidence',
       agent_id: agentId,
       action_type: args.action_type,
@@ -1051,7 +855,7 @@ Tasks support:
     filterAgent: z.string().optional().describe('Filter by agent (for list/available)'),
   },
   async (args) => {
-    const { responseFile } = writeClawworkRequest({
+    const { responseFile } = writeIpcRequest({
       type: 'task_tool',
       ...args,
     });
@@ -1100,7 +904,7 @@ Example: action=validate, task_description="Add dark mode" → DRIFT: Not in spe
     item_text: z.string().optional().describe('Checklist item text to mark as done'),
   },
   async (args) => {
-    const { responseFile } = writeClawworkRequest({
+    const { responseFile } = writeIpcRequest({
       type: 'gsd_tool',
       ...args,
     });
@@ -1132,7 +936,7 @@ Actions:
     limit: z.number().optional().describe('Max items to return for list (default: 20)'),
   },
   async (args) => {
-    const { responseFile } = writeClawworkRequest({
+    const { responseFile } = writeIpcRequest({
       type: 'shared_items',
       action: args.action,
       id: args.id,
@@ -1175,7 +979,7 @@ Only available to the main group.`,
       };
     }
 
-    const { responseFile } = writeClawworkRequest({
+    const { responseFile } = writeIpcRequest({
       type: 'desktop_claude',
       prompt: args.prompt,
       workdir: args.workdir,

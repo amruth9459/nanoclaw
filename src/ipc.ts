@@ -243,7 +243,7 @@ export function startIpcWatcher(deps: IpcDeps): void {
                   continue;
                 }
                 if (data.type && IPC_TYPES.has(data.type)) {
-                  await processClawworkMessage(data, sourceGroup, messagesDir, deps);
+                  await processIpcMessage(data, sourceGroup, messagesDir, deps);
                   fs.unlinkSync(filePath);
                   continue;
                 }
@@ -784,7 +784,7 @@ export function writeIpcResponse(responseFile: string, data: object): void {
   fs.renameSync(tmp, responseFile);
 }
 
-async function processClawworkMessage(
+async function processIpcMessage(
   data: Record<string, unknown>,
   groupFolder: string,
   messagesDir: string,
@@ -795,39 +795,7 @@ async function processClawworkMessage(
   const responseFile = rawResponseFile ? toHostIpcPath(rawResponseFile, groupFolder) : undefined;
 
   switch (data.type) {
-    case 'clawwork_get_status': {
-      const econ = getOrCreateEconomics(groupFolder);
-      const activeTask = getActiveTask(groupFolder);
-      const response = {
-        balance: econ.balance,
-        total_earned: econ.total_earned,
-        total_spent: econ.total_spent,
-        tier: getSurvivalTier(econ.balance),
-        active_task: activeTask ? {
-          id: activeTask.id,
-          occupation: activeTask.occupation,
-          prompt: activeTask.prompt,
-          max_payment: activeTask.max_payment,
-          status: activeTask.status,
-        } : null,
-      };
-      if (responseFile) writeIpcResponse(responseFile, response);
-      logger.debug({ groupFolder }, 'ClawWork: get_status processed');
-      break;
-    }
-
-    case 'clawwork_decide_activity': {
-      // Fire-and-forget: just log the decision
-      logger.info(
-        { groupFolder, activity: data.activity, reasoning: data.reasoning },
-        'ClawWork: activity decision',
-      );
-      // No response needed for fire-and-forget
-      break;
-    }
-
-    case 'learn':
-    case 'clawwork_learn': {
+    case 'learn': {
       const topic = data.topic as string;
       const knowledge = data.knowledge as string;
       if (topic && knowledge) {
@@ -881,194 +849,6 @@ async function processClawworkMessage(
       break;
     }
 
-    case 'clawwork_submit_work': {
-      const workOutput = data.work_output as string;
-      const artifactPaths = (data.artifact_file_paths as string[]) ?? [];
-
-      const task = getActiveTask(groupFolder);
-      if (!task) {
-        if (responseFile) writeIpcResponse(responseFile, { error: 'No active task assigned' });
-        break;
-      }
-
-      const { score, feedback } = await evaluateWork(task, workOutput, artifactPaths);
-      const payment = score >= 0.6 ? Math.round(score * task.max_payment * 100) / 100 : 0;
-
-      updateTaskSubmission(task.id, workOutput, artifactPaths);
-      updateTaskEvaluation(task.id, score, payment);
-      if (payment > 0) addEarnings(groupFolder, payment);
-
-      if (responseFile) {
-        writeIpcResponse(responseFile, {
-          accepted: score >= 0.6,
-          evaluation_score: score,
-          payment,
-          feedback,
-          success: true,
-        });
-      }
-      logger.info({ groupFolder, taskId: task.id, score, payment }, 'ClawWork: work evaluated');
-      break;
-    }
-
-    case 'find_bounties': {
-      const limit = typeof data.limit === 'number' ? data.limit : 20;
-      const bounties = await findBounties(limit);
-      // Store any new bounties in DB so they can be referenced by propose_bounty
-      for (const b of bounties) {
-        try {
-          createBountyOpportunity({
-            id: b.id,
-            group_id: groupFolder,
-            platform: b.platform,
-            title: b.title,
-            url: b.url,
-            reward_usd: b.reward_usd,
-            reward_raw: b.reward_raw,
-            description: b.description ?? '',
-          });
-        } catch { /* already exists */ }
-      }
-      if (responseFile) {
-        writeIpcResponse(responseFile, { bounties: bounties.map(b => ({
-          id: b.id,
-          platform: b.platform,
-          title: b.title,
-          url: b.url,
-          reward_usd: b.reward_usd,
-          reward_raw: b.reward_raw,
-          repo: b.repo,
-        })) });
-      }
-      logger.info({ groupFolder, count: bounties.length }, 'Bounty: find_bounties processed');
-      break;
-    }
-
-    case 'propose_bounty': {
-      const bountyId = data.bounty_id as string;
-      const reason = data.reason as string | undefined;
-
-      if (!bountyId) {
-        if (responseFile) writeIpcResponse(responseFile, { error: 'Missing bounty_id' });
-        break;
-      }
-
-      // Find the bounty in DB (must have been fetched via find_bounties first)
-      const storedBounties = getAllBounties(100);
-      const storedBounty = storedBounties.find(b => b.id === bountyId);
-      if (!storedBounty) {
-        if (responseFile) writeIpcResponse(responseFile, { error: `Bounty not found: ${bountyId}` });
-        break;
-      }
-
-      const bountyObj: Bounty = {
-        id: storedBounty.id,
-        platform: storedBounty.platform as 'algora' | 'github',
-        title: storedBounty.title,
-        url: storedBounty.url,
-        reward_usd: storedBounty.reward_usd,
-        reward_raw: storedBounty.reward_raw ?? '',
-        description: storedBounty.description ?? '',
-      };
-
-      if (!deps.bountyGate) {
-        if (responseFile) writeIpcResponse(responseFile, { error: 'BountyGate not configured' });
-        break;
-      }
-
-      const mainJid = deps.getMainGroupJid?.();
-      if (!mainJid) {
-        if (responseFile) writeIpcResponse(responseFile, { error: 'Main group JID not configured' });
-        break;
-      }
-
-      const token = deps.bountyGate.proposeBounty(
-        bountyObj,
-        groupFolder,
-        () => { updateBountyStatus(bountyId, 'approved'); },
-        () => { updateBountyStatus(bountyId, 'rejected'); },
-      );
-
-      const reasonLine = reason ? `\nReason: ${reason}` : '';
-      const msg = BountyGate.formatProposalMessage(bountyObj, token) + reasonLine;
-      const { getNotifyJid: _getNotifyJid1 } = await import('./notify.js');
-      await deps.sendMessage(_getNotifyJid1('desktop', mainJid), msg);
-
-      if (responseFile) writeIpcResponse(responseFile, { proposed: true, token });
-      logger.info({ groupFolder, bountyId, token }, 'Bounty: propose_bounty processed');
-      break;
-    }
-
-    case 'submit_bounty': {
-      const bountyId = data.bounty_id as string;
-      const workSummary = data.work_summary as string | undefined;
-      const prUrl = data.pr_url as string | undefined;
-      const notes = data.submission_notes as string | undefined;
-
-      if (!bountyId) {
-        if (responseFile) writeIpcResponse(responseFile, { error: 'Missing bounty_id' });
-        break;
-      }
-
-      updateBountyStatus(bountyId, 'submitted', notes);
-
-      const mainJid = deps.getMainGroupJid?.();
-      if (mainJid) {
-        const prLine = prUrl ? `\nPR: ${prUrl}` : '';
-        const summaryLine = workSummary ? `\nSummary: ${workSummary.slice(0, 200)}` : '';
-        const paypalLine = PAYPAL_EMAIL ? `\nPayPal: ${PAYPAL_EMAIL}` : '';
-        const { getNotifyJid: _getNotifyJid2 } = await import('./notify.js');
-        await deps.sendMessage(_getNotifyJid2('desktop', mainJid),
-          `📤 *Bounty Submitted*\nID: ${bountyId}${prLine}${summaryLine}${paypalLine}`,
-        ).catch(err => logger.warn({ err }, 'Failed to notify bounty submission'));
-      }
-
-      if (responseFile) {
-        writeIpcResponse(responseFile, {
-          submitted: true,
-          paypal_email: PAYPAL_EMAIL || null,
-        });
-      }
-      logger.info({ groupFolder, bountyId }, 'Bounty: submit_bounty processed');
-      break;
-    }
-
-    // ── Freelance Gig IPC handlers ──────────────────────────────────
-
-    case 'find_freelance_gigs': {
-      const limit = typeof data.limit === 'number' ? data.limit : 30;
-      const gigs = await findFreelanceGigs(limit);
-      // Store gigs in bounty_opportunities table for reference
-      for (const b of gigs) {
-        try {
-          createBountyOpportunity({
-            id: b.id,
-            group_id: groupFolder,
-            platform: b.platform,
-            title: b.title,
-            url: b.url,
-            reward_usd: b.reward_usd,
-            reward_raw: b.reward_raw,
-            description: b.description,
-          });
-        } catch { /* duplicate — already stored */ }
-      }
-      if (responseFile) {
-        writeIpcResponse(responseFile, { bounties: gigs.map(b => ({
-          id: b.id,
-          platform: b.platform,
-          title: b.title,
-          url: b.url,
-          reward_usd: b.reward_usd,
-          reward_raw: b.reward_raw,
-          description: b.description,
-          repo: b.repo,
-        })) });
-      }
-      logger.info({ groupFolder, count: gigs.length }, 'Freelance: find_freelance_gigs processed');
-      break;
-    }
-
     case 'propose_deliverable': {
       const gigId = data.gig_id as string;
       const gigTitle = data.gig_title as string;
@@ -1100,8 +880,8 @@ async function processClawworkMessage(
         gigTitle,
         workSummary,
         groupFolder,
-        () => { updateBountyStatus(gigId, 'approved'); },
-        () => { updateBountyStatus(gigId, 'rejected'); },
+        () => { logger.info({ gigId }, 'Deliverable approved'); },
+        () => { logger.info({ gigId }, 'Deliverable rejected'); },
         clientInfo,
         deliverablePath,
       );

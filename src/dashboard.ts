@@ -8,25 +8,17 @@ import fs from 'fs';
 import http from 'http';
 import path from 'path';
 
-import { DASH_TOKEN, EARNING_GOAL, GROUPS_DIR, STORE_DIR } from './config.js';
+import { DASH_TOKEN, GROUPS_DIR } from './config.js';
 import {
-  getAllBounties,
   getAllRegisteredGroups,
   getAllTasks,
   getDb,
-  getEconomicsSummary,
-  getAllUsageRecent,
-  getActiveClawworkTasks,
-  getTotalUsage,
-  getUsageSince,
-  getUsageByPurpose,
   getKanbanItems,
   createTaskRecord,
   updateTaskRecord,
   syncKanbanFile,
 } from './db.js';
 import { getIntegrations } from './integration-loader.js';
-import { getSurvivalTier } from './economics.js';
 import { logger } from './logger.js';
 import { GroupQueue } from './group-queue.js';
 import { ResourceOrchestrator } from './resource-orchestrator.js';
@@ -234,76 +226,6 @@ function apiStatus(queue: GroupQueue) {
   };
 }
 
-function apiEconomics() {
-  const summary = getEconomicsSummary();
-  const recentUsage = getAllUsageRecent(20);
-  const activeTasks = getActiveClawworkTasks();
-
-  // Calculate time-based usage
-  const now = new Date();
-  const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate()).toISOString();
-  const weekStart = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000).toISOString();
-  const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
-
-  const totalUsage = getTotalUsage();
-  const todayUsage = getUsageSince(todayStart);
-  const weekUsage = getUsageSince(weekStart);
-  const monthUsage = getUsageSince(monthStart);
-
-  const purposeBreakdown = getUsageByPurpose();
-  const monthPurposeBreakdown = getUsageByPurpose(monthStart);
-
-  return {
-    groups: summary.groups.map(g => ({
-      group_id: g.group_id,
-      balance: g.balance,
-      total_earned: g.total_earned,
-      total_spent: g.total_spent,
-      tier: getSurvivalTier(g.balance),
-    })),
-    recentUsage: recentUsage.map(u => ({
-      run_at: u.run_at,
-      group_id: u.group_id,
-      cost_usd: u.cost_usd,
-      input_tokens: u.input_tokens,
-      output_tokens: u.output_tokens,
-      duration_ms: u.duration_ms,
-      purpose: u.purpose || 'conversation',
-    })),
-    purposeBreakdown,
-    monthPurposeBreakdown,
-    activeTasks: activeTasks.map(t => ({
-      id: t.id,
-      group_id: t.group_id,
-      occupation: t.occupation,
-      max_payment: t.max_payment,
-      status: t.status,
-    })),
-    totals: {
-      all_earned: summary.all_earned,
-      all_spent: summary.all_spent,
-      net: summary.net,
-    },
-    goal: {
-      target: EARNING_GOAL,
-      earned: summary.all_earned,
-      pct: Math.min(100, (summary.all_earned / EARNING_GOAL) * 100),
-      remaining: Math.max(0, EARNING_GOAL - summary.all_earned),
-    },
-    claudeUsage: {
-      total: totalUsage,
-      today: todayUsage,
-      week: weekUsage,
-      month: monthUsage,
-    },
-  };
-}
-
-function apiBounties() {
-  const bounties = getAllBounties(100);
-  return { bounties };
-}
-
 // ── HTML ──────────────────────────────────────────────────────────────────────
 
 const HTML = `<!DOCTYPE html>
@@ -388,16 +310,11 @@ const HTML = `<!DOCTYPE html>
 
 <script>
 let memTab = 'global/MEMORY.md';
-let dashTab = 'overview'; // 'overview' | 'economics' | 'bounties' | 'kanban' | 'files' | 'router' | integration tabs
+let dashTab = 'overview'; // 'overview' | 'kanban' | 'files' | 'router' | integration tabs
 
 function fmt(iso) {
   if (!iso) return '—';
   try { return new Date(iso).toLocaleString(); } catch { return iso; }
-}
-
-function tierBadge(tier) {
-  const colors = { thriving: 'green', stable: 'green', struggling: 'yellow', critical: 'red', bankrupt: 'red' };
-  return \`<span class="pill \${colors[tier] || 'yellow'}">\${tier}</span>\`;
 }
 
 function renderEvent(e) {
@@ -451,193 +368,11 @@ function agentReason(g) {
 }
 
 function tabBar() {
-  var tabs = ['overview', 'economics', 'kanban', 'bounties', 'files'].concat(window._integrationTabIds || []).concat(['router']);
-  var labels = Object.assign({ overview: 'Overview', economics: 'Economics', kanban: 'Kanban', bounties: 'Bounties', files: 'Files', router: 'Router' }, window._integrationTabLabels || {});
+  var tabs = ['overview', 'kanban', 'files'].concat(window._integrationTabIds || []).concat(['router']);
+  var labels = Object.assign({ overview: 'Overview', kanban: 'Kanban', files: 'Files', router: 'Router' }, window._integrationTabLabels || {});
   return tabs.map(function(t) {
     return '<span class="tab' + (dashTab === t ? ' active' : '') + '" onclick="dashTab=\\'' + t + '\\';refresh()">' + labels[t] + '</span>';
   }).join('');
-}
-
-async function refreshBounties() {
-  try {
-    const data = await fetch('/api/bounties').then(r => r.json());
-    const bounties = data.bounties || [];
-    const statusColors = { proposed: 'yellow', approved: 'green', rejected: 'red', working: 'green', submitted: 'green' };
-    document.getElementById('main').innerHTML = \`
-      <div class="card full" style="margin-bottom:0.5rem">
-        <div class="memory-tabs">\${tabBar()}</div>
-      </div>
-      <div class="card full">
-        <h2>💰 Bounty Opportunities <span class="pill yellow">\${bounties.length}</span></h2>
-        \${bounties.length === 0 ? '<p class="empty">No bounties yet. Ask the agent to find_bounties.</p>' : \`
-        <table>
-          <thead><tr><th>Platform</th><th>Title</th><th>Reward</th><th>Status</th><th>Proposed</th><th>URL</th></tr></thead>
-          <tbody>\${bounties.map(b => \`
-            <tr>
-              <td><span class="pill yellow">\${b.platform}</span></td>
-              <td>\${b.title.slice(0, 60)}\${b.title.length > 60 ? '…' : ''}</td>
-              <td class="mono">\${b.reward_usd != null ? '$' + b.reward_usd : (b.reward_raw || '?')}</td>
-              <td><span class="pill \${statusColors[b.status] || 'yellow'}">\${b.status}</span></td>
-              <td class="mono">\${fmt(b.proposed_at)}</td>
-              <td><a href="\${b.url}" target="_blank" style="color:var(--accent2);font-size:0.75rem">link</a></td>
-            </tr>
-          \`).join('')}</tbody>
-        </table>\`}
-      </div>
-    \`;
-  } catch(e) {
-    console.error('Bounties refresh failed', e);
-  }
-}
-
-async function refreshEconomics() {
-  try {
-    const econ = await fetch('/api/economics').then(r => r.json());
-    const goal = econ.goal || { target: 5000, earned: 0, pct: 0, remaining: 5000 };
-    const barFilled = Math.round(goal.pct / 5); // 20 segments
-    const bar = '█'.repeat(barFilled) + '░'.repeat(20 - barFilled);
-    const usage = econ.claudeUsage || { total: {}, today: {}, week: {}, month: {} };
-    document.getElementById('main').innerHTML = \`
-      <div class="card full" style="margin-bottom:0.5rem">
-        <div class="memory-tabs">\${tabBar()}</div>
-      </div>
-      <!-- Computer Fund Goal -->
-      <div class="card full" style="border-color:var(--accent);background:linear-gradient(135deg,#12121a,#1a1228)">
-        <h2>🖥️ Computer Fund Goal</h2>
-        <div style="margin:0.5rem 0">
-          <div style="display:flex;justify-content:space-between;font-size:0.85rem;margin-bottom:0.4rem">
-            <span>$\${goal.earned.toFixed(2)} earned</span>
-            <span style="color:var(--muted)">Goal: $\${goal.target.toLocaleString()}</span>
-            <span style="color:var(--accent)">\${goal.pct.toFixed(1)}%</span>
-          </div>
-          <div style="background:#1e1e2e;border-radius:4px;height:20px;overflow:hidden">
-            <div style="background:linear-gradient(90deg,var(--accent),var(--accent2));height:100%;width:\${goal.pct}%;transition:width 0.5s;border-radius:4px"></div>
-          </div>
-          <div style="text-align:right;font-size:0.78rem;color:var(--muted);margin-top:0.3rem">$\${goal.remaining.toFixed(2)} remaining</div>
-        </div>
-        <div class="mono" style="color:var(--muted);font-size:0.7rem;margin-top:0.25rem">\${bar} \${goal.pct.toFixed(1)}%</div>
-      </div>
-      <!-- Claude Usage Costs -->
-      <div class="card full" style="border-color:var(--accent2);background:linear-gradient(135deg,#12121a,#1a2228)">
-        <h2>☁️ Claude Usage & Costs</h2>
-        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem;margin-top:0.75rem">
-          <div style="background:#07070d;border:1px solid var(--border);border-radius:0.5rem;padding:0.75rem">
-            <div style="font-size:0.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.05em">Total (All Time)</div>
-            <div style="font-size:1.5rem;font-weight:700;color:var(--accent2);margin:0.25rem 0">$\${(usage.total.total_cost || 0).toFixed(2)}</div>
-            <div style="font-size:0.7rem;color:var(--muted)">\${((usage.total.total_tokens || 0) / 1000000).toFixed(2)}M tokens</div>
-            <div style="font-size:0.7rem;color:var(--muted)">\${(usage.total.run_count || 0).toLocaleString()} runs</div>
-          </div>
-          <div style="background:#07070d;border:1px solid var(--border);border-radius:0.5rem;padding:0.75rem">
-            <div style="font-size:0.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.05em">This Month</div>
-            <div style="font-size:1.5rem;font-weight:700;color:var(--green);margin:0.25rem 0">$\${(usage.month.total_cost || 0).toFixed(2)}</div>
-            <div style="font-size:0.7rem;color:var(--muted)">\${((usage.month.total_tokens || 0) / 1000000).toFixed(2)}M tokens</div>
-            <div style="font-size:0.7rem;color:var(--muted)">\${(usage.month.run_count || 0).toLocaleString()} runs</div>
-          </div>
-          <div style="background:#07070d;border:1px solid var(--border);border-radius:0.5rem;padding:0.75rem">
-            <div style="font-size:0.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.05em">Last 7 Days</div>
-            <div style="font-size:1.5rem;font-weight:700;color:var(--yellow);margin:0.25rem 0">$\${(usage.week.total_cost || 0).toFixed(2)}</div>
-            <div style="font-size:0.7rem;color:var(--muted)">\${((usage.week.total_tokens || 0) / 1000000).toFixed(2)}M tokens</div>
-            <div style="font-size:0.7rem;color:var(--muted)">\${(usage.week.run_count || 0).toLocaleString()} runs</div>
-          </div>
-          <div style="background:#07070d;border:1px solid var(--border);border-radius:0.5rem;padding:0.75rem">
-            <div style="font-size:0.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.05em">Today</div>
-            <div style="font-size:1.5rem;font-weight:700;color:var(--accent);margin:0.25rem 0">$\${(usage.today.total_cost || 0).toFixed(2)}</div>
-            <div style="font-size:0.7rem;color:var(--muted)">\${((usage.today.total_tokens || 0) / 1000000).toFixed(2)}M tokens</div>
-            <div style="font-size:0.7rem;color:var(--muted)">\${(usage.today.run_count || 0).toLocaleString()} runs</div>
-          </div>
-        </div>
-      </div>
-      <!-- Cost by Purpose -->
-      <div class="card full" style="border-color:#a78bfa">
-        <h2>🎯 Cost by Purpose</h2>
-        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:0.75rem;margin-top:0.75rem">
-          \${(econ.purposeBreakdown || []).map(p => \`
-            <div style="background:#07070d;border:1px solid var(--border);border-radius:0.5rem;padding:0.6rem;text-align:center">
-              <div style="font-size:0.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.05em">\${p.purpose}</div>
-              <div style="font-size:1.2rem;font-weight:700;color:var(--accent);margin:0.2rem 0">$\${p.total_cost.toFixed(2)}</div>
-              <div style="font-size:0.65rem;color:var(--muted)">\${p.run_count} runs</div>
-            </div>
-          \`).join('')}
-        </div>
-        \${(econ.monthPurposeBreakdown || []).length > 0 ? \`
-        <div style="margin-top:0.75rem;padding-top:0.5rem;border-top:1px solid var(--border)">
-          <div style="font-size:0.7rem;color:var(--muted);margin-bottom:0.4rem">This Month</div>
-          <div style="display:flex;flex-wrap:wrap;gap:0.5rem">
-            \${(econ.monthPurposeBreakdown || []).map(p => \`
-              <span style="font-size:0.75rem;color:var(--accent2)">
-                \${p.purpose}: $\${p.total_cost.toFixed(2)} (\${p.run_count})
-              </span>
-            \`).join('<span style="color:var(--border)">|</span>')}
-          </div>
-        </div>\` : ''}
-      </div>
-      <!-- Summary -->
-      <div class="card">
-        <h2>💵 Economic Summary</h2>
-        <table><tbody>
-          <tr><td>Total Earned</td><td class="mono">$\${econ.totals.all_earned.toFixed(4)}</td></tr>
-          <tr><td>Total Spent</td><td class="mono">$\${econ.totals.all_spent.toFixed(4)}</td></tr>
-          <tr><td>Net</td><td class="mono">$\${econ.totals.net.toFixed(4)}</td></tr>
-          <tr><td>Active Tasks</td><td class="mono">\${econ.activeTasks.length}</td></tr>
-        </tbody></table>
-      </div>
-      <!-- Group balances -->
-      <div class="card">
-        <h2>🏦 Group Balances</h2>
-        \${econ.groups.length === 0 ? '<p class="empty">No economic data yet</p>' : \`
-        <table>
-          <thead><tr><th>Group</th><th>Balance</th><th>Earned</th><th>Spent</th><th>Tier</th></tr></thead>
-          <tbody>\${econ.groups.map(g => \`
-            <tr>
-              <td class="mono">\${g.group_id}</td>
-              <td class="mono">$\${g.balance.toFixed(2)}</td>
-              <td class="mono">$\${g.total_earned.toFixed(4)}</td>
-              <td class="mono">$\${g.total_spent.toFixed(4)}</td>
-              <td>\${tierBadge(g.tier)}</td>
-            </tr>
-          \`).join('')}</tbody>
-        </table>\`}
-      </div>
-      <!-- Recent usage -->
-      <div class="card full">
-        <h2>📊 Recent Usage (last 20 runs)</h2>
-        \${econ.recentUsage.length === 0 ? '<p class="empty">No usage data yet</p>' : \`
-        <table>
-          <thead><tr><th>Time</th><th>Group</th><th>Purpose</th><th>Cost</th><th>Input Tok</th><th>Output Tok</th><th>Duration</th></tr></thead>
-          <tbody>\${econ.recentUsage.map(u => \`
-            <tr>
-              <td class="mono">\${fmt(u.run_at)}</td>
-              <td class="mono">\${u.group_id}</td>
-              <td><span class="pill yellow" style="font-size:0.65rem">\${u.purpose || 'conversation'}</span></td>
-              <td class="mono">$\${u.cost_usd.toFixed(4)}</td>
-              <td class="mono">\${u.input_tokens.toLocaleString()}</td>
-              <td class="mono">\${u.output_tokens.toLocaleString()}</td>
-              <td class="mono">\${u.duration_ms ? (u.duration_ms/1000).toFixed(1)+'s' : '—'}</td>
-            </tr>
-          \`).join('')}</tbody>
-        </table>\`}
-      </div>
-      <!-- Active ClawWork tasks -->
-      <div class="card full">
-        <h2>🛠️ ClawWork Tasks</h2>
-        \${econ.activeTasks.length === 0 ? '<p class="empty">No active tasks</p>' : \`
-        <table>
-          <thead><tr><th>ID</th><th>Group</th><th>Occupation</th><th>Max Pay</th><th>Status</th></tr></thead>
-          <tbody>\${econ.activeTasks.map(t => \`
-            <tr>
-              <td class="mono">\${t.id.slice(0,14)}…</td>
-              <td class="mono">\${t.group_id}</td>
-              <td>\${t.occupation}</td>
-              <td class="mono">$\${t.max_payment.toFixed(2)}</td>
-              <td><span class="pill yellow">\${t.status}</span></td>
-            </tr>
-          \`).join('')}</tbody>
-        </table>\`}
-      </div>
-    \`;
-  } catch(e) {
-    console.error('Economics refresh failed', e);
-  }
 }
 
 function fmtSize(bytes) {
@@ -929,8 +664,6 @@ async function refreshKanban() {
 }
 
 async function refresh() {
-  if (dashTab === 'economics') { await refreshEconomics(); return; }
-  if (dashTab === 'bounties') { await refreshBounties(); return; }
   if (dashTab === 'kanban') { await refreshKanban(); return; }
   if (window._integrationRefreshFns && window._integrationRefreshFns[dashTab]) { await window._integrationRefreshFns[dashTab](); return; }
   if (dashTab === 'router') { await refreshRouter(); return; }
@@ -956,10 +689,9 @@ async function refresh() {
     return;
   }
   try {
-    const [status, memory, econ, resources] = await Promise.all([
+    const [status, memory, resources] = await Promise.all([
       fetch('/api/status').then(r => r.json()),
       fetch('/api/memory?file=' + encodeURIComponent(memTab)).then(r => r.text()),
-      fetch('/api/economics').then(r => r.json()),
       fetch('/api/resources').then(r => r.json()),
     ]);
 
@@ -967,13 +699,11 @@ async function refresh() {
     const activeGroups = status.groups.filter(g => g.hasActiveContainer).length;
     const activeTasks = status.tasks.filter(t => t.status === 'active').length;
     const secCount = status.securityEvents.length;
-    const goal = econ.goal || { target: 5000, earned: 0, pct: 0 };
 
     document.getElementById('main').innerHTML = \`
       <div class="card full" style="margin-bottom:0.5rem">
         <div class="memory-tabs">
           \${tabBar()}
-          <span class="pill yellow" style="margin-left:auto">🖥️ $\${goal.earned.toFixed(2)}/$\${goal.target} (\${goal.pct.toFixed(1)}%)</span>
         </div>
       </div>
       <!-- Resources -->
@@ -1166,30 +896,6 @@ export function startDashboard(queue: GroupQueue, sendFn?: (jid: string, text: s
     if (url.pathname === '/api/status') {
       try {
         const data = apiStatus(queue);
-        res.writeHead(200, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify(data));
-      } catch (err) {
-        res.writeHead(500);
-        res.end(JSON.stringify({ error: String(err) }));
-      }
-      return;
-    }
-
-    if (url.pathname === '/api/economics') {
-      try {
-        const data = apiEconomics();
-        res.writeHead(200, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify(data));
-      } catch (err) {
-        res.writeHead(500);
-        res.end(JSON.stringify({ error: String(err) }));
-      }
-      return;
-    }
-
-    if (url.pathname === '/api/bounties') {
-      try {
-        const data = apiBounties();
         res.writeHead(200, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify(data));
       } catch (err) {

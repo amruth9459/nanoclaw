@@ -12,10 +12,8 @@ import {
 } from './config.js';
 import { ContainerOutput, runContainerAgent, writeTasksSnapshot } from './container-runner.js';
 import {
-  deductBalance,
   getAllTasks,
   getDueTasks,
-  getOrCreateEconomics,
   getTaskById,
   logTaskRun,
   logUsage,
@@ -159,7 +157,6 @@ async function runTask(
             const durationMs = Date.now() - startTime;
             const purpose = task.id.includes('bounty-hunter') ? 'bounty' : 'task';
             logUsage(task.group_folder, task.chat_jid, streamedOutput.usage, durationMs, true, costUsd, purpose);
-            deductBalance(task.group_folder, costUsd);
             logger.info({ taskId: task.id, costUsd, usage: streamedOutput.usage }, 'Task cost tracked');
           }
           deps.queue.notifyIdle(task.chat_jid);
