@@ -439,6 +439,54 @@ function createSchema(database: Database.Database): void {
     CREATE INDEX IF NOT EXISTS idx_tuning_profile ON tuning_experiments(profile_id);
     CREATE INDEX IF NOT EXISTS idx_tuning_adopted ON tuning_experiments(adopted);
   `);
+
+  // Agent Identity & Trust Layer
+  database.exec(`
+    CREATE TABLE IF NOT EXISTS agent_identities (
+      agent_id TEXT PRIMARY KEY,
+      agent_name TEXT NOT NULL,
+      agent_type TEXT NOT NULL,
+      public_key TEXT NOT NULL,
+      private_key_encrypted TEXT NOT NULL,
+      issued_at TEXT NOT NULL,
+      expires_at TEXT NOT NULL,
+      scopes TEXT NOT NULL,
+      issuer TEXT NOT NULL
+    );
+
+    CREATE TABLE IF NOT EXISTS evidence_chain (
+      record_id TEXT PRIMARY KEY,
+      agent_id TEXT NOT NULL,
+      agent_name TEXT NOT NULL,
+      action_type TEXT NOT NULL,
+      action_details TEXT NOT NULL,
+      intent TEXT NOT NULL,
+      authorization TEXT NOT NULL,
+      outcome TEXT NOT NULL,
+      timestamp TEXT NOT NULL,
+      prev_record_hash TEXT NOT NULL,
+      record_hash TEXT NOT NULL,
+      signature TEXT NOT NULL,
+      FOREIGN KEY (agent_id) REFERENCES agent_identities(agent_id)
+    );
+    CREATE INDEX IF NOT EXISTS idx_evidence_agent ON evidence_chain(agent_id);
+    CREATE INDEX IF NOT EXISTS idx_evidence_timestamp ON evidence_chain(timestamp);
+
+    CREATE TABLE IF NOT EXISTS agent_trust_scores (
+      agent_id TEXT PRIMARY KEY,
+      score REAL NOT NULL,
+      level TEXT NOT NULL,
+      factors TEXT NOT NULL,
+      last_computed TEXT NOT NULL,
+      FOREIGN KEY (agent_id) REFERENCES agent_identities(agent_id)
+    );
+
+    CREATE TABLE IF NOT EXISTS seen_nonces (
+      nonce TEXT PRIMARY KEY,
+      seen_at TEXT NOT NULL
+    );
+    CREATE INDEX IF NOT EXISTS idx_nonces_time ON seen_nonces(seen_at);
+  `);
 }
 
 /** Get the main database handle (must be called after initDatabase) */
