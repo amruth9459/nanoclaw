@@ -239,7 +239,7 @@ export function startIpcWatcher(deps: IpcDeps): void {
                   'clawwork_get_status', 'clawwork_decide_activity', 'clawwork_learn', 'learn', 'clawwork_submit_work',
                   'find_bounties', 'propose_bounty', 'submit_bounty',
                   'find_freelance_gigs', 'propose_deliverable',
-                  'task_tool', 'gmail_cleanup', 'shared_items',
+                  'task_tool', 'gsd_tool', 'gmail_cleanup', 'shared_items',
                   'token_refresh',
                   'generate_safety_brief', 'monitoring_log',
                 ]);
@@ -1112,6 +1112,15 @@ async function processClawworkMessage(
         syncKanbanFile();
       }
       logger.debug({ groupFolder, action: data.action }, 'TaskTool processed');
+      break;
+    }
+
+    // ── GSD (Get Shit Done) — Spec-driven development ────────────
+    case 'gsd_tool': {
+      const { executeGsdTool } = await import('./mcp/tools/gsd-tool.js');
+      const result = await executeGsdTool(data as any);
+      if (responseFile) writeIpcResponse(responseFile, { result });
+      logger.debug({ groupFolder, action: data.action }, 'GsdTool processed');
       break;
     }
 

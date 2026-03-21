@@ -970,6 +970,55 @@ Tasks support:
   },
 );
 
+// ── GSD (Get Shit Done) — Spec-driven development ──────────────────────────────
+
+server.tool(
+  'gsd_tool',
+  `GSD (Get Shit Done) — Spec-driven development for autonomous agents.
+
+Stay on track with your project spec. Use this tool to:
+- Check status: What's done, what's next, what's blocked
+- Checkpoint: Save progress snapshots
+- Validate: Check if a task is within spec scope
+- Complete items: Mark checklist items as done
+
+Actions:
+- init: Create a new spec (requires project_path, goal, success_criteria)
+- status: Get current progress
+- checkpoint: Save a progress snapshot (requires summary)
+- validate: Check if a task is within spec (requires task_description)
+- complete_item: Mark a checklist item as done (requires item_text)
+- complete_spec: Mark entire spec as completed
+- list: List all specs
+
+Example: action=validate, task_description="Add dark mode" → DRIFT: Not in spec`,
+  {
+    action: z.enum(['init', 'status', 'checkpoint', 'validate', 'complete_item', 'complete_spec', 'list']).describe('Action to perform'),
+    spec_id: z.string().optional().describe('Spec ID to operate on'),
+    project_path: z.string().optional().describe('Project directory path (for init)'),
+    goal: z.string().optional().describe('Project goal (for init)'),
+    success_criteria: z.array(z.string()).optional().describe('Success criteria (for init)'),
+    constraints: z.array(z.string()).optional().describe('Constraints (for init)'),
+    priorities: z.array(z.string()).optional().describe('Priorities (for init)'),
+    summary: z.string().optional().describe('Checkpoint summary'),
+    agent_id: z.string().optional().describe('Agent identifier'),
+    blockers: z.array(z.string()).optional().describe('Current blockers'),
+    task_description: z.string().optional().describe('Task to validate against spec'),
+    item_text: z.string().optional().describe('Checklist item text to mark as done'),
+  },
+  async (args) => {
+    const { responseFile } = writeClawworkRequest({
+      type: 'gsd_tool',
+      ...args,
+    });
+
+    const result = await pollResponse(responseFile, 10000);
+    if (!result) return { content: [{ type: 'text' as const, text: 'Error: gsd_tool request timed out' }], isError: true };
+    if (result.error) return { content: [{ type: 'text' as const, text: `Error: ${result.error}` }], isError: true };
+    return { content: [{ type: 'text' as const, text: String(result.result) }] };
+  },
+);
+
 // ── Shared Items Inbox ──────────────────────────────────────────────────────────
 
 server.tool(

@@ -440,8 +440,20 @@ Dispatched by: NanoClaw Auto-Dispatch'"
    and explain what's blocking you.
 `;
 
+    // GSD context injection: if there's an active spec, include it
+    let gsdContext = '';
+    try {
+      const { generateCompactStatus } = await import('./gsd/context-keeper.js');
+      const { getActiveSpecs } = await import('./gsd/spec-manager.js');
+      const activeSpecs = getActiveSpecs();
+      if (activeSpecs.length > 0) {
+        const status = generateCompactStatus(activeSpecs[0].id);
+        if (status) gsdContext = `\n${status}\n`;
+      }
+    } catch { /* GSD not initialized yet */ }
+
     // Enqueue in GroupQueue task slot
-    const prompt = `[AUTO-DISPATCH] Task: ${task.description}\n${projectContext}\n${guardrailsBlock}\n${completionBlock}\nYou are ${persona.name} (${persona.department}). Complete this task using your specialized expertise.\n\nTask ID: ${task.id}`;
+    const prompt = `[AUTO-DISPATCH] Task: ${task.description}\n${gsdContext}${projectContext}\n${guardrailsBlock}\n${completionBlock}\nYou are ${persona.name} (${persona.department}). Complete this task using your specialized expertise.\n\nTask ID: ${task.id}`;
 
     const containerInput: ContainerInput = {
       prompt,
