@@ -378,6 +378,67 @@ function createSchema(database: Database.Database): void {
     CREATE INDEX IF NOT EXISTS idx_shared_items_type ON shared_items(item_type);
     CREATE INDEX IF NOT EXISTS idx_shared_items_created ON shared_items(created_at);
   `);
+
+  // Token throughput monitoring (Karpathy-inspired)
+  database.exec(`
+    CREATE TABLE IF NOT EXISTS throughput_metrics (
+      timestamp INTEGER PRIMARY KEY,
+      interval_ms INTEGER NOT NULL,
+      total_tokens INTEGER NOT NULL,
+      input_tokens INTEGER NOT NULL,
+      output_tokens INTEGER NOT NULL,
+      requests_count INTEGER NOT NULL,
+      tokens_per_second REAL NOT NULL,
+      cost_usd REAL NOT NULL,
+      quota_used_percent REAL,
+      models_used TEXT,
+      purpose_breakdown TEXT
+    );
+
+    CREATE TABLE IF NOT EXISTS throughput_alerts (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      alert_type TEXT NOT NULL,
+      severity TEXT NOT NULL,
+      message TEXT NOT NULL,
+      metric_value REAL NOT NULL,
+      threshold REAL NOT NULL,
+      triggered_at TEXT NOT NULL,
+      acknowledged INTEGER DEFAULT 0
+    );
+    CREATE INDEX IF NOT EXISTS idx_throughput_alerts_severity ON throughput_alerts(severity);
+    CREATE INDEX IF NOT EXISTS idx_throughput_alerts_ack ON throughput_alerts(acknowledged);
+  `);
+
+  // Agent personality tuning (Karpathy-inspired Phase 2)
+  database.exec(`
+    CREATE TABLE IF NOT EXISTS personality_profiles (
+      id TEXT PRIMARY KEY,
+      group_id TEXT NOT NULL,
+      agent_type TEXT NOT NULL,
+      personality_params TEXT NOT NULL,
+      avg_quality_score REAL,
+      total_outputs INTEGER DEFAULT 0,
+      created_at INTEGER NOT NULL,
+      last_updated INTEGER NOT NULL
+    );
+
+    CREATE TABLE IF NOT EXISTS tuning_experiments (
+      id TEXT PRIMARY KEY,
+      profile_id TEXT NOT NULL,
+      parameter_name TEXT NOT NULL,
+      old_value TEXT NOT NULL,
+      new_value TEXT NOT NULL,
+      quality_before REAL,
+      quality_after REAL,
+      sample_size INTEGER,
+      improvement REAL,
+      adopted INTEGER DEFAULT 0,
+      tested_at INTEGER NOT NULL,
+      FOREIGN KEY (profile_id) REFERENCES personality_profiles(id)
+    );
+    CREATE INDEX IF NOT EXISTS idx_tuning_profile ON tuning_experiments(profile_id);
+    CREATE INDEX IF NOT EXISTS idx_tuning_adopted ON tuning_experiments(adopted);
+  `);
 }
 
 /** Get the main database handle (must be called after initDatabase) */
@@ -2484,4 +2545,113 @@ export function updateSharedItemStatus(id: string, status: string, notes?: strin
   params.push(id);
   const result = db.prepare(`UPDATE shared_items SET ${sets.join(', ')} WHERE id = ?`).run(...params);
   return result.changes > 0;
+}
+
+// ──────────────────────────────────────────────────────────────────
+// Personality Profiles & Tuning Experiments (Karpathy Phase 2)
+// ──────────────────────────────────────────────────────────────────
+
+export interface PersonalityParams {
+  tone: 'concise' | 'balanced' | 'verbose';
+  verbosity: number;   // 1-10
+  creativity: number;  // 1-10
+  formality: 'casual' | 'professional' | 'formal';
+}
+
+export interface PersonalityProfile {
+  id: string;
+  group_id: string;
+  agent_type: string;
+  personality_params: string; // JSON-encoded PersonalityParams
+  avg_quality_score: number | null;
+  total_outputs: number;
+  created_at: number;
+  last_updated: number;
+}
+
+export interface TuningExperiment {
+  id: string;
+  profile_id: string;
+  parameter_name: string;
+  old_value: string;
+  new_value: string;
+  quality_before: number | null;
+  quality_after: number | null;
+  sample_size: number | null;
+  improvement: number | null;
+  adopted: number;
+  tested_at: number;
+}
+
+export function createPersonalityProfile(profile: PersonalityProfile): void {
+  db.prepare(`
+    INSERT INTO personality_profiles (id, group_id, agent_type, personality_params,
+      avg_quality_score, total_outputs, created_at, last_updated)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+  `).run(
+    profile.id, profile.group_id, profile.agent_type, profile.personality_params,
+    profile.avg_quality_score, profile.total_outputs, profile.created_at, profile.last_updated,
+  );
+}
+
+export function getPersonalityProfile(id: string): PersonalityProfile | undefined {
+  return db.prepare(`SELECT * FROM personality_profiles WHERE id = ?`).get(id) as PersonalityProfile | undefined;
+}
+
+export function getProfileForGroup(groupId: string, agentType: string): PersonalityProfile | undefined {
+  return db.prepare(
+    `SELECT * FROM personality_profiles WHERE group_id = ? AND agent_type = ? ORDER BY last_updated DESC LIMIT 1`,
+  ).get(groupId, agentType) as PersonalityProfile | undefined;
+}
+
+export function getAllProfiles(): PersonalityProfile[] {
+  return db.prepare(`SELECT * FROM personality_profiles ORDER BY last_updated DESC`).all() as PersonalityProfile[];
+}
+
+export function updateProfileQuality(id: string, avgScore: number, totalOutputs: number): void {
+  db.prepare(`
+    UPDATE personality_profiles SET avg_quality_score = ?, total_outputs = ?, last_updated = ?
+    WHERE id = ?
+  `).run(avgScore, totalOutputs, Date.now(), id);
+}
+
+export function updateProfileParams(id: string, params: PersonalityParams): void {
+  db.prepare(`
+    UPDATE personality_profiles SET personality_params = ?, last_updated = ?
+    WHERE id = ?
+  `).run(JSON.stringify(params), Date.now(), id);
+}
+
+export function createTuningExperiment(experiment: TuningExperiment): void {
+  db.prepare(`
+    INSERT INTO tuning_experiments (id, profile_id, parameter_name, old_value, new_value,
+      quality_before, quality_after, sample_size, improvement, adopted, tested_at)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+  `).run(
+    experiment.id, experiment.profile_id, experiment.parameter_name,
+    experiment.old_value, experiment.new_value, experiment.quality_before,
+    experiment.quality_after, experiment.sample_size, experiment.improvement,
+    experiment.adopted, experiment.tested_at,
+  );
+}
+
+export function updateExperimentResults(
+  id: string, qualityAfter: number, sampleSize: number, improvement: number, adopted: boolean,
+): void {
+  db.prepare(`
+    UPDATE tuning_experiments SET quality_after = ?, sample_size = ?, improvement = ?, adopted = ?
+    WHERE id = ?
+  `).run(qualityAfter, sampleSize, improvement, adopted ? 1 : 0, id);
+}
+
+export function getExperimentsForProfile(profileId: string): TuningExperiment[] {
+  return db.prepare(
+    `SELECT * FROM tuning_experiments WHERE profile_id = ? ORDER BY tested_at DESC`,
+  ).all(profileId) as TuningExperiment[];
+}
+
+export function getRecentExperiments(limit = 20): TuningExperiment[] {
+  return db.prepare(
+    `SELECT * FROM tuning_experiments ORDER BY tested_at DESC LIMIT ?`,
+  ).all(limit) as TuningExperiment[];
 }

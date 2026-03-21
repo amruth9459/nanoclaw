@@ -75,6 +75,7 @@ import { classifyGoalHeuristic, extractGoalDetails } from './goal-classifier.js'
 import { ResponseTimeManager } from './response-time-manager.js';
 import { NanoClawOrchestrator } from './nanoclaw-orchestrator.js';
 import { listGroupFiles, startDashboard } from './dashboard.js';
+import { startThroughputMonitor } from './throughput-monitor.js';
 import { initNotificationRouter } from './notification-router.js';
 import { ResourceOrchestrator, AgentPriority } from './resource-orchestrator.js';
 import { BountyGate } from './bounty-gate.js';
@@ -1993,6 +1994,7 @@ Steps:
 
   // Start subsystems (independently of connection handler)
   startDashboard(queue, (jid, text) => clawSend(jid, text), orchestrator, router);
+  startThroughputMonitor();
   startSchedulerLoop({
     registeredGroups: () => registeredGroups,
     getSessions: () => sessions,

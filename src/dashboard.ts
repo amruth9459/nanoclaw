@@ -33,6 +33,8 @@ import { ResourceOrchestrator } from './resource-orchestrator.js';
 import type { UniversalRouter } from './router/index.js';
 import { routeNotification } from './notification-router.js';
 import { getIndexStats } from './semantic-index.js';
+import { getCurrentThroughput, getHourlyThroughput } from './throughput-monitor.js';
+import { getActiveAlerts, acknowledgeAlert } from './throughput-alerts.js';
 
 const PORT = parseInt(process.env.DASHCLAW_PORT || '8080', 10);
 const LOG_PATH = path.join(process.cwd(), 'logs', 'nanoclaw.log');
@@ -1194,6 +1196,62 @@ export function startDashboard(queue: GroupQueue, sendFn?: (jid: string, text: s
         res.writeHead(500);
         res.end(JSON.stringify({ error: String(err) }));
       }
+      return;
+    }
+
+    // ── Throughput API ──────────────────────────────────────────────────────
+    if (url.pathname === '/api/throughput/current') {
+      try {
+        const data = getCurrentThroughput();
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify(data));
+      } catch (err) {
+        res.writeHead(500);
+        res.end(JSON.stringify({ error: String(err) }));
+      }
+      return;
+    }
+
+    if (url.pathname === '/api/throughput/hourly') {
+      try {
+        const data = getHourlyThroughput();
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify(data));
+      } catch (err) {
+        res.writeHead(500);
+        res.end(JSON.stringify({ error: String(err) }));
+      }
+      return;
+    }
+
+    if (url.pathname === '/api/throughput/alerts') {
+      try {
+        const limit = parseInt(url.searchParams.get('limit') || '50', 10);
+        const data = getActiveAlerts(limit);
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ alerts: data }));
+      } catch (err) {
+        res.writeHead(500);
+        res.end(JSON.stringify({ error: String(err) }));
+      }
+      return;
+    }
+
+    if (url.pathname === '/api/throughput/ack-alert' && req.method === 'POST') {
+      let body = '';
+      req.on('data', (chunk) => { body += chunk; });
+      req.on('end', () => {
+        try {
+          const { id } = JSON.parse(body);
+          if (!id) { res.writeHead(400); res.end('Missing alert id'); return; }
+          const ok = acknowledgeAlert(id);
+          res.writeHead(200, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ acknowledged: ok }));
+        } catch (err) {
+          res.writeHead(500);
+          res.end(JSON.stringify({ error: String(err) }));
+        }
+      });
       return;
     }
 
