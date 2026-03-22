@@ -1,8 +1,9 @@
-import { ChildProcess } from 'child_process';
+import { ChildProcess, execSync } from 'child_process';
 import fs from 'fs';
 import path from 'path';
 
 import { DATA_DIR, MAX_CONCURRENT_CONTAINERS } from './config.js';
+import { CONTAINER_RUNTIME_BIN, removeContainer, stopContainer } from './container-runtime.js';
 import { logger } from './logger.js';
 
 interface QueuedTask {
@@ -40,6 +41,7 @@ export class GroupQueue {
   private processMessagesFn: ((groupJid: string) => Promise<boolean>) | null =
     null;
   private shuttingDown = false;
+  private reaperInterval: ReturnType<typeof setInterval> | null = null;
 
   private getGroup(groupJid: string): GroupState {
     let state = this.groups.get(groupJid);
@@ -69,6 +71,80 @@ export class GroupQueue {
 
   setProcessMessagesFn(fn: (groupJid: string) => Promise<boolean>): void {
     this.processMessagesFn = fn;
+  }
+
+  /**
+   * Kill a container's OS process and stop its runtime container.
+   * Safe to call even if the process is already dead.
+   */
+  private killContainer(state: GroupState): void {
+    const proc = state.process;
+    const name = state.containerName;
+
+    // Kill the Node child process if still alive
+    if (proc && !proc.killed) {
+      try { proc.kill('SIGTERM'); } catch { /* already dead */ }
+    }
+
+    // Stop and remove the container runtime VM
+    if (name) {
+      try {
+        execSync(stopContainer(name), { stdio: 'pipe', timeout: 15000 });
+      } catch { /* already stopped */ }
+      removeContainer(name);
+    }
+  }
+
+  /**
+   * Start a periodic zombie reaper that reconciles tracked containers
+   * against actual running containers every 5 minutes.
+   */
+  startReaper(): void {
+    if (this.reaperInterval) return;
+    this.reaperInterval = setInterval(() => this.reap(), 5 * 60 * 1000);
+  }
+
+  /**
+   * Reconcile tracked vs actual containers. Kill any nanoclaw-* containers
+   * that aren't tracked by GroupQueue (zombies from previous crashes, etc).
+   */
+  private reap(): void {
+    try {
+      const output = execSync(`${CONTAINER_RUNTIME_BIN} ls --format json`, {
+        stdio: ['pipe', 'pipe', 'pipe'],
+        encoding: 'utf-8',
+        timeout: 10000,
+      });
+      const containers: { status: string; configuration: { id: string } }[] =
+        JSON.parse(output || '[]');
+
+      const running = containers
+        .filter((c) => c.status === 'running' && c.configuration.id.startsWith('nanoclaw-'))
+        .map((c) => c.configuration.id);
+
+      if (running.length === 0) return;
+
+      // Collect all container names currently tracked by GroupQueue
+      const tracked = new Set<string>();
+      for (const [, state] of this.groups) {
+        if (state.containerName) tracked.add(state.containerName);
+      }
+
+      const zombies = running.filter((name) => !tracked.has(name));
+      for (const name of zombies) {
+        logger.warn({ name }, 'Reaper: killing untracked zombie container');
+        try {
+          execSync(stopContainer(name), { stdio: 'pipe', timeout: 15000 });
+        } catch { /* already stopped */ }
+        removeContainer(name);
+      }
+
+      if (zombies.length > 0) {
+        logger.info({ count: zombies.length, zombies }, 'Reaper: cleaned up zombie containers');
+      }
+    } catch (err) {
+      logger.debug({ err }, 'Reaper: failed to list containers (non-fatal)');
+    }
   }
 
   /** Returns true if the group has any active running container. */
@@ -134,6 +210,7 @@ export class GroupQueue {
     fn()
       .catch((err) => logger.error({ groupJid, err }, 'Warmup failed'))
       .finally(() => {
+        this.killContainer(state);
         state.active = false;
         state.isWarmupContainer = false;
         state.process = null;
@@ -292,6 +369,7 @@ export class GroupQueue {
       logger.error({ groupJid, err }, 'Error processing messages for group');
       this.scheduleRetry(groupJid, state);
     } finally {
+      this.killContainer(state);
       state.active = false;
       state.process = null;
       state.containerName = null;
@@ -321,6 +399,8 @@ export class GroupQueue {
     } catch (err) {
       logger.error({ groupJid, taskId: task.id, err }, 'Error running task');
     } finally {
+      // Tasks share the same state.process — kill if still alive
+      this.killContainer(state);
       state.activeTask = false;
       state.taskSpawnReason = null;
       state.taskStartedAt = null;
@@ -440,16 +520,26 @@ export class GroupQueue {
   async shutdown(_gracePeriodMs: number): Promise<void> {
     this.shuttingDown = true;
 
-    const activeContainers: string[] = [];
+    // Stop the reaper
+    if (this.reaperInterval) {
+      clearInterval(this.reaperInterval);
+      this.reaperInterval = null;
+    }
+
+    // Kill all tracked containers
+    const killed: string[] = [];
     for (const [, state] of this.groups) {
-      if (state.process && !state.process.killed && state.containerName) {
-        activeContainers.push(state.containerName);
+      if (state.containerName) {
+        killed.push(state.containerName);
+        this.killContainer(state);
+        state.process = null;
+        state.containerName = null;
       }
     }
 
     logger.info(
-      { activeCount: this.activeCount, detachedContainers: activeContainers },
-      'GroupQueue shutting down (containers detached, not killed)',
+      { activeCount: this.activeCount, killed },
+      'GroupQueue shutting down (containers killed)',
     );
   }
 }

@@ -21,6 +21,7 @@ import { WhatsAppChannel } from './channels/whatsapp.js';
 import {
   ContainerOutput,
   isOAuthError,
+  readOAuthFromKeychain,
   runContainerAgent,
   writeGroupsSnapshot,
   writeTasksSnapshot,
@@ -896,12 +897,15 @@ async function runAgent(
       // Wait briefly for potential background token refresh
       await new Promise((r) => setTimeout(r, OAUTH_HOST_RETRY_DELAY_MS));
 
-      const freshToken = readEnvFile(['CLAUDE_CODE_OAUTH_TOKEN']).CLAUDE_CODE_OAUTH_TOKEN;
+      // Check both .env and Keychain for a fresh token
+      const envToken = readEnvFile(['CLAUDE_CODE_OAUTH_TOKEN']).CLAUDE_CODE_OAUTH_TOKEN;
+      const keychainToken = process.platform === 'darwin' ? readOAuthFromKeychain() : null;
+      const freshToken = keychainToken || envToken;
       const freshPrefix = freshToken?.slice(0, 20);
 
       if (freshPrefix && freshPrefix !== lastTokenPrefix) {
         // Token changed — worth retrying with a new container
-        logger.info({ group: group.name }, 'Token changed in .env — retrying with fresh token');
+        logger.info({ group: group.name, source: keychainToken ? 'keychain' : 'env' }, 'Token changed — retrying with fresh token');
         lastTokenPrefix = freshPrefix;
 
         const retryOutput = await runContainerAgent(
@@ -1469,7 +1473,54 @@ TOOLS: find_freelance_gigs, find_bounties, propose_bounty, propose_deliverable, 
 }
 
 async function main(): Promise<void> {
+  // Startup: verify native modules are compatible with current Node version
+  {
+    const { createRequire } = await import('module');
+    const req = createRequire(import.meta.url);
+    try {
+      req('better-sqlite3');
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      if (msg.includes('NODE_MODULE_VERSION')) {
+        logger.error({ nodeVersion: process.version, error: msg },
+          'Native module mismatch — running npm rebuild');
+        try {
+          const { execSync: execSyncLocal } = await import('child_process');
+          execSyncLocal('npm rebuild better-sqlite3', {
+            cwd: process.cwd(),
+            stdio: 'pipe',
+            timeout: 60000,
+          });
+          logger.info('better-sqlite3 rebuilt successfully — continuing startup');
+        } catch (rebuildErr) {
+          logger.error({ err: rebuildErr }, 'FATAL: Failed to rebuild better-sqlite3');
+          process.exit(1);
+        }
+      }
+    }
+  }
+
   ensureContainerSystemRunning();
+
+  // Startup: verify OAuth token exists and is valid
+  {
+    const envToken = readEnvFile(['CLAUDE_CODE_OAUTH_TOKEN']).CLAUDE_CODE_OAUTH_TOKEN;
+    const keychainToken = process.platform === 'darwin' ? readOAuthFromKeychain() : null;
+    if (keychainToken && keychainToken !== envToken) {
+      // Keychain has a fresher token — sync to .env
+      const envPath = path.join(process.cwd(), '.env');
+      const envContent = fs.readFileSync(envPath, 'utf-8');
+      fs.writeFileSync(envPath, envContent.replace(/CLAUDE_CODE_OAUTH_TOKEN=.*/, `CLAUDE_CODE_OAUTH_TOKEN=${keychainToken}`));
+      logger.info('Startup: synced fresh Keychain OAuth token to .env');
+    }
+    const token = keychainToken || envToken;
+    if (!token) {
+      logger.error('STARTUP WARNING: No OAuth token found in Keychain or .env — containers will fail');
+    } else {
+      logger.info('Startup: OAuth token verified');
+    }
+  }
+
   initDatabase();
   logger.info('Database initialized');
 
@@ -1833,6 +1884,7 @@ Steps:
     onAgentSendMessage: (chatJid) => { ipcMessageSentThisRun.add(chatJid); },
   });
   queue.setProcessMessagesFn(processGroupMessages);
+  queue.startReaper();
   recoverPendingMessages();
   ensureFreelanceAgentTask();
 

@@ -259,7 +259,23 @@ export class WhatsAppChannel implements Channel {
     this.sock.ev.on('creds.update', saveCreds);
 
     this.sock.ev.on('messages.upsert', async ({ messages }) => {
-      this.resetWatchdog(true); // real message activity = connection is alive
+      // Only reset watchdog strikes after confirming real messages exist.
+      // Empty/protocol-only upserts fire during reconnection and must NOT
+      // reset the strike counter — otherwise the 3-strike kill never triggers.
+      let hasRealMessage = false;
+      for (const msg of messages) {
+        if (!msg.message) continue;
+        const rawJid = msg.key.remoteJid;
+        if (!rawJid || rawJid === 'status@broadcast') continue;
+        hasRealMessage = true;
+        break;
+      }
+      if (hasRealMessage) {
+        this.resetWatchdog(true);
+      } else {
+        this.resetWatchdog(); // timer reset only, no strike reset
+      }
+
       for (const msg of messages) {
         if (!msg.message) continue;
         const rawJid = msg.key.remoteJid;

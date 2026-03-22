@@ -347,7 +347,7 @@ function readSecrets(): Record<string, string> {
 }
 
 /** Read Claude Code OAuth access token directly from macOS Keychain. */
-function readOAuthFromKeychain(): string | null {
+export function readOAuthFromKeychain(): string | null {
   try {
     const creds = execSync(
       'security find-generic-password -s "Claude Code-credentials" -a "amrut" -w',

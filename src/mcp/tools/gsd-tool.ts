@@ -18,8 +18,8 @@ import {
   checkpoint,
   validateTask,
   generateSpecReminder,
-} from '../gsd/index.js';
-import { getSpec, getSpecByProject, listSpecs } from '../gsd/db.js';
+} from '../../gsd/index.js';
+import { getSpec, getSpecByProject, listSpecs } from '../../gsd/db.js';
 
 export const GsdToolSchema = z.object({
   action: z.enum(['init', 'status', 'checkpoint', 'validate', 'complete_item', 'complete_spec', 'list'])
