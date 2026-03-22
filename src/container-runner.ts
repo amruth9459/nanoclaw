@@ -2,7 +2,7 @@
  * Container Runner for NanoClaw
  * Spawns agent execution in containers and handles IPC
  */
-import { ChildProcess, exec, spawn } from 'child_process';
+import { ChildProcess, exec, execSync, spawn } from 'child_process';
 import fs from 'fs';
 import os from 'os';
 import path from 'path';
@@ -330,7 +330,40 @@ function readSecrets(): Record<string, string> {
   // API key is still used host-side by judge-system.ts and semantic-index.ts.
   const fromEnvFile = readEnvFile(['CLAUDE_CODE_OAUTH_TOKEN',
     'OPENAI_API_KEY', 'GOOGLE_API_KEY']);
+
+  // Keychain-first: on macOS, always try reading the freshest token from Keychain
+  // (maintained by Claude Code desktop). Falls back to .env if Keychain is unavailable.
+  if (process.platform === 'darwin') {
+    const keychainToken = readOAuthFromKeychain();
+    if (keychainToken) {
+      if (keychainToken !== fromEnvFile['CLAUDE_CODE_OAUTH_TOKEN']) {
+        logger.debug('OAuth token refreshed from Keychain');
+      }
+      fromEnvFile['CLAUDE_CODE_OAUTH_TOKEN'] = keychainToken;
+    }
+  }
+
   return fromEnvFile;
+}
+
+/** Read Claude Code OAuth access token directly from macOS Keychain. */
+function readOAuthFromKeychain(): string | null {
+  try {
+    const creds = execSync(
+      'security find-generic-password -s "Claude Code-credentials" -a "amrut" -w',
+      { encoding: 'utf-8', timeout: 5000, stdio: ['ignore', 'pipe', 'ignore'] },
+    ).trim();
+    const parsed = JSON.parse(creds);
+    const token = parsed?.claudeAiOauth?.accessToken;
+    const expiresAt = parsed?.claudeAiOauth?.expiresAt ?? 0;
+    // Only use if token has >30 min remaining
+    if (token && (expiresAt / 1000 - Date.now() / 1000) > 1800) {
+      return token;
+    }
+    return null;
+  } catch {
+    return null;
+  }
 }
 
 function buildContainerArgs(
