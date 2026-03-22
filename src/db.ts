@@ -2,7 +2,7 @@ import Database from 'better-sqlite3';
 import fs from 'fs';
 import path from 'path';
 
-import { ASSISTANT_NAME, DATA_DIR, GROUPS_DIR, INITIAL_BALANCE, MAIN_GROUP_FOLDER, STORE_DIR } from './config.js';
+import { ASSISTANT_NAME, DATA_DIR, GROUPS_DIR, MAIN_GROUP_FOLDER, STORE_DIR } from './config.js';
 import { NewMessage, RegisteredGroup, ScheduledTask, TaskRunLog } from './types.js';
 import { logger } from './logger.js';
 import { getIntegrations } from './integration-loader.js';
@@ -1187,12 +1187,12 @@ export function getOrCreateEconomics(groupId: string): GroupEconomics {
   db.prepare(`
     INSERT INTO group_economics (group_id, balance, initial_balance, total_earned, total_spent, last_updated)
     VALUES (?, ?, ?, 0, 0, ?)
-  `).run(groupId, INITIAL_BALANCE, INITIAL_BALANCE, now);
+  `).run(groupId, 1000, 1000, now);
 
   return {
     group_id: groupId,
-    balance: INITIAL_BALANCE,
-    initial_balance: INITIAL_BALANCE,
+    balance: 1000,
+    initial_balance: 1000,
     total_earned: 0,
     total_spent: 0,
     last_updated: now,

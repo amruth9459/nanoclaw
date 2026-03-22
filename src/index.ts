@@ -70,6 +70,7 @@ import { startThroughputMonitor } from './throughput-monitor.js';
 import { initNotificationRouter } from './notification-router.js';
 import { ResourceOrchestrator, AgentPriority } from './resource-orchestrator.js';
 import { CleanupGate } from './cleanup-gate.js';
+import { ImplementationGate } from './implementation-gate.js';
 import { DeliverableGate } from './deliverable-gate.js';
 import { GroupQueue } from './group-queue.js';
 import { HitlGate } from './hitl.js';
@@ -81,6 +82,7 @@ import { Channel, NewMessage, RegisteredGroup } from './types.js';
 import { logger } from './logger.js';
 import { PersonaRegistry } from './persona-registry.js';
 import { AutoDispatcher } from './auto-dispatch.js';
+import { startDailyDigest } from './daily-digest.js';
 import { getPersonalityParams } from './personality-tuner.js';
 
 // Re-export for backwards compatibility during refactor
@@ -103,6 +105,7 @@ const queue = new GroupQueue();
 const hitlGate = new HitlGate();
 const cleanupGate = new CleanupGate();
 const deliverableGate = new DeliverableGate();
+const implementationGate = new ImplementationGate();
 let orchestrator: ResourceOrchestrator;
 let router: UniversalRouter;
 let responseTimeManager: ResponseTimeManager;
@@ -1093,6 +1096,13 @@ async function startMessageLoop(): Promise<void> {
               ).catch((err) =>
                 logger.warn({ err }, 'CleanupGate approval handling error'),
               );
+              // ImplementationGate: handle approve/reject {task-id} for branch merges
+              implementationGate.tryHandleApproval(
+                msg.content,
+                (text) => channel.sendMessage(chatJid, text),
+              ).catch((err) =>
+                logger.warn({ err }, 'ImplementationGate approval handling error'),
+              );
               // Integration gates (e.g. SandboxGate)
               for (const integ of getIntegrations()) {
                 if (integ.tryHandleApproval) {
@@ -1781,6 +1791,13 @@ Steps:
   // Initialize notification router so /api/notify can send to WhatsApp
   initNotificationRouter(clawSend);
 
+  // Daily digest: morning brief (9 AM) + evening report (9 PM)
+  startDailyDigest(clawSend, () =>
+    Object.entries(registeredGroups).find(
+      ([, g]) => g.folder === MAIN_GROUP_FOLDER,
+    )?.[0],
+  );
+
   startIpcWatcher({
     sendMessage: clawSend,
     sendReaction: (jid, msgId, senderJid, emoji) => {
@@ -1805,6 +1822,7 @@ Steps:
     hitlGate,
     cleanupGate,
     deliverableGate,
+    implementationGate,
     getMainGroupJid: () =>
       Object.entries(registeredGroups).find(
         ([, g]) => g.folder === MAIN_GROUP_FOLDER,

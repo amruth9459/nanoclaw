@@ -58,6 +58,8 @@ export interface IpcDeps {
   cleanupGate?: CleanupGate;
   /** Deliverable gate — HITL approval for freelance deliverables */
   deliverableGate?: DeliverableGate;
+  /** Implementation gate — HITL approval for branch merges */
+  implementationGate?: import('./implementation-gate.js').ImplementationGate;
   /** Returns the JID of the main group (used for HITL notifications) */
   getMainGroupJid?: () => string | undefined;
   /**
@@ -223,7 +225,7 @@ export function startIpcWatcher(deps: IpcDeps): void {
                 // ── IPC handlers ────────────────────────────────────────────
                 const IPC_TYPES = new Set([
                   'learn',
-                  'propose_deliverable',
+                  'propose_deliverable', 'propose_implementation',
                   'task_tool', 'gsd_tool', 'gmail_cleanup', 'shared_items',
                   'token_refresh',
                   'generate_safety_brief', 'monitoring_log',
@@ -891,6 +893,51 @@ async function processIpcMessage(
 
       if (responseFile) writeIpcResponse(responseFile, { proposed: true, token });
       logger.info({ groupFolder, gigId, token }, 'Freelance: propose_deliverable processed');
+      break;
+    }
+
+    // ── Implementation Gate (branch-based approval) ─────────────────
+    case 'propose_implementation': {
+      const taskId = data.task_id as string;
+      const branch = data.branch as string;
+      const summary = data.summary as string;
+      const repoPath = data.repo_path as string;
+      const filesChanged = data.files_changed as number | undefined;
+      const insertions = data.insertions as number | undefined;
+      const deletions = data.deletions as number | undefined;
+
+      if (!taskId || !branch || !summary) {
+        if (responseFile) writeIpcResponse(responseFile, { error: 'Missing task_id, branch, or summary' });
+        break;
+      }
+
+      if (!deps.implementationGate) {
+        if (responseFile) writeIpcResponse(responseFile, { error: 'ImplementationGate not configured' });
+        break;
+      }
+
+      const mainJid = deps.getMainGroupJid?.();
+      if (!mainJid) {
+        if (responseFile) writeIpcResponse(responseFile, { error: 'Main group JID not configured' });
+        break;
+      }
+
+      const msg = deps.implementationGate.propose({
+        taskId,
+        branch,
+        repoPath: repoPath || process.cwd(),
+        summary,
+        filesChanged,
+        insertions,
+        deletions,
+      });
+
+      const { getNotifyJid: _getNotifyJid } = await import('./notify.js');
+      const notifyJid = _getNotifyJid('desktop', mainJid);
+      await deps.sendMessage(notifyJid, msg);
+
+      if (responseFile) writeIpcResponse(responseFile, { proposed: true, task_id: taskId });
+      logger.info({ groupFolder, taskId, branch }, 'Implementation proposed for approval');
       break;
     }
 
