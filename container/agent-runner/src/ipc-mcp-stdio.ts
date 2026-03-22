@@ -551,6 +551,51 @@ NEVER deliver work to a client without approval through this gate.`,
 );
 
 server.tool(
+  'propose_implementation',
+  `Propose a code implementation for user approval before merging to main.
+Use this after creating a feature branch with changes. The user will receive a WhatsApp message
+and can reply "approve {task-id}" to merge or "reject {task-id}" to discard.
+
+WORKFLOW:
+1. Create branch: git checkout -b claw/{task-id}
+2. Implement changes, run tests
+3. git commit with descriptive message
+4. Call this tool with the branch name and summary
+5. Wait — the user will approve or reject via WhatsApp`,
+  {
+    task_id: z.string().describe('Task ID (used as approval token, e.g. "lex-2-ai-01")'),
+    branch: z.string().describe('Git branch name (e.g. "claw/lex-2-ai-01")'),
+    summary: z.string().describe('Brief summary of what was implemented'),
+    repo_path: z.string().optional().describe('Absolute path to the git repo on the host (defaults to project root)'),
+    files_changed: z.number().int().optional().describe('Number of files changed'),
+    insertions: z.number().int().optional().describe('Lines added'),
+    deletions: z.number().int().optional().describe('Lines deleted'),
+  },
+  async (args) => {
+    const { responseFile } = writeIpcRequest({
+      type: 'propose_implementation',
+      task_id: args.task_id,
+      branch: args.branch,
+      summary: args.summary,
+      repo_path: args.repo_path,
+      files_changed: args.files_changed,
+      insertions: args.insertions,
+      deletions: args.deletions,
+    });
+    const result = await pollResponse(responseFile, 15000);
+    if (!result) {
+      return { content: [{ type: 'text' as const, text: 'Error: propose_implementation request timed out' }], isError: true };
+    }
+    if (result.error) {
+      return { content: [{ type: 'text' as const, text: `Error: ${result.error}` }], isError: true };
+    }
+    return {
+      content: [{ type: 'text' as const, text: `Implementation proposed for approval (task: ${args.task_id}). The user will reply "approve ${args.task_id}" or "reject ${args.task_id}" via WhatsApp.` }],
+    };
+  },
+);
+
+server.tool(
   'remote_shell',
   `Execute a command on the Mac host from WhatsApp. Use this when the user asks you to run something on their computer remotely.
 

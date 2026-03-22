@@ -1792,10 +1792,13 @@ Steps:
   initNotificationRouter(clawSend);
 
   // Daily digest: morning brief (9 AM) + evening report (9 PM)
-  startDailyDigest(clawSend, () =>
-    Object.entries(registeredGroups).find(
-      ([, g]) => g.folder === MAIN_GROUP_FOLDER,
-    )?.[0],
+  startDailyDigest(
+    clawSend,
+    () =>
+      Object.entries(registeredGroups).find(
+        ([, g]) => g.folder === MAIN_GROUP_FOLDER,
+      )?.[0],
+    () => implementationGate.getPending().length,
   );
 
   startIpcWatcher({

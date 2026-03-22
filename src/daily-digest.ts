@@ -98,7 +98,7 @@ function getContainerErrors(since: string): number {
   }
 }
 
-export function generateMorningBrief(): string {
+export function generateMorningBrief(pendingApprovals?: number): string {
   const since = yesterdayAt(21).toISOString(); // Since last 9 PM
   const dispatches = getDispatchResults(since);
   const completed = dispatches.filter(d => d.status === 'completed').length;
@@ -130,6 +130,10 @@ export function generateMorningBrief(): string {
     if (queued > 0) parts.push(`${queued} queued dispatches`);
     if (pending > 0) parts.push(`${pending} running`);
     lines.push(`*Queued:* ${parts.join(', ')}`);
+  }
+
+  if (pendingApprovals && pendingApprovals > 0) {
+    lines.push(`*Pending approvals:* ${pendingApprovals} implementation branch${pendingApprovals !== 1 ? 'es' : ''} ready`);
   }
 
   return lines.join('\n');
@@ -197,6 +201,7 @@ export function generateEveningReport(): string {
 export function startDailyDigest(
   sendMessage: (jid: string, text: string) => Promise<void>,
   getMainJid: () => string | undefined,
+  getPendingApprovals?: () => number,
 ): void {
   let lastMorningSent = '';
   let lastEveningSent = '';
@@ -214,7 +219,7 @@ export function startDailyDigest(
     // 9 AM morning brief
     if (hour === 9 && lastMorningSent !== dateKey) {
       try {
-        const brief = generateMorningBrief();
+        const brief = generateMorningBrief(getPendingApprovals?.());
         await sendMessage(mainJid, brief);
         lastMorningSent = dateKey;
         logger.info('Daily digest: morning brief sent');

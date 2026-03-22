@@ -429,15 +429,23 @@ You must verify every code change. No exceptions.
     const completionBlock = `
 ## MANDATORY: Task Completion
 When you finish this task:
-1. **Git commit your work.** In your desktop_claude prompt, ALWAYS include at the end:
-   "After all changes, run: git add -A && git commit --author='${agentAuthor}' -m '[Agent] ${task.id}: <brief description>
+1. **Work on a feature branch.** In your desktop_claude prompt, ALWAYS start with:
+   "First: git checkout -b claw/${task.id}"
+   Then implement, test, and commit on that branch:
+   "git add -A && git commit --author='${agentAuthor}' -m '[Agent] ${task.id}: <brief description>
 
 Automated by: ${persona.name} (${persona.department})
 Dispatched by: NanoClaw Auto-Dispatch'"
    This is critical — uncommitted work is invisible and gets redone.
-2. Use task_tool to mark it done: action=update, taskId="${task.id}", status="completed"
-3. Your final message MUST include a summary of what was done, files changed, and test results.
-4. If you cannot complete the task, use task_tool: action=update, taskId="${task.id}", status="blocked"
+2. **Propose for approval.** Call propose_implementation with:
+   - task_id: "${task.id}"
+   - branch: "claw/${task.id}"
+   - summary: brief description of changes
+   - files_changed, insertions, deletions from git diff --stat
+   The user will approve or reject via WhatsApp. Do NOT merge to main yourself.
+3. Use task_tool to mark it: action=update, taskId="${task.id}", status="review"
+4. Your final message MUST include a summary of what was done, files changed, and test results.
+5. If you cannot complete the task, use task_tool: action=update, taskId="${task.id}", status="blocked"
    and explain what's blocking you.
 `;
 
