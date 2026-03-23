@@ -1,4 +1,4 @@
-import { exec } from 'child_process';
+import { exec, execSync } from 'child_process';
 import fs from 'fs';
 import path from 'path';
 
@@ -738,6 +738,22 @@ export class WhatsAppChannel implements Channel {
       const filePath = path.join(MEDIA_DIR, filename);
 
       fs.writeFileSync(filePath, buffer);
+
+      // Resize images to max 1568px (Claude API limit for multi-image is 2000px;
+      // 1568px gives headroom and is Claude's recommended long-edge for best quality/token ratio).
+      if (mediaType === 'image' && process.platform === 'darwin') {
+        try {
+          execSync(
+            `sips --resampleHeightWidthMax 1568 "${filePath}"`,
+            { stdio: 'pipe', timeout: 30000 },
+          );
+          const newSize = fs.statSync(filePath).size;
+          logger.debug({ messageId, originalSize: buffer.length, newSize }, 'Image resized for API compatibility');
+          buffer = fs.readFileSync(filePath);
+        } catch {
+          // sips failed (unsupported format, etc) — use original
+        }
+      }
 
       logger.info({
         messageId,

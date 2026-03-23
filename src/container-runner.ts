@@ -531,6 +531,11 @@ export async function runContainerAgent(
     return { status: 'error', error: 'OAuth token missing from .env', result: null };
   }
 
+  // Pre-process PDFs: convert pages to resized images so Claude API doesn't hit
+  // the 2000px multi-image limit. The media dir is mounted read-only in the container,
+  // so we do this on the host before spawn.
+  input.prompt = preprocessPdfMedia(input.prompt, path.join(STORE_DIR, 'media'));
+
   // Create or retrieve cryptographic identity for this agent
   let agentId: string | undefined;
   try {
@@ -900,6 +905,94 @@ export async function runContainerAgent(
       });
     });
   });
+}
+
+/**
+ * Convert PDF pages to resized PNG images so Claude API doesn't hit the
+ * 2000px multi-image dimension limit. Rewrites prompt references from
+ * [document: /workspace/media/X.pdf] to [image: /workspace/media/X-page-N.png].
+ *
+ * Uses `sips` (macOS built-in) for resizing. Skips if already converted.
+ */
+function preprocessPdfMedia(prompt: string, mediaDir: string): string {
+  // Find all PDF references: [document: /workspace/media/something.pdf]
+  const pdfPattern = /\[document:\s*\/workspace\/media\/([^\]]+\.pdf)\]/gi;
+  const matches = [...prompt.matchAll(pdfPattern)];
+  if (matches.length === 0) return prompt;
+
+  for (const match of matches) {
+    const pdfFilename = match[1];
+    const pdfPath = path.join(mediaDir, pdfFilename);
+    if (!fs.existsSync(pdfPath)) continue;
+
+    const baseName = pdfFilename.replace(/\.pdf$/i, '');
+    const pagesDir = path.join(mediaDir, `${baseName}-pages`);
+
+    // Skip if already converted
+    if (fs.existsSync(pagesDir) && fs.readdirSync(pagesDir).length > 0) {
+      const pageFiles = fs.readdirSync(pagesDir)
+        .filter((f) => f.endsWith('.png'))
+        .sort();
+      const imageRefs = pageFiles
+        .map((f) => `[image: /workspace/media/${baseName}-pages/${f}]`)
+        .join(' ');
+      prompt = prompt.replace(match[0], imageRefs);
+      continue;
+    }
+
+    try {
+      fs.mkdirSync(pagesDir, { recursive: true });
+
+      // Convert PDF pages to PNG using pdftoppm (poppler-utils) or sips fallback.
+      // pdftoppm renders at specified DPI; sips resizes after.
+      // Max 1568px on longest edge (Claude's recommended resolution).
+      try {
+        // pdftoppm: render at 150 DPI (good balance for most PDFs)
+        execSync(
+          `pdftoppm -png -r 150 "${pdfPath}" "${pagesDir}/page"`,
+          { stdio: 'pipe', timeout: 120000 },
+        );
+      } catch {
+        // Fallback: try macOS Preview via sips (can handle some PDFs)
+        logger.debug({ pdfPath }, 'pdftoppm not available, skipping PDF preprocessing');
+        continue;
+      }
+
+      // Resize any oversized pages
+      const pageFiles = fs.readdirSync(pagesDir)
+        .filter((f) => f.endsWith('.png') || f.endsWith('.ppm'))
+        .sort();
+
+      for (const pageFile of pageFiles) {
+        const pagePath = path.join(pagesDir, pageFile);
+        try {
+          execSync(
+            `sips --resampleHeightWidthMax 1568 "${pagePath}"`,
+            { stdio: 'pipe', timeout: 15000 },
+          );
+        } catch {
+          // sips failed on this page — leave as-is
+        }
+      }
+
+      // Rebuild the file list (sips may have changed extensions)
+      const finalFiles = fs.readdirSync(pagesDir)
+        .filter((f) => f.endsWith('.png') || f.endsWith('.ppm'))
+        .sort();
+
+      if (finalFiles.length > 0) {
+        const imageRefs = finalFiles
+          .map((f) => `[image: /workspace/media/${baseName}-pages/${f}]`)
+          .join(' ');
+        prompt = prompt.replace(match[0], imageRefs);
+        logger.info({ pdf: pdfFilename, pages: finalFiles.length }, 'PDF pre-processed to page images');
+      }
+    } catch (err) {
+      logger.warn({ err, pdf: pdfFilename }, 'PDF preprocessing failed, using original');
+    }
+  }
+
+  return prompt;
 }
 
 /**
