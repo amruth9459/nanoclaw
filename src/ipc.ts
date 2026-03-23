@@ -14,10 +14,11 @@ import {
   TIMEZONE,
 } from './config.js';
 import { getIntegrations } from './integration-loader.js';
-import { AvailableGroup } from './container-runner.js';
+import { AvailableGroup, writeTasksSnapshot } from './container-runner.js';
 import {
   createTask,
   deleteTask,
+  getAllTasks,
   getNewSharedItemCount,
   getSharedItemById,
   getSharedItems,
@@ -1325,6 +1326,40 @@ export async function processTaskIpc(
           { taskId, sourceGroup, targetFolder, contextMode },
           'Task created via IPC',
         );
+
+        // Refresh the tasks snapshot so the container sees the new task
+        const allTasks = getAllTasks();
+        const isTargetMain = targetFolder === MAIN_GROUP_FOLDER;
+        writeTasksSnapshot(
+          targetFolder,
+          isTargetMain,
+          allTasks.map((t) => ({
+            id: t.id,
+            groupFolder: t.group_folder,
+            prompt: t.prompt,
+            schedule_type: t.schedule_type,
+            schedule_value: t.schedule_value,
+            status: t.status,
+            next_run: t.next_run,
+          })),
+        );
+        // Also refresh source group's snapshot if different
+        if (sourceGroup !== targetFolder) {
+          const isSourceMain = sourceGroup === MAIN_GROUP_FOLDER;
+          writeTasksSnapshot(
+            sourceGroup,
+            isSourceMain,
+            allTasks.map((t) => ({
+              id: t.id,
+              groupFolder: t.group_folder,
+              prompt: t.prompt,
+              schedule_type: t.schedule_type,
+              schedule_value: t.schedule_value,
+              status: t.status,
+              next_run: t.next_run,
+            })),
+          );
+        }
       }
       break;
 

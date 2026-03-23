@@ -486,6 +486,11 @@ function createSchema(database: Database.Database): void {
       seen_at TEXT NOT NULL
     );
     CREATE INDEX IF NOT EXISTS idx_nonces_time ON seen_nonces(seen_at);
+
+    CREATE TABLE IF NOT EXISTS daily_digest_state (
+      report_type TEXT PRIMARY KEY CHECK(report_type IN ('morning', 'evening')),
+      last_sent_date TEXT NOT NULL
+    );
   `);
 }
 

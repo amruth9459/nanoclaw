@@ -194,18 +194,33 @@ export function generateEveningReport(): string {
   return lines.join('\n');
 }
 
+function getLastSentDate(reportType: 'morning' | 'evening'): string {
+  const db = getDb();
+  const row = db.prepare(
+    'SELECT last_sent_date FROM daily_digest_state WHERE report_type = ?'
+  ).get(reportType) as { last_sent_date: string } | undefined;
+  return row?.last_sent_date ?? '';
+}
+
+function setLastSentDate(reportType: 'morning' | 'evening', dateKey: string): void {
+  const db = getDb();
+  db.prepare(`
+    INSERT INTO daily_digest_state (report_type, last_sent_date)
+    VALUES (?, ?)
+    ON CONFLICT(report_type) DO UPDATE SET last_sent_date = excluded.last_sent_date
+  `).run(reportType, dateKey);
+}
+
 /**
  * Start the daily digest scheduler.
  * Checks every minute whether it's time to send a digest.
+ * State is persisted in SQLite so restarts don't cause missed/duplicate reports.
  */
 export function startDailyDigest(
   sendMessage: (jid: string, text: string) => Promise<void>,
   getMainJid: () => string | undefined,
   getPendingApprovals?: () => number,
 ): void {
-  let lastMorningSent = '';
-  let lastEveningSent = '';
-
   const CHECK_INTERVAL = 60_000; // 1 minute
 
   const check = async () => {
@@ -217,11 +232,11 @@ export function startDailyDigest(
     if (!mainJid) return;
 
     // 9 AM morning brief
-    if (hour === 9 && lastMorningSent !== dateKey) {
+    if (hour === 9 && getLastSentDate('morning') !== dateKey) {
       try {
         const brief = generateMorningBrief(getPendingApprovals?.());
         await sendMessage(mainJid, brief);
-        lastMorningSent = dateKey;
+        setLastSentDate('morning', dateKey);
         logger.info('Daily digest: morning brief sent');
       } catch (err) {
         logger.warn({ err }, 'Daily digest: morning brief failed');
@@ -229,11 +244,11 @@ export function startDailyDigest(
     }
 
     // 9 PM evening report
-    if (hour === 21 && lastEveningSent !== dateKey) {
+    if (hour === 21 && getLastSentDate('evening') !== dateKey) {
       try {
         const report = generateEveningReport();
         await sendMessage(mainJid, report);
-        lastEveningSent = dateKey;
+        setLastSentDate('evening', dateKey);
         logger.info('Daily digest: evening report sent');
       } catch (err) {
         logger.warn({ err }, 'Daily digest: evening report failed');
