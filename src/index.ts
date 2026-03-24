@@ -1473,12 +1473,16 @@ TOOLS: find_freelance_gigs, find_bounties, propose_bounty, propose_deliverable, 
 }
 
 async function main(): Promise<void> {
-  // Startup: verify native modules are compatible with current Node version
+  // Startup: verify native modules are compatible with current Node version.
+  // require('better-sqlite3') only loads the JS wrapper; the native .node binary
+  // isn't loaded until new Database() is called. So we must instantiate one.
   {
     const { createRequire } = await import('module');
     const req = createRequire(import.meta.url);
     try {
-      req('better-sqlite3');
+      const Database = req('better-sqlite3');
+      const testDb = new Database(':memory:');
+      testDb.close();
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : String(err);
       if (msg.includes('NODE_MODULE_VERSION')) {
@@ -1491,11 +1495,16 @@ async function main(): Promise<void> {
             stdio: 'pipe',
             timeout: 60000,
           });
-          logger.info('better-sqlite3 rebuilt successfully — continuing startup');
+          logger.info('better-sqlite3 rebuilt successfully — restarting');
+          // After rebuild, the cached module is stale. Restart cleanly.
+          process.exit(0);
         } catch (rebuildErr) {
           logger.error({ err: rebuildErr }, 'FATAL: Failed to rebuild better-sqlite3');
           process.exit(1);
         }
+      } else {
+        // Some other error (not version mismatch) — let it proceed and fail naturally
+        logger.warn({ error: msg }, 'better-sqlite3 startup check failed (non-version issue)');
       }
     }
   }
