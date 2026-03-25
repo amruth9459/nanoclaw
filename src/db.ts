@@ -7,6 +7,7 @@ import { NewMessage, RegisteredGroup, ScheduledTask, TaskRunLog } from './types.
 import { logger } from './logger.js';
 import { getIntegrations } from './integration-loader.js';
 import { initMonitoringSchema } from './agent-monitoring-system.js';
+import { initAutoresearchSchema } from './autoresearch/persistence.js';
 
 let db: Database.Database;
 
@@ -513,6 +514,7 @@ export function initDatabase(): void {
 
   createSchema(db);
   initMonitoringSchema(db);
+  initAutoresearchSchema(db);
 
   // Migrate from JSON files if they exist
   migrateJsonState();

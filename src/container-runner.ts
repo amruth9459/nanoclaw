@@ -426,6 +426,9 @@ function buildContainerArgs(
     }
   }
 
+  // Autoresearch tools available for all groups
+  toolModules.push('autoresearch-tools');
+
   if (toolModules.length > 0) {
     args.push('-e', `NANOCLAW_TOOL_MODULES=${toolModules.join(',')}`);
   }

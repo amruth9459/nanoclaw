@@ -38,6 +38,7 @@ import { logger } from './logger.js';
 import { indexDocument, semanticSearch } from './semantic-index.js';
 import { RegisteredGroup } from './types.js';
 import { processIdentityIpc, signOutgoingMessage, recordUnsignedMessage } from './identity/ipc-handlers.js';
+import { handleAutoresearchIpc } from './autoresearch/ipc-handler.js';
 
 export interface IpcDeps {
   sendMessage: (jid: string, text: string) => Promise<void>;
@@ -230,6 +231,7 @@ export function startIpcWatcher(deps: IpcDeps): void {
                   'task_tool', 'gsd_tool', 'gmail_cleanup', 'shared_items',
                   'token_refresh',
                   'generate_safety_brief', 'monitoring_log',
+                  'autoresearch',
                 ]);
 
                 // ── Identity IPC handlers ─────────────────────────────────
@@ -1157,6 +1159,18 @@ async function processIpcMessage(
         const errMsg = err instanceof Error ? err.message : String(err);
         if (responseFile) writeIpcResponse(responseFile, { error: errMsg });
         logger.error({ err, groupFolder }, 'Token refresh failed');
+      }
+      break;
+    }
+
+    // ── Autoresearch (experiment engine) ──────────────────────────
+    case 'autoresearch': {
+      try {
+        const result = await handleAutoresearchIpc(data as any);
+        if (responseFile) writeIpcResponse(responseFile, result);
+      } catch (err) {
+        logger.error({ err }, 'Autoresearch IPC handler error');
+        if (responseFile) writeIpcResponse(responseFile, { error: String(err) });
       }
       break;
     }
