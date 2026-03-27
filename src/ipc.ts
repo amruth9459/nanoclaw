@@ -41,7 +41,7 @@ import { processIdentityIpc, signOutgoingMessage, recordUnsignedMessage } from '
 import { handleAutoresearchIpc } from './autoresearch/ipc-handler.js';
 
 export interface IpcDeps {
-  sendMessage: (jid: string, text: string) => Promise<void>;
+  sendMessage: (jid: string, text: string, senderName?: string) => Promise<string | undefined | void>;
   sendReaction?: (jid: string, messageId: string, senderJid: string, emoji: string) => Promise<void>;
   sendFile?: (jid: string, buffer: Buffer, mimetype: string, filename: string, caption?: string) => Promise<void>;
   registeredGroups: () => Record<string, RegisteredGroup>;
@@ -627,6 +627,12 @@ export function startIpcWatcher(deps: IpcDeps): void {
                 if (data.type === 'message' && data.chatJid && data.text) {
                   // Authorization: verify this group can send to this chatJid
                   const targetGroup = registeredGroups[data.chatJid];
+                  // Look up displayName for the source group (for custom bot prefix)
+                  const sourceGroupEntry = Object.values(registeredGroups).find(g => g.folder === sourceGroup);
+                  const senderName = sourceGroupEntry?.displayName;
+                  // Translate responseFile if present (for returning messageId)
+                  const rawRF = data.responseFile as string | undefined;
+                  const msgResponseFile = rawRF ? toHostIpcPath(rawRF, sourceGroup) : undefined;
 
                   if (isMain && !targetGroup) {
                     // HITL gate: main agent targeting an unregistered JID.
@@ -638,7 +644,7 @@ export function startIpcWatcher(deps: IpcDeps): void {
                         data.text,
                         sourceGroup,
                         (msg) => deps.sendMessage(mainJid, msg),
-                        () => deps.sendMessage(data.chatJid, data.text),
+                        () => deps.sendMessage(data.chatJid, data.text, senderName),
                       );
                     } else {
                       logger.warn(
@@ -668,12 +674,16 @@ export function startIpcWatcher(deps: IpcDeps): void {
                       recordUnsignedMessage(sourceGroup, data.text as string, data.chatJid as string).catch(() => {});
                     }
 
-                    await deps.sendMessage(data.chatJid, data.text);
+                    const messageId = await deps.sendMessage(data.chatJid, data.text, senderName);
                     deps.onAgentSendMessage?.(data.chatJid);
                     logger.info(
-                      { chatJid: data.chatJid, sourceGroup, signed: !!agentId },
+                      { chatJid: data.chatJid, sourceGroup, signed: !!agentId, messageId },
                       'IPC message sent',
                     );
+                    // Write messageId to responseFile so container can track it
+                    if (msgResponseFile) {
+                      writeIpcResponse(msgResponseFile, { success: true, messageId: messageId ?? null });
+                    }
                   } else {
                     logger.warn(
                       { chatJid: data.chatJid, sourceGroup },

@@ -161,6 +161,8 @@ function loadState(): void {
             trigger: g.trigger,
             added_at: new Date().toISOString(),
             requiresTrigger: g.requiresTrigger,
+            displayName: g.displayName,
+            containerConfig: g.containerConfig,
           });
         }
       }
@@ -1689,9 +1691,30 @@ Steps:
     onMessage: (_chatJid: string, msg: NewMessage, channelName?: string) => {
       storeMessage(msg);
       if (channelName) chatChannelSource.set(msg.chat_jid, channelName);
+      // Dispatch quote-replies to integrations (reactions handled separately)
+      if (msg.quoted_message_id && !msg.is_bot_message) {
+        (async () => {
+          for (const integration of getIntegrations()) {
+            if (integration.handleQuoteReply) {
+              const handled = await integration.handleQuoteReply(msg.chat_jid, msg.quoted_message_id!, msg);
+              if (handled) break;
+            }
+          }
+        })().catch((err) => logger.warn({ err, chatJid: msg.chat_jid }, 'Error in quote-reply handler'));
+      }
     },
     onChatMetadata: (chatJid: string, timestamp: string, name?: string, channel?: string, isGroup?: boolean) =>
       storeChatMetadata(chatJid, timestamp, name, channel, isGroup),
+    onReaction: (chatJid: string, messageId: string, senderJid: string, emoji: string) => {
+      // Dispatch reactions to integrations
+      (async () => {
+        for (const integration of getIntegrations()) {
+          if (integration.handleReaction) {
+            await integration.handleReaction(chatJid, messageId, senderJid, emoji);
+          }
+        }
+      })().catch((err) => logger.warn({ err, chatJid }, 'Error in reaction handler'));
+    },
     registeredGroups: () => registeredGroups,
   };
 
@@ -1802,28 +1825,28 @@ Steps:
   // Claw's outbound messages (IPC-originated) go through WA2 when available so
   // they trigger notifications — sending from the same number as the user gets
   // silenced by WhatsApp as "your own message". Falls back to WA1 if WA2 not in group.
-  const clawSend = async (jid: string, text: string): Promise<void> => {
+  const clawSend = async (jid: string, text: string, senderName?: string): Promise<string | undefined | void> => {
     // First, use ownsJid-based routing — respects registered group context
     // and prevents cross-channel contamination when a JID appears on multiple channels.
     const owned = findChannel(channels, jid);
-    if (owned?.isConnected()) return owned.sendMessage(jid, text);
+    if (owned?.isConnected()) return owned.sendMessage(jid, text, senderName);
 
     // For unregistered/guest JIDs, fall back to in-memory source then DB.
     const channelName = chatChannelSource.get(jid) || getChatChannel(jid);
     if (channelName) {
       const ch = channels.find((c) => c.name === channelName && c.isConnected());
-      if (ch) return ch.sendMessage(jid, text);
+      if (ch) return ch.sendMessage(jid, text, senderName);
     }
     // Fallback: prefer WA2 for notifications, then any channel
     const wa2 = findWa2();
     if (wa2) {
-      try { return await wa2.sendMessage(jid, text); } catch { /* WA2 not in group, fall through */ }
+      try { return await wa2.sendMessage(jid, text, senderName); } catch { /* WA2 not in group, fall through */ }
     }
-    if (owned) return owned.sendMessage(jid, text); // owned but was disconnected earlier — retry
+    if (owned) return owned.sendMessage(jid, text, senderName); // owned but was disconnected earlier — retry
     // Last resort: try any connected channel (handles disconnected preferred channel)
     const anyConnected = channels.find((c) => c.isConnected());
     if (!anyConnected) throw new Error(`No connected channel for JID: ${jid}`);
-    return anyConnected.sendMessage(jid, text);
+    return anyConnected.sendMessage(jid, text, senderName);
   };
 
   const clawSendFile = async (jid: string, buffer: Buffer, mimetype: string, filename: string, caption?: string): Promise<void> => {

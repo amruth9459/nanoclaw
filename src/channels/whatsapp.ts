@@ -53,6 +53,8 @@ export interface WhatsAppChannelOpts {
   primary?: boolean;
   /** Called when connection is restored after being down for > 30s */
   onReconnect?: (downMs: number) => void;
+  /** Called when a user reacts to a message with an emoji */
+  onReaction?: (chatJid: string, messageId: string, senderJid: string, emoji: string) => void;
 }
 
 export class WhatsAppChannel implements Channel {
@@ -428,34 +430,59 @@ export class WhatsAppChannel implements Channel {
             media_path: effectiveMedia?.path ?? null,
             media_mimetype: effectiveMedia?.mimetype ?? null,
             media_size: effectiveMedia?.size ?? null,
+            quoted_message_id: contextInfo?.stanzaId ?? undefined,
           }, this.name);
         }
       }
     });
+
+    // Listen for emoji reactions on messages
+    this.sock.ev.on('messages.reaction', (reactions) => {
+      if (!this.opts.onReaction) return;
+      for (const { key, reaction } of reactions) {
+        if (!key.remoteJid || !key.id || !reaction.text) continue;
+        // reaction.key.participant is the sender of the reaction
+        const senderJid = reaction.key?.participant || reaction.key?.remoteJid || '';
+        this.translateJid(key.remoteJid).then((chatJid) => {
+          const resolveAndNotify = async () => {
+            const resolvedSender = senderJid.endsWith('@lid')
+              ? await this.translateJid(senderJid)
+              : senderJid;
+            this.opts.onReaction!(chatJid, key.id!, resolvedSender, reaction.text!);
+          };
+          resolveAndNotify().catch((err) =>
+            logger.warn({ err, chatJid: key.remoteJid }, 'Error processing reaction'),
+          );
+        });
+      }
+    });
   }
 
-  async sendMessage(jid: string, text: string): Promise<void> {
-    // Prefix bot messages with assistant name so users know who's speaking.
+  async sendMessage(jid: string, text: string, senderName?: string): Promise<string | undefined> {
+    // Prefix bot messages with display name so users know who's speaking.
     // On a shared number, prefix is also needed in DMs (including self-chat)
     // to distinguish bot output from user messages.
     // Skip only when the assistant has its own dedicated phone number.
+    const displayPrefix = senderName || ASSISTANT_NAME;
     const prefixed = ASSISTANT_HAS_OWN_NUMBER
       ? text
-      : `${ASSISTANT_NAME}: ${text}`;
+      : `${displayPrefix}: ${text}`;
 
     if (!this.connected) {
       this.outgoingQueue.push({ jid, text: prefixed });
       logger.info({ jid, length: prefixed.length, queueSize: this.outgoingQueue.length }, 'WA disconnected, message queued');
-      return;
+      return undefined;
     }
     try {
-      await this.sock.sendMessage(jid, { text: prefixed });
+      const sentMsg = await this.sock.sendMessage(jid, { text: prefixed });
       this.resetWatchdog(true); // outgoing message proves connection is alive
-      logger.info({ jid, length: prefixed.length }, 'Message sent');
+      logger.info({ jid, length: prefixed.length, messageId: sentMsg?.key?.id }, 'Message sent');
+      return sentMsg?.key?.id ?? undefined;
     } catch (err) {
       // If send fails, queue it for retry on reconnect (transient during initial sync)
       this.outgoingQueue.push({ jid, text: prefixed });
       logger.info({ jid, err, queueSize: this.outgoingQueue.length }, 'Failed to send, message queued for retry');
+      return undefined;
     }
   }
 

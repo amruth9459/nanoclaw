@@ -15,7 +15,7 @@ export interface IntegrationContext {
   registerGroup: (jid: string, group: RegisteredGroup) => void;
   channels: Channel[];
   queue: GroupQueue;
-  sendMessage: (jid: string, text: string) => Promise<void>;
+  sendMessage: (jid: string, text: string, senderName?: string) => Promise<string | undefined | void>;
 }
 
 export interface ValidationResult {
@@ -53,7 +53,7 @@ export interface ChannelConfig {
 }
 
 export interface IpcHandlerContext {
-  sendMessage: (jid: string, text: string) => Promise<void>;
+  sendMessage: (jid: string, text: string, senderName?: string) => Promise<string | undefined | void>;
   registeredGroups: () => Record<string, RegisteredGroup>;
   registerGroup: (jid: string, group: RegisteredGroup) => void;
 }
@@ -79,6 +79,12 @@ export interface NanoClawIntegration {
     groupFolder: string,
     ctx: IpcHandlerContext,
   ): Promise<void>;
+
+  /** Handle a WhatsApp reaction on a message */
+  handleReaction?(chatJid: string, reactedMessageId: string, senderJid: string, emoji: string): Promise<void>;
+
+  /** Handle a quote-reply to a message. Return true if handled (prevents normal processing). */
+  handleQuoteReply?(chatJid: string, quotedMessageId: string, message: NewMessage): Promise<boolean>;
 
   /**
    * Called each message loop tick. Returns JIDs to enqueue for processing.
@@ -148,6 +154,8 @@ export interface NanoClawIntegration {
     folder: string;
     trigger: string;
     requiresTrigger: boolean;
+    displayName?: string;
+    containerConfig?: import('./types.js').ContainerConfig;
   }>;
 
   /** Contribute to the main group kanban context summary */
