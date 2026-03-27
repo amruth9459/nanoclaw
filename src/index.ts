@@ -1809,21 +1809,6 @@ Steps:
   // Helper: find WA2 channel (the secondary number, used as Claw's outbound identity)
   const findWa2 = () => channels.find((c) => c.name === 'whatsapp2' && c.isConnected());
 
-  startSchedulerLoop({
-    registeredGroups: () => registeredGroups,
-    getSessions: () => sessions,
-    queue,
-    orchestrator,
-    onProcess: (groupJid, proc, containerName, groupFolder) => queue.registerProcess(groupJid, proc, containerName, groupFolder),
-    sendMessage: async (jid, rawText, senderName?) => {
-      const text = formatOutbound(rawText);
-      if (text) await clawSend(jid, text, senderName).catch((err) =>
-        logger.warn({ jid, err }, 'Scheduler sendMessage failed'),
-      );
-    },
-    sendMessageGetId: clawSendGetId,
-  });
-
   // Claw's outbound messages (IPC-originated) go through WA2 when available so
   // they trigger notifications — sending from the same number as the user gets
   // silenced by WhatsApp as "your own message". Falls back to WA1 if WA2 not in group.
@@ -1881,6 +1866,22 @@ Steps:
     if (!ch.sendFile) throw new Error(`Channel ${ch.name} does not support file sending`);
     return ch.sendFile(jid, buffer, mimetype, filename, caption);
   };
+
+  // Start scheduler (after clawSendGetId is defined)
+  startSchedulerLoop({
+    registeredGroups: () => registeredGroups,
+    getSessions: () => sessions,
+    queue,
+    orchestrator,
+    onProcess: (groupJid, proc, containerName, groupFolder) => queue.registerProcess(groupJid, proc, containerName, groupFolder),
+    sendMessage: async (jid, rawText, senderName?) => {
+      const text = formatOutbound(rawText);
+      if (text) await clawSend(jid, text, senderName).catch((err) =>
+        logger.warn({ jid, err }, 'Scheduler sendMessage failed'),
+      );
+    },
+    sendMessageGetId: clawSendGetId,
+  });
 
   // Initialize notification router so /api/notify can send to WhatsApp
   initNotificationRouter(clawSend);

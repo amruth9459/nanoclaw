@@ -137,6 +137,179 @@ const integration: NanoClawIntegration = {
   },
 };
 
+// ── Host-side task runners (local LLM for change parsing) ───────────
+
+type SendFn = (jid: string, text: string, senderName?: string) => Promise<void>;
+type SendGetIdFn = (jid: string, text: string, senderName?: string) => Promise<string | undefined>;
+
+const MLX_URL = 'http://127.0.0.1:8800/v1/completions';
+const MLX_MODEL = 'mlx-community/Qwen2.5-7B-Instruct-4bit';
+
+/** Call local Qwen to apply free-text changes to structured crew data. */
+async function parseChanges(prefill: Record<string, string>, rawChanges: string): Promise<Record<string, string>> {
+  const current = [
+    prefill.ays ? `AYS: ${prefill.ays}` : '',
+    prefill.contractors ? `Contractors: ${prefill.contractors}` : '',
+    prefill.equipment ? `Equipment: ${prefill.equipment}` : '',
+  ].filter(Boolean).join('\n');
+
+  const prompt = `<|im_start|>system\nYou parse construction crew changes. Given the current data and a change description, output the updated data. Output ONLY the three lines (AYS/Contractors/Equipment), nothing else.<|im_end|>\n<|im_start|>user\nCurrent:\n${current}\n\nChanges: ${rawChanges}\n\nOutput updated data:<|im_end|>\n<|im_start|>assistant\n`;
+
+  try {
+    const body = JSON.stringify({ model: MLX_MODEL, prompt, temperature: 0, max_tokens: 300, stop: ['<|im_end|>'] });
+    const resp = await fetch(MLX_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body, signal: AbortSignal.timeout(15000) });
+    if (!resp.ok) throw new Error(`MLX ${resp.status}`);
+    const data = await resp.json() as { choices: Array<{ text: string }> };
+    const text = data.choices[0]?.text?.trim() ?? '';
+
+    const result: Record<string, string> = { ...prefill };
+    for (const line of text.split('\n')) {
+      if (line.startsWith('AYS:')) result.ays = line.slice(4).trim();
+      else if (line.startsWith('Contractors:')) result.contractors = line.slice(12).trim();
+      else if (line.startsWith('Equipment:')) result.equipment = line.slice(10).trim();
+    }
+    return result;
+  } catch (err) {
+    logger.warn({ err, rawChanges }, 'PLC: local LLM failed, using raw changes as-is');
+    return { ...prefill, changes: rawChanges };
+  }
+}
+
+function todayET(): string {
+  return new Date().toLocaleDateString('en-CA', { timeZone: 'America/New_York' });
+}
+
+function dayLabel(): string {
+  const d = new Date();
+  const day = d.toLocaleDateString('en-US', { timeZone: 'America/New_York', weekday: 'short' });
+  const month = d.toLocaleDateString('en-US', { timeZone: 'America/New_York', month: 'numeric' });
+  const date = d.toLocaleDateString('en-US', { timeZone: 'America/New_York', day: 'numeric' });
+  return `${day} ${month}/${date}`;
+}
+
+function formatPrefillBlock(site: { site_id: string; site_name: string; manager_name: string }, data: Record<string, unknown> | null): string {
+  const label = `${site.site_name} (${site.manager_name})`;
+  if (!data) return `${label}\nNo previous data`;
+  const ays = (data.ays as string) || '';
+  const contractors = (data.contractors as string) || '';
+  const equipment = (data.equipment as string) || '';
+  const lines = [label];
+  if (ays) lines.push(ays);
+  if (contractors) lines.push(contractors);
+  if (equipment) lines.push(equipment);
+  return lines.join('\n');
+}
+
+async function runCheckin(chatJid: string, sendMessage: SendFn, sendMessageGetId: SendGetIdFn): Promise<string> {
+  const date = todayET();
+  const sites = getSites();
+  if (sites.length === 0) return 'No sites configured';
+
+  // Create reports (dedup: skips if already exist)
+  const reportIds: Record<string, string> = {};
+  let anyCreated = false;
+  for (const site of sites) {
+    const latest = getLatestReportForSite(site.site_id);
+    const prefill = latest ? JSON.parse(latest.report_data) : {};
+    const result = createDailyReport(date, site.site_id, prefill);
+    reportIds[site.site_id] = result.id;
+    if (result.created) anyCreated = true;
+  }
+
+  if (!anyCreated) return 'Check-in already sent today';
+
+  // Build message
+  const blocks: string[] = [];
+  for (const site of sites) {
+    const latest = getLatestReportForSite(site.site_id);
+    const data = latest ? JSON.parse(latest.report_data) : null;
+    blocks.push(formatPrefillBlock(site, data));
+  }
+
+  const message = `📋 CHECK-IN — ${dayLabel()}\n\n${blocks.join('\n\n')}\n\n👍 same | ❌ off | Reply with changes`;
+
+  // Send and capture message ID for reaction tracking
+  const messageId = await sendMessageGetId(chatJid, message, 'PLC Site Report');
+
+  if (messageId) {
+    for (const reportId of Object.values(reportIds)) {
+      setPrefillMessageId(reportId, messageId);
+    }
+    logger.info({ messageId, date }, 'PLC check-in sent, prefill IDs stored');
+  } else {
+    logger.warn({ date }, 'PLC check-in sent but no message ID returned — reactions won\'t track');
+  }
+
+  return `Check-in sent for ${sites.length} sites`;
+}
+
+async function runCompilation(chatJid: string, sendMessage: SendFn): Promise<string> {
+  const date = todayET();
+  const reports = getReportsForDate(date);
+  const sites = getSites();
+  const siteMap = new Map(sites.map(s => [s.site_id, s]));
+
+  if (reports.length === 0) {
+    await sendMessage(chatJid, '⚠️ No check-in was sent today — skipping compilation.', 'PLC Site Report');
+    return 'No reports to compile';
+  }
+
+  const lines: string[] = [`✅ DAILY REPORT — ${dayLabel()}`];
+
+  for (const report of reports) {
+    const site = siteMap.get(report.site_id);
+    if (!site) continue;
+
+    let statusEmoji: string;
+    let dataBlock = '';
+
+    switch (report.status) {
+      case 'confirmed_same': {
+        statusEmoji = '✅';
+        const data = report.prefill_data ? JSON.parse(report.prefill_data) as Record<string, string> : null;
+        if (data) {
+          if (data.ays) dataBlock += `\nAYS: ${data.ays}`;
+          if (data.contractors) dataBlock += `\nContractors: ${data.contractors}`;
+          if (data.equipment) dataBlock += `\nEquipment: ${data.equipment}`;
+        }
+        // Store in history for tomorrow's prefill
+        if (data) storeReportHistory(date, report.site_id, data);
+        break;
+      }
+      case 'confirmed_changed': {
+        statusEmoji = '✅';
+        const confirmed = report.confirmed_data ? JSON.parse(report.confirmed_data) as Record<string, string> : null;
+        if (confirmed?.raw_changes) {
+          const prefill = report.prefill_data ? JSON.parse(report.prefill_data) as Record<string, string> : {};
+          // Use local LLM to parse free-text changes into structured data
+          const parsed = await parseChanges(prefill, confirmed.raw_changes);
+          if (parsed.ays) dataBlock += `\nAYS: ${parsed.ays}`;
+          if (parsed.contractors) dataBlock += `\nContractors: ${parsed.contractors}`;
+          if (parsed.equipment) dataBlock += `\nEquipment: ${parsed.equipment}`;
+          // Store parsed structured data as history (feeds tomorrow's prefill)
+          storeReportHistory(date, report.site_id, parsed);
+        }
+        break;
+      }
+      case 'off':
+        statusEmoji = '🚫 No work';
+        break;
+      case 'pending':
+      default:
+        statusEmoji = '⚠️ Not reported';
+        break;
+    }
+
+    lines.push(`\n*${site.site_name}* — ${site.manager_name} ${statusEmoji}${dataBlock}`);
+  }
+
+  const message = lines.join('');
+  await sendMessage(chatJid, message, 'PLC Site Report');
+
+  const confirmed = reports.filter(r => r.status !== 'pending').length;
+  return `Daily report compiled: ${confirmed}/${reports.length} sites reported`;
+}
+
 async function ensureScheduledTasks(_ctx: IntegrationContext): Promise<void> {
   const { getTaskById, createTask } = await import('../../db.js');
   const { CronExpressionParser } = await import('cron-parser');
