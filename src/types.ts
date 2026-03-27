@@ -101,7 +101,9 @@ export interface TaskRunLog {
 export interface Channel {
   name: string;
   connect(): Promise<void>;
-  sendMessage(jid: string, text: string, senderName?: string): Promise<string | undefined | void>;
+  sendMessage(jid: string, text: string, senderName?: string): Promise<void>;
+  /** Get the message ID of the last sent message (channel-specific) */
+  getLastSentMessageId?(): string | undefined;
   /** Send a file (PDF, image, etc.) as a WhatsApp document/image message. */
   sendFile?(jid: string, buffer: Buffer, mimetype: string, filename: string, caption?: string): Promise<void>;
   isConnected(): boolean;

@@ -1825,28 +1825,37 @@ Steps:
   // Claw's outbound messages (IPC-originated) go through WA2 when available so
   // they trigger notifications — sending from the same number as the user gets
   // silenced by WhatsApp as "your own message". Falls back to WA1 if WA2 not in group.
-  const clawSend = async (jid: string, text: string, senderName?: string): Promise<string | undefined | void> => {
+  const clawSend = async (jid: string, text: string, senderName?: string): Promise<void> => {
     // First, use ownsJid-based routing — respects registered group context
     // and prevents cross-channel contamination when a JID appears on multiple channels.
     const owned = findChannel(channels, jid);
-    if (owned?.isConnected()) return owned.sendMessage(jid, text, senderName);
+    if (owned?.isConnected()) { await owned.sendMessage(jid, text, senderName); return; }
 
     // For unregistered/guest JIDs, fall back to in-memory source then DB.
     const channelName = chatChannelSource.get(jid) || getChatChannel(jid);
     if (channelName) {
       const ch = channels.find((c) => c.name === channelName && c.isConnected());
-      if (ch) return ch.sendMessage(jid, text, senderName);
+      if (ch) { await ch.sendMessage(jid, text, senderName); return; }
     }
     // Fallback: prefer WA2 for notifications, then any channel
     const wa2 = findWa2();
     if (wa2) {
-      try { return await wa2.sendMessage(jid, text, senderName); } catch { /* WA2 not in group, fall through */ }
+      try { await wa2.sendMessage(jid, text, senderName); return; } catch { /* WA2 not in group, fall through */ }
     }
-    if (owned) return owned.sendMessage(jid, text, senderName); // owned but was disconnected earlier — retry
+    if (owned) { await owned.sendMessage(jid, text, senderName); return; } // owned but was disconnected earlier — retry
     // Last resort: try any connected channel (handles disconnected preferred channel)
     const anyConnected = channels.find((c) => c.isConnected());
     if (!anyConnected) throw new Error(`No connected channel for JID: ${jid}`);
-    return anyConnected.sendMessage(jid, text, senderName);
+    await anyConnected.sendMessage(jid, text, senderName);
+  };
+
+  // Like clawSend but returns the WhatsApp message ID (for IPC responseFile)
+  const clawSendGetId = async (jid: string, text: string, senderName?: string): Promise<string | undefined> => {
+    const owned = findChannel(channels, jid);
+    const ch = owned?.isConnected() ? owned : findWa2() ?? channels.find((c) => c.isConnected());
+    if (!ch) throw new Error(`No connected channel for JID: ${jid}`);
+    await ch.sendMessage(jid, text, senderName);
+    return ch.getLastSentMessageId?.();
   };
 
   const clawSendFile = async (jid: string, buffer: Buffer, mimetype: string, filename: string, caption?: string): Promise<void> => {
@@ -1886,6 +1895,7 @@ Steps:
 
   startIpcWatcher({
     sendMessage: clawSend,
+    sendMessageGetId: clawSendGetId,
     sendReaction: (jid, msgId, senderJid, emoji) => {
       // Respect the channel the chat arrived on (critical for guest DMs)
       const dbChannel = getChatChannel(jid);

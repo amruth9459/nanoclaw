@@ -194,7 +194,7 @@ Equipment: [list]
   for (const task of tasks) {
     const existing = getTaskById(task.id);
     if (!existing) {
-      const cron = CronExpressionParser.parseExpression(task.schedule_value, { tz: 'America/New_York' });
+      const cron = CronExpressionParser.parse(task.schedule_value, { tz: 'America/New_York' });
       createTask({
         ...task,
         next_run: cron.next().toISOString(),

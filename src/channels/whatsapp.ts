@@ -458,7 +458,10 @@ export class WhatsAppChannel implements Channel {
     });
   }
 
-  async sendMessage(jid: string, text: string, senderName?: string): Promise<string | undefined> {
+  /** Last sent message ID (captured for IPC responseFile) */
+  private lastSentMessageId: string | undefined;
+
+  async sendMessage(jid: string, text: string, senderName?: string): Promise<void> {
     // Prefix bot messages with display name so users know who's speaking.
     // On a shared number, prefix is also needed in DMs (including self-chat)
     // to distinguish bot output from user messages.
@@ -468,22 +471,28 @@ export class WhatsAppChannel implements Channel {
       ? text
       : `${displayPrefix}: ${text}`;
 
+    this.lastSentMessageId = undefined;
+
     if (!this.connected) {
       this.outgoingQueue.push({ jid, text: prefixed });
       logger.info({ jid, length: prefixed.length, queueSize: this.outgoingQueue.length }, 'WA disconnected, message queued');
-      return undefined;
+      return;
     }
     try {
       const sentMsg = await this.sock.sendMessage(jid, { text: prefixed });
+      this.lastSentMessageId = sentMsg?.key?.id ?? undefined;
       this.resetWatchdog(true); // outgoing message proves connection is alive
-      logger.info({ jid, length: prefixed.length, messageId: sentMsg?.key?.id }, 'Message sent');
-      return sentMsg?.key?.id ?? undefined;
+      logger.info({ jid, length: prefixed.length, messageId: this.lastSentMessageId }, 'Message sent');
     } catch (err) {
       // If send fails, queue it for retry on reconnect (transient during initial sync)
       this.outgoingQueue.push({ jid, text: prefixed });
       logger.info({ jid, err, queueSize: this.outgoingQueue.length }, 'Failed to send, message queued for retry');
-      return undefined;
     }
+  }
+
+  /** Get the message ID from the last sendMessage call */
+  getLastSentMessageId(): string | undefined {
+    return this.lastSentMessageId;
   }
 
   async sendFile(jid: string, buffer: Buffer, mimetype: string, filename: string, caption?: string): Promise<void> {

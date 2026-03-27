@@ -15,7 +15,7 @@ export interface IntegrationContext {
   registerGroup: (jid: string, group: RegisteredGroup) => void;
   channels: Channel[];
   queue: GroupQueue;
-  sendMessage: (jid: string, text: string, senderName?: string) => Promise<string | undefined | void>;
+  sendMessage: (jid: string, text: string, senderName?: string) => Promise<void>;
 }
 
 export interface ValidationResult {
@@ -53,7 +53,7 @@ export interface ChannelConfig {
 }
 
 export interface IpcHandlerContext {
-  sendMessage: (jid: string, text: string, senderName?: string) => Promise<string | undefined | void>;
+  sendMessage: (jid: string, text: string, senderName?: string) => Promise<void>;
   registeredGroups: () => Record<string, RegisteredGroup>;
   registerGroup: (jid: string, group: RegisteredGroup) => void;
 }

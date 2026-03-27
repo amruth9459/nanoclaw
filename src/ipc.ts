@@ -41,7 +41,9 @@ import { processIdentityIpc, signOutgoingMessage, recordUnsignedMessage } from '
 import { handleAutoresearchIpc } from './autoresearch/ipc-handler.js';
 
 export interface IpcDeps {
-  sendMessage: (jid: string, text: string, senderName?: string) => Promise<string | undefined | void>;
+  sendMessage: (jid: string, text: string, senderName?: string) => Promise<void>;
+  /** Like sendMessage but returns the WhatsApp message ID. Used for IPC responseFile. */
+  sendMessageGetId?: (jid: string, text: string, senderName?: string) => Promise<string | undefined>;
   sendReaction?: (jid: string, messageId: string, senderJid: string, emoji: string) => Promise<void>;
   sendFile?: (jid: string, buffer: Buffer, mimetype: string, filename: string, caption?: string) => Promise<void>;
   registeredGroups: () => Record<string, RegisteredGroup>;
@@ -674,7 +676,12 @@ export function startIpcWatcher(deps: IpcDeps): void {
                       recordUnsignedMessage(sourceGroup, data.text as string, data.chatJid as string).catch(() => {});
                     }
 
-                    const messageId = await deps.sendMessage(data.chatJid, data.text, senderName);
+                    let messageId: string | undefined;
+                    if (msgResponseFile && deps.sendMessageGetId) {
+                      messageId = await deps.sendMessageGetId(data.chatJid, data.text, senderName);
+                    } else {
+                      await deps.sendMessage(data.chatJid, data.text, senderName);
+                    }
                     deps.onAgentSendMessage?.(data.chatJid);
                     logger.info(
                       { chatJid: data.chatJid, sourceGroup, signed: !!agentId, messageId },
