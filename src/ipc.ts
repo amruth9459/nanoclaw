@@ -38,6 +38,7 @@ import { logger } from './logger.js';
 import { indexDocument, semanticSearch } from './semantic-index.js';
 import { RegisteredGroup } from './types.js';
 import { processIdentityIpc, signOutgoingMessage, recordUnsignedMessage } from './identity/ipc-handlers.js';
+import { handleCompetitiveIntelIpc } from './competitive-intel/ipc-handler.js';
 
 export interface IpcDeps {
   sendMessage: (jid: string, text: string) => Promise<void>;
@@ -1157,6 +1158,18 @@ async function processIpcMessage(
         const errMsg = err instanceof Error ? err.message : String(err);
         if (responseFile) writeIpcResponse(responseFile, { error: errMsg });
         logger.error({ err, groupFolder }, 'Token refresh failed');
+      }
+      break;
+    }
+
+    // ── Competitive Intelligence (quarterly monitoring) ──────────
+    case 'competitive_intel_check': {
+      try {
+        const result = await handleCompetitiveIntelIpc(data as any);
+        if (responseFile) writeIpcResponse(responseFile, result);
+      } catch (err) {
+        logger.error({ err }, 'Competitive intel IPC handler error');
+        if (responseFile) writeIpcResponse(responseFile, { error: String(err) });
       }
       break;
     }
