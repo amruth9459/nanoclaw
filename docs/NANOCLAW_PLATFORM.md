@@ -1,6 +1,6 @@
 # NanoClaw Platform Overview
 
-*Living document — last updated: 2026-03-05*
+*Living document — last updated: 2026-03-26*
 *Auto-updated by `lexios/update-docs.py` via NanoClaw scheduled task (twice daily)*
 
 ## What is NanoClaw?

@@ -38,10 +38,16 @@ import { logger } from './logger.js';
 import { indexDocument, semanticSearch } from './semantic-index.js';
 import { RegisteredGroup } from './types.js';
 import { processIdentityIpc, signOutgoingMessage, recordUnsignedMessage } from './identity/ipc-handlers.js';
+<<<<<<< HEAD
 import { handleCompetitiveIntelIpc } from './competitive-intel/ipc-handler.js';
+=======
+import { handleAutoresearchIpc } from './autoresearch/ipc-handler.js';
+>>>>>>> claw/task_1774497485754_mm34hey
 
 export interface IpcDeps {
-  sendMessage: (jid: string, text: string) => Promise<void>;
+  sendMessage: (jid: string, text: string, senderName?: string) => Promise<void>;
+  /** Like sendMessage but returns the WhatsApp message ID. Used for IPC responseFile. */
+  sendMessageGetId?: (jid: string, text: string, senderName?: string) => Promise<string | undefined>;
   sendReaction?: (jid: string, messageId: string, senderJid: string, emoji: string) => Promise<void>;
   sendFile?: (jid: string, buffer: Buffer, mimetype: string, filename: string, caption?: string) => Promise<void>;
   registeredGroups: () => Record<string, RegisteredGroup>;
@@ -231,6 +237,7 @@ export function startIpcWatcher(deps: IpcDeps): void {
                   'task_tool', 'gsd_tool', 'gmail_cleanup', 'shared_items',
                   'token_refresh',
                   'generate_safety_brief', 'monitoring_log',
+                  'autoresearch',
                 ]);
 
                 // ── Identity IPC handlers ─────────────────────────────────
@@ -626,6 +633,12 @@ export function startIpcWatcher(deps: IpcDeps): void {
                 if (data.type === 'message' && data.chatJid && data.text) {
                   // Authorization: verify this group can send to this chatJid
                   const targetGroup = registeredGroups[data.chatJid];
+                  // Look up displayName for the source group (for custom bot prefix)
+                  const sourceGroupEntry = Object.values(registeredGroups).find(g => g.folder === sourceGroup);
+                  const senderName = sourceGroupEntry?.displayName;
+                  // Translate responseFile if present (for returning messageId)
+                  const rawRF = data.responseFile as string | undefined;
+                  const msgResponseFile = rawRF ? toHostIpcPath(rawRF, sourceGroup) : undefined;
 
                   if (isMain && !targetGroup) {
                     // HITL gate: main agent targeting an unregistered JID.
@@ -637,7 +650,7 @@ export function startIpcWatcher(deps: IpcDeps): void {
                         data.text,
                         sourceGroup,
                         (msg) => deps.sendMessage(mainJid, msg),
-                        () => deps.sendMessage(data.chatJid, data.text),
+                        () => deps.sendMessage(data.chatJid, data.text, senderName),
                       );
                     } else {
                       logger.warn(
@@ -667,12 +680,21 @@ export function startIpcWatcher(deps: IpcDeps): void {
                       recordUnsignedMessage(sourceGroup, data.text as string, data.chatJid as string).catch(() => {});
                     }
 
-                    await deps.sendMessage(data.chatJid, data.text);
+                    let messageId: string | undefined;
+                    if (msgResponseFile && deps.sendMessageGetId) {
+                      messageId = await deps.sendMessageGetId(data.chatJid, data.text, senderName);
+                    } else {
+                      await deps.sendMessage(data.chatJid, data.text, senderName);
+                    }
                     deps.onAgentSendMessage?.(data.chatJid);
                     logger.info(
-                      { chatJid: data.chatJid, sourceGroup, signed: !!agentId },
+                      { chatJid: data.chatJid, sourceGroup, signed: !!agentId, messageId },
                       'IPC message sent',
                     );
+                    // Write messageId to responseFile so container can track it
+                    if (msgResponseFile) {
+                      writeIpcResponse(msgResponseFile, { success: true, messageId: messageId ?? null });
+                    }
                   } else {
                     logger.warn(
                       { chatJid: data.chatJid, sourceGroup },
@@ -1162,6 +1184,7 @@ async function processIpcMessage(
       break;
     }
 
+<<<<<<< HEAD
     // ── Competitive Intelligence (quarterly monitoring) ──────────
     case 'competitive_intel_check': {
       try {
@@ -1169,6 +1192,15 @@ async function processIpcMessage(
         if (responseFile) writeIpcResponse(responseFile, result);
       } catch (err) {
         logger.error({ err }, 'Competitive intel IPC handler error');
+=======
+    // ── Autoresearch (experiment engine) ──────────────────────────
+    case 'autoresearch': {
+      try {
+        const result = await handleAutoresearchIpc(data as any);
+        if (responseFile) writeIpcResponse(responseFile, result);
+      } catch (err) {
+        logger.error({ err }, 'Autoresearch IPC handler error');
+>>>>>>> claw/task_1774497485754_mm34hey
         if (responseFile) writeIpcResponse(responseFile, { error: String(err) });
       }
       break;
