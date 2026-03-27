@@ -38,11 +38,8 @@ import { logger } from './logger.js';
 import { indexDocument, semanticSearch } from './semantic-index.js';
 import { RegisteredGroup } from './types.js';
 import { processIdentityIpc, signOutgoingMessage, recordUnsignedMessage } from './identity/ipc-handlers.js';
-<<<<<<< HEAD
 import { handleCompetitiveIntelIpc } from './competitive-intel/ipc-handler.js';
-=======
 import { handleAutoresearchIpc } from './autoresearch/ipc-handler.js';
->>>>>>> claw/task_1774497485754_mm34hey
 
 export interface IpcDeps {
   sendMessage: (jid: string, text: string, senderName?: string) => Promise<void>;
@@ -1184,7 +1181,6 @@ async function processIpcMessage(
       break;
     }
 
-<<<<<<< HEAD
     // ── Competitive Intelligence (quarterly monitoring) ──────────
     case 'competitive_intel_check': {
       try {
@@ -1192,7 +1188,11 @@ async function processIpcMessage(
         if (responseFile) writeIpcResponse(responseFile, result);
       } catch (err) {
         logger.error({ err }, 'Competitive intel IPC handler error');
-=======
+        if (responseFile) writeIpcResponse(responseFile, { error: String(err) });
+      }
+      break;
+    }
+
     // ── Autoresearch (experiment engine) ──────────────────────────
     case 'autoresearch': {
       try {
@@ -1200,7 +1200,6 @@ async function processIpcMessage(
         if (responseFile) writeIpcResponse(responseFile, result);
       } catch (err) {
         logger.error({ err }, 'Autoresearch IPC handler error');
->>>>>>> claw/task_1774497485754_mm34hey
         if (responseFile) writeIpcResponse(responseFile, { error: String(err) });
       }
       break;
