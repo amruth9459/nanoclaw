@@ -1806,21 +1806,23 @@ Steps:
   // Start subsystems (independently of connection handler)
   startDashboard(queue, (jid, text) => clawSend(jid, text), orchestrator, router);
   startThroughputMonitor();
+  // Helper: find WA2 channel (the secondary number, used as Claw's outbound identity)
+  const findWa2 = () => channels.find((c) => c.name === 'whatsapp2' && c.isConnected());
+
   startSchedulerLoop({
     registeredGroups: () => registeredGroups,
     getSessions: () => sessions,
     queue,
     orchestrator,
     onProcess: (groupJid, proc, containerName, groupFolder) => queue.registerProcess(groupJid, proc, containerName, groupFolder),
-    sendMessage: async (jid, rawText) => {
+    sendMessage: async (jid, rawText, senderName?) => {
       const text = formatOutbound(rawText);
-      if (text) await clawSend(jid, text).catch((err) =>
+      if (text) await clawSend(jid, text, senderName).catch((err) =>
         logger.warn({ jid, err }, 'Scheduler sendMessage failed'),
       );
     },
+    sendMessageGetId: clawSendGetId,
   });
-  // Helper: find WA2 channel (the secondary number, used as Claw's outbound identity)
-  const findWa2 = () => channels.find((c) => c.name === 'whatsapp2' && c.isConnected());
 
   // Claw's outbound messages (IPC-originated) go through WA2 when available so
   // they trigger notifications — sending from the same number as the user gets

@@ -70,6 +70,12 @@ export interface NanoClawIntegration {
   /** Returns true if this integration owns the given group folder */
   ownsGroup?(folder: string): boolean;
 
+  /**
+   * Handle a scheduled task host-side (no container/LLM needed).
+   * Return a result string if handled, or undefined to fall through to container execution.
+   */
+  handleScheduledTask?(taskId: string, chatJid: string, sendMessage: (jid: string, text: string, senderName?: string) => Promise<void>, sendMessageGetId: (jid: string, text: string, senderName?: string) => Promise<string | undefined>): Promise<string | undefined>;
+
   /** Set of IPC message type strings this integration handles */
   ipcMessageTypes?: Set<string>;
 

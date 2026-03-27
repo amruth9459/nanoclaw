@@ -33,7 +33,8 @@ export interface SchedulerDependencies {
   queue: GroupQueue;
   orchestrator?: ResourceOrchestrator;
   onProcess: (groupJid: string, proc: ChildProcess, containerName: string, groupFolder: string) => void;
-  sendMessage: (jid: string, text: string) => Promise<void>;
+  sendMessage: (jid: string, text: string, senderName?: string) => Promise<void>;
+  sendMessageGetId?: (jid: string, text: string, senderName?: string) => Promise<string | undefined>;
 }
 
 async function runTask(
@@ -89,6 +90,46 @@ async function runTask(
 
   let result: string | null = null;
   let error: string | null = null;
+
+  // Check if an integration handles this task host-side (no container needed)
+  for (const integration of getIntegrations()) {
+    if (integration.ownsGroup?.(task.group_folder) && integration.handleScheduledTask) {
+      try {
+        const sendGetId = deps.sendMessageGetId ?? (async (jid: string, text: string, senderName?: string) => {
+          await deps.sendMessage(jid, text, senderName);
+          return undefined;
+        });
+        const hostResult = await integration.handleScheduledTask(
+          task.id, task.chat_jid, deps.sendMessage, sendGetId,
+        );
+        if (hostResult !== undefined) {
+          result = hostResult;
+          const durationMs = Date.now() - startTime;
+          logTaskRun({ task_id: task.id, run_at: new Date().toISOString(), duration_ms: durationMs, status: 'success', result, error: null });
+          let nextRun: string | null = null;
+          if (task.schedule_type === 'cron') {
+            const interval = CronExpressionParser.parse(task.schedule_value, { tz: TIMEZONE });
+            nextRun = interval.next().toISOString();
+          }
+          updateTaskAfterRun(task.id, nextRun, result.slice(0, 200));
+          logger.info({ taskId: task.id, durationMs }, 'Task completed host-side');
+          return;
+        }
+      } catch (err) {
+        error = err instanceof Error ? err.message : String(err);
+        logger.error({ taskId: task.id, error }, 'Host-side task failed');
+        const durationMs = Date.now() - startTime;
+        logTaskRun({ task_id: task.id, run_at: new Date().toISOString(), duration_ms: durationMs, status: 'error', result: null, error });
+        let nextRun: string | null = null;
+        if (task.schedule_type === 'cron') {
+          const interval = CronExpressionParser.parse(task.schedule_value, { tz: TIMEZONE });
+          nextRun = interval.next().toISOString();
+        }
+        updateTaskAfterRun(task.id, nextRun, `Error: ${error}`);
+        return;
+      }
+    }
+  }
 
   // Track task agent lifecycle in orchestrator
   const taskDesignation = task.id.includes('bounty-hunter') ? 'bounty' : 'task';

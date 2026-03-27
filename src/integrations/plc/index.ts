@@ -7,7 +7,12 @@
  */
 import type { NanoClawIntegration, IntegrationContext } from '../../integration-types.js';
 import type { NewMessage } from '../../types.js';
-import { initPlcSchema, getReportsByPrefillMessageId, getSiteByManagerJid, confirmReport } from './db.js';
+import {
+  initPlcSchema, getReportsByPrefillMessageId, getSiteByManagerJid, confirmReport,
+  getSites, getLatestReportForSite, createDailyReport, setPrefillMessageId,
+  getReportsForDate, storeReportHistory,
+} from './db.js';
+import type { PlcDailyReport } from './db.js';
 import { PLC_IPC_TYPES, handlePlcIpc } from './ipc-handlers.js';
 import { logger } from '../../logger.js';
 
@@ -115,6 +120,12 @@ const integration: NanoClawIntegration = {
 
   async onStartup(ctx: IntegrationContext) {
     await ensureScheduledTasks(ctx);
+  },
+
+  async handleScheduledTask(taskId, chatJid, sendMessage, sendMessageGetId) {
+    if (taskId === 'plc-daily-checkin') return runCheckin(chatJid, sendMessage, sendMessageGetId);
+    if (taskId === 'plc-daily-compilation') return runCompilation(chatJid, sendMessage);
+    return undefined; // fall through to container for other tasks
   },
 
   determinePurpose(groupFolder: string) {
