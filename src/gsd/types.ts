@@ -15,6 +15,8 @@ export interface SpecFrontmatter {
   success_criteria: string[];
   constraints: string[];
   priorities: string[];
+  jira_id?: string;
+  branch_type?: 'feature' | 'bugfix' | 'hotfix';
 }
 
 export interface SpecChecklistItem {
@@ -99,7 +101,12 @@ export type GsdAction =
   | 'validate'
   | 'update'
   | 'complete_item'
-  | 'list';
+  | 'list'
+  | 'gen_branch'
+  | 'gen_commit'
+  | 'gen_pr'
+  | 'validate_branch'
+  | 'validate_commit';
 
 export interface GsdToolInput {
   action: GsdAction;
@@ -112,6 +119,14 @@ export interface GsdToolInput {
   success_criteria?: string[];
   constraints?: string[];
   priorities?: string[];
+  jira_id?: string;
+  branch_type?: 'feature' | 'bugfix' | 'hotfix';
+  gitmoji?: string;
+  description?: string;
+  testing_notes?: string;
+  risk_notes?: string;
+  branch_name?: string;
+  commit_message?: string;
 }
 
 // ── DB row types ────────────────────────────────────────────────────────────────

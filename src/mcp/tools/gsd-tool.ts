@@ -18,12 +18,19 @@ import {
   checkpoint,
   validateTask,
   generateSpecReminder,
+  generateBranchName,
+  generateCommitMessage,
+  validateBranchName,
+  validateCommitMessage,
+  generatePRTemplate,
 } from '../../gsd/index.js';
 import { getSpec, getSpecByProject, listSpecs } from '../../gsd/db.js';
 
 export const GsdToolSchema = z.object({
-  action: z.enum(['init', 'status', 'checkpoint', 'validate', 'complete_item', 'complete_spec', 'list'])
-    .describe('Action to perform'),
+  action: z.enum([
+    'init', 'status', 'checkpoint', 'validate', 'complete_item', 'complete_spec', 'list',
+    'gen_branch', 'gen_commit', 'gen_pr', 'validate_branch', 'validate_commit',
+  ]).describe('Action to perform'),
 
   // For init
   project_path: z.string().optional().describe('Project directory path (for init)'),
@@ -36,7 +43,7 @@ export const GsdToolSchema = z.object({
   spec_id: z.string().optional().describe('Spec ID to operate on'),
 
   // For checkpoint
-  summary: z.string().optional().describe('Checkpoint summary'),
+  summary: z.string().optional().describe('Checkpoint summary or PR summary'),
   agent_id: z.string().optional().describe('Agent identifier'),
   blockers: z.array(z.string()).optional().describe('Current blockers'),
 
@@ -45,6 +52,16 @@ export const GsdToolSchema = z.object({
 
   // For complete_item
   item_text: z.string().optional().describe('Checklist item text to mark as done'),
+
+  // Git workflow fields
+  jira_id: z.string().optional().describe('Jira task ID (e.g. PROJ-123)'),
+  branch_type: z.enum(['feature', 'bugfix', 'hotfix']).optional().describe('Branch type'),
+  gitmoji: z.string().optional().describe('Gitmoji emoji (e.g. ✨, 🐛)'),
+  description: z.string().optional().describe('Short description for branch/commit'),
+  testing_notes: z.string().optional().describe('Testing details for PR'),
+  risk_notes: z.string().optional().describe('Risk/security notes for PR'),
+  branch_name: z.string().optional().describe('Branch name to validate'),
+  commit_message: z.string().optional().describe('Commit message to validate'),
 });
 
 export type GsdToolInput = z.infer<typeof GsdToolSchema>;
@@ -160,6 +177,67 @@ export async function executeGsdTool(input: GsdToolInput): Promise<string> {
         return lines.join('\n');
       }
 
+      // ── Git workflow actions ──────────────────────────────────────────
+
+      case 'gen_branch': {
+        const spec = resolveSpec(input.spec_id);
+        if (!spec?.frontmatter.jira_id && !input.jira_id) {
+          return 'Error: jira_id required (set in spec or pass as parameter)';
+        }
+        const jiraId = input.jira_id ?? spec!.frontmatter.jira_id!;
+        const branchType = input.branch_type ?? spec?.frontmatter.branch_type ?? 'feature';
+        const desc = input.description ?? spec?.frontmatter.goal ?? 'implementation';
+
+        const branch = generateBranchName(jiraId, desc, branchType);
+        return `Branch: ${branch}\n\nUse:\ngit checkout -b ${branch}`;
+      }
+
+      case 'gen_commit': {
+        if (!input.jira_id || !input.gitmoji || !input.description) {
+          return 'Error: jira_id, gitmoji, and description are required';
+        }
+        const commitMsg = generateCommitMessage(input.jira_id, input.gitmoji, input.description);
+        return `Commit message:\n${commitMsg}\n\nUse:\ngit commit -m "${commitMsg}"`;
+      }
+
+      case 'gen_pr': {
+        const spec = resolveSpec(input.spec_id);
+        if (!spec?.frontmatter.jira_id && !input.jira_id) {
+          return 'Error: jira_id required (set in spec or pass as parameter)';
+        }
+        if (!input.testing_notes) {
+          return 'Error: testing_notes required for PR template';
+        }
+
+        const jiraId = input.jira_id ?? spec!.frontmatter.jira_id!;
+        const branchType = input.branch_type ?? spec?.frontmatter.branch_type ?? 'feature';
+        const goal = input.description ?? spec?.frontmatter.goal ?? 'implementation';
+
+        const branchForPR = generateBranchName(jiraId, goal, branchType);
+
+        const template = generatePRTemplate({
+          jiraId,
+          branchName: branchForPR,
+          summary: input.summary ?? goal,
+          testingNotes: input.testing_notes,
+          riskNotes: input.risk_notes,
+        });
+
+        return template;
+      }
+
+      case 'validate_branch': {
+        if (!input.branch_name) return 'Error: branch_name required';
+        const result = validateBranchName(input.branch_name);
+        return result.valid ? `✓ Valid branch name` : `✗ Invalid: ${result.reason}`;
+      }
+
+      case 'validate_commit': {
+        if (!input.commit_message) return 'Error: commit_message required';
+        const result = validateCommitMessage(input.commit_message);
+        return result.valid ? `✓ Valid commit message` : `✗ Invalid: ${result.reason}`;
+      }
+
       default:
         return `Error: Unknown action ${input.action}`;
     }
@@ -184,6 +262,7 @@ Stay on track with your project spec. Use this tool to:
 - Checkpoint: Save progress snapshots
 - Validate: Check if a task is within spec scope
 - Complete items: Mark checklist items as done
+- Git workflow: Generate branch names, commit messages, and PR templates
 
 Actions:
 - init: Create a new spec (requires project_path, goal, success_criteria)
@@ -193,11 +272,15 @@ Actions:
 - complete_item: Mark a checklist item as done (requires item_text)
 - complete_spec: Mark the entire spec as completed
 - list: List all specs
+- gen_branch: Generate Jira-linked branch name (requires jira_id or spec with jira_id)
+- gen_commit: Generate commit message (requires jira_id, gitmoji, description)
+- gen_pr: Generate PR template (requires jira_id or spec with jira_id, testing_notes)
+- validate_branch: Validate a branch name format
+- validate_commit: Validate a commit message format
 
 Example usage:
-- Status: action=status, spec_id="osha-mvp"
-- Checkpoint: action=checkpoint, summary="Data pipeline complete. 15K citations."
-- Validate: action=validate, task_description="Add dark mode" → DRIFT: Not in spec
-- Complete: action=complete_item, item_text="Scrape OSHA database"`,
+- Gen branch: action=gen_branch, jira_id="PROJ-123", description="add auth"
+- Gen commit: action=gen_commit, jira_id="PROJ-123", gitmoji="✨", description="add SSO login"
+- Validate: action=validate_branch, branch_name="feature/PROJ-123-add-auth"`,
   input_schema: GsdToolSchema,
 };
