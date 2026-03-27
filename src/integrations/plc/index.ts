@@ -2,21 +2,21 @@
  * PLC Site Report — Integration module
  *
  * Automates daily crew reporting for PLC site managers.
- * Handles reaction-based confirmations, quote-reply parsing, and scheduled reports.
+ * Single compact CHECK-IN message; reactions/replies matched via JID → site
+ * with fallback for unrecognized senders when only one report is pending.
  */
 import type { NanoClawIntegration, IntegrationContext } from '../../integration-types.js';
 import type { NewMessage } from '../../types.js';
-import { initPlcSchema, getReportByPrefillMessageId, getSiteByManagerJid, confirmReport } from './db.js';
+import { initPlcSchema, getReportsByPrefillMessageId, getSiteByManagerJid, confirmReport } from './db.js';
 import { PLC_IPC_TYPES, handlePlcIpc } from './ipc-handlers.js';
 import { logger } from '../../logger.js';
 
 const PLC_GROUP_JID = '120363404678903841@g.us';
 const PLC_GROUP_FOLDER = 'plc-site-managers';
 
-// Text replies that mean "same as yesterday"
 const SAME_KEYWORDS = new Set(['same', 'ok', 'yes', 'no change', 'no changes', 'good', 'correct', '👍']);
-// Text replies that mean "not on site"
 const OFF_KEYWORDS = new Set(['off', 'no work', 'not on site', 'day off', 'no']);
+const THUMBS_UP = new Set(['👍', '👍🏻', '👍🏼', '👍🏽', '👍🏾', '👍🏿']);
 
 const integration: NanoClawIntegration = {
   name: 'plc',
@@ -37,7 +37,7 @@ const integration: NanoClawIntegration = {
       trigger: '@PLC Site Report',
       requiresTrigger: true,
       displayName: 'PLC Site Report',
-      containerConfig: { isolatedPersona: true },
+      containerConfig: { isolatedPersona: true, networkRestricted: false },
     }];
   },
 
@@ -50,54 +50,70 @@ const integration: NanoClawIntegration = {
   async handleReaction(chatJid: string, reactedMessageId: string, senderJid: string, emoji: string) {
     if (chatJid !== PLC_GROUP_JID) return;
 
-    const report = getReportByPrefillMessageId(reactedMessageId);
-    if (!report || report.status !== 'pending') return;
+    const reports = getReportsByPrefillMessageId(reactedMessageId);
+    if (reports.length === 0) return;
 
+    // Match sender JID → their site's pending report
     const site = getSiteByManagerJid(senderJid);
-    if (!site || site.site_id !== report.site_id) return;
+    let report = site ? reports.find(r => r.site_id === site.site_id && r.status === 'pending') : undefined;
 
-    // 👍 or ✅ = confirmed same as yesterday
-    if (emoji === '👍' || emoji === '👍🏻' || emoji === '👍🏼' || emoji === '👍🏽' || emoji === '👍🏾' || emoji === '👍🏿' || emoji === '✅') {
+    // Fallback: if JID didn't match but only one report is still pending, use it
+    if (!report) {
+      const pending = reports.filter(r => r.status === 'pending');
+      if (pending.length === 1) {
+        report = pending[0];
+        logger.info({ senderJid, siteId: report.site_id }, 'PLC reaction: JID unrecognized, using last pending report');
+      }
+    }
+    if (!report) return;
+
+    if (THUMBS_UP.has(emoji) || emoji === '✅') {
       confirmReport(report.id, null, 'confirmed_same');
-      logger.info({ siteId: site.site_id, emoji }, 'PLC report confirmed via reaction (same)');
+      logger.info({ siteId: report.site_id, emoji }, 'PLC report confirmed via reaction (same)');
     } else if (emoji === '❌') {
       confirmReport(report.id, null, 'off');
-      logger.info({ siteId: site.site_id, emoji }, 'PLC report confirmed via reaction (off)');
+      logger.info({ siteId: report.site_id, emoji }, 'PLC report confirmed via reaction (off)');
     }
-    // Ignore other emojis
   },
 
   async handleQuoteReply(chatJid: string, quotedMessageId: string, message: NewMessage): Promise<boolean> {
     if (chatJid !== PLC_GROUP_JID) return false;
 
-    const report = getReportByPrefillMessageId(quotedMessageId);
-    if (!report) return false;
+    const reports = getReportsByPrefillMessageId(quotedMessageId);
+    if (reports.length === 0) return false;
 
     const site = getSiteByManagerJid(message.sender);
-    if (!site || site.site_id !== report.site_id) return false;
+    let report = site ? reports.find(r => r.site_id === site.site_id) : undefined;
 
-    // Already confirmed — don't overwrite
-    if (report.status !== 'pending') return true;
+    // Fallback: if JID didn't match but only one report is still pending, use it
+    if (!report) {
+      const pending = reports.filter(r => r.status === 'pending');
+      if (pending.length === 1) {
+        report = pending[0];
+        logger.info({ sender: message.sender, siteId: report.site_id }, 'PLC reply: JID unrecognized, using last pending report');
+      }
+    }
+    if (!report) return false;
+
+    if (report.status !== 'pending') return true; // already confirmed
 
     const text = message.content.trim().toLowerCase();
 
     if (SAME_KEYWORDS.has(text)) {
       confirmReport(report.id, null, 'confirmed_same');
-      logger.info({ siteId: site.site_id }, 'PLC report confirmed via reply (same)');
+      logger.info({ siteId: report.site_id }, 'PLC report confirmed via reply (same)');
     } else if (OFF_KEYWORDS.has(text)) {
       confirmReport(report.id, null, 'off');
-      logger.info({ siteId: site.site_id }, 'PLC report confirmed via reply (off)');
+      logger.info({ siteId: report.site_id }, 'PLC report confirmed via reply (off)');
     } else {
-      // Free-text changes — store raw for AI parsing at compilation time
       confirmReport(report.id, { raw_changes: message.content }, 'confirmed_changed');
-      logger.info({ siteId: site.site_id, preview: message.content.slice(0, 100) }, 'PLC report confirmed via reply (changes)');
+      logger.info({ siteId: report.site_id, preview: message.content.slice(0, 100) }, 'PLC report confirmed via reply (changes)');
     }
 
-    return true; // handled — skip normal agent processing
+    return true;
   },
 
   async onStartup(ctx: IntegrationContext) {
-    // Ensure scheduled tasks exist
     await ensureScheduledTasks(ctx);
   },
 
@@ -111,7 +127,6 @@ const integration: NanoClawIntegration = {
 };
 
 async function ensureScheduledTasks(_ctx: IntegrationContext): Promise<void> {
-  // Import DB functions lazily to avoid circular deps
   const { getTaskById, createTask } = await import('../../db.js');
   const { CronExpressionParser } = await import('cron-parser');
 
@@ -120,13 +135,15 @@ async function ensureScheduledTasks(_ctx: IntegrationContext): Promise<void> {
       id: 'plc-daily-checkin',
       group_folder: PLC_GROUP_FOLDER,
       chat_jid: PLC_GROUP_JID,
-      prompt: `You are PLC Site Report. It's time for the 4 PM daily check-in.
+      prompt: `You are PLC Site Report. It's time for the daily check-in.
 
 1. Call plc_get_prefill IPC to get the latest report data for all sites.
-2. Format a compact CHECK-IN message using yesterday's data as the pre-fill.
-3. Send the message to the group via send_message (use responseFile to get the messageId back).
-4. Call plc_create_reports IPC with today's date to create pending report entries.
+2. Call plc_create_reports IPC with today's date to create pending report entries. If it returns "already_exists" for a site, that means the check-in already ran today — do NOT send another message.
+3. Format a single compact CHECK-IN message using yesterday's data as the pre-fill.
+4. Send the message to the group via send_message (use responseFile to get the messageId back).
 5. Call plc_store_prefill_id IPC with the messageId and reportIds so reactions can be tracked.
+
+If ALL sites returned "already_exists", do nothing (check-in already sent).
 
 Use the exact format:
 📋 CHECK-IN — [Day] [M/D]
@@ -147,16 +164,16 @@ Use the exact format:
       id: 'plc-daily-compilation',
       group_folder: PLC_GROUP_FOLDER,
       chat_jid: PLC_GROUP_JID,
-      prompt: `You are PLC Site Report. It's time for the 6 PM daily compilation.
+      prompt: `You are PLC Site Report. It's time for the daily compilation.
 
 1. Call plc_get_reports IPC for today's date to get report statuses.
-2. For each site:
+2. If no reports exist for today, send: "⚠️ No check-in was sent today — skipping compilation." and stop.
+3. For each site:
    - confirmed_same: use the prefill_data as final
    - confirmed_changed: parse the raw_changes to update the prefill_data
    - off: show "No work"
    - pending (not reported): show "⚠️ Not reported"
-3. Format the DAILY REPORT message.
-4. Send to group via send_message.
+4. Format and send the DAILY REPORT message.
 5. Call plc_store_history IPC with final data for each confirmed site (feeds tomorrow's pre-fill).
 
 Format:
@@ -178,13 +195,13 @@ Equipment: [list]
       chat_jid: PLC_GROUP_JID,
       prompt: `You are PLC Site Report. Generate the weekly summary report.
 
-1. Query plc_report_history for the past 7 days.
-2. Generate an Excel file using openpyxl with:
-   - Summary sheet: all sites, all days (Date, Site, AYS Count, AYS Names, Contractors, Equipment)
-   - Per-site sheets with daily breakdown
-3. Save to /workspace/output/weekly-report-[date].xlsx
-4. Send the Excel file to the group via send_file.
-5. Also send a text summary of the week's crew counts and trends.`,
+1. Call plc_get_reports IPC with the past 7 day dates to gather data.
+2. Call plc_get_prefill IPC to get site info.
+3. Format a text summary of the week's crew counts and trends.
+4. Send the summary to the group via send_message.
+
+Include for each site: days active, average crew size, notable changes.
+If no data exists for the week, send: "📊 No report data available for the past week."`,
       schedule_type: 'cron' as const,
       schedule_value: '0 9 * * 1',
       context_mode: 'isolated' as const,

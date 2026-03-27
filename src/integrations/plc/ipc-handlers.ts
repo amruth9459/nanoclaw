@@ -50,18 +50,19 @@ export async function handlePlcIpc(
     }
 
     case 'plc_create_reports': {
-      // Create pending daily report entries for all sites
       const date = data.date as string;
       const sitePrefills = data.sitePrefills as Record<string, object> | undefined;
       const sites = getSites();
       const reportIds: Record<string, string> = {};
+      const status: Record<string, string> = {};
       for (const site of sites) {
         const prefill = sitePrefills?.[site.site_id] ?? {};
-        const id = createDailyReport(date, site.site_id, prefill);
-        reportIds[site.site_id] = id;
+        const result = createDailyReport(date, site.site_id, prefill);
+        reportIds[site.site_id] = result.id;
+        status[site.site_id] = result.created ? 'created' : 'already_exists';
       }
       if (responseFile) {
-        writeIpcResponse(responseFile, { reportIds });
+        writeIpcResponse(responseFile, { reportIds, status });
       }
       break;
     }
