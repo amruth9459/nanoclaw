@@ -5,6 +5,66 @@
 
 ---
 
+### 2026-03-26 20:12
+
+**Areas:** config, docs, hooks
+**Files (11):** .claude/hooks/memory-bridge.sh, .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/skills/get-api-docs/SKILL.md, .config/nanoclaw/mount-allowlist.json, .env, .env.example, .gitignore, .gstack/projects/nanoclaw/amrut-main-test-plan-20260320-005500.md, .gstack/projects/nanoclaw/ceo-plans/2026-03-20-lexios-production-polish.md, .mcp.json, CLAUDE.md
+**Diff:** +84 -3 across 4 files
+
+### 2026-03-26 20:11
+
+**Areas:** config, docs, hooks
+**Files (11):** .claude/hooks/memory-bridge.sh, .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/skills/get-api-docs/SKILL.md, .config/nanoclaw/mount-allowlist.json, .env, .env.example, .gitignore, .gstack/projects/nanoclaw/amrut-main-test-plan-20260320-005500.md, .gstack/projects/nanoclaw/ceo-plans/2026-03-20-lexios-production-polish.md, .mcp.json, CLAUDE.md
+**Diff:** +78 -3 across 4 files
+
+### 2026-03-26 20:11
+
+**Areas:** config, docs, hooks
+**Files (11):** .claude/hooks/memory-bridge.sh, .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/skills/get-api-docs/SKILL.md, .config/nanoclaw/mount-allowlist.json, .env, .env.example, .gitignore, .gstack/projects/nanoclaw/amrut-main-test-plan-20260320-005500.md, .gstack/projects/nanoclaw/ceo-plans/2026-03-20-lexios-production-polish.md, .mcp.json, CLAUDE.md
+**Diff:** +72 -3 across 4 files
+
+### 2026-03-26 20:10
+
+**Areas:** config, docs, hooks
+**Files (11):** .claude/hooks/memory-bridge.sh, .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/skills/get-api-docs/SKILL.md, .config/nanoclaw/mount-allowlist.json, .env, .env.example, .gitignore, .gstack/projects/nanoclaw/amrut-main-test-plan-20260320-005500.md, .gstack/projects/nanoclaw/ceo-plans/2026-03-20-lexios-production-polish.md, .mcp.json, CLAUDE.md
+**Diff:** +66 -3 across 4 files
+
+### 2026-03-26 20:07
+
+**Areas:** config, docs, hooks
+**Files (11):** .claude/hooks/memory-bridge.sh, .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/skills/get-api-docs/SKILL.md, .config/nanoclaw/mount-allowlist.json, .env, .env.example, .gitignore, .gstack/projects/nanoclaw/amrut-main-test-plan-20260320-005500.md, .gstack/projects/nanoclaw/ceo-plans/2026-03-20-lexios-production-polish.md, .mcp.json, CLAUDE.md
+**Diff:** +60 -3 across 4 files
+
+### 2026-03-26 20:06
+
+**Areas:** config, docs, hooks
+**Files (11):** .claude/hooks/memory-bridge.sh, .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/skills/get-api-docs/SKILL.md, .config/nanoclaw/mount-allowlist.json, .env, .env.example, .gitignore, .gstack/projects/nanoclaw/amrut-main-test-plan-20260320-005500.md, .gstack/projects/nanoclaw/ceo-plans/2026-03-20-lexios-production-polish.md, .mcp.json, CLAUDE.md
+**Diff:** +54 -3 across 4 files
+
+### 2026-03-26 20:06
+
+**Areas:** config, docs, hooks
+**Files (11):** .claude/hooks/memory-bridge.sh, .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/skills/get-api-docs/SKILL.md, .config/nanoclaw/mount-allowlist.json, .env, .env.example, .gitignore, .gstack/projects/nanoclaw/amrut-main-test-plan-20260320-005500.md, .gstack/projects/nanoclaw/ceo-plans/2026-03-20-lexios-production-polish.md, .mcp.json, CLAUDE.md
+**Diff:** +48 -3 across 4 files
+
+### 2026-03-26 20:04
+
+**Areas:** config, docs, hooks
+**Files (11):** .claude/hooks/memory-bridge.sh, .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/skills/get-api-docs/SKILL.md, .config/nanoclaw/mount-allowlist.json, .env, .env.example, .gitignore, .gstack/projects/nanoclaw/amrut-main-test-plan-20260320-005500.md, .gstack/projects/nanoclaw/ceo-plans/2026-03-20-lexios-production-polish.md, .mcp.json, CLAUDE.md
+**Diff:** +42 -3 across 4 files
+
+### 2026-03-26 20:04
+
+**Areas:** config, docs, hooks
+**Files (11):** .claude/hooks/memory-bridge.sh, .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/skills/get-api-docs/SKILL.md, .config/nanoclaw/mount-allowlist.json, .env, .env.example, .gitignore, .gstack/projects/nanoclaw/amrut-main-test-plan-20260320-005500.md, .gstack/projects/nanoclaw/ceo-plans/2026-03-20-lexios-production-polish.md, .mcp.json, CLAUDE.md
+**Diff:** +36 -3 across 4 files
+
+### 2026-03-26 20:03
+
+**Areas:** config, docs, hooks
+**Files (11):** .claude/hooks/memory-bridge.sh, .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/skills/get-api-docs/SKILL.md, .config/nanoclaw/mount-allowlist.json, .env, .env.example, .gitignore, .gstack/projects/nanoclaw/amrut-main-test-plan-20260320-005500.md, .gstack/projects/nanoclaw/ceo-plans/2026-03-20-lexios-production-polish.md, .mcp.json, CLAUDE.md
+**Diff:** +30 -3 across 3 files
+
 ### 2026-03-26 19:53
 
 **Areas:** config, docs, hooks
