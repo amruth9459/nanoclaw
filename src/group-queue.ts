@@ -2,9 +2,12 @@ import { ChildProcess, execSync } from 'child_process';
 import fs from 'fs';
 import path from 'path';
 
-import { DATA_DIR, MAX_CONCURRENT_CONTAINERS } from './config.js';
+import { CONTAINER_TIMEOUT, DATA_DIR, MAX_CONCURRENT_CONTAINERS } from './config.js';
 import { CONTAINER_RUNTIME_BIN, removeContainer, stopContainer } from './container-runtime.js';
 import { logger } from './logger.js';
+
+/** Hard kill any container running longer than this (2x configured timeout). */
+const HARD_KILL_MS = CONTAINER_TIMEOUT * 2;
 
 interface QueuedTask {
   id: string;
@@ -105,10 +108,50 @@ export class GroupQueue {
   }
 
   /**
-   * Reconcile tracked vs actual containers. Kill any nanoclaw-* containers
-   * that aren't tracked by GroupQueue (zombies from previous crashes, etc).
+   * Reconcile tracked vs actual containers. Kills:
+   * 1. Untracked nanoclaw-* containers (orphans from crashes)
+   * 2. Tracked containers running beyond HARD_KILL_MS (stuck promises)
    */
   private reap(): void {
+    const now = Date.now();
+
+    // Phase 1: Kill tracked containers that have been running too long.
+    // This handles the case where the container process hangs and the
+    // promise never resolves, so the finally block never runs.
+    for (const [jid, state] of this.groups) {
+      const startedAt = state.startedAt || state.taskStartedAt;
+      if (!startedAt || !state.containerName) continue;
+
+      const elapsed = now - startedAt;
+      if (elapsed > HARD_KILL_MS) {
+        logger.warn(
+          { jid, containerName: state.containerName, elapsedMs: elapsed, hardKillMs: HARD_KILL_MS },
+          'Reaper: force-killing stale tracked container',
+        );
+        this.killContainer(state);
+
+        // Clean up state so the slot is freed
+        if (state.active) {
+          state.active = false;
+          state.process = null;
+          state.containerName = null;
+          state.groupFolder = null;
+          state.spawnReason = null;
+          state.startedAt = null;
+          state.designation = null;
+          this.activeCount--;
+        }
+        if (state.activeTask) {
+          state.activeTask = false;
+          state.taskSpawnReason = null;
+          state.taskStartedAt = null;
+          state.taskDesignation = null;
+          this.activeCount--;
+        }
+      }
+    }
+
+    // Phase 2: Kill untracked containers (orphans from previous process crashes)
     try {
       const output = execSync(`${CONTAINER_RUNTIME_BIN} ls --format json`, {
         stdio: ['pipe', 'pipe', 'pipe'],
@@ -145,6 +188,9 @@ export class GroupQueue {
     } catch (err) {
       logger.debug({ err }, 'Reaper: failed to list containers (non-fatal)');
     }
+
+    // After cleaning up, drain any waiting groups that were blocked
+    this.drainWaiting();
   }
 
   /** Returns true if the group has any active running container. */

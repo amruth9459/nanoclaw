@@ -77,13 +77,24 @@ export interface PlcDailyReport {
   confirmed_at: string | null;
 }
 
-export function createDailyReport(date: string, siteId: string, prefillData: object): string {
+/**
+ * Create a daily report entry. Returns { id, created: true } for new reports,
+ * or { id, created: false } if a report already exists for this date+site (dedup).
+ */
+export function createDailyReport(date: string, siteId: string, prefillData: object): { id: string; created: boolean } {
+  // Dedup: don't create duplicates for the same date+site
+  const existing = db
+    .prepare('SELECT id FROM plc_daily_reports WHERE date = ? AND site_id = ?')
+    .get(date, siteId) as { id: string } | undefined;
+  if (existing) {
+    return { id: existing.id, created: false };
+  }
   const id = randomUUID();
   db.prepare(
     `INSERT INTO plc_daily_reports (id, date, site_id, status, prefill_data)
      VALUES (?, ?, ?, 'pending', ?)`,
   ).run(id, date, siteId, JSON.stringify(prefillData));
-  return id;
+  return { id, created: true };
 }
 
 export function getReportsForDate(date: string): PlcDailyReport[] {
@@ -94,6 +105,13 @@ export function getReportByPrefillMessageId(messageId: string): PlcDailyReport |
   return db
     .prepare('SELECT * FROM plc_daily_reports WHERE prefill_message_id = ?')
     .get(messageId) as PlcDailyReport | undefined;
+}
+
+/** Returns ALL reports linked to a prefill message (one per site). */
+export function getReportsByPrefillMessageId(messageId: string): PlcDailyReport[] {
+  return db
+    .prepare('SELECT * FROM plc_daily_reports WHERE prefill_message_id = ?')
+    .all(messageId) as PlcDailyReport[];
 }
 
 export function setPrefillMessageId(reportId: string, messageId: string): void {

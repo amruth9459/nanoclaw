@@ -1,11 +1,44 @@
 # NanoClaw — Daily Build Log
 
 *Living document — auto-generated from git history*
-*Last generated: 2026-03-26*
+*Last generated: 2026-03-27*
 
-**554 total commits** (220 meaningful) | 2026-01-31 to 2026-03-25
+**573 total commits** (222 meaningful) | 2026-01-31 to 2026-03-26
 
 ---
+
+## 2026-03-26
+
+### What Changed
+- [Agent] task_1774497485754_mm34hey: Add fine-tuning guide for construction ML models
+- [Agent] task_1774497485754_mm34hey: Add practical fine-tuning guide
+- (+17 auto-backup commits)
+
+### Files (74 changed)
+- CLAUDE.md
+- container/skills/plc-report/requirements.txt
+- docs/DEVLOG.md
+- docs/EXPERIMENTS.md
+- docs/FINE_TUNING_GUIDE.md
+- docs/NANOCLAW_BUILD_LOG.md
+- docs/NANOCLAW_CHANGELOG.md
+- docs/NANOCLAW_PLATFORM.md
+- docs/examples/fine_tune_example.py
+- docs/journal/2026-01-31.md
+- docs/journal/2026-02-01.md
+- docs/journal/2026-02-02.md
+- docs/journal/2026-02-03.md
+- docs/journal/2026-02-04.md
+- docs/journal/2026-02-05.md
+- docs/journal/2026-02-07.md
+- docs/journal/2026-02-08.md
+- docs/journal/2026-02-09.md
+- docs/journal/2026-02-10.md
+- docs/journal/2026-02-11.md
+- ... and 54 more
+
+### Stats
+- 9062 insertions, 43 deletions
 
 ## 2026-03-25
 
