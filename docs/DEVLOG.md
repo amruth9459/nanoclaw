@@ -5,6 +5,125 @@
 
 ---
 
+### 2026-03-28 02:25
+
+**Areas:** config, docs, hooks
+**Files (18):** .claude/hooks/extract-topic.py, .claude/hooks/memory-bridge.sh, .claude/hooks/tmux-auto-rename.sh, .claude/hooks/tmux-bell.sh, .claude/hooks/tmux-rename.sh, .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/settings.json, .claude/skills/get-api-docs/SKILL.md, .config/nanoclaw/mount-allowlist.json, .config/rclone/rclone.conf, .env, .env.example, .gitignore, .gstack/projects/nanoclaw/amrut-main-test-plan-20260320-005500.md, .gstack/projects/nanoclaw/ceo-plans/2026-03-20-lexios-production-polish.md, .mcp.json, .tmux.conf, CLAUDE.md
+**Diff:** +113 -0 across 1 files
+
+### 2026-03-28 02:24
+
+**Areas:** config, docs, hooks
+**Files (18):** .claude/hooks/extract-topic.py, .claude/hooks/memory-bridge.sh, .claude/hooks/tmux-auto-rename.sh, .claude/hooks/tmux-bell.sh, .claude/hooks/tmux-rename.sh, .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/settings.json, .claude/skills/get-api-docs/SKILL.md, .config/nanoclaw/mount-allowlist.json, .config/rclone/rclone.conf, .env, .env.example, .gitignore, .gstack/projects/nanoclaw/amrut-main-test-plan-20260320-005500.md, .gstack/projects/nanoclaw/ceo-plans/2026-03-20-lexios-production-polish.md, .mcp.json, .tmux.conf, CLAUDE.md
+**Diff:** +107 -0 across 1 files
+
+### 2026-03-28 02:23
+
+**Areas:** config, docs, hooks
+**Files (18):** .claude/hooks/extract-topic.py, .claude/hooks/memory-bridge.sh, .claude/hooks/tmux-auto-rename.sh, .claude/hooks/tmux-bell.sh, .claude/hooks/tmux-rename.sh, .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/settings.json, .claude/skills/get-api-docs/SKILL.md, .config/nanoclaw/mount-allowlist.json, .config/rclone/rclone.conf, .env, .env.example, .gitignore, .gstack/projects/nanoclaw/amrut-main-test-plan-20260320-005500.md, .gstack/projects/nanoclaw/ceo-plans/2026-03-20-lexios-production-polish.md, .mcp.json, .tmux.conf, CLAUDE.md
+**Diff:** +101 -0 across 1 files
+
+### 2026-03-28 02:23
+
+**Areas:** config, docs, hooks
+**Files (18):** .claude/hooks/extract-topic.py, .claude/hooks/memory-bridge.sh, .claude/hooks/tmux-auto-rename.sh, .claude/hooks/tmux-bell.sh, .claude/hooks/tmux-rename.sh, .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/settings.json, .claude/skills/get-api-docs/SKILL.md, .config/nanoclaw/mount-allowlist.json, .config/rclone/rclone.conf, .env, .env.example, .gitignore, .gstack/projects/nanoclaw/amrut-main-test-plan-20260320-005500.md, .gstack/projects/nanoclaw/ceo-plans/2026-03-20-lexios-production-polish.md, .mcp.json, .tmux.conf, CLAUDE.md
+**Diff:** +95 -0 across 1 files
+
+### 2026-03-28 02:22
+
+**Areas:** config, docs, hooks
+**Files (18):** .claude/hooks/extract-topic.py, .claude/hooks/memory-bridge.sh, .claude/hooks/tmux-auto-rename.sh, .claude/hooks/tmux-bell.sh, .claude/hooks/tmux-rename.sh, .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/settings.json, .claude/skills/get-api-docs/SKILL.md, .config/nanoclaw/mount-allowlist.json, .config/rclone/rclone.conf, .env, .env.example, .gitignore, .gstack/projects/nanoclaw/amrut-main-test-plan-20260320-005500.md, .gstack/projects/nanoclaw/ceo-plans/2026-03-20-lexios-production-polish.md, .mcp.json, .tmux.conf, CLAUDE.md
+**Diff:** +89 -0 across 1 files
+
+### 2026-03-28 02:22
+
+**Areas:** config, docs, hooks
+**Files (18):** .claude/hooks/extract-topic.py, .claude/hooks/memory-bridge.sh, .claude/hooks/tmux-auto-rename.sh, .claude/hooks/tmux-bell.sh, .claude/hooks/tmux-rename.sh, .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/settings.json, .claude/skills/get-api-docs/SKILL.md, .config/nanoclaw/mount-allowlist.json, .config/rclone/rclone.conf, .env, .env.example, .gitignore, .gstack/projects/nanoclaw/amrut-main-test-plan-20260320-005500.md, .gstack/projects/nanoclaw/ceo-plans/2026-03-20-lexios-production-polish.md, .mcp.json, .tmux.conf, CLAUDE.md
+**Diff:** +83 -0 across 1 files
+
+### 2026-03-28 02:21
+
+**Areas:** config, docs, hooks
+**Files (18):** .claude/hooks/extract-topic.py, .claude/hooks/memory-bridge.sh, .claude/hooks/tmux-auto-rename.sh, .claude/hooks/tmux-bell.sh, .claude/hooks/tmux-rename.sh, .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/settings.json, .claude/skills/get-api-docs/SKILL.md, .config/nanoclaw/mount-allowlist.json, .config/rclone/rclone.conf, .env, .env.example, .gitignore, .gstack/projects/nanoclaw/amrut-main-test-plan-20260320-005500.md, .gstack/projects/nanoclaw/ceo-plans/2026-03-20-lexios-production-polish.md, .mcp.json, .tmux.conf, CLAUDE.md
+**Diff:** +77 -0 across 1 files
+
+### 2026-03-28 02:20
+
+**Areas:** config, docs, hooks
+**Files (18):** .claude/hooks/extract-topic.py, .claude/hooks/memory-bridge.sh, .claude/hooks/tmux-auto-rename.sh, .claude/hooks/tmux-bell.sh, .claude/hooks/tmux-rename.sh, .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/settings.json, .claude/skills/get-api-docs/SKILL.md, .config/nanoclaw/mount-allowlist.json, .config/rclone/rclone.conf, .env, .env.example, .gitignore, .gstack/projects/nanoclaw/amrut-main-test-plan-20260320-005500.md, .gstack/projects/nanoclaw/ceo-plans/2026-03-20-lexios-production-polish.md, .mcp.json, .tmux.conf, CLAUDE.md
+**Diff:** +71 -0 across 1 files
+
+### 2026-03-28 02:20
+
+**Areas:** config, docs, hooks
+**Files (18):** .claude/hooks/extract-topic.py, .claude/hooks/memory-bridge.sh, .claude/hooks/tmux-auto-rename.sh, .claude/hooks/tmux-bell.sh, .claude/hooks/tmux-rename.sh, .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/settings.json, .claude/skills/get-api-docs/SKILL.md, .config/nanoclaw/mount-allowlist.json, .config/rclone/rclone.conf, .env, .env.example, .gitignore, .gstack/projects/nanoclaw/amrut-main-test-plan-20260320-005500.md, .gstack/projects/nanoclaw/ceo-plans/2026-03-20-lexios-production-polish.md, .mcp.json, .tmux.conf, CLAUDE.md
+**Diff:** +65 -0 across 1 files
+
+### 2026-03-28 02:19
+
+**Areas:** config, docs, hooks
+**Files (18):** .claude/hooks/extract-topic.py, .claude/hooks/memory-bridge.sh, .claude/hooks/tmux-auto-rename.sh, .claude/hooks/tmux-bell.sh, .claude/hooks/tmux-rename.sh, .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/settings.json, .claude/skills/get-api-docs/SKILL.md, .config/nanoclaw/mount-allowlist.json, .config/rclone/rclone.conf, .env, .env.example, .gitignore, .gstack/projects/nanoclaw/amrut-main-test-plan-20260320-005500.md, .gstack/projects/nanoclaw/ceo-plans/2026-03-20-lexios-production-polish.md, .mcp.json, .tmux.conf, CLAUDE.md
+**Diff:** +59 -0 across 1 files
+
+### 2026-03-28 02:18
+
+**Areas:** config, docs, hooks
+**Files (18):** .claude/hooks/extract-topic.py, .claude/hooks/memory-bridge.sh, .claude/hooks/tmux-auto-rename.sh, .claude/hooks/tmux-bell.sh, .claude/hooks/tmux-rename.sh, .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/settings.json, .claude/skills/get-api-docs/SKILL.md, .config/nanoclaw/mount-allowlist.json, .config/rclone/rclone.conf, .env, .env.example, .gitignore, .gstack/projects/nanoclaw/amrut-main-test-plan-20260320-005500.md, .gstack/projects/nanoclaw/ceo-plans/2026-03-20-lexios-production-polish.md, .mcp.json, .tmux.conf, CLAUDE.md
+**Diff:** +53 -0 across 1 files
+
+### 2026-03-28 02:18
+
+**Areas:** config, docs, hooks
+**Files (18):** .claude/hooks/extract-topic.py, .claude/hooks/memory-bridge.sh, .claude/hooks/tmux-auto-rename.sh, .claude/hooks/tmux-bell.sh, .claude/hooks/tmux-rename.sh, .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/settings.json, .claude/skills/get-api-docs/SKILL.md, .config/nanoclaw/mount-allowlist.json, .config/rclone/rclone.conf, .env, .env.example, .gitignore, .gstack/projects/nanoclaw/amrut-main-test-plan-20260320-005500.md, .gstack/projects/nanoclaw/ceo-plans/2026-03-20-lexios-production-polish.md, .mcp.json, .tmux.conf, CLAUDE.md
+**Diff:** +47 -0 across 1 files
+
+### 2026-03-28 02:16
+
+**Areas:** config, docs, hooks
+**Files (18):** .claude/hooks/extract-topic.py, .claude/hooks/memory-bridge.sh, .claude/hooks/tmux-auto-rename.sh, .claude/hooks/tmux-bell.sh, .claude/hooks/tmux-rename.sh, .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/settings.json, .claude/skills/get-api-docs/SKILL.md, .config/nanoclaw/mount-allowlist.json, .config/rclone/rclone.conf, .env, .env.example, .gitignore, .gstack/projects/nanoclaw/amrut-main-test-plan-20260320-005500.md, .gstack/projects/nanoclaw/ceo-plans/2026-03-20-lexios-production-polish.md, .mcp.json, .tmux.conf, CLAUDE.md
+**Diff:** +41 -0 across 1 files
+
+### 2026-03-28 02:16
+
+**Areas:** config, docs, hooks
+**Files (18):** .claude/hooks/extract-topic.py, .claude/hooks/memory-bridge.sh, .claude/hooks/tmux-auto-rename.sh, .claude/hooks/tmux-bell.sh, .claude/hooks/tmux-rename.sh, .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/settings.json, .claude/skills/get-api-docs/SKILL.md, .config/nanoclaw/mount-allowlist.json, .config/rclone/rclone.conf, .env, .env.example, .gitignore, .gstack/projects/nanoclaw/amrut-main-test-plan-20260320-005500.md, .gstack/projects/nanoclaw/ceo-plans/2026-03-20-lexios-production-polish.md, .mcp.json, .tmux.conf, CLAUDE.md
+**Diff:** +35 -0 across 1 files
+
+### 2026-03-28 02:15
+
+**Areas:** config, docs, hooks
+**Files (18):** .claude/hooks/extract-topic.py, .claude/hooks/memory-bridge.sh, .claude/hooks/tmux-auto-rename.sh, .claude/hooks/tmux-bell.sh, .claude/hooks/tmux-rename.sh, .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/settings.json, .claude/skills/get-api-docs/SKILL.md, .config/nanoclaw/mount-allowlist.json, .config/rclone/rclone.conf, .env, .env.example, .gitignore, .gstack/projects/nanoclaw/amrut-main-test-plan-20260320-005500.md, .gstack/projects/nanoclaw/ceo-plans/2026-03-20-lexios-production-polish.md, .mcp.json, .tmux.conf, CLAUDE.md
+**Diff:** +29 -0 across 1 files
+
+### 2026-03-28 02:15
+
+**Areas:** config, docs, hooks
+**Files (18):** .claude/hooks/extract-topic.py, .claude/hooks/memory-bridge.sh, .claude/hooks/tmux-auto-rename.sh, .claude/hooks/tmux-bell.sh, .claude/hooks/tmux-rename.sh, .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/settings.json, .claude/skills/get-api-docs/SKILL.md, .config/nanoclaw/mount-allowlist.json, .config/rclone/rclone.conf, .env, .env.example, .gitignore, .gstack/projects/nanoclaw/amrut-main-test-plan-20260320-005500.md, .gstack/projects/nanoclaw/ceo-plans/2026-03-20-lexios-production-polish.md, .mcp.json, .tmux.conf, CLAUDE.md
+**Diff:** +23 -0 across 1 files
+
+### 2026-03-28 02:14
+
+**Areas:** config, docs, hooks
+**Files (18):** .claude/hooks/extract-topic.py, .claude/hooks/memory-bridge.sh, .claude/hooks/tmux-auto-rename.sh, .claude/hooks/tmux-bell.sh, .claude/hooks/tmux-rename.sh, .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/settings.json, .claude/skills/get-api-docs/SKILL.md, .config/nanoclaw/mount-allowlist.json, .config/rclone/rclone.conf, .env, .env.example, .gitignore, .gstack/projects/nanoclaw/amrut-main-test-plan-20260320-005500.md, .gstack/projects/nanoclaw/ceo-plans/2026-03-20-lexios-production-polish.md, .mcp.json, .tmux.conf, CLAUDE.md
+**Diff:** +17 -0 across 1 files
+
+### 2026-03-28 02:14
+
+**Areas:** config, docs, hooks
+**Files (18):** .claude/hooks/extract-topic.py, .claude/hooks/memory-bridge.sh, .claude/hooks/tmux-auto-rename.sh, .claude/hooks/tmux-bell.sh, .claude/hooks/tmux-rename.sh, .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/settings.json, .claude/skills/get-api-docs/SKILL.md, .config/nanoclaw/mount-allowlist.json, .config/rclone/rclone.conf, .env, .env.example, .gitignore, .gstack/projects/nanoclaw/amrut-main-test-plan-20260320-005500.md, .gstack/projects/nanoclaw/ceo-plans/2026-03-20-lexios-production-polish.md, .mcp.json, .tmux.conf, CLAUDE.md
+**Diff:** +11 -0 across 1 files
+
+### 2026-03-28 02:13
+
+**Areas:** config, docs, hooks
+**Files (18):** .claude/hooks/extract-topic.py, .claude/hooks/memory-bridge.sh, .claude/hooks/tmux-auto-rename.sh, .claude/hooks/tmux-bell.sh, .claude/hooks/tmux-rename.sh, .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/settings.json, .claude/skills/get-api-docs/SKILL.md, .config/nanoclaw/mount-allowlist.json, .config/rclone/rclone.conf, .env, .env.example, .gitignore, .gstack/projects/nanoclaw/amrut-main-test-plan-20260320-005500.md, .gstack/projects/nanoclaw/ceo-plans/2026-03-20-lexios-production-polish.md, .mcp.json, .tmux.conf, CLAUDE.md
+**Diff:** +5 -0 across 1 files
+
+### 2026-03-28 02:13
+
+**Areas:** config, docs, hooks
+**Files (18):** .claude/hooks/extract-topic.py, .claude/hooks/memory-bridge.sh, .claude/hooks/tmux-auto-rename.sh, .claude/hooks/tmux-bell.sh, .claude/hooks/tmux-rename.sh, .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/settings.json, .claude/skills/get-api-docs/SKILL.md, .config/nanoclaw/mount-allowlist.json, .config/rclone/rclone.conf, .env, .env.example, .gitignore, .gstack/projects/nanoclaw/amrut-main-test-plan-20260320-005500.md, .gstack/projects/nanoclaw/ceo-plans/2026-03-20-lexios-production-polish.md, .mcp.json, .tmux.conf, CLAUDE.md
+
 ### 2026-03-27 23:53
 
 **Areas:** config, docs, hooks
