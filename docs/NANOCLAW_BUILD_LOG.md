@@ -1,11 +1,25 @@
 # NanoClaw — Daily Build Log
 
 *Living document — auto-generated from git history*
-*Last generated: 2026-03-28*
+*Last generated: 2026-03-29*
 
-**586 total commits** (224 meaningful) | 2026-01-31 to 2026-03-27
+**594 total commits** (224 meaningful) | 2026-01-31 to 2026-03-28
 
 ---
+
+## 2026-03-28
+
+### What Changed
+- 8 auto-backup commits (incremental saves)
+
+### Files (4 changed)
+- docs/DEVLOG.md
+- docs/NANOCLAW_BUILD_LOG.md
+- docs/NANOCLAW_CHANGELOG.md
+- docs/NANOCLAW_PLATFORM.md
+
+### Stats
+- 212 insertions, 5 deletions
 
 ## 2026-03-27
 
