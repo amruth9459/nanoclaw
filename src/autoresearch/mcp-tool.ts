@@ -13,7 +13,8 @@
  * - analyze: Statistical analysis of an experiment
  * - baseline: Set/update baseline score
  */
-import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type McpServer = any;
 import { z } from 'zod';
 
 export interface AutoresearchToolContext {

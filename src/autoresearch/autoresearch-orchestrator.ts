@@ -172,8 +172,8 @@ export class AutoresearchOrchestrator {
         taskId: experimentId,
       };
 
-      const resourceCheck = await this.resourceOrchestrator.requestResources(resourceRequest);
-      if (!resourceCheck.allowed) {
+      const resourceCheck = await this.resourceOrchestrator.requestAgent(resourceRequest);
+      if (!resourceCheck.approved) {
         logger.warn({ queueId: queuedRun.id, wait: resourceCheck.estimatedWaitMs },
           'Insufficient resources for autoresearch run');
         // Re-queue
