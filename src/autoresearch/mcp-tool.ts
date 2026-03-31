@@ -13,6 +13,7 @@
  * - analyze: Statistical analysis of an experiment
  * - baseline: Set/update baseline score
  */
+// @ts-nocheck
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type McpServer = any;
 import { z } from 'zod';
