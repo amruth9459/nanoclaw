@@ -189,15 +189,15 @@ function dayLabel(): string {
 }
 
 function formatPrefillBlock(site: { site_id: string; site_name: string; manager_name: string }, data: Record<string, unknown> | null): string {
-  const label = `${site.site_name} (${site.manager_name})`;
+  const label = `*${site.site_name}* (${site.site_id.toUpperCase()})`;
   if (!data) return `${label}\nNo previous data`;
   const ays = (data.ays as string) || '';
   const contractors = (data.contractors as string) || '';
   const equipment = (data.equipment as string) || '';
   const lines = [label];
-  if (ays) lines.push(ays);
-  if (contractors) lines.push(contractors);
-  if (equipment) lines.push(equipment);
+  if (ays) lines.push(`AYS: ${ays}`);
+  if (contractors) lines.push(`Sub: ${contractors}`);
+  if (equipment) lines.push(`Equip: ${equipment}`);
   return lines.join('\n');
 }
 
@@ -205,12 +205,12 @@ function formatPrefillBlockFromHistory(
   site: { site_id: string; site_name: string; manager_name: string },
   messages: Array<{ sender_name: string; content: string }>,
 ): string {
-  const label = `${site.site_name} (${site.manager_name})`;
+  const label = `*${site.site_name}* (${site.site_id.toUpperCase()})`;
   if (messages.length === 0) return `${label}\nNo previous data`;
-  const lines = [label, '📜 Recent (no compiled report yet):'];
-  for (const m of messages.slice(-6)) {
+  const lines = [label, '📜 Recent:'];
+  for (const m of messages.slice(-3)) {
     const text = m.content.length > 120 ? m.content.slice(0, 120) + '…' : m.content;
-    lines.push(`${m.sender_name}: ${text}`);
+    lines.push(text);
   }
   return lines.join('\n');
 }
@@ -324,7 +324,7 @@ async function runCompilation(chatJid: string, sendMessage: SendFn): Promise<str
         break;
     }
 
-    lines.push(`\n*${site.site_name}* — ${site.manager_name} ${statusEmoji}${dataBlock}`);
+    lines.push(`\n*${site.site_name}* (${site.site_id.toUpperCase()}) ${statusEmoji}${dataBlock}`);
   }
 
   const message = lines.join('');
@@ -356,10 +356,10 @@ If ALL sites returned "already_exists", do nothing (check-in already sent).
 Use the exact format:
 📋 CHECK-IN — [Day] [M/D]
 
-[Site] ([Manager])
-[AYS crew with counts]
-[Contractors with counts]
-[Equipment list]
+*[Site Name]* ([SITE_ID])
+AYS: [crew with counts]
+Sub: [contractors with counts]
+Equip: [equipment list]
 
 [Next site...]
 
@@ -387,10 +387,10 @@ Use the exact format:
 Format:
 ✅ DAILY REPORT — [Day] [M/D]
 
-*[Site]* — [Manager] [✅|⚠️ Not reported|🚫 No work]
+*[Site Name]* ([SITE_ID]) [✅|⚠️ Not reported|🚫 No work]
 AYS: [names with counts]
-Contractors: [names with counts]
-Equipment: [list]
+Sub: [contractors with counts]
+Equip: [list]
 
 [Next site...]`,
       schedule_type: 'cron' as const,
