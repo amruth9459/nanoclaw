@@ -13,6 +13,7 @@ import {
   getReportsForDate, storeReportHistory,
 } from './db.js';
 import type { PlcDailyReport } from './db.js';
+import { getMessagesSince } from '../../db.js';
 import { PLC_IPC_TYPES, handlePlcIpc } from './ipc-handlers.js';
 import { logger } from '../../logger.js';
 
@@ -200,6 +201,20 @@ function formatPrefillBlock(site: { site_id: string; site_name: string; manager_
   return lines.join('\n');
 }
 
+function formatPrefillBlockFromHistory(
+  site: { site_id: string; site_name: string; manager_name: string },
+  messages: Array<{ sender_name: string; content: string }>,
+): string {
+  const label = `${site.site_name} (${site.manager_name})`;
+  if (messages.length === 0) return `${label}\nNo previous data`;
+  const lines = [label, '📜 Recent (no compiled report yet):'];
+  for (const m of messages.slice(-6)) {
+    const text = m.content.length > 120 ? m.content.slice(0, 120) + '…' : m.content;
+    lines.push(`${m.sender_name}: ${text}`);
+  }
+  return lines.join('\n');
+}
+
 async function runCheckin(chatJid: string, sendMessage: SendFn, sendMessageGetId: SendGetIdFn): Promise<string> {
   const date = todayET();
   const sites = getSites();
@@ -220,10 +235,19 @@ async function runCheckin(chatJid: string, sendMessage: SendFn, sendMessageGetId
 
   // Build message
   const blocks: string[] = [];
+  const since48h = new Date(Date.now() - 48 * 60 * 60 * 1000).toISOString();
+  let recentMsgs: Array<{ sender_name: string; content: string }> | null = null;
   for (const site of sites) {
     const latest = getLatestReportForSite(site.site_id);
-    const data = latest ? JSON.parse(latest.report_data) : null;
-    blocks.push(formatPrefillBlock(site, data));
+    if (latest) {
+      blocks.push(formatPrefillBlock(site, JSON.parse(latest.report_data)));
+    } else {
+      // No compiled report yet — fall back to recent chat history
+      if (!recentMsgs) {
+        recentMsgs = getMessagesSince(chatJid, since48h, 'PLC Site Report');
+      }
+      blocks.push(formatPrefillBlockFromHistory(site, recentMsgs));
+    }
   }
 
   const message = `📋 CHECK-IN — ${dayLabel()}\n\n${blocks.join('\n\n')}\n\n👍 same | ❌ off | Reply with changes`;
