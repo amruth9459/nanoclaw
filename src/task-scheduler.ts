@@ -185,11 +185,14 @@ async function runTask(
       },
       (proc, containerName) => deps.onProcess(task.chat_jid, proc, containerName, task.group_folder),
       async (streamedOutput: ContainerOutput) => {
-        if (streamedOutput.result) {
+        if (streamedOutput.result && !streamedOutput.isPartial) {
           result = streamedOutput.result;
-          // Forward result to user (sendMessage handles formatting)
+          // Forward final result to user only (never partial/streaming chunks)
           await deps.sendMessage(task.chat_jid, streamedOutput.result);
           scheduleClose();
+        } else if (streamedOutput.result && streamedOutput.isPartial) {
+          // Buffer the latest partial text but do NOT send to WhatsApp
+          result = streamedOutput.result;
         }
         if (streamedOutput.status === 'success') {
           // Track usage/cost for scheduled tasks (same as user messages)
