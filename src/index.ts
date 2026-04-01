@@ -1,6 +1,8 @@
 import fs from 'fs';
 import path from 'path';
 
+import { CronExpressionParser } from 'cron-parser';
+
 import {
   ASSISTANT_NAME,
   DATA_DIR,
@@ -11,6 +13,7 @@ import {
   OPEN_MENTIONS,
   POLL_INTERVAL,
   STORE_DIR,
+  TIMEZONE,
   TRIGGER_PATTERN,
   WA2_ENABLED,
   WARMUP_ON_START,
@@ -1614,7 +1617,7 @@ Steps:
           schedule_type: 'cron',
           schedule_value: '0 9 * * *',
           context_mode: 'group',
-          next_run: null,
+          next_run: CronExpressionParser.parse('0 9 * * *', { tz: TIMEZONE }).next().toISOString(),
           status: 'active',
           created_at: new Date().toISOString(),
         });

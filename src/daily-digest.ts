@@ -226,14 +226,21 @@ export function startDailyDigest(
   const check = async () => {
     const now = new Date();
     const hour = now.getHours();
-    const dateKey = now.toISOString().slice(0, 10); // YYYY-MM-DD
+    // Use local date (matches getHours()) — not UTC which shifts at evening check
+    const dateKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
 
     const mainJid = getMainJid();
-    if (!mainJid) return;
+    if (!mainJid) {
+      if (hour === 9 || hour === 21) {
+        logger.warn('Daily digest: no main JID available, skipping send');
+      }
+      return;
+    }
 
     // 9 AM morning brief
     if (hour === 9 && getLastSentDate('morning') !== dateKey) {
       try {
+        logger.info({ mainJid, dateKey }, 'Daily digest: sending morning brief');
         const brief = generateMorningBrief(getPendingApprovals?.());
         await sendMessage(mainJid, brief);
         setLastSentDate('morning', dateKey);
@@ -246,6 +253,7 @@ export function startDailyDigest(
     // 9 PM evening report
     if (hour === 21 && getLastSentDate('evening') !== dateKey) {
       try {
+        logger.info({ mainJid, dateKey }, 'Daily digest: sending evening report');
         const report = generateEveningReport();
         await sendMessage(mainJid, report);
         setLastSentDate('evening', dateKey);

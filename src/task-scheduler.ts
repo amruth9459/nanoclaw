@@ -17,6 +17,7 @@ import {
   getTaskById,
   logTaskRun,
   logUsage,
+  updateTask,
   updateTaskAfterRun,
 } from './db.js';
 import { calculateCost } from './economics.js';
@@ -274,6 +275,27 @@ export function startSchedulerLoop(deps: SchedulerDependencies): void {
   schedulerRunning = true;
   logger.info('Scheduler loop started');
 
+  // Repair active cron tasks with NULL next_run (bug: tasks created without
+  // computing next_run from their cron expression never fire)
+  {
+    const allTasks = getAllTasks();
+    for (const task of allTasks) {
+      if (task.status === 'active' && task.schedule_type === 'cron' && !task.next_run) {
+        try {
+          const interval = CronExpressionParser.parse(task.schedule_value, { tz: TIMEZONE });
+          const nextRun = interval.next().toISOString();
+          updateTask(task.id, { next_run: nextRun });
+          logger.info(
+            { taskId: task.id, nextRun, cron: task.schedule_value },
+            'Repaired NULL next_run for active cron task',
+          );
+        } catch (err) {
+          logger.warn({ taskId: task.id, err }, 'Failed to repair next_run for cron task');
+        }
+      }
+    }
+  }
+
   // Run media cleanup on startup
   cleanupOldMedia();
 
@@ -291,7 +313,10 @@ export function startSchedulerLoop(deps: SchedulerDependencies): void {
 
       const dueTasks = getDueTasks();
       if (dueTasks.length > 0) {
-        logger.info({ count: dueTasks.length }, 'Found due tasks');
+        logger.info(
+          { count: dueTasks.length, taskIds: dueTasks.map(t => t.id) },
+          'Found due tasks',
+        );
       }
 
       for (const task of dueTasks) {
