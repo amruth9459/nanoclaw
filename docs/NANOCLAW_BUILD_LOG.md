@@ -1,11 +1,31 @@
 # NanoClaw — Daily Build Log
 
 *Living document — auto-generated from git history*
-*Last generated: 2026-04-01*
+*Last generated: 2026-04-02*
 
-**629 total commits** (224 meaningful) | 2026-01-31 to 2026-03-31
+**650 total commits** (225 meaningful) | 2026-01-31 to 2026-04-01
 
 ---
+
+## 2026-04-01
+
+### What Changed
+- [Agent] task_user_3tier_arch: Complete Perplexity API integration for Tier 3 cold fetch
+- (+20 auto-backup commits)
+
+### Files (9 changed)
+- docs/DEVLOG.md
+- docs/NANOCLAW_BUILD_LOG.md
+- docs/NANOCLAW_PLATFORM.md
+- src/context/context-manager.ts
+- src/context/perplexity-integration.test.ts
+- src/context/perplexity-integration.ts
+- src/integrations/plc/db.ts
+- src/integrations/plc/index.ts
+- src/task-scheduler.ts
+
+### Stats
+- 536 insertions, 38 deletions
 
 ## 2026-03-31
 
