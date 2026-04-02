@@ -50,7 +50,7 @@ export interface PlcSite {
 }
 
 export function getSites(): PlcSite[] {
-  return db.prepare('SELECT * FROM plc_sites').all() as PlcSite[];
+  return db.prepare('SELECT * FROM plc_sites WHERE active = 1').all() as PlcSite[];
 }
 
 export function getSiteByManagerJid(jid: string): PlcSite | undefined {
