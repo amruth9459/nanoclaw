@@ -67,6 +67,7 @@ import { classifyGoalHeuristic, extractGoalDetails } from './goal-classifier.js'
 import { ResponseTimeManager } from './response-time-manager.js';
 import { NanoClawOrchestrator } from './nanoclaw-orchestrator.js';
 import { listGroupFiles, startDashboard } from './dashboard.js';
+import { startApiServer, apiEvents } from './api-server.js';
 import { startThroughputMonitor } from './throughput-monitor.js';
 import { initNotificationRouter } from './notification-router.js';
 import { ResourceOrchestrator, AgentPriority } from './resource-orchestrator.js';
@@ -1690,6 +1691,7 @@ Steps:
   const channelOpts = {
     onMessage: (_chatJid: string, msg: NewMessage, channelName?: string) => {
       storeMessage(msg);
+      apiEvents.emit('new_message', { jid: msg.chat_jid, message: msg });
       if (channelName) chatChannelSource.set(msg.chat_jid, channelName);
       // Dispatch quote-replies to integrations (reactions handled separately)
       if (msg.quoted_message_id && !msg.is_bot_message) {
@@ -1805,6 +1807,7 @@ Steps:
 
   // Start subsystems (independently of connection handler)
   startDashboard(queue, (jid, text) => clawSend(jid, text), orchestrator, router);
+  startApiServer(queue, (jid, text) => clawSend(jid, text), orchestrator);
   startThroughputMonitor();
   // Helper: find WA2 channel (the secondary number, used as Claw's outbound identity)
   const findWa2 = () => channels.find((c) => c.name === 'whatsapp2' && c.isConnected());
