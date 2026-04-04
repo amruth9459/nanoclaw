@@ -20,6 +20,10 @@ import { query, HookCallback, PreCompactHookInput, PreToolUseHookInput } from '@
 import { fileURLToPath } from 'url';
 import { SafetyPulse } from './safety-pulse.js';
 import { beforeBashCommand, beforeFileEdit, afterAgentMessage } from './monitoring.js';
+import { classifyRequest } from './request-classifier.js';
+import { createSafeActionHook } from './safe-action-classifier.js';
+import { createAutoCommitHook } from './auto-commit.js';
+import { createAutoTestHook } from './auto-test.js';
 
 interface ContainerInput {
   prompt: string;
@@ -598,6 +602,12 @@ async function runQuery(
   containerInput: ContainerInput,
   sdkEnv: Record<string, string | undefined>,
   resumeAt?: string,
+  extraHooks?: {
+    safeAction?: HookCallback;
+    autoCommit?: HookCallback;
+    autoTestEdit?: HookCallback;
+    autoTestTrigger?: HookCallback;
+  },
 ): Promise<{ newSessionId?: string; lastAssistantUuid?: string; closedDuringQuery: boolean }> {
   const stream = new MessageStream();
   stream.push(prompt);
@@ -813,20 +823,48 @@ async function runQuery(
               createMonitoringBashHook(containerInput.groupFolder, containerInput.isScheduledTask ? 'sched-task' : undefined),
               createSanitizeBashHook(),
               createSecurityHook(containerInput.chatJid, containerInput.groupFolder),
+              // Phase 1: Safe-action classification for Bash commands
+              ...(extraHooks?.safeAction ? [extraHooks.safeAction] : []),
+              // Phase 1: Auto-test trigger — runs tests when agent uses Bash after edits
+              ...(extraHooks?.autoTestTrigger ? [extraHooks.autoTestTrigger] : []),
             ],
           },
           {
             matcher: 'Edit',
             hooks: [
               createMonitoringFileEditHook(containerInput.groupFolder, containerInput.isScheduledTask ? 'sched-task' : undefined),
+              // Phase 1: Track edited files for auto-testing
+              ...(extraHooks?.autoTestEdit ? [extraHooks.autoTestEdit] : []),
+              // Phase 1: Safe-action classification for Edit
+              ...(extraHooks?.safeAction ? [extraHooks.safeAction] : []),
             ],
           },
           {
             matcher: 'Write',
             hooks: [
               createMonitoringFileEditHook(containerInput.groupFolder, containerInput.isScheduledTask ? 'sched-task' : undefined),
+              // Phase 1: Track written files for auto-testing
+              ...(extraHooks?.autoTestEdit ? [extraHooks.autoTestEdit] : []),
+              // Phase 1: Safe-action classification for Write
+              ...(extraHooks?.safeAction ? [extraHooks.safeAction] : []),
             ],
           },
+          // Phase 1: Auto-commit hook — triggers on TodoWrite when task marked completed
+          ...(extraHooks?.autoCommit ? [{
+            matcher: 'TodoWrite' as const,
+            hooks: [extraHooks.autoCommit],
+          }] : []),
+          // Phase 1: Safe-action classification for read-only tools
+          ...(extraHooks?.safeAction ? [{
+            matcher: 'Read' as const,
+            hooks: [extraHooks.safeAction],
+          }, {
+            matcher: 'Glob' as const,
+            hooks: [extraHooks.safeAction],
+          }, {
+            matcher: 'Grep' as const,
+            hooks: [extraHooks.safeAction],
+          }] : []),
         ],
       },
     }
@@ -983,6 +1021,27 @@ async function main(): Promise<void> {
     }
   }
 
+  // ── Phase 1: Request Classification ──────────────────────────────────
+  // Classify the initial request before the first query
+  const classification = classifyRequest(prompt);
+  log(`[request-classifier] complexity=${classification.complexity} teams=${classification.shouldUseTeams} turns=${classification.estimatedTurns} — ${classification.reasoning}`);
+
+  // Inject classification context into the prompt so the agent knows the task type
+  const classificationContext = [
+    `\n\n<system-context type="request-classification">`,
+    `Complexity: ${classification.complexity}`,
+    `Planning required: yes (plan before executing)`,
+    `Estimated turns: ${classification.estimatedTurns}`,
+    classification.shouldUseTeams ? `Team recommended: yes (consider using spawn_team for parallel execution)` : '',
+    `</system-context>`,
+  ].filter(Boolean).join('\n');
+  prompt += classificationContext;
+
+  // ── Phase 1: Auto-Test & Auto-Commit Hooks Setup ──────────────────
+  const autoTest = createAutoTestHook('/workspace/group');
+  const autoCommitHook = createAutoCommitHook('/workspace/group');
+  const safeActionHook = createSafeActionHook(containerInput.chatJid, containerInput.groupFolder);
+
   // Query loop: run query → wait for IPC message → run new query → repeat
   // Auth errors trigger IPC-based token refresh and in-place retry (no container restart).
   const AUTH_RETRY_MAX = 2;
@@ -1000,7 +1059,12 @@ async function main(): Promise<void> {
 
           const hb = startHeartbeat();
           try {
-          queryResult = await runQuery(prompt, sessionId, mcpServerPath, containerInput, sdkEnv, resumeAt);
+          queryResult = await runQuery(prompt, sessionId, mcpServerPath, containerInput, sdkEnv, resumeAt, {
+            safeAction: safeActionHook,
+            autoCommit: autoCommitHook,
+            autoTestEdit: autoTest.editHook,
+            autoTestTrigger: autoTest.triggerHook,
+          });
           } finally { clearInterval(hb); }
           if (queryResult.newSessionId) {
             sessionId = queryResult.newSessionId;
@@ -1041,6 +1105,16 @@ async function main(): Promise<void> {
         log(`maxTurns=${containerInput.maxTurns} — exiting after query`);
         writeOutput({ status: 'success', result: null, newSessionId: sessionId });
         process.exit(0);
+      }
+
+      // Scheduled tasks are single-turn: exit after the SDK query completes.
+      // They must NOT poll the IPC input directory for follow-up messages —
+      // that directory is shared with any concurrent conversation container
+      // for the same group folder, and polling would steal user messages and
+      // route the responses to the wrong chat JID (cross-group bug).
+      if (containerInput.isScheduledTask) {
+        log('Scheduled task complete — exiting without IPC wait loop');
+        break;
       }
 
       // If _close was consumed during the query, exit immediately.

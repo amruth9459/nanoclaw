@@ -10,10 +10,10 @@ import type { NewMessage } from '../../types.js';
 import {
   initPlcSchema, getReportsByPrefillMessageId, getSiteByManagerJid, confirmReport,
   getSites, getLatestReportForSite, createDailyReport, setPrefillMessageId,
-  getReportsForDate, storeReportHistory,
+  getReportsForDate, storeReportHistory, getCrewRosterForSite, getEquipmentForSite,
+  getAllRosterEntries, getAllEquipmentEntries,
 } from './db.js';
 import type { PlcDailyReport } from './db.js';
-import { getMessagesSince } from '../../db.js';
 import { PLC_IPC_TYPES, handlePlcIpc } from './ipc-handlers.js';
 import { logger } from '../../logger.js';
 
@@ -148,13 +148,14 @@ const MLX_MODEL = 'mlx-community/Qwen2.5-7B-Instruct-4bit';
 
 /** Call local Qwen to apply free-text changes to structured crew data. */
 async function parseChanges(prefill: Record<string, string>, rawChanges: string): Promise<Record<string, string>> {
+  const subVal = prefill.sub || prefill.contractors || '';
   const current = [
     prefill.ays ? `AYS: ${prefill.ays}` : '',
-    prefill.contractors ? `Contractors: ${prefill.contractors}` : '',
+    subVal ? `Sub: ${subVal}` : '',
     prefill.equipment ? `Equipment: ${prefill.equipment}` : '',
   ].filter(Boolean).join('\n');
 
-  const prompt = `<|im_start|>system\nYou parse construction crew changes. Given the current data and a change description, output the updated data. Output ONLY the three lines (AYS/Contractors/Equipment), nothing else.<|im_end|>\n<|im_start|>user\nCurrent:\n${current}\n\nChanges: ${rawChanges}\n\nOutput updated data:<|im_end|>\n<|im_start|>assistant\n`;
+  const prompt = `<|im_start|>system\nYou parse construction crew changes. Given the current data and a change description, output the updated data. Output ONLY the three lines (AYS/Sub/Equipment), nothing else.<|im_end|>\n<|im_start|>user\nCurrent:\n${current}\n\nChanges: ${rawChanges}\n\nOutput updated data:<|im_end|>\n<|im_start|>assistant\n`;
 
   try {
     const body = JSON.stringify({ model: MLX_MODEL, prompt, temperature: 0, max_tokens: 300, stop: ['<|im_end|>'] });
@@ -166,7 +167,7 @@ async function parseChanges(prefill: Record<string, string>, rawChanges: string)
     const result: Record<string, string> = { ...prefill };
     for (const line of text.split('\n')) {
       if (line.startsWith('AYS:')) result.ays = line.slice(4).trim();
-      else if (line.startsWith('Contractors:')) result.contractors = line.slice(12).trim();
+      else if (line.startsWith('Sub:')) result.sub = line.slice(4).trim();
       else if (line.startsWith('Equipment:')) result.equipment = line.slice(10).trim();
     }
     return result;
@@ -188,32 +189,62 @@ function dayLabel(): string {
   return `${day} ${month}/${date}`;
 }
 
+/** Build roster-sourced prefill data for a site (used when no history exists). */
+function buildRosterPrefill(siteId: string): Record<string, string> {
+  const crew = getCrewRosterForSite(siteId);
+  const equipment = getEquipmentForSite(siteId);
+  const result: Record<string, string> = {};
+  const ays = crew.filter(c => c.type === 'ays').map(c => `${c.name} - ${c.typical_count}`).join(', ');
+  const sub = crew.filter(c => c.type === 'sub').map(c => `${c.name} - ${c.typical_count}`).join(', ');
+  const equip = equipment.map(e => `${e.name} x${e.typical_count}`).join(', ');
+  if (ays) result.ays = ays;
+  if (sub) result.sub = sub;
+  if (equip) result.equipment = equip;
+  return result;
+}
+
 function formatPrefillBlock(site: { site_id: string; site_name: string; manager_name: string }, data: Record<string, unknown> | null): string {
   const label = `${site.site_name} (${site.manager_name})`;
   if (!data) return `${label}\nNo previous data`;
   const ays = (data.ays as string) || '';
-  const contractors = (data.contractors as string) || '';
+  // support both 'sub' (new) and 'contractors' (legacy)
+  const sub = (data.sub as string) || (data.contractors as string) || '';
   const equipment = (data.equipment as string) || '';
   const lines = [label];
-  if (ays) lines.push(ays);
-  if (contractors) lines.push(contractors);
-  if (equipment) lines.push(equipment);
+  if (ays) lines.push(`AYS: ${ays}`);
+  if (sub) lines.push(`Sub: ${sub}`);
+  if (equipment) lines.push(`Equip: ${equipment}`);
   return lines.join('\n');
 }
 
-function formatPrefillBlockFromHistory(
-  site: { site_id: string; site_name: string; manager_name: string },
-  messages: Array<{ sender_name: string; content: string }>,
-): string {
-  const label = `${site.site_name} (${site.manager_name})`;
-  if (messages.length === 0) return `${label}\nNo previous data`;
-  const lines = [label, '📜 Recent (no compiled report yet):'];
-  for (const m of messages.slice(-6)) {
-    const text = m.content.length > 120 ? m.content.slice(0, 120) + '…' : m.content;
-    lines.push(`${m.sender_name}: ${text}`);
-  }
-  return lines.join('\n');
+/** Flag names in a "name - count, ..." string that don't appear in the roster. */
+function flagUnknownCrew(crewStr: string, allNames: Set<string>, siteNames: Set<string>): string {
+  if (!crewStr) return crewStr;
+  return crewStr.split(',').map(entry => {
+    const trimmed = entry.trim();
+    const dashIdx = trimmed.lastIndexOf(' - ');
+    const name = (dashIdx >= 0 ? trimmed.slice(0, dashIdx) : trimmed).trim();
+    const lc = name.toLowerCase();
+    if (!allNames.has(lc)) return `⚠️ ${trimmed}`;
+    if (!siteNames.has(lc)) return `${trimmed} ⚠️(other site)`;
+    return trimmed;
+  }).join(', ');
 }
+
+/** Flag names in a "name xN, ..." string that don't appear in equipment. */
+function flagUnknownEquipment(equipStr: string, allNames: Set<string>, siteNames: Set<string>): string {
+  if (!equipStr) return equipStr;
+  return equipStr.split(',').map(entry => {
+    const trimmed = entry.trim();
+    const xIdx = trimmed.search(/ x\d/);
+    const name = (xIdx >= 0 ? trimmed.slice(0, xIdx) : trimmed).trim();
+    const lc = name.toLowerCase();
+    if (!allNames.has(lc)) return `⚠️ ${trimmed}`;
+    if (!siteNames.has(lc)) return `${trimmed} ⚠️(other site)`;
+    return trimmed;
+  }).join(', ');
+}
+
 
 async function runCheckin(chatJid: string, sendMessage: SendFn, sendMessageGetId: SendGetIdFn): Promise<string> {
   const date = todayET();
@@ -225,7 +256,8 @@ async function runCheckin(chatJid: string, sendMessage: SendFn, sendMessageGetId
   let anyCreated = false;
   for (const site of sites) {
     const latest = getLatestReportForSite(site.site_id);
-    const prefill = latest ? JSON.parse(latest.report_data) : {};
+    // Prefer history (manager-confirmed data), fall back to live roster
+    const prefill = latest ? JSON.parse(latest.report_data) : buildRosterPrefill(site.site_id);
     const result = createDailyReport(date, site.site_id, prefill);
     reportIds[site.site_id] = result.id;
     if (result.created) anyCreated = true;
@@ -235,19 +267,10 @@ async function runCheckin(chatJid: string, sendMessage: SendFn, sendMessageGetId
 
   // Build message
   const blocks: string[] = [];
-  const since48h = new Date(Date.now() - 48 * 60 * 60 * 1000).toISOString();
-  let recentMsgs: Array<{ sender_name: string; content: string }> | null = null;
   for (const site of sites) {
     const latest = getLatestReportForSite(site.site_id);
-    if (latest) {
-      blocks.push(formatPrefillBlock(site, JSON.parse(latest.report_data)));
-    } else {
-      // No compiled report yet — fall back to recent chat history
-      if (!recentMsgs) {
-        recentMsgs = getMessagesSince(chatJid, since48h, 'PLC Site Report');
-      }
-      blocks.push(formatPrefillBlockFromHistory(site, recentMsgs));
-    }
+    const data = latest ? JSON.parse(latest.report_data) : buildRosterPrefill(site.site_id);
+    blocks.push(formatPrefillBlock(site, Object.keys(data).length > 0 ? data : null));
   }
 
   const message = `📋 CHECK-IN — ${dayLabel()}\n\n${blocks.join('\n\n')}\n\n👍 same | ❌ off | Reply with changes`;
@@ -292,12 +315,19 @@ async function runCompilation(chatJid: string, sendMessage: SendFn): Promise<str
         statusEmoji = '✅';
         const data = report.prefill_data ? JSON.parse(report.prefill_data) as Record<string, string> : null;
         if (data) {
-          if (data.ays) dataBlock += `\nAYS: ${data.ays}`;
-          if (data.contractors) dataBlock += `\nContractors: ${data.contractors}`;
-          if (data.equipment) dataBlock += `\nEquipment: ${data.equipment}`;
+          const ays = data.ays || '';
+          const sub = data.sub || data.contractors || '';
+          const equipment = data.equipment || '';
+          if (ays) dataBlock += `\nAYS: ${ays}`;
+          if (sub) dataBlock += `\nSub: ${sub}`;
+          if (equipment) dataBlock += `\nEquip: ${equipment}`;
+          // Normalize to 'sub' key and store structured data for tomorrow
+          const toStore: Record<string, string> = {};
+          if (ays) toStore.ays = ays;
+          if (sub) toStore.sub = sub;
+          if (equipment) toStore.equipment = equipment;
+          storeReportHistory(date, report.site_id, toStore);
         }
-        // Store in history for tomorrow's prefill
-        if (data) storeReportHistory(date, report.site_id, data);
         break;
       }
       case 'confirmed_changed': {
@@ -307,11 +337,32 @@ async function runCompilation(chatJid: string, sendMessage: SendFn): Promise<str
           const prefill = report.prefill_data ? JSON.parse(report.prefill_data) as Record<string, string> : {};
           // Use local LLM to parse free-text changes into structured data
           const parsed = await parseChanges(prefill, confirmed.raw_changes);
-          if (parsed.ays) dataBlock += `\nAYS: ${parsed.ays}`;
-          if (parsed.contractors) dataBlock += `\nContractors: ${parsed.contractors}`;
-          if (parsed.equipment) dataBlock += `\nEquipment: ${parsed.equipment}`;
-          // Store parsed structured data as history (feeds tomorrow's prefill)
-          storeReportHistory(date, report.site_id, parsed);
+
+          // Validate parsed names against roster
+          const allRoster = getAllRosterEntries();
+          const allEquip = getAllEquipmentEntries();
+          const siteId = report.site_id;
+          const allCrewNames = new Set(allRoster.map(r => r.name.toLowerCase()));
+          const siteCrewNames = new Set(allRoster.filter(r => r.default_site.toLowerCase() === siteId.toLowerCase()).map(r => r.name.toLowerCase()));
+          const allEquipNames = new Set(allEquip.map(e => e.name.toLowerCase()));
+          const siteEquipNames = new Set(allEquip.filter(e => e.default_site.toLowerCase() === siteId.toLowerCase()).map(e => e.name.toLowerCase()));
+
+          const ays = parsed.ays ? flagUnknownCrew(parsed.ays, allCrewNames, siteCrewNames) : '';
+          const sub = parsed.sub || parsed.contractors
+            ? flagUnknownCrew(parsed.sub || parsed.contractors || '', allCrewNames, siteCrewNames)
+            : '';
+          const equipment = parsed.equipment ? flagUnknownEquipment(parsed.equipment, allEquipNames, siteEquipNames) : '';
+
+          if (ays) dataBlock += `\nAYS: ${ays}`;
+          if (sub) dataBlock += `\nSub: ${sub}`;
+          if (equipment) dataBlock += `\nEquip: ${equipment}`;
+
+          // Store structured data (strip ⚠️ flags before saving to history)
+          const toStore: Record<string, string> = {};
+          if (parsed.ays) toStore.ays = parsed.ays;
+          if (parsed.sub || parsed.contractors) toStore.sub = parsed.sub || parsed.contractors || '';
+          if (parsed.equipment) toStore.equipment = parsed.equipment;
+          storeReportHistory(date, report.site_id, toStore);
         }
         break;
       }

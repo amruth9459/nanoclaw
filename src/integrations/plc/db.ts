@@ -47,6 +47,7 @@ export interface PlcSite {
   site_name: string;
   manager_jid: string;
   manager_name: string;
+  active?: number;
 }
 
 export function getSites(): PlcSite[] {
@@ -62,6 +63,47 @@ export function upsertSite(site: PlcSite): void {
     `INSERT OR REPLACE INTO plc_sites (site_id, site_name, manager_jid, manager_name)
      VALUES (?, ?, ?, ?)`,
   ).run(site.site_id, site.site_name, site.manager_jid, site.manager_name);
+}
+
+// --- Crew Roster & Equipment ---
+
+export interface PlcCrewMember {
+  id: number;
+  name: string;
+  type: 'ays' | 'sub';
+  default_site: string;
+  typical_count: number;
+  active: number;
+  trade: string | null;
+  notes: string | null;
+}
+
+export interface PlcEquipmentItem {
+  id: number;
+  name: string;
+  default_site: string;
+  typical_count: number;
+  active: number;
+}
+
+export function getCrewRosterForSite(siteId: string): PlcCrewMember[] {
+  return db
+    .prepare('SELECT * FROM plc_crew_roster WHERE LOWER(default_site) = LOWER(?) AND active = 1 ORDER BY type, id')
+    .all(siteId) as PlcCrewMember[];
+}
+
+export function getEquipmentForSite(siteId: string): PlcEquipmentItem[] {
+  return db
+    .prepare('SELECT * FROM plc_equipment WHERE LOWER(default_site) = LOWER(?) AND active = 1 ORDER BY id')
+    .all(siteId) as PlcEquipmentItem[];
+}
+
+export function getAllRosterEntries(): PlcCrewMember[] {
+  return db.prepare('SELECT * FROM plc_crew_roster WHERE active = 1').all() as PlcCrewMember[];
+}
+
+export function getAllEquipmentEntries(): PlcEquipmentItem[] {
+  return db.prepare('SELECT * FROM plc_equipment WHERE active = 1').all() as PlcEquipmentItem[];
 }
 
 // --- Daily Report CRUD ---
