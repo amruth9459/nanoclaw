@@ -42,17 +42,26 @@ const server = new McpServer({
 
 server.tool(
   'send_message',
-  "Send a message to the user or group immediately while you're still running. Use this for progress updates or to send multiple messages. You can call this multiple times. Note: when running as a scheduled task, your final output is NOT sent to the user — use this tool if you need to communicate with the user or group. Main group agents can send to other groups using target_jid (get JIDs from list_groups).",
+  "Send a message to the user or group immediately while you're still running. Use this for progress updates or to send multiple messages. You can call this multiple times. Note: when running as a scheduled task, your final output is NOT sent to the user — use this tool if you need to communicate with the user or group. Main group agents can send to other groups using target_jid (get JIDs from list_groups). Use the optional ui parameter to send interactive buttons.",
   {
     text: z.string().describe('The message text to send'),
     sender: z.string().optional().describe('Your role/identity name (e.g. "Researcher"). When set, messages appear from a dedicated bot in Telegram.'),
     target_jid: z.string().optional().describe('(Main group only) Send to a different group by JID. Get JIDs from list_groups. Defaults to current group.'),
+    ui: z.object({
+      type: z.literal('buttons'),
+      body: z.string().describe('Main message text displayed above buttons'),
+      footer: z.string().optional().describe('Small footer text below the message'),
+      buttons: z.array(z.object({
+        id: z.string().describe('Unique button ID returned when pressed (e.g. "approve")'),
+        title: z.string().describe('Button display text (max 20 chars)'),
+      })).min(1).max(3).describe('1-3 buttons'),
+    }).optional().describe('Optional interactive UI. When provided, sends buttons instead of plain text. The text parameter is used as fallback for channels that do not support buttons.'),
   },
   async (args) => {
     // Main group can target other groups; non-main always sends to own group
     const targetJid = (isMain && args.target_jid) ? args.target_jid : chatJid;
 
-    const data: Record<string, string | undefined> = {
+    const data: Record<string, unknown> = {
       type: 'message',
       chatJid: targetJid,
       text: args.text,
@@ -62,10 +71,15 @@ server.tool(
       agent_id: agentId, // Cryptographic identity for message signing (host-side)
     };
 
+    if (args.ui) {
+      data.ui = args.ui;
+    }
+
     writeIpcFile(MESSAGES_DIR, data);
 
     const targetNote = targetJid !== chatJid ? ` (to ${targetJid})` : '';
-    return { content: [{ type: 'text' as const, text: `Message sent${targetNote}.` }] };
+    const uiNote = args.ui ? ' (with buttons)' : '';
+    return { content: [{ type: 'text' as const, text: `Message sent${targetNote}${uiNote}.` }] };
   },
 );
 

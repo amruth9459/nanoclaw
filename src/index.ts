@@ -1908,6 +1908,17 @@ Steps:
       return ch.sendReaction(jid, msgId, senderJid, emoji);
     },
     sendFile: clawSendFile,
+    sendInteractiveMessage: async (jid, ui, senderName) => {
+      const owned = findChannel(channels, jid);
+      const ch = owned?.isConnected() ? owned : (findWa2() ?? whatsapp);
+      if (ch?.sendInteractiveMessage) {
+        await ch.sendInteractiveMessage(jid, ui, senderName);
+      } else {
+        // Fallback: send as plain text with button labels
+        const buttonList = ui.buttons.map(b => `• ${b.title}`).join('\n');
+        await clawSend(jid, `${ui.body}\n\n${buttonList}${ui.footer ? '\n\n' + ui.footer : ''}`, senderName);
+      }
+    },
     registeredGroups: () => {
       // Merge guest groups so IPC auth allows guest agents to reply to their own chat
       const merged = { ...registeredGroups };

@@ -36,7 +36,7 @@ import { HitlGate } from './hitl.js';
 import { getIntegration } from './integration-loader.js';
 import { logger } from './logger.js';
 import { indexDocument, semanticSearch } from './semantic-index.js';
-import { RegisteredGroup } from './types.js';
+import { RegisteredGroup, UIMetadata } from './types.js';
 import { processIdentityIpc, signOutgoingMessage, recordUnsignedMessage } from './identity/ipc-handlers.js';
 import { handleCompetitiveIntelIpc } from './competitive-intel/ipc-handler.js';
 import { handleAutoresearchIpc } from './autoresearch/ipc-handler.js';
@@ -47,6 +47,7 @@ export interface IpcDeps {
   sendMessageGetId?: (jid: string, text: string, senderName?: string) => Promise<string | undefined>;
   sendReaction?: (jid: string, messageId: string, senderJid: string, emoji: string) => Promise<void>;
   sendFile?: (jid: string, buffer: Buffer, mimetype: string, filename: string, caption?: string) => Promise<void>;
+  sendInteractiveMessage?: (jid: string, ui: UIMetadata, senderName?: string) => Promise<void>;
   registeredGroups: () => Record<string, RegisteredGroup>;
   registerGroup: (jid: string, group: RegisteredGroup) => void;
   syncGroupMetadata: (force: boolean) => Promise<void>;
@@ -677,15 +678,19 @@ export function startIpcWatcher(deps: IpcDeps): void {
                       recordUnsignedMessage(sourceGroup, data.text as string, data.chatJid as string).catch(() => {});
                     }
 
+                    // Route: interactive message (buttons) or plain text
+                    const uiData = data.ui as UIMetadata | undefined;
                     let messageId: string | undefined;
-                    if (msgResponseFile && deps.sendMessageGetId) {
+                    if (uiData && deps.sendInteractiveMessage) {
+                      await deps.sendInteractiveMessage(data.chatJid, uiData, senderName);
+                    } else if (msgResponseFile && deps.sendMessageGetId) {
                       messageId = await deps.sendMessageGetId(data.chatJid, data.text, senderName);
                     } else {
                       await deps.sendMessage(data.chatJid, data.text, senderName);
                     }
                     deps.onAgentSendMessage?.(data.chatJid);
                     logger.info(
-                      { chatJid: data.chatJid, sourceGroup, signed: !!agentId, messageId },
+                      { chatJid: data.chatJid, sourceGroup, signed: !!agentId, messageId, hasUi: !!uiData },
                       'IPC message sent',
                     );
                     // Write messageId to responseFile so container can track it

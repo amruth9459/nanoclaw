@@ -22,7 +22,7 @@ import {
 } from '../db.js';
 import { validateFileType } from '../file-validation.js';
 import { logger } from '../logger.js';
-import { Channel, OnInboundMessage, OnChatMetadata, RegisteredGroup } from '../types.js';
+import { Channel, OnInboundMessage, OnChatMetadata, RegisteredGroup, UIMetadata } from '../types.js';
 
 const GROUP_SYNC_INTERVAL_MS = 24 * 60 * 60 * 1000; // 24 hours
 
@@ -306,13 +306,28 @@ export class WhatsAppChannel implements Channel {
         const inRegisteredGroup = Boolean(groups[chatJid]);
 
         // Extract text content for registered groups and for mention detection
-        const content =
-          msg.message?.conversation ||
-          msg.message?.extendedTextMessage?.text ||
-          msg.message?.imageMessage?.caption ||
-          msg.message?.videoMessage?.caption ||
-          msg.message?.documentMessage?.caption ||
-          '';
+        // Button/list responses are translated to "[button_id] display_text" so agents see actionable text
+        const buttonsResponse = msg.message?.buttonsResponseMessage;
+        const listResponse = msg.message?.listResponseMessage;
+
+        let content: string;
+        if (buttonsResponse) {
+          const btnId = buttonsResponse.selectedButtonId || '';
+          const btnText = buttonsResponse.selectedDisplayText || '';
+          content = `[${btnId}] ${btnText}`.trim();
+        } else if (listResponse) {
+          const rowId = listResponse.singleSelectReply?.selectedRowId || '';
+          const rowTitle = listResponse.title || '';
+          content = `[${rowId}] ${rowTitle}`.trim();
+        } else {
+          content =
+            msg.message?.conversation ||
+            msg.message?.extendedTextMessage?.text ||
+            msg.message?.imageMessage?.caption ||
+            msg.message?.videoMessage?.caption ||
+            msg.message?.documentMessage?.caption ||
+            '';
+        }
 
         // For non-registered chats: only proceed if open mentions is on and
         // the message @-mentions the assistant (text-only, no media download)
@@ -525,6 +540,46 @@ export class WhatsAppChannel implements Channel {
       await this.sock.sendMessage(jid, { document: buffer, mimetype, fileName: filename, caption: caption ?? '' });
     }
     logger.info({ jid, filename, mimetype, bytes: buffer.length }, 'File sent');
+  }
+
+  async sendInteractiveMessage(jid: string, ui: UIMetadata, senderName?: string): Promise<void> {
+    const displayPrefix = senderName || ASSISTANT_NAME;
+
+    if (!this.connected) {
+      // Fallback: queue as plain text with button labels
+      const buttonList = ui.buttons.map(b => `• ${b.title}`).join('\n');
+      const fallback = `${ui.body}\n\n${buttonList}${ui.footer ? '\n\n' + ui.footer : ''}`;
+      const prefixed = ASSISTANT_HAS_OWN_NUMBER ? fallback : `${displayPrefix}: ${fallback}`;
+      this.outgoingQueue.push({ jid, text: prefixed });
+      logger.info({ jid, queueSize: this.outgoingQueue.length }, 'WA disconnected, interactive message queued as text');
+      return;
+    }
+
+    try {
+      // WhatsApp interactive buttons via baileys proto
+      const buttonRows = ui.buttons.map((b) => ({
+        buttonId: b.id,
+        buttonText: { displayText: b.title },
+        type: 1 as const,
+      }));
+
+      const bodyPrefix = ASSISTANT_HAS_OWN_NUMBER ? '' : `${displayPrefix}: `;
+
+      await this.sock.sendMessage(jid, {
+        text: `${bodyPrefix}${ui.body}${ui.footer ? '\n\n' + ui.footer : ''}`,
+        buttons: buttonRows,
+        headerType: 1,
+      } as any); // baileys types don't fully expose buttons in the TS SDK
+
+      this.resetWatchdog(true);
+      logger.info({ jid, buttonCount: ui.buttons.length }, 'Interactive button message sent');
+    } catch (err) {
+      // Fallback: send as plain text if interactive message fails
+      logger.warn({ jid, err }, 'Interactive message failed, falling back to text');
+      const buttonList = ui.buttons.map(b => `[${b.id}] ${b.title}`).join('\n');
+      const fallback = `${ui.body}\n\n${buttonList}${ui.footer ? '\n\n' + ui.footer : ''}`;
+      await this.sendMessage(jid, fallback, senderName);
+    }
   }
 
   isConnected(): boolean {

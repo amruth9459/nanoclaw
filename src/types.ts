@@ -96,6 +96,20 @@ export interface TaskRunLog {
   error: string | null;
 }
 
+// --- Interactive UI metadata ---
+
+export interface UIButton {
+  id: string;     // Unique button ID returned on press (e.g. "approve", "reject")
+  title: string;  // Display text (max 20 chars for WhatsApp)
+}
+
+export interface UIMetadata {
+  type: 'buttons';
+  body: string;           // Main message text
+  footer?: string;        // Small footer text
+  buttons: UIButton[];    // 1-3 buttons
+}
+
 // --- Channel abstraction ---
 
 export interface Channel {
@@ -119,6 +133,8 @@ export interface Channel {
   ownPhoneJid?(): string | undefined;
   /** Update a WhatsApp group's description text. */
   updateGroupDescription?(jid: string, description: string): Promise<void>;
+  /** Send an interactive message (buttons/lists). Falls back to text if unsupported. */
+  sendInteractiveMessage?(jid: string, ui: UIMetadata, senderName?: string): Promise<void>;
 }
 
 // Callback type that channels use to deliver inbound messages
