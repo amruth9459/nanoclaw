@@ -971,11 +971,16 @@ async function main(): Promise<void> {
   let prompt = containerInput.prompt;
   if (containerInput.isScheduledTask) {
     prompt = `[SCHEDULED TASK - The following message was sent automatically and is not coming directly from the user or group.]\n\n${prompt}`;
-  }
-  const pending = drainIpcInput();
-  if (pending.length > 0) {
-    log(`Draining ${pending.length} pending IPC messages into initial prompt`);
-    prompt += '\n' + pending.join('\n');
+    // Scheduled tasks must NOT drain the shared IPC input directory — doing so would
+    // steal follow-up messages that belong to a concurrent conversation container
+    // sharing the same group folder. Tasks are single-turn; they get their prompt
+    // from containerInput.prompt only.
+  } else {
+    const pending = drainIpcInput();
+    if (pending.length > 0) {
+      log(`Draining ${pending.length} pending IPC messages into initial prompt`);
+      prompt += '\n' + pending.join('\n');
+    }
   }
 
   // Query loop: run query → wait for IPC message → run new query → repeat
