@@ -5,6 +5,71 @@
 
 ---
 
+### 2026-04-05 12:51
+
+**Areas:** container, docs, hooks, orchestrator
+**Files (18):** .claude/hooks/extract-topic.py, .claude/hooks/memory-bridge.sh, .claude/hooks/tmux-auto-rename.sh, .claude/hooks/tmux-bell.sh, .claude/hooks/tmux-rename.sh, .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/settings.json, .claude/skills/get-api-docs/SKILL.md, .claude/worktrees/quirky-lederberg/src/api-server.ts, .claude/worktrees/quirky-lederberg/src/index.ts, .claude/worktrees/sleepy-shtern/src/agent-monitoring-system.ts, .claude/worktrees/sleepy-shtern/src/auto-dispatch.ts, .claude/worktrees/sleepy-shtern/src/container-runner.ts, .claude/worktrees/sleepy-shtern/src/group-queue.ts, .claude/worktrees/sleepy-shtern/src/resource-orchestrator.ts, .config/nanoclaw/mount-allowlist.json, .config/rclone/rclone.conf, .env
+**Diff:** +59 -0 across 26 files
+
+### 2026-04-05 12:42
+
+**Areas:** container, docs, hooks, orchestrator
+**Files (18):** .claude/hooks/extract-topic.py, .claude/hooks/memory-bridge.sh, .claude/hooks/tmux-auto-rename.sh, .claude/hooks/tmux-bell.sh, .claude/hooks/tmux-rename.sh, .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/settings.json, .claude/skills/get-api-docs/SKILL.md, .claude/worktrees/quirky-lederberg/src/api-server.ts, .claude/worktrees/quirky-lederberg/src/index.ts, .claude/worktrees/sleepy-shtern/src/agent-monitoring-system.ts, .claude/worktrees/sleepy-shtern/src/auto-dispatch.ts, .claude/worktrees/sleepy-shtern/src/container-runner.ts, .claude/worktrees/sleepy-shtern/src/group-queue.ts, .claude/worktrees/sleepy-shtern/src/resource-orchestrator.ts, .config/nanoclaw/mount-allowlist.json, .config/rclone/rclone.conf, .env
+**Diff:** +53 -0 across 26 files
+
+### 2026-04-05 12:39
+
+**Areas:** container, docs, hooks, orchestrator
+**Files (18):** .claude/hooks/extract-topic.py, .claude/hooks/memory-bridge.sh, .claude/hooks/tmux-auto-rename.sh, .claude/hooks/tmux-bell.sh, .claude/hooks/tmux-rename.sh, .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/settings.json, .claude/skills/get-api-docs/SKILL.md, .claude/worktrees/quirky-lederberg/src/api-server.ts, .claude/worktrees/quirky-lederberg/src/index.ts, .claude/worktrees/sleepy-shtern/src/agent-monitoring-system.ts, .claude/worktrees/sleepy-shtern/src/auto-dispatch.ts, .claude/worktrees/sleepy-shtern/src/container-runner.ts, .claude/worktrees/sleepy-shtern/src/group-queue.ts, .claude/worktrees/sleepy-shtern/src/resource-orchestrator.ts, .config/nanoclaw/mount-allowlist.json, .config/rclone/rclone.conf, .env
+**Diff:** +47 -0 across 26 files
+
+### 2026-04-05 12:37
+
+**Areas:** container, docs, hooks, orchestrator
+**Files (18):** .claude/hooks/extract-topic.py, .claude/hooks/memory-bridge.sh, .claude/hooks/tmux-auto-rename.sh, .claude/hooks/tmux-bell.sh, .claude/hooks/tmux-rename.sh, .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/settings.json, .claude/skills/get-api-docs/SKILL.md, .claude/worktrees/quirky-lederberg/src/api-server.ts, .claude/worktrees/quirky-lederberg/src/index.ts, .claude/worktrees/sleepy-shtern/src/agent-monitoring-system.ts, .claude/worktrees/sleepy-shtern/src/auto-dispatch.ts, .claude/worktrees/sleepy-shtern/src/container-runner.ts, .claude/worktrees/sleepy-shtern/src/group-queue.ts, .claude/worktrees/sleepy-shtern/src/resource-orchestrator.ts, .config/nanoclaw/mount-allowlist.json, .config/rclone/rclone.conf, .env
+**Diff:** +41 -0 across 26 files
+
+### 2026-04-05 12:30
+
+**Areas:** container, docs, hooks, orchestrator
+**Files (18):** .claude/hooks/extract-topic.py, .claude/hooks/memory-bridge.sh, .claude/hooks/tmux-auto-rename.sh, .claude/hooks/tmux-bell.sh, .claude/hooks/tmux-rename.sh, .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/settings.json, .claude/skills/get-api-docs/SKILL.md, .claude/worktrees/quirky-lederberg/src/api-server.ts, .claude/worktrees/quirky-lederberg/src/index.ts, .claude/worktrees/sleepy-shtern/src/agent-monitoring-system.ts, .claude/worktrees/sleepy-shtern/src/auto-dispatch.ts, .claude/worktrees/sleepy-shtern/src/container-runner.ts, .claude/worktrees/sleepy-shtern/src/group-queue.ts, .claude/worktrees/sleepy-shtern/src/resource-orchestrator.ts, .config/nanoclaw/mount-allowlist.json, .config/rclone/rclone.conf, .env
+**Diff:** +35 -0 across 26 files
+
+### 2026-04-05 12:25
+
+**Areas:** container, docs, hooks, orchestrator
+**Files (18):** .claude/hooks/extract-topic.py, .claude/hooks/memory-bridge.sh, .claude/hooks/tmux-auto-rename.sh, .claude/hooks/tmux-bell.sh, .claude/hooks/tmux-rename.sh, .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/settings.json, .claude/skills/get-api-docs/SKILL.md, .claude/worktrees/quirky-lederberg/src/api-server.ts, .claude/worktrees/quirky-lederberg/src/index.ts, .claude/worktrees/sleepy-shtern/src/agent-monitoring-system.ts, .claude/worktrees/sleepy-shtern/src/auto-dispatch.ts, .claude/worktrees/sleepy-shtern/src/container-runner.ts, .claude/worktrees/sleepy-shtern/src/group-queue.ts, .claude/worktrees/sleepy-shtern/src/resource-orchestrator.ts, .config/nanoclaw/mount-allowlist.json, .config/rclone/rclone.conf, .env
+**Diff:** +29 -0 across 26 files
+
+### 2026-04-05 12:24
+
+**Areas:** container, docs, hooks, orchestrator
+**Files (18):** .claude/hooks/extract-topic.py, .claude/hooks/memory-bridge.sh, .claude/hooks/tmux-auto-rename.sh, .claude/hooks/tmux-bell.sh, .claude/hooks/tmux-rename.sh, .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/settings.json, .claude/skills/get-api-docs/SKILL.md, .claude/worktrees/quirky-lederberg/src/api-server.ts, .claude/worktrees/quirky-lederberg/src/index.ts, .claude/worktrees/sleepy-shtern/src/agent-monitoring-system.ts, .claude/worktrees/sleepy-shtern/src/auto-dispatch.ts, .claude/worktrees/sleepy-shtern/src/container-runner.ts, .claude/worktrees/sleepy-shtern/src/group-queue.ts, .claude/worktrees/sleepy-shtern/src/resource-orchestrator.ts, .config/nanoclaw/mount-allowlist.json, .config/rclone/rclone.conf, .env
+**Diff:** +23 -0 across 26 files
+
+### 2026-04-05 12:22
+
+**Areas:** container, docs, hooks, orchestrator
+**Files (18):** .claude/hooks/extract-topic.py, .claude/hooks/memory-bridge.sh, .claude/hooks/tmux-auto-rename.sh, .claude/hooks/tmux-bell.sh, .claude/hooks/tmux-rename.sh, .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/settings.json, .claude/skills/get-api-docs/SKILL.md, .claude/worktrees/quirky-lederberg/src/api-server.ts, .claude/worktrees/quirky-lederberg/src/index.ts, .claude/worktrees/sleepy-shtern/src/agent-monitoring-system.ts, .claude/worktrees/sleepy-shtern/src/auto-dispatch.ts, .claude/worktrees/sleepy-shtern/src/container-runner.ts, .claude/worktrees/sleepy-shtern/src/group-queue.ts, .claude/worktrees/sleepy-shtern/src/resource-orchestrator.ts, .config/nanoclaw/mount-allowlist.json, .config/rclone/rclone.conf, .env
+**Diff:** +17 -0 across 26 files
+
+### 2026-04-05 12:22
+
+**Areas:** container, docs, hooks, orchestrator
+**Files (18):** .claude/hooks/extract-topic.py, .claude/hooks/memory-bridge.sh, .claude/hooks/tmux-auto-rename.sh, .claude/hooks/tmux-bell.sh, .claude/hooks/tmux-rename.sh, .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/settings.json, .claude/skills/get-api-docs/SKILL.md, .claude/worktrees/quirky-lederberg/src/api-server.ts, .claude/worktrees/quirky-lederberg/src/index.ts, .claude/worktrees/sleepy-shtern/src/agent-monitoring-system.ts, .claude/worktrees/sleepy-shtern/src/auto-dispatch.ts, .claude/worktrees/sleepy-shtern/src/container-runner.ts, .claude/worktrees/sleepy-shtern/src/group-queue.ts, .claude/worktrees/sleepy-shtern/src/resource-orchestrator.ts, .config/nanoclaw/mount-allowlist.json, .config/rclone/rclone.conf, .env
+**Diff:** +11 -0 across 26 files
+
+### 2026-04-05 12:15
+
+**Areas:** container, docs, hooks, orchestrator
+**Files (18):** .claude/hooks/extract-topic.py, .claude/hooks/memory-bridge.sh, .claude/hooks/tmux-auto-rename.sh, .claude/hooks/tmux-bell.sh, .claude/hooks/tmux-rename.sh, .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/settings.json, .claude/skills/get-api-docs/SKILL.md, .claude/worktrees/quirky-lederberg/src/api-server.ts, .claude/worktrees/quirky-lederberg/src/index.ts, .claude/worktrees/sleepy-shtern/src/agent-monitoring-system.ts, .claude/worktrees/sleepy-shtern/src/auto-dispatch.ts, .claude/worktrees/sleepy-shtern/src/container-runner.ts, .claude/worktrees/sleepy-shtern/src/group-queue.ts, .claude/worktrees/sleepy-shtern/src/resource-orchestrator.ts, .config/nanoclaw/mount-allowlist.json, .config/rclone/rclone.conf, .env
+**Diff:** +5 -0 across 26 files
+
+### 2026-04-05 12:15
+
+**Areas:** container, docs, hooks, orchestrator
+**Files (18):** .claude/hooks/extract-topic.py, .claude/hooks/memory-bridge.sh, .claude/hooks/tmux-auto-rename.sh, .claude/hooks/tmux-bell.sh, .claude/hooks/tmux-rename.sh, .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/settings.json, .claude/skills/get-api-docs/SKILL.md, .claude/worktrees/quirky-lederberg/src/api-server.ts, .claude/worktrees/quirky-lederberg/src/index.ts, .claude/worktrees/sleepy-shtern/src/agent-monitoring-system.ts, .claude/worktrees/sleepy-shtern/src/auto-dispatch.ts, .claude/worktrees/sleepy-shtern/src/container-runner.ts, .claude/worktrees/sleepy-shtern/src/group-queue.ts, .claude/worktrees/sleepy-shtern/src/resource-orchestrator.ts, .config/nanoclaw/mount-allowlist.json, .config/rclone/rclone.conf, .env
+
 ### 2026-04-05 11:52
 
 **Areas:** container, docs, hooks, orchestrator
