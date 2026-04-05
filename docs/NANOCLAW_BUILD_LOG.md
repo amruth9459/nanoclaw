@@ -1,11 +1,43 @@
 # NanoClaw — Daily Build Log
 
 *Living document — auto-generated from git history*
-*Last generated: 2026-04-04*
+*Last generated: 2026-04-05*
 
-**689 total commits** (226 meaningful) | 2026-01-31 to 2026-04-03
+**713 total commits** (227 meaningful) | 2026-01-31 to 2026-04-04
 
 ---
+
+## 2026-04-04
+
+### What Changed
+- Backup before upstream sync - PLC and agent-runner changes
+- (+23 auto-backup commits)
+
+### Files (83 changed)
+- .../NBU_MedicalClinic_Arch.ground-truth.json
+- .../NBU_MedicalClinic_Eng-HVAC.ground-truth.json
+- .../agent-runner/src/safe-action-classifier.ts
+- .claude/worktrees/agitated-haibt
+- .claude/worktrees/angry-hypatia
+- .claude/worktrees/bold-feistel
+- .claude/worktrees/busy-chatterjee
+- .claude/worktrees/charming-wilbur
+- .claude/worktrees/compassionate-mclaren
+- .claude/worktrees/condescending-lederberg
+- .claude/worktrees/condescending-torvalds
+- .claude/worktrees/dazzling-rosalind
+- .claude/worktrees/distracted-williams
+- .claude/worktrees/eloquent-wu
+- .claude/worktrees/festive-leavitt
+- .claude/worktrees/funny-kilby
+- .claude/worktrees/gifted-franklin
+- .claude/worktrees/gracious-bohr
+- .claude/worktrees/heuristic-kowalevski
+- .claude/worktrees/infallible-aryabhata
+- ... and 63 more
+
+### Stats
+- 3289 insertions, 68 deletions
 
 ## 2026-04-03
 
