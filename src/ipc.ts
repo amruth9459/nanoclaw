@@ -36,6 +36,8 @@ import { HitlGate } from './hitl.js';
 import { getIntegration } from './integration-loader.js';
 import { logger } from './logger.js';
 import { indexDocument, semanticSearch } from './semantic-index.js';
+import { sanitizeWebContent, detectPromptInjection } from './content-filter.js';
+import { spawnGate } from './spawn-gate.js';
 import { RegisteredGroup, UIMetadata } from './types.js';
 import { processIdentityIpc, signOutgoingMessage, recordUnsignedMessage } from './identity/ipc-handlers.js';
 import { handleCompetitiveIntelIpc } from './competitive-intel/ipc-handler.js';
@@ -197,8 +199,21 @@ export function startIpcWatcher(deps: IpcDeps): void {
                 });
                 const rawRF = req.responseFile as string;
                 const responseFile = toHostIpcPath(rawRF, sourceGroup);
-                const response = results
-                  ? { results }
+
+                // Content Sanitization: scrub RAG results before returning to agent
+                let sanitizedResults = results;
+                if (results) {
+                  sanitizedResults = results.map(r => {
+                    const result = sanitizeWebContent(r.content, { sourceUrl: r.source });
+                    if (!result.safe) {
+                      logger.warn({ source: r.source, riskScore: result.riskScore }, 'RAG result sanitized — high risk content');
+                    }
+                    return { ...r, content: result.sanitized };
+                  });
+                }
+
+                const response = sanitizedResults
+                  ? { results: sanitizedResults }
                   : { error: 'Search failed — check ANTHROPIC_API_KEY and index status' };
                 fs.mkdirSync(path.dirname(responseFile), { recursive: true });
                 fs.writeFileSync(responseFile + '.tmp', JSON.stringify(response));
@@ -827,6 +842,31 @@ async function processIpcMessage(
       const topic = data.topic as string;
       const knowledge = data.knowledge as string;
       if (topic && knowledge) {
+        // Spawn Gate: rate limit learns to prevent memory flooding
+        const learnRateCheck = spawnGate.checkLearnRate(groupFolder);
+        if (!learnRateCheck.allowed) {
+          logger.warn({ groupFolder, reason: learnRateCheck.reason }, 'SpawnGate blocked learn');
+          if (responseFile) writeIpcResponse(responseFile, { error: learnRateCheck.reason });
+          break;
+        }
+
+        // Memory Poisoning Defense: validate learned facts for prompt injection
+        const topicCheck = detectPromptInjection(topic);
+        const knowledgeCheck = detectPromptInjection(knowledge);
+        if (!topicCheck.safe || !knowledgeCheck.safe) {
+          const riskSource = !topicCheck.safe ? 'topic' : 'knowledge';
+          const riskScore = Math.max(topicCheck.riskScore, knowledgeCheck.riskScore);
+          logger.warn({
+            groupFolder,
+            topic,
+            riskSource,
+            riskScore,
+            threats: [...topicCheck.threats, ...knowledgeCheck.threats].map(t => t.type),
+          }, 'Memory poisoning attempt blocked — learn rejected');
+          if (responseFile) writeIpcResponse(responseFile, { error: 'Content blocked by security filter', riskScore });
+          break;
+        }
+
         const domain = (data.domain as string) || 'nanoclaw';
         saveLearn(domain, topic, knowledge);
 
@@ -1259,6 +1299,13 @@ export async function processTaskIpc(
         data.schedule_value &&
         data.targetJid
       ) {
+        // Spawn Gate: rate limit + prompt injection check on scheduled tasks
+        const spawnCheck = await spawnGate.checkTaskSchedule(sourceGroup, data.prompt as string);
+        if (!spawnCheck.allowed) {
+          logger.warn({ sourceGroup, reason: spawnCheck.reason }, 'SpawnGate blocked schedule_task');
+          break;
+        }
+
         // Resolve the target group from JID
         const targetJid = data.targetJid as string;
         const targetGroupEntry = registeredGroups[targetJid];

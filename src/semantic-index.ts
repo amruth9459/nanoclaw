@@ -18,6 +18,7 @@ import * as sqliteVec from 'sqlite-vec';
 import { STORE_DIR } from './config.js';
 import { readEnvFile } from './env.js';
 import { logger } from './logger.js';
+import { validateBeforeIndex } from './semantic-index-validator.js';
 
 export { TaskType };
 
@@ -129,12 +130,28 @@ export interface IndexResult {
 
 /**
  * Index a text document. Skips chunks already indexed (by source + chunk_index).
+ * Validates content against RAG poisoning attacks before indexing.
  */
 export async function indexDocument(
   source: string,
   groupFolder: string,
   content: string,
+  options: { sourceUrl?: string; skipValidation?: boolean } = {},
 ): Promise<IndexResult> {
+  // RAG Poisoning Defense: validate content before indexing
+  if (!options.skipValidation) {
+    const validation = validateBeforeIndex(content, source, { sourceUrl: options.sourceUrl });
+    if (!validation.safe) {
+      logger.warn({
+        source,
+        groupFolder,
+        riskScore: validation.riskScore,
+        threats: validation.threats.map(t => t.type),
+      }, 'RAG validation blocked document indexing');
+      return { source, chunksIndexed: 0, chunksSkipped: 0 };
+    }
+  }
+
   const db = openVecDb();
   const chunks = chunkText(content);
   let indexed = 0;
