@@ -76,7 +76,7 @@ import { ImplementationGate } from './implementation-gate.js';
 import { DeliverableGate } from './deliverable-gate.js';
 import { GroupQueue } from './group-queue.js';
 import { HitlGate } from './hitl.js';
-import { startIpcWatcher } from './ipc.js';
+import { startIpcWatcher, tryHandleSpawnApproval } from './ipc.js';
 import { getIntegrations, loadIntegrations } from './integration-loader.js';
 import { findChannel, formatMessages, formatOutbound } from './router.js';
 import { startSchedulerLoop } from './task-scheduler.js';
@@ -1109,6 +1109,13 @@ async function startMessageLoop(): Promise<void> {
                 (text) => channel.sendMessage(chatJid, text),
               ).catch((err) =>
                 logger.warn({ err }, 'ImplementationGate approval handling error'),
+              );
+              // SpawnGate: handle approve-spawn / reject-spawn tokens
+              tryHandleSpawnApproval(
+                msg.content,
+                (text) => channel.sendMessage(chatJid, text),
+              ).catch((err) =>
+                logger.warn({ err }, 'SpawnGate approval handling error'),
               );
               // Integration gates (e.g. SandboxGate)
               for (const integ of getIntegrations()) {

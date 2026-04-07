@@ -1,4 +1,4 @@
-import { createHash } from 'crypto';
+import crypto, { createHash } from 'crypto';
 import fs from 'fs';
 import path from 'path';
 import Database from 'better-sqlite3';
@@ -617,6 +617,49 @@ export function startIpcWatcher(deps: IpcDeps): void {
                   continue;
                 }
 
+                // ── Spawn Gate Approval (HITL for Task/TeamCreate after web content) ──
+                if (data.type === 'spawn_gate_approval' && data.responseFile) {
+                  const responseFile = toHostIpcPath(data.responseFile as string, sourceGroup);
+                  const mainJid = deps.getMainGroupJid?.();
+                  if (!mainJid) {
+                    logger.warn({ sourceGroup }, 'spawn_gate_approval: no main JID, auto-denying');
+                    writeIpcResponse(responseFile, { approved: false, reason: 'Main group JID not configured' });
+                    fs.unlinkSync(filePath);
+                    continue;
+                  }
+
+                  const toolName = data.toolName as string || 'Unknown';
+                  const description = data.description as string || '';
+                  const lowTrust = data.lowTrustSource as { url?: string; domain?: string; trustScore?: number } | undefined;
+                  const domain = lowTrust?.domain || 'unknown';
+                  const trustScore = lowTrust?.trustScore ?? 0;
+
+                  // Register with the spawn gate's own approval mechanism
+                  // (can't use HitlGate because rejection also needs to write a response)
+                  const token = crypto.randomBytes(4).toString('hex');
+                  spawnGateApprovals.set(token, { responseFile, toolName, sourceGroup, expiresAt: Date.now() + 120_000 });
+
+                  const preview = description.length > 200 ? description.slice(0, 200) + '...' : description;
+                  const msg = [
+                    '\u{1F6E1}\uFE0F *Spawn Gate — Approval Required*',
+                    '',
+                    `Agent wants to spawn *${toolName}* after fetching from a low-trust source.`,
+                    '',
+                    `*Source:* \`${domain}\` (Trust: ${trustScore}%)`,
+                    `*Agent:* ${sourceGroup}`,
+                    `*Action:* ${preview}`,
+                    '',
+                    `Reply *approve-spawn ${token}* to allow, or *reject-spawn ${token}* to block.`,
+                    `_(expires in 2 minutes)_`,
+                  ].join('\n');
+
+                  await deps.sendMessage(mainJid, msg);
+                  logger.info({ sourceGroup, toolName, domain, token }, 'Spawn gate: approval requested');
+
+                  fs.unlinkSync(filePath);
+                  continue;
+                }
+
                 if (data.type === 'react' && data.chatJid && data.messageId && data.emoji) {
                   // Authorization: non-main groups can only react in their own JID
                   const reactTargetGroup = registeredGroups[data.chatJid as string];
@@ -825,6 +868,62 @@ export function writeIpcResponse(responseFile: string, data: object): void {
   fs.mkdirSync(path.dirname(responseFile), { recursive: true });
   fs.writeFileSync(tmp, JSON.stringify(data));
   fs.renameSync(tmp, responseFile);
+}
+
+// ── Spawn Gate Approval (HITL for Task/TeamCreate after web content) ──────────
+
+interface PendingSpawnApproval {
+  responseFile: string;
+  toolName: string;
+  sourceGroup: string;
+  expiresAt: number;
+}
+
+const spawnGateApprovals = new Map<string, PendingSpawnApproval>();
+const SPAWN_APPROVAL_PATTERN = /\b(approve-spawn|reject-spawn)\s+([a-f0-9]{8})\b/i;
+
+/**
+ * Check if a message contains a spawn gate approval/rejection token.
+ * Writes the IPC response file so the container's polling hook unblocks.
+ * Returns true if the message was a spawn gate command (handled or not).
+ */
+export async function tryHandleSpawnApproval(
+  message: string,
+  notifyFn: (text: string) => Promise<void>,
+): Promise<boolean> {
+  // Cleanup expired approvals
+  const now = Date.now();
+  for (const [token, pending] of spawnGateApprovals) {
+    if (pending.expiresAt < now) {
+      spawnGateApprovals.delete(token);
+      logger.info({ token, toolName: pending.toolName }, 'Spawn gate: approval expired');
+    }
+  }
+
+  const match = message.match(SPAWN_APPROVAL_PATTERN);
+  if (!match) return false;
+
+  const [, action, token] = match;
+  const pending = spawnGateApprovals.get(token.toLowerCase());
+
+  if (!pending) {
+    await notifyFn(`No pending spawn approval found for token *${token}*. It may have expired.`);
+    return true;
+  }
+
+  spawnGateApprovals.delete(token.toLowerCase());
+
+  if (action.toLowerCase() === 'approve-spawn') {
+    writeIpcResponse(pending.responseFile, { approved: true });
+    await notifyFn(`\u2705 Spawn approved: *${pending.toolName}* in ${pending.sourceGroup}`);
+    logger.info({ token, toolName: pending.toolName, sourceGroup: pending.sourceGroup }, 'Spawn gate: approved');
+  } else {
+    writeIpcResponse(pending.responseFile, { approved: false, reason: 'User rejected' });
+    await notifyFn(`\u274C Spawn rejected: *${pending.toolName}* in ${pending.sourceGroup}`);
+    logger.info({ token, toolName: pending.toolName, sourceGroup: pending.sourceGroup }, 'Spawn gate: rejected');
+  }
+
+  return true;
 }
 
 async function processIpcMessage(
