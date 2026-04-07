@@ -25,6 +25,7 @@ import { createSafeActionHook } from './safe-action-classifier.js';
 import { createAutoCommitHook } from './auto-commit.js';
 import { createAutoTestHook } from './auto-test.js';
 import { sanitizeContent, calculateTrustScore, detectSpawnTriggers } from './content-sanitizer.js';
+import { selectModel, getSelectionReason } from './model-selector.js';
 
 interface ContainerInput {
   prompt: string;
@@ -1121,9 +1122,13 @@ async function runQuery(
     log(`Additional directories: ${extraDirs.join(', ')}`);
   }
 
+  const selectedModel = selectModel(containerInput.groupFolder, containerInput.prompt, containerInput.isScheduledTask);
+  log(`Model selected: ${selectedModel} (${getSelectionReason(selectedModel, containerInput.groupFolder, containerInput.prompt)})`);
+
   for await (const message of query({
     prompt: stream,
     options: {
+      model: selectedModel,
       cwd: '/workspace/group',
       additionalDirectories: extraDirs.length > 0 ? extraDirs : undefined,
       resume: sessionId,
