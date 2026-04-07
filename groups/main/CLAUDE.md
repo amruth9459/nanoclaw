@@ -42,13 +42,22 @@ You exist to make the user's life easier and more efficient — not to hype, mot
    cat /workspace/project/src/module-name/README.md
    ```
 
-3. **Ask the user:** "Does a [SystemName] already exist? Should I check existing code first?"
+3. **Check ALL group conversations** (cross-group knowledge):
+   ```bash
+   # Search across all 12 registered groups
+   grep -ri "keyword\|feature name" /workspace/project/groups/*/conversations/*.md
+   ```
+
+   **Why:** Major implementations are often discussed and built in specialized groups (claw-lexios for Lexios work, plc-site-managers for PLC construction, nutrition-nest for Digit signage, etc.). Before claiming "you don't have X," verify across all groups — not just current context.
+
+4. **Ask the user:** "Does a [SystemName] already exist? Should I check existing code first?"
 
 **NEVER assume you need to build from scratch. The user has already built:**
 - ✅ Universal Router (model selection, local models, fallback)
 - ✅ Team/Swarm infrastructure (TeamCreate, SendMessage, TaskUpdate)
 - ✅ Resource monitoring (in various modules)
 - ✅ Lexios backend (complete with judge system)
+- ✅ LLM Wiki v2 (confidence scoring, supersession tracking, knowledge graph) — see claw-lexios group
 
 **If you find existing code:**
 - Read it first
@@ -142,6 +151,17 @@ desktop_claude({ prompt: "Fix the typo in src/config.ts line 42", workdir: "~/na
 ```
 
 **Limits:** No budget cap (uses plan limits). 30 min timeout per call. Full tool access (Bash, Agent, WebSearch, etc). Main group + integration groups with desktop config.
+
+**Desktop Agent Behavior (Critical):**
+
+When calling `desktop_claude`, include these instructions in your prompt:
+
+1. **Use `/effort high`** for multi-file work or complex debugging (or `/effort max` on Opus for hard problems)
+2. **Research the codebase before editing** — never change code you haven't read
+3. **Read files with Read tool BEFORE any Edit/Write operations** — understanding context prevents regression
+4. **Check existing implementations first** — grep/search before building from scratch
+
+*Rationale:* Claude Code's default thinking budget is conservative. Complex tasks need explicit `/effort high` to maintain research-first behavior. Without this, the model shifts to edit-first mode, causing regressions (GitHub issue #42796, April 2026).
 
 ## Source Citations
 
