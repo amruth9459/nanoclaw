@@ -1,11 +1,37 @@
 # NanoClaw — Daily Build Log
 
 *Living document — auto-generated from git history*
-*Last generated: 2026-04-07*
+*Last generated: 2026-04-08*
 
-**752 total commits** (227 meaningful) | 2026-01-31 to 2026-04-06
+**775 total commits** (227 meaningful) | 2026-01-31 to 2026-04-07
 
 ---
+
+## 2026-04-07
+
+### What Changed
+- 23 auto-backup commits (incremental saves)
+
+### Files (17 changed)
+- container/agent-runner/src/content-sanitizer.ts
+- container/agent-runner/src/index.ts
+- container/agent-runner/src/model-selector.ts
+- docs/DEVLOG.md
+- docs/NANOCLAW_BUILD_LOG.md
+- docs/NANOCLAW_PLATFORM.md
+- groups/main/CLAUDE.md
+- package-lock.json
+- src/content-filter.test.ts
+- src/content-filter.ts
+- src/index.ts
+- src/ipc.ts
+- src/semantic-index-validator.test.ts
+- src/semantic-index-validator.ts
+- src/semantic-index.ts
+- ... and 2 more
+
+### Stats
+- 3307 insertions, 580 deletions
 
 ## 2026-04-06
 
