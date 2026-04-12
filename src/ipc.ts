@@ -6,6 +6,7 @@ import Database from 'better-sqlite3';
 import { CronExpressionParser } from 'cron-parser';
 
 import {
+  BRAIN_VAULT_PATH,
   DATA_DIR,
   GROUPS_DIR,
   IPC_POLL_INTERVAL,
@@ -1007,6 +1008,19 @@ async function processIpcMessage(
 
         // Update hot cache so learning is visible immediately (no restart needed)
         learnFact(topic, knowledge, 0.85, 'learn');
+
+        // Write Obsidian Brain Vault note (non-blocking, fail-safe)
+        try {
+          const learnDir = path.join(BRAIN_VAULT_PATH, 'Learnings');
+          if (fs.existsSync(BRAIN_VAULT_PATH)) {
+            fs.mkdirSync(learnDir, { recursive: true });
+            const slug = topic.replace(/[^a-zA-Z0-9\-_ ]/g, '').replace(/\s+/g, '-').toLowerCase().slice(0, 80);
+            const date = new Date().toISOString().slice(0, 10);
+            const notePath = path.join(learnDir, `${date}_${slug}.md`);
+            const note = `---\ntags: [learning, ${domain}]\ndomain: ${domain}\ncreated: ${new Date().toISOString()}\nsource: ${groupFolder}\n---\n\n# ${topic}\n\n${knowledge}\n`;
+            fs.writeFileSync(notePath, note);
+          }
+        } catch { /* vault may not exist — that's fine */ }
 
         if (responseFile) writeIpcResponse(responseFile, { success: true, topic, knowledge_length: knowledge.length });
         logger.info({ groupFolder, domain, topic, length: knowledge.length }, 'Learn: saved');

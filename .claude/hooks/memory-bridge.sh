@@ -361,6 +361,67 @@ if lexios_files and os.path.isdir(LEXIOS_DIR):
     write_devlog(devlog, short_files, areas, diff_stat, timestamp)
 " "$NANOCLAW_DIR" "$CLAUDE_MEMORY" "$TIMESTAMP" 2>/dev/null || true
 
+  # ── Write Obsidian daily note ────────────────────────────────────────
+  BRAIN_PATH="${BRAIN_VAULT_PATH:-${HOME}/Brain}"
+  if [ -d "${BRAIN_PATH}/Daily" ] && [ -f "$CLAUDE_MEMORY" ]; then
+    python3 -c "
+import re, os, subprocess, sys
+
+brain_daily = sys.argv[1]
+claude_memory = sys.argv[2]
+timestamp = sys.argv[3]
+nanoclaw_dir = sys.argv[4]
+
+daily_note = os.path.join(brain_daily, timestamp.split(' ')[0].replace('-', '-') + '.md')
+date_str = timestamp.split(' ')[0]
+
+# Read file list from Claude Code auto-memory
+mem = open(claude_memory).read()
+match = re.search(r'## Last Session\n(.*?)(?=\n## |\Z)', mem, re.DOTALL)
+if not match:
+    sys.exit(0)
+
+section = match.group(1)
+files_match = re.search(r'Files: (.+)', section)
+scope_match = re.search(r'Scope: (.+)', section)
+
+files = [f.strip() for f in files_match.group(1).split(',')] if files_match else []
+scope = scope_match.group(1) if scope_match else 'unknown'
+files = [f for f in files if f]
+
+if not files:
+    sys.exit(0)
+
+# Get diff stats
+diff_stat = ''
+try:
+    r = subprocess.run(['git', '-C', nanoclaw_dir, 'diff', '--stat', 'HEAD'],
+                       capture_output=True, text=True, timeout=10)
+    lines = r.stdout.strip().split('\n')
+    if lines and lines[-1]:
+        diff_stat = lines[-1].strip()
+except Exception:
+    pass
+
+# Build session entry
+entry = f'## Session — {timestamp}\n\n'
+entry += f'**Scope:** {scope}\n'
+if diff_stat:
+    entry += f'**Diff:** {diff_stat}\n'
+entry += f'**Files ({len(files)}):** {\", \".join(sorted(files))}\n'
+
+if os.path.exists(daily_note):
+    # Append to existing daily note
+    with open(daily_note, 'a') as f:
+        f.write('\n' + entry)
+else:
+    # Create new daily note with frontmatter
+    content = f'---\ntags: [daily]\ndate: {date_str}\n---\n\n# {date_str}\n\n{entry}'
+    with open(daily_note, 'w') as f:
+        f.write(content)
+" "${BRAIN_PATH}/Daily" "$CLAUDE_MEMORY" "$TIMESTAMP" "$NANOCLAW_DIR" 2>/dev/null || true
+  fi
+
   # ── Reconcile kanban tasks against MEMORY.md completions ──────────────
   python3 "${NANOCLAW_DIR}/scripts/reconcile-tasks.py" 2>/dev/null || true
 

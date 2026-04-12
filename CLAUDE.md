@@ -22,6 +22,7 @@ Single Node.js process that connects to WhatsApp, routes messages to Claude Agen
 | `container/skills/agent-browser.md` | Browser automation tool (available to all agents via Bash) |
 | `docs/EXPERIMENTS.md` | Experiment log (read before starting experiments) |
 | `docs/journal/` | Auto-generated daily journals |
+| `~/Brain/` | Obsidian vault — shared knowledge (symlinked to NanoClaw) |
 
 ## Skills
 
