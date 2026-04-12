@@ -721,7 +721,7 @@ async function processGroupMessages(chatJid: string): Promise<boolean> {
         body: JSON.stringify({
           model: routingDecision.modelId,
           messages: ollamaMessages,
-          max_tokens: 2048,
+          max_tokens: 8192,  // Thinking models need headroom for reasoning + content
           temperature: 0.7,
         }),
         signal: controller.signal,

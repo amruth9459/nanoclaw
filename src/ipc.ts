@@ -37,6 +37,7 @@ import { HitlGate } from './hitl.js';
 import { getIntegration } from './integration-loader.js';
 import { logger } from './logger.js';
 import { indexDocument, semanticSearch } from './semantic-index.js';
+import { ragQuery } from './rag-chain.js';
 import { sanitizeWebContent, detectPromptInjection } from './content-filter.js';
 import { spawnGate } from './spawn-gate.js';
 import { RegisteredGroup, UIMetadata } from './types.js';
@@ -223,6 +224,22 @@ export function startIpcWatcher(deps: IpcDeps): void {
                 indexDocument(req.source, req.groupFolder, req.content).catch(err =>
                   logger.warn({ source: req.source, err }, 'Background indexing failed'),
                 );
+              } else if (req.type === 'rag_query') {
+                const rawRF = req.responseFile as string;
+                const responseFile = toHostIpcPath(rawRF, sourceGroup);
+                ragQuery(req.query, req.threadId, req.topK ?? 5, req.groupFolder)
+                  .then(result => {
+                    const response = { answer: result.answer, sources: result.sources, contextualizedQuery: result.contextualizedQuery };
+                    fs.mkdirSync(path.dirname(responseFile), { recursive: true });
+                    fs.writeFileSync(responseFile + '.tmp', JSON.stringify(response));
+                    fs.renameSync(responseFile + '.tmp', responseFile);
+                  })
+                  .catch(err => {
+                    logger.warn({ err, query: req.query }, 'RAG query failed');
+                    fs.mkdirSync(path.dirname(responseFile), { recursive: true });
+                    fs.writeFileSync(responseFile + '.tmp', JSON.stringify({ error: 'RAG query failed' }));
+                    fs.renameSync(responseFile + '.tmp', responseFile);
+                  });
               }
             } catch (err) {
               logger.warn({ file, sourceGroup, err }, 'Error processing semantic IPC file');

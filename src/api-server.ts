@@ -56,7 +56,7 @@ import {
   revokeAllTokens,
   ALLOWED_WORKING_DIRS,
 } from './security-config.js';
-import { TerminalSession } from './terminal-session.js';
+import { TerminalSessionManager, listTmuxSessions } from './terminal-session.js';
 
 // ── Config ─────────────────────────────────────────────────────────────────────
 
@@ -756,6 +756,12 @@ export function startApiServer(
         return;
       }
 
+      // GET /api/terminal/sessions
+      if (path === '/api/terminal/sessions' && method === 'GET') {
+        json(res, 200, { sessions: listTmuxSessions() });
+        return;
+      }
+
       json(res, 404, { error: 'Not found' });
     } catch (err) {
       logger.error({ err }, 'API server error');
@@ -765,8 +771,9 @@ export function startApiServer(
 
   // ── WebSocket ──────────────────────────────────────────────────────────────
 
-  // ── Persistent terminal (shared across all WS clients, last-wins) ────────
-  const terminalSession = new TerminalSession();
+  // ── Persistent terminal (multi-client broadcast) ─────────────────────────
+  const terminalMgr = new TerminalSessionManager();
+  let wsClientCounter = 0;
 
   const wss = new wsModule.Server({ server, path: '/ws' });
 
@@ -780,7 +787,10 @@ export function startApiServer(
       return;
     }
 
-    logger.info({ addr: req.socket.remoteAddress }, 'API WebSocket client connected');
+    const clientId = `ws-${++wsClientCounter}`;
+    let activeTerminalSession: string | null = null; // tracks which tmux session this client is in
+
+    logger.info({ addr: req.socket.remoteAddress, clientId }, 'API WebSocket client connected');
 
     function send(event: string, data: unknown): void {
       if (ws.readyState === wsModule.OPEN) {
@@ -839,6 +849,8 @@ export function startApiServer(
           send('ack', { type: 'unsubscribe_container_logs', ok: true });
 
         // ── Terminal messages ──────────────────────────────────────────────
+        } else if (msg.type === 'list_sessions') {
+          send('sessions_list', { sessions: listTmuxSessions() });
         } else if (msg.type === 'start_terminal') {
           const secToken = (msg as Record<string, unknown>).securityToken as string;
           if (!secToken || !validateElevatedToken(secToken)) {
@@ -846,30 +858,39 @@ export function startApiServer(
           } else {
             const cols = (msg as Record<string, unknown>).cols as number || 80;
             const rows = (msg as Record<string, unknown>).rows as number || 24;
+            const sessionName = (msg as Record<string, unknown>).sessionName as string || 'claw-mobile';
             try {
-              // Wire up output before starting (start may emit immediately)
-              terminalSession.removeAllListeners();
-              terminalSession.on('data', (data: string) => send('terminal_output', { data }));
-              terminalSession.on('exit', (info: unknown) => send('terminal_exit', info));
-              terminalSession.start(cols, rows);
-              send('ack', { type: 'start_terminal', ok: true });
+              // Leave previous session if switching
+              if (activeTerminalSession) {
+                terminalMgr.leave(clientId);
+              }
+              activeTerminalSession = sessionName;
+              terminalMgr.join(sessionName, {
+                id: clientId,
+                onData: (data: string) => send('terminal_output', { data }),
+                onExit: (info) => { send('terminal_exit', info); activeTerminalSession = null; },
+              }, cols, rows);
+              send('ack', { type: 'start_terminal', ok: true, sessionName });
             } catch (err) {
               send('terminal_error', { error: String(err) });
             }
           }
         } else if (msg.type === 'terminal_input') {
-          const data = (msg as Record<string, unknown>).data as string;
-          if (data && terminalSession.active) {
-            terminalSession.write(data);
+          if (activeTerminalSession) {
+            const data = (msg as Record<string, unknown>).data as string;
+            if (data) terminalMgr.write(activeTerminalSession, data);
           }
         } else if (msg.type === 'terminal_resize') {
-          const cols = (msg as Record<string, unknown>).cols as number;
-          const rows = (msg as Record<string, unknown>).rows as number;
-          if (cols && rows && terminalSession.active) {
-            terminalSession.resize(cols, rows);
+          if (activeTerminalSession) {
+            const cols = (msg as Record<string, unknown>).cols as number;
+            const rows = (msg as Record<string, unknown>).rows as number;
+            if (cols && rows) terminalMgr.resize(activeTerminalSession, cols, rows);
           }
         } else if (msg.type === 'stop_terminal') {
-          terminalSession.stop();
+          if (activeTerminalSession) {
+            terminalMgr.stop(activeTerminalSession);
+            activeTerminalSession = null;
+          }
           send('ack', { type: 'stop_terminal', ok: true });
         }
       } catch (err) {
@@ -883,9 +904,10 @@ export function startApiServer(
       for (const [event, handler] of Object.entries(handlers)) {
         apiEvents.off(event, handler);
       }
-      // Remove terminal listeners for this client (tmux session persists)
-      terminalSession.removeAllListeners();
-      logger.info('API WebSocket client disconnected');
+      // Remove only this client's terminal subscription (other clients keep receiving)
+      terminalMgr.leave(clientId);
+      activeTerminalSession = null;
+      logger.info({ clientId }, 'API WebSocket client disconnected');
     });
   });
 

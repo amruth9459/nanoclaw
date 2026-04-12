@@ -477,6 +477,64 @@ server.tool(
   },
 );
 
+server.tool(
+  'rag_query',
+  `Ask a question using RAG (Retrieval-Augmented Generation). Searches indexed documents
+for relevant context, then generates an answer with source citations. Supports
+conversational follow-ups: provide a thread_id to maintain context across questions.`,
+  {
+    query: z.string().describe('Natural language question, e.g. "What are the door specifications?"'),
+    thread_id: z.string().optional().describe('Thread ID for conversational follow-ups. Reuse the same ID to maintain context.'),
+    top_k: z.number().int().min(1).max(20).default(5).describe('Number of source chunks to retrieve (default: 5)'),
+    group_folder: z.string().optional().describe('Limit search to a specific group folder. Omit to search all groups.'),
+  },
+  async (args) => {
+    const requestId = `rag-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+    const requestFile = path.join(IPC_DIR, `${requestId}.search.json`);
+    const responseFile = path.join(IPC_DIR, `${requestId}.result.json`);
+
+    const request = {
+      type: 'rag_query',
+      requestId,
+      query: args.query,
+      threadId: args.thread_id,
+      topK: args.top_k ?? 5,
+      groupFolder: args.group_folder,
+      responseFile,
+    };
+
+    const tmp = `${requestFile}.tmp`;
+    fs.writeFileSync(tmp, JSON.stringify(request, null, 2));
+    fs.renameSync(tmp, requestFile);
+
+    // Poll for response (host processes and writes responseFile)
+    const timeout = Date.now() + 60000; // 60s — RAG chain includes LLM calls
+    while (Date.now() < timeout) {
+      await new Promise(r => setTimeout(r, 300));
+      if (fs.existsSync(responseFile)) {
+        try {
+          const result = JSON.parse(fs.readFileSync(responseFile, 'utf-8'));
+          fs.unlinkSync(responseFile);
+          if (result.error) {
+            return { content: [{ type: 'text' as const, text: `RAG query error: ${result.error}` }], isError: true };
+          }
+          const sources = (result.sources as Array<{ source: string; content: string; distance: number }>)
+            .map((s, i) => `  [${i + 1}] ${s.source} (distance: ${s.distance.toFixed(3)})`)
+            .join('\n');
+          const contextNote = result.contextualizedQuery
+            ? `\n\n[Contextualized query: "${result.contextualizedQuery}"]`
+            : '';
+          const text = `${result.answer}\n\nSources:\n${sources}${contextNote}`;
+          return { content: [{ type: 'text' as const, text }] };
+        } catch {
+          return { content: [{ type: 'text' as const, text: 'Failed to parse RAG query results.' }], isError: true };
+        }
+      }
+    }
+    return { content: [{ type: 'text' as const, text: 'RAG query timed out. The host may be busy or the semantic index unavailable.' }], isError: true };
+  },
+);
+
 function writeIpcRequest(data: object): { requestFile: string; responseFile: string } {
   const requestId = `ipc-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
   const requestFile = path.join(MESSAGES_DIR, `${requestId}.json`);
