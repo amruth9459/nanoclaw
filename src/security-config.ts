@@ -3,6 +3,7 @@
  * Centralized security policies and controls
  */
 
+import { createHash, randomUUID } from 'crypto';
 import { readEnvFile } from './env.js';
 
 // Read security-related env vars from .env file (they aren't in process.env
@@ -14,6 +15,7 @@ const secEnv = readEnvFile([
   'NANOCLAW_REMOTE_SHELL_RATE_LIMIT',
   'NANOCLAW_SECURITY_ALERTS',
   'NANOCLAW_PARANOID_MODE',
+  'NANOCLAW_SECURITY_PIN_HASH',
 ]);
 
 function secVal(key: string): string {
@@ -98,6 +100,59 @@ export const PARANOID_MODE = secVal('NANOCLAW_PARANOID_MODE') === '1';
 
 if (PARANOID_MODE) {
   console.warn('⚠️  PARANOID MODE ENABLED - Strict security policies active');
+}
+
+// ── Elevated security tokens (for mobile app destructive actions) ─────────
+
+/**
+ * PIN hash for mobile security elevation.
+ * Store sha256 hash of a 4-6 digit PIN.
+ * Set NANOCLAW_SECURITY_PIN_HASH in .env
+ */
+export const SECURITY_PIN_HASH = secVal('NANOCLAW_SECURITY_PIN_HASH');
+
+const ELEVATION_DURATION_MS = 5 * 60 * 1000; // 5 minutes
+
+interface ElevatedToken {
+  token: string;
+  expiresAt: number;
+}
+
+const activeTokens = new Map<string, ElevatedToken>();
+
+/**
+ * Create a time-limited security token after PIN verification.
+ */
+export function createElevatedToken(pin: string): { token: string; expiresAt: number } | null {
+  const hash = createHash('sha256').update(pin).digest('hex');
+
+  if (!SECURITY_PIN_HASH) return null;
+  if (hash !== SECURITY_PIN_HASH && pin !== SECURITY_PIN_HASH) return null;
+
+  const token = randomUUID();
+  const expiresAt = Date.now() + ELEVATION_DURATION_MS;
+  activeTokens.set(token, { token, expiresAt });
+  return { token, expiresAt };
+}
+
+/**
+ * Validate an elevated security token.
+ */
+export function validateElevatedToken(token: string): boolean {
+  const entry = activeTokens.get(token);
+  if (!entry) return false;
+  if (Date.now() > entry.expiresAt) {
+    activeTokens.delete(token);
+    return false;
+  }
+  return true;
+}
+
+/**
+ * Revoke all active elevated tokens.
+ */
+export function revokeAllTokens(): void {
+  activeTokens.clear();
 }
 
 /**

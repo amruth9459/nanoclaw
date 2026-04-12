@@ -185,7 +185,7 @@ export class FallbackHandler {
     // Add tier escalation chain
     if (primaryTier === 'local-slm') {
       // SLM -> LLM -> Cloud (if network allows)
-      chain.push({ modelId: 'deepseek-coder-v2:latest', tier: 'local-llm' });
+      chain.push({ modelId: 'gemma4:26b', tier: 'local-llm' });
       if (!networkRestricted) {
         chain.push({ modelId: 'claude-sonnet-4.6', tier: 'cloud' });
       }

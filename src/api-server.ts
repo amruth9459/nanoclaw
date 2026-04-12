@@ -29,6 +29,10 @@ interface WsServer {
   on(event: 'connection', cb: (ws: WsSocket, req: http.IncomingMessage) => void): void;
 }
 
+import os from 'os';
+import fs from 'fs';
+import path from 'path';
+import { exec, spawn, ChildProcess } from 'child_process';
 import { DASH_TOKEN, GROUPS_DIR, ASSISTANT_NAME } from './config.js';
 import {
   getAllRegisteredGroups,
@@ -41,6 +45,18 @@ import {
 import { logger } from './logger.js';
 import { GroupQueue } from './group-queue.js';
 import { ResourceOrchestrator } from './resource-orchestrator.js';
+import {
+  PRESET_COMMANDS,
+  validateCommand,
+  executeRemoteCommand,
+} from './remote-shell.js';
+import {
+  createElevatedToken,
+  validateElevatedToken,
+  revokeAllTokens,
+  ALLOWED_WORKING_DIRS,
+} from './security-config.js';
+import { TerminalSession } from './terminal-session.js';
 
 // ── Config ─────────────────────────────────────────────────────────────────────
 
@@ -76,7 +92,7 @@ function json(res: http.ServerResponse, status: number, body: unknown): void {
   res.writeHead(status, {
     'Content-Type': 'application/json',
     'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Headers': 'Authorization, Content-Type',
+    'Access-Control-Allow-Headers': 'Authorization, Content-Type, X-Security-Token',
     'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
   });
   res.end(payload);
@@ -246,6 +262,296 @@ function handlePlcRoster(): unknown {
   }
 }
 
+// ── Shell handlers ────────────────────────────────────────────────────────────
+
+function handleShellPresets(): unknown {
+  const presets = Object.entries(PRESET_COMMANDS).map(([key, command]) => {
+    const name = key.replace(/_/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase());
+    let category = 'System';
+    if (key.includes('disk') || key.includes('large') || key.includes('space') || key.includes('cache') || key.includes('node_modules') || key.includes('xcode') || key.includes('ios_sim') || key.includes('homebrew') || key.includes('docker_space') || key.includes('downloads')) category = 'Disk';
+    else if (key.includes('nanoclaw') || key.includes('container') || key.includes('logs')) category = 'NanoClaw';
+    else if (key.includes('wifi') || key.includes('tailscale')) category = 'Network';
+    return { key, name, command, category };
+  });
+  return { presets };
+}
+
+async function handleShellExecute(req: http.IncomingMessage): Promise<unknown> {
+  const body = await readBody(req);
+  let command = String(body.command || '').trim();
+  if (!command) throw new Error('command is required');
+
+  const isPreset = Boolean(body.isPreset);
+  const workingDir = body.workingDir ? String(body.workingDir) : undefined;
+
+  // Resolve preset key to actual command
+  if (isPreset && command in PRESET_COMMANDS) {
+    command = PRESET_COMMANDS[command as keyof typeof PRESET_COMMANDS];
+  }
+
+  // Non-preset commands require elevated security token
+  if (!isPreset) {
+    const secToken = req.headers['x-security-token'] as string;
+    if (!secToken || !validateElevatedToken(secToken)) {
+      return { success: false, output: '', error: 'Security elevation required for custom commands', exitCode: 1, duration: 0 };
+    }
+  }
+
+  const result = await executeRemoteCommand({
+    command,
+    workingDir,
+    requester: 'mobile-app',
+    isPreset,
+  });
+
+  return result;
+}
+
+function handleShellHistory(): unknown {
+  const logPath = path.join(process.cwd(), 'logs', 'remote-shell.log');
+  try {
+    const content = fs.readFileSync(logPath, 'utf-8');
+    const lines = content.trim().split('\n').filter(Boolean);
+    const entries = lines.slice(-50).reverse().map((line) => {
+      try { return JSON.parse(line); } catch { return null; }
+    }).filter(Boolean);
+    return { entries };
+  } catch {
+    return { entries: [] };
+  }
+}
+
+// ── File handlers ─────────────────────────────────────────────────────────────
+
+const FILE_ALLOWED_ROOTS = [process.cwd(), os.homedir()];
+
+function isPathAllowed(filePath: string): boolean {
+  const resolved = path.resolve(filePath);
+  return FILE_ALLOWED_ROOTS.some(
+    (root) => resolved === root || resolved.startsWith(root + '/'),
+  );
+}
+
+function handleFilesList(url: URL): unknown {
+  const dirPath = url.searchParams.get('path') || process.cwd();
+  if (!isPathAllowed(dirPath)) {
+    throw new Error('Path outside allowed directories');
+  }
+
+  const entries = fs.readdirSync(dirPath, { withFileTypes: true }).map((entry) => {
+    const fullPath = path.join(dirPath, entry.name);
+    let size = 0;
+    let modified = '';
+    try {
+      const stat = fs.statSync(fullPath);
+      size = stat.size;
+      modified = stat.mtime.toISOString();
+    } catch { /* skip */ }
+    return {
+      name: entry.name,
+      type: entry.isDirectory() ? 'directory' : entry.isSymbolicLink() ? 'symlink' : 'file',
+      size,
+      modified,
+    };
+  });
+
+  // Sort: directories first, then by name
+  entries.sort((a, b) => {
+    if (a.type === 'directory' && b.type !== 'directory') return -1;
+    if (a.type !== 'directory' && b.type === 'directory') return 1;
+    return a.name.localeCompare(b.name);
+  });
+
+  return { path: dirPath, entries };
+}
+
+function handleFilesRead(url: URL): unknown {
+  const filePath = url.searchParams.get('path');
+  if (!filePath) throw new Error('path is required');
+  if (!isPathAllowed(filePath)) throw new Error('Path outside allowed directories');
+
+  const offset = parseInt(url.searchParams.get('offset') || '0', 10);
+  const limit = parseInt(url.searchParams.get('limit') || '2000', 10);
+
+  const stat = fs.statSync(filePath);
+  const content = fs.readFileSync(filePath, 'utf-8');
+  const lines = content.split('\n');
+  const sliced = lines.slice(offset, offset + limit).join('\n');
+
+  return {
+    path: filePath,
+    content: sliced,
+    totalLines: lines.length,
+    size: stat.size,
+    offset,
+    limit,
+  };
+}
+
+async function handleFilesWrite(req: http.IncomingMessage): Promise<unknown> {
+  const secToken = req.headers['x-security-token'] as string;
+  if (!secToken || !validateElevatedToken(secToken)) {
+    throw new Error('Security elevation required to write files');
+  }
+
+  const body = await readBody(req);
+  const filePath = String(body.path || '').trim();
+  const content = String(body.content ?? '');
+  if (!filePath) throw new Error('path is required');
+  if (!isPathAllowed(filePath)) throw new Error('Path outside allowed directories');
+
+  // Create .bak backup
+  if (fs.existsSync(filePath)) {
+    fs.copyFileSync(filePath, filePath + '.bak');
+  }
+
+  fs.writeFileSync(filePath, content, 'utf-8');
+  return { ok: true, path: filePath };
+}
+
+// ── System handlers ───────────────────────────────────────────────────────────
+
+function handleSystemStats(): unknown {
+  const cpus = os.cpus();
+  const totalMem = os.totalmem();
+  const freeMem = os.freemem();
+  const loadAvg = os.loadavg();
+
+  return {
+    cpu: {
+      cores: cpus.length,
+      model: cpus[0]?.model || 'unknown',
+      loadAvg1: loadAvg[0],
+      loadAvg5: loadAvg[1],
+      loadAvg15: loadAvg[2],
+      usagePercent: Math.round((loadAvg[0] / cpus.length) * 100),
+    },
+    memory: {
+      total: totalMem,
+      free: freeMem,
+      used: totalMem - freeMem,
+      usagePercent: Math.round(((totalMem - freeMem) / totalMem) * 100),
+    },
+    disk: { usagePercent: 0, total: 0, used: 0 }, // filled async below
+    uptime: os.uptime(),
+  };
+}
+
+async function handleSystemStatsAsync(): Promise<unknown> {
+  const stats = handleSystemStats() as Record<string, unknown>;
+
+  // Get disk usage via df
+  return new Promise((resolve) => {
+    exec('df -h / | tail -1', (err, stdout) => {
+      if (!err && stdout) {
+        const parts = stdout.trim().split(/\s+/);
+        if (parts.length >= 5) {
+          stats.disk = {
+            total: parts[1],
+            used: parts[2],
+            available: parts[3],
+            usagePercent: parseInt(parts[4], 10) || 0,
+          };
+        }
+      }
+      resolve(stats);
+    });
+  });
+}
+
+async function handleSystemContainers(): Promise<unknown> {
+  return new Promise((resolve) => {
+    exec('docker ps -a --format json 2>/dev/null || container ls -a --format json 2>/dev/null', (err, stdout) => {
+      if (err || !stdout.trim()) {
+        resolve({ containers: [] });
+        return;
+      }
+      const containers = stdout.trim().split('\n').map((line) => {
+        try { return JSON.parse(line); } catch { return null; }
+      }).filter(Boolean).map((c: Record<string, string>) => ({
+        id: c.ID || c.Id || '',
+        name: c.Names || c.Name || '',
+        status: c.Status || c.State || '',
+        image: c.Image || '',
+        createdAt: c.CreatedAt || '',
+      }));
+      resolve({ containers });
+    });
+  });
+}
+
+async function handleContainerLogs(name: string, tail: number): Promise<unknown> {
+  return new Promise((resolve) => {
+    exec(`docker logs --tail ${tail} ${name} 2>&1 || container logs --tail ${tail} ${name} 2>&1`, (err, stdout) => {
+      resolve({
+        containerName: name,
+        lines: (stdout || '').trim().split('\n'),
+      });
+    });
+  });
+}
+
+async function handleSystemServices(): Promise<unknown> {
+  const services: Array<{ name: string; status: string; detail?: string }> = [];
+
+  // Check NanoClaw launchd
+  await new Promise<void>((resolve) => {
+    exec('launchctl list | grep nanoclaw', (err, stdout) => {
+      if (stdout?.includes('nanoclaw')) {
+        services.push({ name: 'NanoClaw', status: 'running', detail: 'launchd service active' });
+      } else {
+        services.push({ name: 'NanoClaw', status: 'stopped' });
+      }
+      resolve();
+    });
+  });
+
+  // Check Tailscale
+  await new Promise<void>((resolve) => {
+    exec('tailscale status --json 2>/dev/null', (err, stdout) => {
+      if (!err && stdout) {
+        try {
+          const ts = JSON.parse(stdout);
+          services.push({ name: 'Tailscale', status: ts.BackendState === 'Running' ? 'running' : 'stopped', detail: ts.BackendState });
+        } catch {
+          services.push({ name: 'Tailscale', status: 'error' });
+        }
+      } else {
+        services.push({ name: 'Tailscale', status: 'stopped' });
+      }
+      resolve();
+    });
+  });
+
+  // Check container runtime
+  await new Promise<void>((resolve) => {
+    exec('docker info --format json 2>/dev/null || container info 2>/dev/null', (err, stdout) => {
+      if (!err && stdout) {
+        services.push({ name: 'Container Runtime', status: 'running' });
+      } else {
+        services.push({ name: 'Container Runtime', status: 'stopped' });
+      }
+      resolve();
+    });
+  });
+
+  return { services };
+}
+
+// ── Security handlers ─────────────────────────────────────────────────────────
+
+async function handleSecurityElevate(req: http.IncomingMessage): Promise<unknown> {
+  const body = await readBody(req);
+  const pin = String(body.pin || '').trim();
+  if (!pin) throw new Error('pin is required');
+
+  const result = createElevatedToken(pin);
+  if (!result) {
+    return { ok: false, error: 'Invalid PIN' };
+  }
+  return { ok: true, token: result.token, expiresAt: result.expiresAt };
+}
+
 // ── Router ────────────────────────────────────────────────────────────────────
 
 export function startApiServer(
@@ -260,7 +566,7 @@ export function startApiServer(
     if (req.method === 'OPTIONS') {
       res.writeHead(204, {
         'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Headers': 'Authorization, Content-Type',
+        'Access-Control-Allow-Headers': 'Authorization, Content-Type, X-Security-Token',
         'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
       });
       res.end();
@@ -366,6 +672,90 @@ export function startApiServer(
         return;
       }
 
+      // ── Shell endpoints ──────────────────────────────────────────────────
+
+      // GET /api/shell/presets
+      if (path === '/api/shell/presets' && method === 'GET') {
+        json(res, 200, handleShellPresets());
+        return;
+      }
+
+      // POST /api/shell/execute
+      if (path === '/api/shell/execute' && method === 'POST') {
+        const result = await handleShellExecute(req);
+        json(res, 200, result);
+        return;
+      }
+
+      // GET /api/shell/history
+      if (path === '/api/shell/history' && method === 'GET') {
+        json(res, 200, handleShellHistory());
+        return;
+      }
+
+      // ── File endpoints ───────────────────────────────────────────────────
+
+      // GET /api/files/list
+      if (path === '/api/files/list' && method === 'GET') {
+        json(res, 200, handleFilesList(url));
+        return;
+      }
+
+      // GET /api/files/read
+      if (path === '/api/files/read' && method === 'GET') {
+        json(res, 200, handleFilesRead(url));
+        return;
+      }
+
+      // POST /api/files/write
+      if (path === '/api/files/write' && method === 'POST') {
+        const result = await handleFilesWrite(req);
+        json(res, 200, result);
+        return;
+      }
+
+      // ── System endpoints ─────────────────────────────────────────────────
+
+      // GET /api/system/stats
+      if (path === '/api/system/stats' && method === 'GET') {
+        const stats = await handleSystemStatsAsync();
+        json(res, 200, stats);
+        return;
+      }
+
+      // GET /api/system/containers
+      if (path === '/api/system/containers' && method === 'GET') {
+        const result = await handleSystemContainers();
+        json(res, 200, result);
+        return;
+      }
+
+      // GET /api/system/containers/:name/logs
+      const logMatch = path.match(/^\/api\/system\/containers\/(.+)\/logs$/);
+      if (logMatch && method === 'GET') {
+        const name = decodeURIComponent(logMatch[1]);
+        const tail = parseInt(url.searchParams.get('tail') || '100', 10);
+        const result = await handleContainerLogs(name, Math.min(tail, 500));
+        json(res, 200, result);
+        return;
+      }
+
+      // GET /api/system/services
+      if (path === '/api/system/services' && method === 'GET') {
+        const result = await handleSystemServices();
+        json(res, 200, result);
+        return;
+      }
+
+      // ── Security endpoints ───────────────────────────────────────────────
+
+      // POST /api/security/elevate
+      if (path === '/api/security/elevate' && method === 'POST') {
+        const result = await handleSecurityElevate(req);
+        json(res, 200, result);
+        return;
+      }
+
       json(res, 404, { error: 'Not found' });
     } catch (err) {
       logger.error({ err }, 'API server error');
@@ -374,6 +764,9 @@ export function startApiServer(
   });
 
   // ── WebSocket ──────────────────────────────────────────────────────────────
+
+  // ── Persistent terminal (shared across all WS clients, last-wins) ────────
+  const terminalSession = new TerminalSession();
 
   const wss = new wsModule.Server({ server, path: '/ws' });
 
@@ -414,15 +807,70 @@ export function startApiServer(
       if (ws.readyState === WebSocket.OPEN) ws.ping();
     }, 30_000);
 
+    // Container log streaming
+    let logProcess: ChildProcess | null = null;
+
     ws.on('message', async (raw: Buffer) => {
       try {
-        const msg = JSON.parse(raw.toString()) as { type: string; jid?: string; text?: string; taskId?: string };
+        const msg = JSON.parse(raw.toString()) as { type: string; jid?: string; text?: string; taskId?: string; containerName?: string };
         if (msg.type === 'send_message' && msg.jid && msg.text) {
           await sendFn(msg.jid, msg.text);
           send('ack', { type: 'send_message', ok: true });
         } else if (msg.type === 'trigger_task' && msg.taskId) {
           apiEvents.emit('task_trigger_requested', { taskId: msg.taskId });
           send('ack', { type: 'trigger_task', ok: true });
+        } else if (msg.type === 'subscribe_container_logs' && msg.containerName) {
+          // Kill any existing log stream
+          if (logProcess) { logProcess.kill(); logProcess = null; }
+          const name = msg.containerName.replace(/[^a-zA-Z0-9_.-]/g, '');
+          logProcess = spawn('docker', ['logs', '-f', '--tail', '100', name], { stdio: ['ignore', 'pipe', 'pipe'] });
+          const onData = (chunk: Buffer) => {
+            const lines = chunk.toString().split('\n').filter(Boolean);
+            for (const line of lines) {
+              send('container_log', { containerName: name, line });
+            }
+          };
+          logProcess.stdout?.on('data', onData);
+          logProcess.stderr?.on('data', onData);
+          logProcess.on('close', () => { logProcess = null; });
+          send('ack', { type: 'subscribe_container_logs', ok: true });
+        } else if (msg.type === 'unsubscribe_container_logs') {
+          if (logProcess) { logProcess.kill(); logProcess = null; }
+          send('ack', { type: 'unsubscribe_container_logs', ok: true });
+
+        // ── Terminal messages ──────────────────────────────────────────────
+        } else if (msg.type === 'start_terminal') {
+          const secToken = (msg as Record<string, unknown>).securityToken as string;
+          if (!secToken || !validateElevatedToken(secToken)) {
+            send('terminal_error', { error: 'Security elevation required' });
+          } else {
+            const cols = (msg as Record<string, unknown>).cols as number || 80;
+            const rows = (msg as Record<string, unknown>).rows as number || 24;
+            try {
+              // Wire up output before starting (start may emit immediately)
+              terminalSession.removeAllListeners();
+              terminalSession.on('data', (data: string) => send('terminal_output', { data }));
+              terminalSession.on('exit', (info: unknown) => send('terminal_exit', info));
+              terminalSession.start(cols, rows);
+              send('ack', { type: 'start_terminal', ok: true });
+            } catch (err) {
+              send('terminal_error', { error: String(err) });
+            }
+          }
+        } else if (msg.type === 'terminal_input') {
+          const data = (msg as Record<string, unknown>).data as string;
+          if (data && terminalSession.active) {
+            terminalSession.write(data);
+          }
+        } else if (msg.type === 'terminal_resize') {
+          const cols = (msg as Record<string, unknown>).cols as number;
+          const rows = (msg as Record<string, unknown>).rows as number;
+          if (cols && rows && terminalSession.active) {
+            terminalSession.resize(cols, rows);
+          }
+        } else if (msg.type === 'stop_terminal') {
+          terminalSession.stop();
+          send('ack', { type: 'stop_terminal', ok: true });
         }
       } catch (err) {
         logger.warn({ err }, 'API WS message parse error');
@@ -431,9 +879,12 @@ export function startApiServer(
 
     ws.on('close', () => {
       clearInterval(ping);
+      if (logProcess) { logProcess.kill(); logProcess = null; }
       for (const [event, handler] of Object.entries(handlers)) {
         apiEvents.off(event, handler);
       }
+      // Remove terminal listeners for this client (tmux session persists)
+      terminalSession.removeAllListeners();
       logger.info('API WebSocket client disconnected');
     });
   });

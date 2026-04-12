@@ -182,7 +182,8 @@ export class WhatsAppChannel implements Channel {
         exec(
           `osascript -e 'display notification "${msg}" with title "NanoClaw" sound name "Basso"'`,
         );
-        setTimeout(() => process.exit(1), 1000);
+        onFirstFail?.(new Error(msg));
+        onFirstFail = undefined;
       }
 
       if (connection === 'close') {
@@ -196,8 +197,9 @@ export class WhatsAppChannel implements Channel {
           this.scheduleReconnect();
         } else {
           logger.info({ channel: this.name }, 'Logged out. Run /setup to re-authenticate.');
-          if (this.isPrimary) process.exit(0);
-          // Secondary: just stop — don't bring down the whole process
+          // Don't crash process — let API/terminal keep running in degraded mode
+          onFirstFail?.(new Error(`${this.name}: logged out — run /setup to re-authenticate`));
+          onFirstFail = undefined;
         }
       } else if (connection === 'open') {
         this.connected = true;

@@ -19,6 +19,7 @@ import {
 } from './config.js';
 import { WhatsAppChannel } from './channels/whatsapp.js';
 import {
+  ContainerInput,
   ContainerOutput,
   isOAuthError,
   readOAuthFromKeychain,
@@ -55,9 +56,9 @@ import {
   updateTask,
   getDb,
 } from './db.js';
-// Local routing disabled while Max subscription is active
 // import { routeWithOpus, executeLocal } from './opus-router.js';
 import { calculateCost } from './economics.js';
+import { runHostClaudeAgent, shouldUseHostRunner } from './host-runner.js';
 // Dead code clusters — wired as enrichment/monitoring layers (non-blocking)
 import { contextManager, codedContext, setSystemFact, setCapability } from './context/index.js';
 import { pruneOldChunks } from './semantic-index.js';
@@ -444,6 +445,24 @@ async function processGroupMessages(chatJid: string): Promise<boolean> {
     return true;
   }
 
+  // Handle /runner command — toggle host runner on/off from WhatsApp
+  if (rawCmd === '/runner' || rawCmd.startsWith('/runner ')) {
+    const arg = rawCmd.replace('/runner', '').trim().toLowerCase();
+    if (arg === 'on' || arg === '1' || arg === 'host') {
+      process.env.USE_HOST_RUNNER = '1';
+      await channel.sendMessage(chatJid, 'Host runner *enabled* — using Claude Code CLI on host.');
+    } else if (arg === 'off' || arg === '0' || arg === 'container') {
+      process.env.USE_HOST_RUNNER = '0';
+      await channel.sendMessage(chatJid, 'Host runner *disabled* — using container sandbox.');
+    } else {
+      const current = shouldUseHostRunner(group.folder) ? 'host (Claude Code CLI)' : 'container (sandboxed)';
+      await channel.sendMessage(chatJid, `Runner: *${current}*\n\nUsage:\n/runner on — use host Claude Code CLI\n/runner off — use container sandbox`);
+    }
+    lastAgentTimestamp[chatJid] = lastMsgForCmd.timestamp;
+    saveState();
+    return true;
+  }
+
   const lastMsg = missedMessages[missedMessages.length - 1];
 
   let prompt = formatMessages(missedMessages);
@@ -536,7 +555,7 @@ async function processGroupMessages(chatJid: string): Promise<boolean> {
     const routingCtx: RoutingContext = {
       taskType: 'conversation',
       userTier: 'internal',
-      costBudget: 'standard',
+      costBudget: 'limited',
       qualityNeeds: 'good',
       latencyNeeds: 'fast',
       source: (chatChannelSource.get(chatJid) || 'whatsapp') as import('./router/types.js').TaskSource,
@@ -563,7 +582,7 @@ async function processGroupMessages(chatJid: string): Promise<boolean> {
       'Goal classification',
     );
 
-    // Multi-agent path (no-op until decomposition engine has real model calls)
+    // Multi-agent path: decompose complex goals into teams (uses local Ollama for decomposition)
     if (goalClass.shouldUseTeams && goalClass.confidence === 'high' && nanoClawOrchestrator) {
       try {
         const goalDetails = extractGoalDetails(strippedContent);
@@ -677,9 +696,73 @@ async function processGroupMessages(chatJid: string): Promise<boolean> {
     logger.warn({ err }, 'ResponseTimeManager startTask failed');
   }
 
-  // LOCAL ROUTING DISABLED — sending everything to cloud while Max subscription is active.
-  // To re-enable local routing, uncomment the block in this section.
-  // See src/opus-router.ts for the routing logic (uses Ollama for classification).
+  // LOCAL MODEL ROUTING: dispatch simple tasks to Ollama directly (free, fast)
+  // Falls through to container for cloud-tier tasks or if Ollama is unavailable
+  if (routingDecision && (routingDecision.modelTier === 'local-slm' || routingDecision.modelTier === 'local-llm')) {
+    try {
+      const ollamaUrl = process.env.OLLAMA_URL || 'http://127.0.0.1:11434';
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 60000);
+
+      // Build conversation from missed messages
+      const ollamaMessages: Array<{ role: string; content: string }> = [
+        { role: 'system', content: `You are ${ASSISTANT_NAME}, a helpful assistant. Be concise. Current date: ${new Date().toISOString().slice(0, 10)}.` },
+      ];
+      for (const msg of missedMessages) {
+        ollamaMessages.push({
+          role: msg.is_from_me ? 'assistant' : 'user',
+          content: msg.content.replace(TRIGGER_PATTERN, '').trim(),
+        });
+      }
+
+      const ollamaRes = await fetch(`${ollamaUrl}/v1/chat/completions`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: routingDecision.modelId,
+          messages: ollamaMessages,
+          max_tokens: 2048,
+          temperature: 0.7,
+        }),
+        signal: controller.signal,
+      });
+      clearTimeout(timeout);
+
+      if (ollamaRes.ok) {
+        const ollamaData = await ollamaRes.json() as {
+          choices?: Array<{ message?: { content?: string; reasoning?: string } }>;
+          usage?: { completion_tokens?: number; prompt_tokens?: number; total_tokens?: number };
+        };
+        // Some models (e.g., glm-4.7-flash) put output in reasoning field instead of content
+        const msg = ollamaData.choices?.[0]?.message;
+        const localResponse = (msg?.content || msg?.reasoning || '').trim() || undefined;
+        if (localResponse) {
+          // Send the local model response to user
+          const formatted = formatOutbound(localResponse);
+          await channel.sendMessage(chatJid, formatted);
+          await ackChannel.setTyping?.(chatJid, false);
+
+          // Log usage (zero cost for local models)
+          const tokens = ollamaData.usage?.total_tokens || 0;
+          const localStartTime = Date.now();
+          logUsage(group.folder, chatJid, { inputTokens: ollamaData.usage?.prompt_tokens || 0, outputTokens: ollamaData.usage?.completion_tokens || 0 }, 0, false, 0, determinePurpose(group.folder, chatJid));
+
+          logger.info(
+            { model: routingDecision.modelId, tier: routingDecision.modelTier, tokens, group: group.name },
+            'Local model response sent',
+          );
+
+          // Complete response time tracking
+          try { responseTimeManager.completeTask(); } catch { /* non-blocking */ }
+          return true;
+        }
+      }
+      // Ollama failed or empty response — fall through to container
+      logger.info({ model: routingDecision.modelId, status: ollamaRes.status }, 'Local model unavailable, falling through to container');
+    } catch (err) {
+      logger.info({ err, model: routingDecision.modelId }, 'Local model dispatch failed, falling through to container');
+    }
+  }
 
   // Track idle timer for closing stdin when agent is idle
   let idleTimer: ReturnType<typeof setTimeout> | null = null;
@@ -865,24 +948,35 @@ async function runAgent(
     // Resolve personality params for this group (Phase 2 Karpathy tuning)
     const personalityParams = getPersonalityParams(group.folder) ?? undefined;
 
-    const output = await runContainerAgent(
+    const useHostRunner = shouldUseHostRunner(group.folder);
+    const runnerFn = useHostRunner ? runHostClaudeAgent : runContainerAgent;
+
+    if (useHostRunner) {
+      logger.info({ group: group.name }, 'Using host Claude Code runner (subscription-safe)');
+    } else {
+      logger.info({ group: group.name }, 'Using container runner (sandboxed)');
+    }
+
+    const containerInput: ContainerInput = {
+      prompt,
+      sessionId,
+      groupFolder: group.folder,
+      chatJid,
+      isMain,
+      designation,
+      routingHint: routingDecisionHint ? {
+        suggestedModel: routingDecisionHint.modelId,
+        tier: routingDecisionHint.modelTier,
+        confidence: routingDecisionHint.confidence,
+        reasoning: routingDecisionHint.reasoning,
+      } : undefined,
+      maxTurns,
+      personalityParams,
+    };
+
+    const output = await runnerFn(
       group,
-      {
-        prompt,
-        sessionId,
-        groupFolder: group.folder,
-        chatJid,
-        isMain,
-        designation,
-        routingHint: routingDecisionHint ? {
-          suggestedModel: routingDecisionHint.modelId,
-          tier: routingDecisionHint.modelTier,
-          confidence: routingDecisionHint.confidence,
-          reasoning: routingDecisionHint.reasoning,
-        } : undefined,
-        maxTurns,
-        personalityParams,
-      },
+      containerInput,
       (proc, containerName) => {
         queue.registerProcess(chatJid, proc, containerName, group.folder);
         queue.setDesignation(chatJid, designation);
@@ -911,23 +1005,9 @@ async function runAgent(
         logger.info({ group: group.name, source: keychainToken ? 'keychain' : 'env' }, 'Token changed — retrying with fresh token');
         lastTokenPrefix = freshPrefix;
 
-        const retryOutput = await runContainerAgent(
+        const retryOutput = await runnerFn(
           group,
-          {
-            prompt,
-            sessionId, // Same session = conversation context preserved
-            groupFolder: group.folder,
-            chatJid,
-            isMain,
-            designation,
-            routingHint: routingDecisionHint ? {
-              suggestedModel: routingDecisionHint.modelId,
-              tier: routingDecisionHint.modelTier,
-              confidence: routingDecisionHint.confidence,
-              reasoning: routingDecisionHint.reasoning,
-            } : undefined,
-            maxTurns,
-          },
+          { ...containerInput, sessionId }, // Same session = context preserved
           (proc, containerName) => {
             queue.registerProcess(chatJid, proc, containerName, group.folder);
             queue.setDesignation(chatJid, designation);
@@ -1743,7 +1823,10 @@ Steps:
     },
   });
   channels.push(whatsapp);
-  await whatsapp.connect();
+  await whatsapp.connect().catch((err: Error) => {
+    logger.error({ err: err.message }, 'Primary WhatsApp connect failed — running in degraded mode (API/terminal still available)');
+    channels.splice(channels.indexOf(whatsapp), 1);
+  });
 
   // Optional second WhatsApp number (enable with NANOCLAW_WA2=1)
   if (WA2_ENABLED) {

@@ -221,6 +221,26 @@ export class MLXBackendFactory {
     const config: MLXBackendConfig = {
       models: new Map([
         [
+          'gemma4:26b',
+          {
+            modelId: 'gemma4:26b',
+            modelPath: 'gemma4:26b',
+            maxTokens: 8192,
+            temperature: 0.7,
+            memoryGb: 18,
+          },
+        ],
+        [
+          'glm-4.7-flash',
+          {
+            modelId: 'glm-4.7-flash',
+            modelPath: 'glm-4.7-flash',
+            maxTokens: 8192,
+            temperature: 0.7,
+            memoryGb: 5,
+          },
+        ],
+        [
           'qwen2.5-coder',
           {
             modelId: 'qwen2.5-coder',
