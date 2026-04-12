@@ -252,6 +252,7 @@ export function startIpcWatcher(deps: IpcDeps): void {
                   'token_refresh',
                   'generate_safety_brief', 'monitoring_log',
                   'autoresearch',
+                  'competitive_intel_check',
                 ]);
 
                 // ── Identity IPC handlers ─────────────────────────────────

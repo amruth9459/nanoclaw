@@ -498,6 +498,11 @@ function buildContainerArgs(
   // Autoresearch tools available for all groups
   toolModules.push('autoresearch-tools');
 
+  // Competitive intel tools available for main group
+  if (group.folder === 'main') {
+    toolModules.push('competitive-intel-tools');
+  }
+
   if (toolModules.length > 0) {
     args.push('-e', `NANOCLAW_TOOL_MODULES=${toolModules.join(',')}`);
   }

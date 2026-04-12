@@ -529,15 +529,15 @@ async function processGroupMessages(chatJid: string): Promise<boolean> {
     }
   }
 
-  // Route decision: log which model the router would pick (monitoring-only)
+  // Route decision: select model tier based on message complexity
   let routingDecision: RoutingDecision | undefined;
   try {
     const strippedContent = lastMsg.content.replace(TRIGGER_PATTERN, '').trim();
     const routingCtx: RoutingContext = {
       taskType: 'conversation',
       userTier: 'internal',
-      costBudget: 'unlimited',
-      qualityNeeds: 'best',
+      costBudget: 'standard',
+      qualityNeeds: 'good',
       latencyNeeds: 'fast',
       source: (chatChannelSource.get(chatJid) || 'whatsapp') as import('./router/types.js').TaskSource,
       hasMedia: false,
@@ -546,7 +546,7 @@ async function processGroupMessages(chatJid: string): Promise<boolean> {
     routingDecision = await router.route(routingCtx);
     logger.info(
       { model: routingDecision.modelId, tier: routingDecision.modelTier, confidence: routingDecision.confidence, reasoning: routingDecision.reasoning },
-      'Routing decision (monitoring-only)',
+      'Routing decision',
     );
   } catch (err) {
     logger.warn({ err }, 'Router decision failed');

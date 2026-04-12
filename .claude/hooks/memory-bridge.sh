@@ -422,6 +422,12 @@ else:
 " "${BRAIN_PATH}/Daily" "$CLAUDE_MEMORY" "$TIMESTAMP" "$NANOCLAW_DIR" 2>/dev/null || true
   fi
 
+  # ── Auto-link new Brain vault files ────────────────────────────────────
+  AUTOLINK_SCRIPT="${NANOCLAW_DIR}/scripts/brain-autolink.py"
+  if [ -f "$AUTOLINK_SCRIPT" ] && [ -d "${BRAIN_PATH}" ]; then
+    python3 "$AUTOLINK_SCRIPT" 2>/dev/null || true
+  fi
+
   # ── Reconcile kanban tasks against MEMORY.md completions ──────────────
   python3 "${NANOCLAW_DIR}/scripts/reconcile-tasks.py" 2>/dev/null || true
 
