@@ -750,3 +750,12 @@ At 10 documents/day: break-even in ~280 days.
 - [AWS EC2 On-Demand Pricing](https://aws.amazon.com/ec2/pricing/on-demand/)
 - [Jarvislabs A100 Pricing](https://docs.jarvislabs.ai/blog/a100-price)
 - [LLM Fine-Tuning Pricing Comparison](https://pricepertoken.com/fine-tuning)
+
+## Related
+
+- [[FINE_TUNING_PLAN|Lexios Fine-Tuning Plan: Custom Extraction Models]]
+- [[PLATFORM|Lexios Platform Overview]]
+- [[README|Area: Lexios]]
+- [[LEXIOS_IMPLEMENTATION_PLAN|Lexios Implementation Plan]]
+- [[PRACTICAL_FINE_TUNING_GUIDE|Practical Fine-Tuning Guide: From Zero to Production]]
+- [[EXPERIMENTS|Experiment Log]]

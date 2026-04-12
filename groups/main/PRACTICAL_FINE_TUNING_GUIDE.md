@@ -1032,3 +1032,12 @@ F1 = 2 × (0.875 × 0.700) / (0.875 + 0.700) = 0.778
 **Last Updated:** 2026-03-26
 **Next Review:** 2026-04-26
 **Maintained By:** AI Engineer Agent (NanoClaw)
+
+## Related
+
+- [[FINE_TUNING_PLAN|Lexios Fine-Tuning Plan: Custom Extraction Models]]
+- [[FINE_TUNING_GUIDE|Fine-Tuning Specialized Models for Construction Document Ext]]
+- [[README|Lexios Training System]]
+- [[LEXIOS_TRAINING_SYSTEM|Lexios Training Orchestrator & Active Learning System]]
+- [[QUICKSTART|Lexios Training System - Quick Start]]
+- [[BETA_LAUNCH_CHECKLIST|Lexios WhatsApp Beta Launch Checklist]]

@@ -194,3 +194,12 @@ NanoClaw is one consumer of the Lexios platform:
 | Feb 2026 | Lexios integration, 101-type extraction, eval framework |
 | Mar 2026 | Context system, semantic index, auto-deploy, dead code revival |
 | Mar 2026 | Multi-model Lexios (GPT-4.1 + Gemini), corpus builder, metrics dashboard |
+
+## Related
+
+- [[CHANGELOG|NanoClaw Changelog]]
+- [[README|Area: Infrastructure]]
+- [[MEMORY_ARCHIVE_2026-03|Memory - Main Group]]
+- [[IDENTITY|IDENTITY]]
+- [[technical-openharness|OpenHarness - Open Agent Framework]]
+- [[2026-04-07-conversation-2232|Conversation]]

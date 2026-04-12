@@ -117,3 +117,12 @@ const allowedVars = ['CLAUDE_CODE_OAUTH_TOKEN', 'ANTHROPIC_API_KEY'];
 │  • Cannot modify security config                                  │
 └──────────────────────────────────────────────────────────────────┘
 ```
+
+## Related
+
+- [[REQUIREMENTS|NanoClaw Requirements]]
+- [[SPEC|NanoClaw Specification]]
+- [[security-review-remote-shell|Security Review: remote_shell MCP Tool]]
+- [[nanoclaw-whatsapp-integration|NanoClaw WhatsApp Integration]]
+- [[LEXIOS_AGENT_ACCESSIBILITY_SUMMARY|Lexios Agent Accessibility - Implementation Summary]]
+- [[SKILL|Check if nanoclaw launchd service is running]]

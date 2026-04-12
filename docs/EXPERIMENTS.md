@@ -60,3 +60,12 @@
 **Learning:** Token-level cost tracking is valuable for observability. Autonomous revenue generation for an AI agent is premature — focus on utility first. The bounty hunting concept needs a much clearer market signal before investing further.
 **Files:** `src/db.ts`, `src/index.ts`, DashClaw Economics tab
 **Journal:** [2026-02-23](journal/2026-02-23.md)
+
+## Related
+
+- [[README|Area: Lexios]]
+- [[PLATFORM|Lexios Platform Overview]]
+- [[LEXIOS_PLATFORM|Lexios Platform Overview]]
+- [[MEMORY_ARCHIVE_2026-03|Memory - Main Group]]
+- [[llm-judge-system-complete|LLM Judge System - Complete Implementation]]
+- [[FINE_TUNING_GUIDE|Fine-Tuning Specialized Models for Construction Document Ext]]
