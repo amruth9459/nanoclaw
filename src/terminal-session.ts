@@ -52,7 +52,7 @@ export interface TmuxSessionInfo {
 export function listTmuxSessions(): TmuxSessionInfo[] {
   try {
     const raw = execSync(
-      "tmux list-sessions -F '#{session_name}|#{session_windows}|#{session_activity}|#{session_attached}|#{window_width}x#{window_height}'",
+      "/opt/homebrew/bin/tmux list-sessions -F '#{session_name}|#{session_windows}|#{session_activity}|#{session_attached}|#{window_width}x#{window_height}'",
       { encoding: 'utf-8', timeout: 3000 },
     ).trim();
     if (!raw) return [];
@@ -145,9 +145,11 @@ class TerminalSession {
 
   private startPty(cols: number, rows: number): void {
     const shell = process.env.SHELL || '/bin/zsh';
+    // Use full path — launchd doesn't have /opt/homebrew/bin in PATH
+    const tmuxPath = '/opt/homebrew/bin/tmux';
 
     try {
-      this.ptyProcess = pty.spawn('tmux', ['new-session', '-A', '-s', this.sessionName], {
+      this.ptyProcess = pty.spawn(tmuxPath, ['new-session', '-A', '-s', this.sessionName], {
         name: 'xterm-256color',
         cols,
         rows,
@@ -156,6 +158,7 @@ class TerminalSession {
           ...process.env as Record<string, string>,
           TERM: 'xterm-256color',
           SHELL: shell,
+          PATH: `/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:${process.env.PATH || ''}`,
         },
       });
 
