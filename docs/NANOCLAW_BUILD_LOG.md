@@ -1,11 +1,55 @@
 # NanoClaw — Daily Build Log
 
 *Living document — auto-generated from git history*
-*Last generated: 2026-04-12*
+*Last generated: 2026-04-13*
 
-**857 total commits** (227 meaningful) | 2026-01-31 to 2026-04-11
+**881 total commits** (228 meaningful) | 2026-01-31 to 2026-04-13
 
 ---
+
+## 2026-04-13
+
+### What Changed
+- 1 auto-backup commits (incremental saves)
+
+### Files (2 changed)
+- docs/DEVLOG.md
+- src/terminal-session.ts
+
+### Stats
+- 41 insertions, 2 deletions
+
+## 2026-04-12
+
+### What Changed
+- [Agent] task_1775964178935_njqjb7h: Add RAG chat history and conversational query chains
+- (+22 auto-backup commits)
+
+### Files (107 changed)
+- .claude/hooks/memory-bridge.sh
+- .claude/hooks/safety-gate.sh
+- .claude/hooks/session-start.sh
+- .claude/hooks/write-gate.sh
+- CLAUDE.md
+- container/agent-runner/src/ipc-mcp-stdio.ts
+- container/skills/agent-browser/SKILL.md
+- container/skills/ollama/SKILL.md
+- container/skills/security-review/SKILL.md
+- container/skills/self-audit/SKILL.md
+- docs/APPLE-CONTAINER-NETWORKING.md
+- docs/DEBUG_CHECKLIST.md
+- docs/DEVLOG.md
+- docs/EXPERIMENTS.md
+- docs/FINE_TUNING_GUIDE.md
+- docs/NANOCLAW_BUILD_LOG.md
+- docs/NANOCLAW_CHANGELOG.md
+- docs/NANOCLAW_HARDENING_CHECKLIST.md
+- docs/NANOCLAW_PLATFORM.md
+- docs/R2_BACKUP_SECURITY.md
+- ... and 87 more
+
+### Stats
+- 6422 insertions, 190 deletions
 
 ## 2026-04-11
 
@@ -1673,6 +1717,9 @@
 
 ## Related
 
-- [[2026-02-28|Journal: 2026-02-28]]
-- [[2026-02-02|Journal: 2026-02-02]]
-- [[LEXIOS_BUILD_LOG|Lexios — Daily Build Log]]
+- [[CHANGELOG|Changelog]]
+- [[MEMORY_ARCHIVE_2026-03|Memory Archive 2026 03]]
+- [[KANBAN|Kanban]]
+- [[SPEC|Spec]]
+- [[ROADMAP|Roadmap]]
+- [[CHANGELOG|Changelog]]
