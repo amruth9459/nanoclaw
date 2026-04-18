@@ -4,6 +4,7 @@
 
 | Date | Commits | Tasks | Sessions | Areas |
 |------|---------|-------|----------|-------|
+| [2026-04-18](2026-04-18.md) | 0 | 0 | 136 |  |
 | [2026-03-26](2026-03-26.md) | 0 | 0 | 47 |  |
 | [2026-03-25](2026-03-25.md) | 3 + 18 auto | 0 | 49 | docs, integrations, ipc, orchestrator, other, +2 |
 | [2026-03-24](2026-03-24.md) | 0 + 13 auto | 0 | 46 | agent-runtime, container, docs, ipc, other |
@@ -57,8 +58,3 @@
 | [2026-02-02](2026-02-02.md) | 7 | 0 | 0 | config, container, docs, orchestrator, other, +1 |
 | [2026-02-01](2026-02-01.md) | 6 | 0 | 0 |  |
 | [2026-01-31](2026-01-31.md) | 49 | 0 | 0 | agent-runtime, config, container, container-build, docs, +3 |
-
-## Related
-
-- [[2026-02-28|Journal: 2026-02-28]]
-- [[2026-03-12|Journal: 2026-03-12]]
