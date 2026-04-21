@@ -661,6 +661,82 @@ Total score out of 36 (North Indian method). Score >= 18 is considered acceptabl
 );
 
 server.tool(
+  'jyotish_interpret',
+  `Interpret a Vedic astrology chart using the 7-stage PVR pipeline. Computes chart + runs interpretation.
+Returns structured predictions for career, marriage, wealth, health with confidence levels.
+Stages: 1) Chart verification, 2) Strength assessment, 3) Navamsha cross-check,
+4) Karaka identification, 5) Dasha analysis, 6) Transit layer, 7) Synthesis.
+Use this instead of jyotish_calculate when you want interpreted results, not raw chart data.`,
+  {
+    year: z.number().int().describe('Birth year'),
+    month: z.number().int().min(1).max(12).describe('Birth month'),
+    day: z.number().int().min(1).max(31).describe('Birth day'),
+    hour: z.number().int().min(0).max(23).describe('Birth hour (24h)'),
+    minute: z.number().int().min(0).max(59).describe('Birth minute'),
+    second: z.number().int().min(0).max(59).default(0),
+    place_name: z.string().describe('Birth place name'),
+    latitude: z.number().describe('Latitude'),
+    longitude: z.number().describe('Longitude'),
+    timezone_offset: z.number().describe('Timezone offset (hours)'),
+  },
+  async (args) => {
+    const requestId = `jyotish-interp-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+    const requestFile = path.join(IPC_DIR, `${requestId}.jyotish.json`);
+    const responseFile = path.join(IPC_DIR, `${requestId}.result.json`);
+
+    const request = {
+      type: 'interpret',
+      requestId,
+      ...args,
+      analyses: ['yogas', 'raja_yogas', 'doshas', 'ashtakavarga', 'karakas', 'panchanga', 'all_dashas', 'sahams'],
+      responseFile,
+    };
+
+    const tmp = `${requestFile}.tmp`;
+    fs.writeFileSync(tmp, JSON.stringify(request, null, 2));
+    fs.renameSync(tmp, requestFile);
+
+    const timeout = Date.now() + 90000; // 90s for full interpretation
+    while (Date.now() < timeout) {
+      await new Promise(r => setTimeout(r, 500));
+      if (fs.existsSync(responseFile)) {
+        try {
+          const result = JSON.parse(fs.readFileSync(responseFile, 'utf-8'));
+          fs.unlinkSync(responseFile);
+          if (result.error) {
+            return { content: [{ type: 'text' as const, text: `Interpretation error: ${result.error}` }], isError: true };
+          }
+
+          const summary = result.chart_summary || {};
+          const predictions = result.predictions || [];
+
+          const lines = [
+            `JYOTISH INTERPRETATION — ${args.place_name} | ${args.year}-${String(args.month).padStart(2, '0')}-${String(args.day).padStart(2, '0')}`,
+            `Lagna: ${summary.lagna || '?'}`,
+            `Strong: ${(summary.strong_planets || []).join(', ')}`,
+            `Weak: ${(summary.weak_planets || []).join(', ')}`,
+            `Vargottama: ${(summary.vargottama || []).join(', ') || 'None'}`,
+            `\nPREDICTIONS (${predictions.length}):`,
+            ...predictions.map((p: any) => `[${(p.confidence * 100).toFixed(0)}%] ${p.area}: ${p.summary}`),
+            `\nYogas: ${result.yogas?.count || 0} | Raja Yogas: ${result.yogas?.raja_yoga_count || 0}`,
+            `Overall Confidence: ${((result.overall_confidence || 0) * 100).toFixed(0)}%`,
+            `Methodology: ${result.methodology || 'PVR 7-Stage'}`,
+          ];
+
+          return { content: [
+            { type: 'text' as const, text: lines.join('\n') },
+            { type: 'text' as const, text: `\n\nFull interpretation:\n${JSON.stringify(result, null, 2).slice(0, 30000)}` },
+          ]};
+        } catch {
+          return { content: [{ type: 'text' as const, text: 'Failed to parse interpretation results.' }], isError: true };
+        }
+      }
+    }
+    return { content: [{ type: 'text' as const, text: 'Interpretation timed out.' }], isError: true };
+  },
+);
+
+server.tool(
   'index_document',
   'Index a text document for semantic search. Use after processing OCR output or saving important notes.',
   {

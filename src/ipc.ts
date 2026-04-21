@@ -240,15 +240,15 @@ export function startIpcWatcher(deps: IpcDeps): void {
                     fs.writeFileSync(responseFile + '.tmp', JSON.stringify({ error: 'RAG query failed' }));
                     fs.renameSync(responseFile + '.tmp', responseFile);
                   });
-              } else if (req.type === 'jyotish_calculate' || req.type === 'compatibility') {
+              } else if (req.type === 'jyotish_calculate' || req.type === 'compatibility' || req.type === 'interpret') {
                 const rawRF = req.responseFile as string;
                 const responseFile = toHostIpcPath(rawRF, sourceGroup);
                 const { spawn } = await import('child_process');
                 const venvPython = path.join(process.env.HOME ?? '', 'nanoclaw/services/jyotish/.venv/bin/python3');
                 const enginePath = path.join(process.env.HOME ?? '', 'nanoclaw/services/jyotish/engine.py');
-                // Build input — compatibility passes type through, chart strips it
+                // Build input — compatibility and interpret pass type through, chart strips it
                 const { requestId: _rid, responseFile: _rf, ...reqFields } = req;
-                const input = req.type === 'compatibility'
+                const input = (req.type === 'compatibility' || req.type === 'interpret')
                   ? JSON.stringify(reqFields)
                   : JSON.stringify({
                     year: req.year, month: req.month, day: req.day,
@@ -258,7 +258,8 @@ export function startIpcWatcher(deps: IpcDeps): void {
                     divisional_charts: req.divisional_charts,
                     analyses: req.analyses,
                   });
-                const proc = spawn(venvPython, [enginePath, '--ipc'], { timeout: 60000 });
+                const procTimeout = req.type === 'interpret' ? 90000 : 60000;
+                const proc = spawn(venvPython, [enginePath, '--ipc'], { timeout: procTimeout });
                 let stdout = '';
                 let stderr = '';
                 proc.stdout.on('data', (d: Buffer) => { stdout += d.toString(); });
