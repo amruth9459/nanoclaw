@@ -451,6 +451,90 @@ Returns the most relevant text chunks for your query.`,
 );
 
 server.tool(
+  'jyotish_calculate',
+  `Calculate a Vedic astrology (Jyotish) chart. Uses Swiss Ephemeris with Lahiri ayanamsa (matching Jagannatha Hora).
+Returns: D-1 (Rasi), D-9 (Navamsa), D-10 (Dasamsa), Vimshottari Dasha, Shadbala, Bhava Bala, nakshatras, padas.
+All planetary positions include sign, degrees, nakshatra, and pada.`,
+  {
+    year: z.number().int().describe('Birth year (e.g., 1990)'),
+    month: z.number().int().min(1).max(12).describe('Birth month (1-12)'),
+    day: z.number().int().min(1).max(31).describe('Birth day (1-31)'),
+    hour: z.number().int().min(0).max(23).describe('Birth hour (0-23, 24-hour format)'),
+    minute: z.number().int().min(0).max(59).describe('Birth minute (0-59)'),
+    second: z.number().int().min(0).max(59).default(0).describe('Birth second (default: 0)'),
+    place_name: z.string().describe('Birth place name (e.g., "Mumbai")'),
+    latitude: z.number().describe('Latitude of birth place (e.g., 19.0760)'),
+    longitude: z.number().describe('Longitude of birth place (e.g., 72.8777)'),
+    timezone_offset: z.number().describe('Timezone offset in hours (e.g., 5.5 for IST)'),
+    ayanamsa: z.string().default('LAHIRI').describe('Ayanamsa mode (default: LAHIRI). Options: LAHIRI, TRUE_CITRA, KP, RAMAN'),
+    divisional_charts: z.array(z.number().int()).optional().describe('Divisional chart factors to compute (default: [9, 10]). E.g., [2,3,4,7,9,10,12,16,20,24,27,30,40,45,60] for full Shodasavarga'),
+  },
+  async (args) => {
+    const requestId = `jyotish-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+    const requestFile = path.join(IPC_DIR, `${requestId}.jyotish.json`);
+    const responseFile = path.join(IPC_DIR, `${requestId}.result.json`);
+
+    const request = {
+      type: 'jyotish_calculate',
+      requestId,
+      ...args,
+      responseFile,
+    };
+
+    const tmp = `${requestFile}.tmp`;
+    fs.writeFileSync(tmp, JSON.stringify(request, null, 2));
+    fs.renameSync(tmp, requestFile);
+
+    // Poll for response
+    const timeout = Date.now() + 35000;
+    while (Date.now() < timeout) {
+      await new Promise(r => setTimeout(r, 300));
+      if (fs.existsSync(responseFile)) {
+        try {
+          const result = JSON.parse(fs.readFileSync(responseFile, 'utf-8'));
+          fs.unlinkSync(responseFile);
+          if (result.error) {
+            return { content: [{ type: 'text' as const, text: `Jyotish error: ${result.error}` }], isError: true };
+          }
+
+          // Format chart output for Claude
+          const rasi = (result.rasi || []).map((p: { body: string; rashi: string; deg: number; min: number; nakshatra: string; pada: number }) =>
+            `${p.body}: ${p.rashi} ${p.deg}°${String(p.min).padStart(2, '0')}' [${p.nakshatra} P${p.pada}]`
+          ).join('\n');
+
+          const dasha = (result.vimshottari || [])
+            .filter((d: { level: string }) => d.level === 'maha')
+            .map((d: { lord: string; start_date: string; years: number }) =>
+              `${d.lord}: ${d.start_date} (${d.years} yrs)`
+            ).join('\n');
+
+          const text = `VEDIC CHART — ${result.place_name} | ${result.birth_date} ${result.birth_time}
+Ayanamsa: ${result.ayanamsa}
+
+RASI (D-1):
+${rasi}
+
+VIMSHOTTARI MAHADASHA:
+${dasha}
+
+Full chart JSON available in result.`;
+
+          return {
+            content: [
+              { type: 'text' as const, text },
+              { type: 'text' as const, text: `\n\nFull data:\n${JSON.stringify(result, null, 2).slice(0, 8000)}` },
+            ],
+          };
+        } catch {
+          return { content: [{ type: 'text' as const, text: 'Failed to parse jyotish results.' }], isError: true };
+        }
+      }
+    }
+    return { content: [{ type: 'text' as const, text: 'Jyotish calculation timed out.' }], isError: true };
+  },
+);
+
+server.tool(
   'index_document',
   'Index a text document for semantic search. Use after processing OCR output or saving important notes.',
   {

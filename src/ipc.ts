@@ -187,7 +187,7 @@ export function startIpcWatcher(deps: IpcDeps): void {
         // ── Semantic search / index requests ─────────────────────────────────
         try {
           const searchFiles = fs.readdirSync(groupIpcDir)
-            .filter(f => f.endsWith('.search.json') || f.endsWith('.index.json'));
+            .filter(f => f.endsWith('.search.json') || f.endsWith('.index.json') || f.endsWith('.jyotish.json'));
           for (const file of searchFiles) {
             const filePath = path.join(groupIpcDir, file);
             try {
@@ -240,6 +240,49 @@ export function startIpcWatcher(deps: IpcDeps): void {
                     fs.writeFileSync(responseFile + '.tmp', JSON.stringify({ error: 'RAG query failed' }));
                     fs.renameSync(responseFile + '.tmp', responseFile);
                   });
+              } else if (req.type === 'jyotish_calculate') {
+                const rawRF = req.responseFile as string;
+                const responseFile = toHostIpcPath(rawRF, sourceGroup);
+                const { spawn } = await import('child_process');
+                const venvPython = path.join(process.env.HOME ?? '', 'nanoclaw/services/jyotish/.venv/bin/python3');
+                const enginePath = path.join(process.env.HOME ?? '', 'nanoclaw/services/jyotish/engine.py');
+                const input = JSON.stringify({
+                  year: req.year, month: req.month, day: req.day,
+                  hour: req.hour, minute: req.minute, second: req.second ?? 0,
+                  place_name: req.place_name ?? '', latitude: req.latitude, longitude: req.longitude,
+                  timezone_offset: req.timezone_offset, ayanamsa: req.ayanamsa ?? 'LAHIRI',
+                  divisional_charts: req.divisional_charts,
+                });
+                const proc = spawn(venvPython, [enginePath, '--ipc'], { timeout: 30000 });
+                let stdout = '';
+                let stderr = '';
+                proc.stdout.on('data', (d: Buffer) => { stdout += d.toString(); });
+                proc.stderr.on('data', (d: Buffer) => { stderr += d.toString(); });
+                proc.stdin.write(input);
+                proc.stdin.end();
+                proc.on('close', (code: number | null) => {
+                  try {
+                    if (code === 0 && stdout) {
+                      // Find the JSON object in stdout (skip PyJHora path spam)
+                      const jsonStart = stdout.indexOf('{');
+                      const json = jsonStart >= 0 ? stdout.slice(jsonStart) : stdout;
+                      const result = JSON.parse(json);
+                      fs.mkdirSync(path.dirname(responseFile), { recursive: true });
+                      fs.writeFileSync(responseFile + '.tmp', JSON.stringify(result));
+                      fs.renameSync(responseFile + '.tmp', responseFile);
+                    } else {
+                      logger.warn({ code, stderr: stderr.slice(0, 500) }, 'Jyotish calculation failed');
+                      fs.mkdirSync(path.dirname(responseFile), { recursive: true });
+                      fs.writeFileSync(responseFile + '.tmp', JSON.stringify({ error: `Jyotish failed (code ${code}): ${stderr.slice(0, 200)}` }));
+                      fs.renameSync(responseFile + '.tmp', responseFile);
+                    }
+                  } catch (err) {
+                    logger.warn({ err, stdout: stdout.slice(0, 200) }, 'Jyotish parse error');
+                    fs.mkdirSync(path.dirname(responseFile), { recursive: true });
+                    fs.writeFileSync(responseFile + '.tmp', JSON.stringify({ error: 'Failed to parse jyotish output' }));
+                    fs.renameSync(responseFile + '.tmp', responseFile);
+                  }
+                });
               }
             } catch (err) {
               logger.warn({ file, sourceGroup, err }, 'Error processing semantic IPC file');
