@@ -252,8 +252,9 @@ export function startIpcWatcher(deps: IpcDeps): void {
                   place_name: req.place_name ?? '', latitude: req.latitude, longitude: req.longitude,
                   timezone_offset: req.timezone_offset, ayanamsa: req.ayanamsa ?? 'LAHIRI',
                   divisional_charts: req.divisional_charts,
+                  analyses: req.analyses,
                 });
-                const proc = spawn(venvPython, [enginePath, '--ipc'], { timeout: 30000 });
+                const proc = spawn(venvPython, [enginePath, '--ipc'], { timeout: 60000 });
                 let stdout = '';
                 let stderr = '';
                 proc.stdout.on('data', (d: Buffer) => { stdout += d.toString(); });

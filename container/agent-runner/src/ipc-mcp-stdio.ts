@@ -453,8 +453,20 @@ Returns the most relevant text chunks for your query.`,
 server.tool(
   'jyotish_calculate',
   `Calculate a Vedic astrology (Jyotish) chart. Uses Swiss Ephemeris with Lahiri ayanamsa (matching Jagannatha Hora).
-Returns: D-1 (Rasi), D-9 (Navamsa), D-10 (Dasamsa), Vimshottari Dasha, Shadbala, Bhava Bala, nakshatras, padas.
-All planetary positions include sign, degrees, nakshatra, and pada.`,
+Always returns: D-1 (Rasi), D-9 (Navamsa), D-10 (Dasamsa), Vimshottari Dasha, Shadbala, Bhava Bala.
+Use the 'analyses' parameter to request additional computations:
+- yogas: 100+ classical yogas (Vesi, Vosi, Gajakesari, etc.)
+- raja_yogas: Power/authority yogas (Dharma-Karmadhipati, Neecha Bhanga, etc.)
+- doshas: Manglik, Kala Sarpa, Guru Chandala, Pitru, Shrapit, etc.
+- ashtakavarga: Full BAV (per-planet) + SAV (total) bindus per house
+- arudhas: Bhava Arudhas A1-A12 + Graha Arudhas
+- sphutas: 12 sensitive points (Prana, Deha, Mrityu, Beeja, Kshetra, Yogi, etc.)
+- special_lagnas: Sree, Indu, Bhrigu Bindhu, Hora, Ghati, Varnada, etc.
+- karakas: Chara Karakas (Jaimini) — AK through PiK
+- vimsopaka: 20-point divisional strength (Shadvarga/Sapthavarga/Shodasavarga)
+- panchanga: Tithi, Nakshatra, Yoga, Karana, Vaara, Sunrise/Sunset
+- all_dashas: 10 additional dasha systems (Ashtottari, Yogini, Narayana, Chara, Sthira, Kalachakra, Shoola, Sudasa, Drig, Trikona)
+- all: Everything above`,
   {
     year: z.number().int().describe('Birth year (e.g., 1990)'),
     month: z.number().int().min(1).max(12).describe('Birth month (1-12)'),
@@ -467,7 +479,8 @@ All planetary positions include sign, degrees, nakshatra, and pada.`,
     longitude: z.number().describe('Longitude of birth place (e.g., 72.8777)'),
     timezone_offset: z.number().describe('Timezone offset in hours (e.g., 5.5 for IST)'),
     ayanamsa: z.string().default('LAHIRI').describe('Ayanamsa mode (default: LAHIRI). Options: LAHIRI, TRUE_CITRA, KP, RAMAN'),
-    divisional_charts: z.array(z.number().int()).optional().describe('Divisional chart factors to compute (default: [9, 10]). E.g., [2,3,4,7,9,10,12,16,20,24,27,30,40,45,60] for full Shodasavarga'),
+    divisional_charts: z.array(z.number().int()).optional().describe('Divisional chart factors (default: [9, 10]). Full Shodasavarga: [2,3,4,7,9,10,12,16,20,24,27,30,40,45,60]'),
+    analyses: z.array(z.string()).optional().describe('Extra analyses to compute. Options: yogas, raja_yogas, doshas, ashtakavarga, arudhas, sphutas, special_lagnas, karakas, vimsopaka, panchanga, all_dashas, all'),
   },
   async (args) => {
     const requestId = `jyotish-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
@@ -485,8 +498,9 @@ All planetary positions include sign, degrees, nakshatra, and pada.`,
     fs.writeFileSync(tmp, JSON.stringify(request, null, 2));
     fs.renameSync(tmp, requestFile);
 
-    // Poll for response
-    const timeout = Date.now() + 35000;
+    // Poll for response (longer timeout for full analysis)
+    const hasAnalyses = args.analyses && args.analyses.length > 0;
+    const timeout = Date.now() + (hasAnalyses ? 60000 : 35000);
     while (Date.now() < timeout) {
       await new Promise(r => setTimeout(r, 300));
       if (fs.existsSync(responseFile)) {
@@ -497,7 +511,7 @@ All planetary positions include sign, degrees, nakshatra, and pada.`,
             return { content: [{ type: 'text' as const, text: `Jyotish error: ${result.error}` }], isError: true };
           }
 
-          // Format chart output for Claude
+          // Format chart output
           const rasi = (result.rasi || []).map((p: { body: string; rashi: string; deg: number; min: number; nakshatra: string; pada: number }) =>
             `${p.body}: ${p.rashi} ${p.deg}°${String(p.min).padStart(2, '0')}' [${p.nakshatra} P${p.pada}]`
           ).join('\n');
@@ -508,21 +522,38 @@ All planetary positions include sign, degrees, nakshatra, and pada.`,
               `${d.lord}: ${d.start_date} (${d.years} yrs)`
             ).join('\n');
 
-          const text = `VEDIC CHART — ${result.place_name} | ${result.birth_date} ${result.birth_time}
-Ayanamsa: ${result.ayanamsa}
+          // Build sections dynamically
+          const sections: string[] = [
+            `VEDIC CHART — ${result.place_name} | ${result.birth_date} ${result.birth_time}`,
+            `Ayanamsa: ${result.ayanamsa}`,
+            `\nRASI (D-1):\n${rasi}`,
+            `\nVIMSHOTTARI MAHADASHA:\n${dasha}`,
+          ];
 
-RASI (D-1):
-${rasi}
-
-VIMSHOTTARI MAHADASHA:
-${dasha}
-
-Full chart JSON available in result.`;
+          if (result.ashtakavarga_sav?.length) {
+            sections.push(`\nSARVASHTAKAVARGA (SAV): ${JSON.stringify(result.ashtakavarga_sav)}`);
+          }
+          if (result.yogas?.length) {
+            sections.push(`\nYOGAS (${result.yogas.length} found)`);
+          }
+          if (result.raja_yogas?.length) {
+            sections.push(`RAJA YOGAS (${result.raja_yogas.length} found)`);
+          }
+          if (result.doshas && Object.keys(result.doshas).length) {
+            sections.push(`DOSHAS: ${Object.keys(result.doshas).join(', ')}`);
+          }
+          if (result.chara_karakas && Object.keys(result.chara_karakas).length) {
+            const ck = Object.entries(result.chara_karakas).map(([k, v]) => `${k}=${v}`).join(', ');
+            sections.push(`\nCHARA KARAKAS: ${ck}`);
+          }
+          if (result.other_dashas && Object.keys(result.other_dashas).length) {
+            sections.push(`\nOTHER DASHAS: ${Object.keys(result.other_dashas).join(', ')}`);
+          }
 
           return {
             content: [
-              { type: 'text' as const, text },
-              { type: 'text' as const, text: `\n\nFull data:\n${JSON.stringify(result, null, 2).slice(0, 8000)}` },
+              { type: 'text' as const, text: sections.join('\n') },
+              { type: 'text' as const, text: `\n\nFull data:\n${JSON.stringify(result, null, 2).slice(0, 15000)}` },
             ],
           };
         } catch {
