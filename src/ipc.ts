@@ -240,20 +240,24 @@ export function startIpcWatcher(deps: IpcDeps): void {
                     fs.writeFileSync(responseFile + '.tmp', JSON.stringify({ error: 'RAG query failed' }));
                     fs.renameSync(responseFile + '.tmp', responseFile);
                   });
-              } else if (req.type === 'jyotish_calculate') {
+              } else if (req.type === 'jyotish_calculate' || req.type === 'compatibility') {
                 const rawRF = req.responseFile as string;
                 const responseFile = toHostIpcPath(rawRF, sourceGroup);
                 const { spawn } = await import('child_process');
                 const venvPython = path.join(process.env.HOME ?? '', 'nanoclaw/services/jyotish/.venv/bin/python3');
                 const enginePath = path.join(process.env.HOME ?? '', 'nanoclaw/services/jyotish/engine.py');
-                const input = JSON.stringify({
-                  year: req.year, month: req.month, day: req.day,
-                  hour: req.hour, minute: req.minute, second: req.second ?? 0,
-                  place_name: req.place_name ?? '', latitude: req.latitude, longitude: req.longitude,
-                  timezone_offset: req.timezone_offset, ayanamsa: req.ayanamsa ?? 'LAHIRI',
-                  divisional_charts: req.divisional_charts,
-                  analyses: req.analyses,
-                });
+                // Build input — compatibility passes type through, chart strips it
+                const { requestId: _rid, responseFile: _rf, ...reqFields } = req;
+                const input = req.type === 'compatibility'
+                  ? JSON.stringify(reqFields)
+                  : JSON.stringify({
+                    year: req.year, month: req.month, day: req.day,
+                    hour: req.hour, minute: req.minute, second: req.second ?? 0,
+                    place_name: req.place_name ?? '', latitude: req.latitude, longitude: req.longitude,
+                    timezone_offset: req.timezone_offset, ayanamsa: req.ayanamsa ?? 'LAHIRI',
+                    divisional_charts: req.divisional_charts,
+                    analyses: req.analyses,
+                  });
                 const proc = spawn(venvPython, [enginePath, '--ipc'], { timeout: 60000 });
                 let stdout = '';
                 let stderr = '';

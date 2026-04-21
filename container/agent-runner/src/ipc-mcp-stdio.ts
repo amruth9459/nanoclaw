@@ -465,7 +465,9 @@ Use the 'analyses' parameter to request additional computations:
 - karakas: Chara Karakas (Jaimini) — AK through PiK
 - vimsopaka: 20-point divisional strength (Shadvarga/Sapthavarga/Shodasavarga)
 - panchanga: Tithi, Nakshatra, Yoga, Karana, Vaara, Sunrise/Sunset
-- all_dashas: 10 additional dasha systems (Ashtottari, Yogini, Narayana, Chara, Sthira, Kalachakra, Shoola, Sudasa, Drig, Trikona)
+- all_dashas: 50 dasha systems — 22 Graha (Vimshottari, Ashtottari, Yogini, Moola, Naisargika, Buddhi Gathi, Dwadasottari, Chathuraaseethi Sama, Panchottari, Shodasottari, Sataatbika, Dwisatpathi, Kaala, Karaka, Rashmi, Tara, Saptharishi, Shastihayani, Shattrimsa, Tithi Ashtottari, Tithi Yogini, Yoga Vimsottari) + 24 Raasi (Narayana, Chara, Sthira, Kalachakra, Shoola, Sudasa, Drig, Trikona, Brahma, Chakra, Niryaana, Raashiyanka, Varnada, Yogardha, Mandooka, Paryaaya, Sandhya, Tara Lagna, Lagnamsaka, Navamsa, Padhanadhamsa, Chathurvidha Utthara, Lagna Kendraadhi, Karaka Kendraadhi) + 3 Annual (Mudda, Varsha Vimsottari, Patyayini)
+- sahams: 36 Sahams (Arabic Parts) — Punya, Vidya, Vivaha, Rajya, Karma, Roga, Mrithyu, etc.
+- tajaka: Annual chart (Varshaphal) + Year Lord
 - all: Everything above`,
   {
     year: z.number().int().describe('Birth year (e.g., 1990)'),
@@ -480,7 +482,7 @@ Use the 'analyses' parameter to request additional computations:
     timezone_offset: z.number().describe('Timezone offset in hours (e.g., 5.5 for IST)'),
     ayanamsa: z.string().default('LAHIRI').describe('Ayanamsa mode (default: LAHIRI). Options: LAHIRI, TRUE_CITRA, KP, RAMAN'),
     divisional_charts: z.array(z.number().int()).optional().describe('Divisional chart factors (default: [9, 10]). Full Shodasavarga: [2,3,4,7,9,10,12,16,20,24,27,30,40,45,60]'),
-    analyses: z.array(z.string()).optional().describe('Extra analyses to compute. Options: yogas, raja_yogas, doshas, ashtakavarga, arudhas, sphutas, special_lagnas, karakas, vimsopaka, panchanga, all_dashas, all'),
+    analyses: z.array(z.string()).optional().describe('Extra analyses to compute. Options: yogas, raja_yogas, doshas, ashtakavarga, arudhas, sphutas, special_lagnas, karakas, vimsopaka, panchanga, all_dashas, sahams, tajaka, all'),
   },
   async (args) => {
     const requestId = `jyotish-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
@@ -547,13 +549,20 @@ Use the 'analyses' parameter to request additional computations:
             sections.push(`\nCHARA KARAKAS: ${ck}`);
           }
           if (result.other_dashas && Object.keys(result.other_dashas).length) {
-            sections.push(`\nOTHER DASHAS: ${Object.keys(result.other_dashas).join(', ')}`);
+            sections.push(`\nDASHA SYSTEMS (${Object.keys(result.other_dashas).length}): ${Object.keys(result.other_dashas).join(', ')}`);
+          }
+          if (result.sahams && Object.keys(result.sahams).length) {
+            sections.push(`\nSAHAMS (${Object.keys(result.sahams).length} computed)`);
+          }
+          if (result.tajaka && Object.keys(result.tajaka).length) {
+            const tj = result.tajaka;
+            sections.push(`\nTAJAKA: Year Lord=${tj.year_lord || '?'}, Annual Chart=${tj.annual_chart?.length || 0} planets`);
           }
 
           return {
             content: [
               { type: 'text' as const, text: sections.join('\n') },
-              { type: 'text' as const, text: `\n\nFull data:\n${JSON.stringify(result, null, 2).slice(0, 15000)}` },
+              { type: 'text' as const, text: `\n\nFull data:\n${JSON.stringify(result, null, 2).slice(0, 30000)}` },
             ],
           };
         } catch {
@@ -562,6 +571,92 @@ Use the 'analyses' parameter to request additional computations:
       }
     }
     return { content: [{ type: 'text' as const, text: 'Jyotish calculation timed out.' }], isError: true };
+  },
+);
+
+server.tool(
+  'jyotish_compatibility',
+  `Calculate marriage compatibility (Ashtakoota / Koota Milan) between two birth charts.
+Returns 8 main Kootas (Varna, Vasiya, Tara, Yoni, Maitri, Gana, Bahut/Bhakut, Naadi) plus supplementary checks (Rajju, Vedha, Dina, Stree Dheerga, Mahendra).
+Total score out of 36 (North Indian method). Score >= 18 is considered acceptable for marriage.`,
+  {
+    boy_year: z.number().int().describe('Boy birth year'),
+    boy_month: z.number().int().min(1).max(12).describe('Boy birth month'),
+    boy_day: z.number().int().min(1).max(31).describe('Boy birth day'),
+    boy_hour: z.number().int().min(0).max(23).describe('Boy birth hour (24h)'),
+    boy_minute: z.number().int().min(0).max(59).describe('Boy birth minute'),
+    boy_second: z.number().int().min(0).max(59).default(0),
+    boy_place_name: z.string().describe('Boy birth place'),
+    boy_latitude: z.number().describe('Boy birth latitude'),
+    boy_longitude: z.number().describe('Boy birth longitude'),
+    boy_timezone: z.number().describe('Boy timezone offset (hours)'),
+    girl_year: z.number().int().describe('Girl birth year'),
+    girl_month: z.number().int().min(1).max(12).describe('Girl birth month'),
+    girl_day: z.number().int().min(1).max(31).describe('Girl birth day'),
+    girl_hour: z.number().int().min(0).max(23).describe('Girl birth hour (24h)'),
+    girl_minute: z.number().int().min(0).max(59).describe('Girl birth minute'),
+    girl_second: z.number().int().min(0).max(59).default(0),
+    girl_place_name: z.string().describe('Girl birth place'),
+    girl_latitude: z.number().describe('Girl birth latitude'),
+    girl_longitude: z.number().describe('Girl birth longitude'),
+    girl_timezone: z.number().describe('Girl timezone offset (hours)'),
+    method: z.string().default('North').describe('Method: North (Ashtakoota, 36 max) or South (Dashakoota)'),
+  },
+  async (args) => {
+    const requestId = `jyotish-compat-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+    const requestFile = path.join(IPC_DIR, `${requestId}.jyotish.json`);
+    const responseFile = path.join(IPC_DIR, `${requestId}.result.json`);
+
+    const request = {
+      type: 'compatibility',
+      requestId,
+      ...args,
+      responseFile,
+    };
+
+    const tmp = `${requestFile}.tmp`;
+    fs.writeFileSync(tmp, JSON.stringify(request, null, 2));
+    fs.renameSync(tmp, requestFile);
+
+    const timeout = Date.now() + 35000;
+    while (Date.now() < timeout) {
+      await new Promise(r => setTimeout(r, 300));
+      if (fs.existsSync(responseFile)) {
+        try {
+          const result = JSON.parse(fs.readFileSync(responseFile, 'utf-8'));
+          fs.unlinkSync(responseFile);
+          if (result.error) {
+            return { content: [{ type: 'text' as const, text: `Compatibility error: ${result.error}` }], isError: true };
+          }
+
+          const kootas = result.kootas || {};
+          const lines = Object.entries(kootas).map(([k, v]: [string, any]) => {
+            if (v.max !== undefined && v.max !== null) return `${k}: ${v.score}/${v.max}`;
+            if (v.match !== undefined) return `${k}: ${v.match ? 'Yes' : 'No'}`;
+            return `${k}: ${v.score ?? v.result ?? 'N/A'}`;
+          }).join('\n');
+
+          const text = [
+            `MARRIAGE COMPATIBILITY (${result.method} method)`,
+            `Boy: ${result.boy.nakshatra} Pada ${result.boy.pada}`,
+            `Girl: ${result.girl.nakshatra} Pada ${result.girl.pada}`,
+            `\nTOTAL SCORE: ${result.total_score}/${result.max_score}`,
+            result.total_score >= 18 ? 'Verdict: ACCEPTABLE for marriage' :
+              result.total_score >= 12 ? 'Verdict: MARGINAL — remedies recommended' :
+              'Verdict: NOT RECOMMENDED without strong remedies',
+            `\nKOOTA BREAKDOWN:\n${lines}`,
+          ].join('\n');
+
+          return { content: [
+            { type: 'text' as const, text },
+            { type: 'text' as const, text: `\n\nFull data:\n${JSON.stringify(result, null, 2)}` },
+          ]};
+        } catch {
+          return { content: [{ type: 'text' as const, text: 'Failed to parse compatibility results.' }], isError: true };
+        }
+      }
+    }
+    return { content: [{ type: 'text' as const, text: 'Compatibility calculation timed out.' }], isError: true };
   },
 );
 
