@@ -172,6 +172,15 @@ export async function runHostClaudeAgent(
           newSessionId: sessionId,
         });
       } else {
+        // Session conflict — clear stale session and retry without it
+        if (stderr.includes('already in use') && input.sessionId) {
+          logger.warn({ group: group.name, sessionId: input.sessionId }, 'Session ID conflict — retrying without session');
+          const retryInput = { ...input, sessionId: undefined };
+          const retryResult = await runHostClaudeAgent(group, retryInput, onProcess, onOutput);
+          resolve(retryResult);
+          return;
+        }
+
         const errorMsg = signal === 'SIGTERM'
           ? `Host Claude Code timed out after ${HOST_RUNNER_TIMEOUT_MS / 1000}s`
           : `Host Claude Code exited with code ${code}: ${stderr.slice(0, 500)}`;
