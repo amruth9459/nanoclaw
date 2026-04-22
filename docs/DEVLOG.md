@@ -5,6 +5,78 @@
 
 ---
 
+### 2026-04-22 02:30
+
+**Areas:** general
+**Files (8):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, data/jyotish-books/bphs-deep-extraction.md, data/jyotish-books/brihat-jataka-deep-extraction.md, data/jyotish-books/laghu-parashari-deep-extraction.md, data/jyotish-books/phaladeepika-deep-extraction.md, data/jyotish-books/saravali-deep-extraction.md, data/jyotish-books/uttara-kalamrita-deep-extraction.md, groups/main/lexios-autoresearch/experiment.py
+**Diff:** +2581 -443 across 31 files
+
+### 2026-04-22 02:29
+
+**Areas:** general
+**Files (8):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, data/jyotish-books/bphs-deep-extraction.md, data/jyotish-books/brihat-jataka-deep-extraction.md, data/jyotish-books/laghu-parashari-deep-extraction.md, data/jyotish-books/phaladeepika-deep-extraction.md, data/jyotish-books/saravali-deep-extraction.md, data/jyotish-books/uttara-kalamrita-deep-extraction.md, groups/main/lexios-autoresearch/experiment.py
+**Diff:** +2575 -443 across 31 files
+
+### 2026-04-22 02:28
+
+**Areas:** general
+**Files (8):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, data/jyotish-books/bphs-deep-extraction.md, data/jyotish-books/brihat-jataka-deep-extraction.md, data/jyotish-books/laghu-parashari-deep-extraction.md, data/jyotish-books/phaladeepika-deep-extraction.md, data/jyotish-books/saravali-deep-extraction.md, data/jyotish-books/uttara-kalamrita-deep-extraction.md, groups/main/lexios-autoresearch/experiment.py
+**Diff:** +2569 -443 across 31 files
+
+### 2026-04-22 02:28
+
+**Areas:** general
+**Files (8):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, data/jyotish-books/bphs-deep-extraction.md, data/jyotish-books/brihat-jataka-deep-extraction.md, data/jyotish-books/laghu-parashari-deep-extraction.md, data/jyotish-books/phaladeepika-deep-extraction.md, data/jyotish-books/saravali-deep-extraction.md, data/jyotish-books/uttara-kalamrita-deep-extraction.md, groups/main/lexios-autoresearch/experiment.py
+**Diff:** +2563 -443 across 31 files
+
+### 2026-04-22 02:27
+
+**Areas:** general
+**Files (8):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, data/jyotish-books/bphs-deep-extraction.md, data/jyotish-books/brihat-jataka-deep-extraction.md, data/jyotish-books/laghu-parashari-deep-extraction.md, data/jyotish-books/phaladeepika-deep-extraction.md, data/jyotish-books/saravali-deep-extraction.md, data/jyotish-books/uttara-kalamrita-deep-extraction.md, groups/main/lexios-autoresearch/experiment.py
+**Diff:** +2557 -443 across 31 files
+
+### 2026-04-22 02:27
+
+**Areas:** general
+**Files (8):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, data/jyotish-books/bphs-deep-extraction.md, data/jyotish-books/brihat-jataka-deep-extraction.md, data/jyotish-books/laghu-parashari-deep-extraction.md, data/jyotish-books/phaladeepika-deep-extraction.md, data/jyotish-books/saravali-deep-extraction.md, data/jyotish-books/uttara-kalamrita-deep-extraction.md, groups/main/lexios-autoresearch/experiment.py
+**Diff:** +2551 -443 across 31 files
+
+### 2026-04-22 02:22
+
+**Areas:** general
+**Files (8):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, data/jyotish-books/bphs-deep-extraction.md, data/jyotish-books/brihat-jataka-deep-extraction.md, data/jyotish-books/laghu-parashari-deep-extraction.md, data/jyotish-books/phaladeepika-deep-extraction.md, data/jyotish-books/saravali-deep-extraction.md, data/jyotish-books/uttara-kalamrita-deep-extraction.md, groups/main/lexios-autoresearch/experiment.py
+**Diff:** +2545 -443 across 31 files
+
+### 2026-04-22 02:22
+
+**Areas:** general
+**Files (8):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, data/jyotish-books/bphs-deep-extraction.md, data/jyotish-books/brihat-jataka-deep-extraction.md, data/jyotish-books/laghu-parashari-deep-extraction.md, data/jyotish-books/phaladeepika-deep-extraction.md, data/jyotish-books/saravali-deep-extraction.md, data/jyotish-books/uttara-kalamrita-deep-extraction.md, groups/main/lexios-autoresearch/experiment.py
+**Diff:** +2539 -443 across 31 files
+
+### 2026-04-22 02:03
+
+**Areas:** general
+**Files (7):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, data/jyotish-books/bphs-deep-extraction.md, data/jyotish-books/brihat-jataka-deep-extraction.md, data/jyotish-books/laghu-parashari-deep-extraction.md, data/jyotish-books/phaladeepika-deep-extraction.md, data/jyotish-books/saravali-deep-extraction.md, data/jyotish-books/uttara-kalamrita-deep-extraction.md
+**Diff:** +2533 -443 across 31 files
+
+### 2026-04-22 02:02
+
+**Areas:** general
+**Files (7):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, data/jyotish-books/bphs-deep-extraction.md, data/jyotish-books/brihat-jataka-deep-extraction.md, data/jyotish-books/laghu-parashari-deep-extraction.md, data/jyotish-books/phaladeepika-deep-extraction.md, data/jyotish-books/saravali-deep-extraction.md, data/jyotish-books/uttara-kalamrita-deep-extraction.md
+**Diff:** +2527 -443 across 31 files
+
+### 2026-04-22 01:47
+
+**Areas:** general
+**Files (7):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, data/jyotish-books/bphs-deep-extraction.md, data/jyotish-books/brihat-jataka-deep-extraction.md, data/jyotish-books/laghu-parashari-deep-extraction.md, data/jyotish-books/phaladeepika-deep-extraction.md, data/jyotish-books/saravali-deep-extraction.md, data/jyotish-books/uttara-kalamrita-deep-extraction.md
+**Diff:** +2521 -443 across 31 files
+
+### 2026-04-22 00:47
+
+**Areas:** general
+**Files (7):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, data/jyotish-books/bphs-deep-extraction.md, data/jyotish-books/brihat-jataka-deep-extraction.md, data/jyotish-books/laghu-parashari-deep-extraction.md, data/jyotish-books/phaladeepika-deep-extraction.md, data/jyotish-books/saravali-deep-extraction.md, data/jyotish-books/uttara-kalamrita-deep-extraction.md
+**Diff:** +2515 -443 across 30 files
+
 ### 2026-04-21 23:47
 
 **Areas:** general
