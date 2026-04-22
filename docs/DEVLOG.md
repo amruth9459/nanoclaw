@@ -5,6 +5,24 @@
 
 ---
 
+### 2026-04-22 17:58
+
+**Areas:** general
+**Files (20):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, data/jyotish-books/MASTER-REASONING-FRAMEWORK.md, data/jyotish-books/bphs-deep-extraction.md, data/jyotish-books/brihat-jataka-deep-extraction.md, data/jyotish-books/bv-raman-case-studies.md, data/jyotish-books/dasha-timing-deep-extraction.md, data/jyotish-books/kn-rao-case-studies.md, data/jyotish-books/kn-rao-jaimini-chara-dasha-deep-extraction.md, data/jyotish-books/kn-rao-karakamsha-deep-extraction.md, data/jyotish-books/kn-rao-learn-hindu-deep-extraction.md, data/jyotish-books/kn-rao-predictive-techniques-deep-extraction.md, data/jyotish-books/kn-rao-wheel-of-time-deep-extraction.md, data/jyotish-books/laghu-parashari-deep-extraction.md, data/jyotish-books/light-on-life-deep-extraction.md, data/jyotish-books/phaladeepika-deep-extraction.md, data/jyotish-books/sanjay-rath-case-studies.md, data/jyotish-books/saravali-deep-extraction.md, data/jyotish-books/uttara-kalamrita-deep-extraction.md, glowboard/deploy/install.bat, glowboard/deploy/package.json
+**Diff:** +2527 -443 across 31 files
+
+### 2026-04-22 17:22
+
+**Areas:** general
+**Files (20):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, data/jyotish-books/MASTER-REASONING-FRAMEWORK.md, data/jyotish-books/bphs-deep-extraction.md, data/jyotish-books/brihat-jataka-deep-extraction.md, data/jyotish-books/bv-raman-case-studies.md, data/jyotish-books/dasha-timing-deep-extraction.md, data/jyotish-books/kn-rao-case-studies.md, data/jyotish-books/kn-rao-jaimini-chara-dasha-deep-extraction.md, data/jyotish-books/kn-rao-karakamsha-deep-extraction.md, data/jyotish-books/kn-rao-learn-hindu-deep-extraction.md, data/jyotish-books/kn-rao-predictive-techniques-deep-extraction.md, data/jyotish-books/kn-rao-wheel-of-time-deep-extraction.md, data/jyotish-books/laghu-parashari-deep-extraction.md, data/jyotish-books/light-on-life-deep-extraction.md, data/jyotish-books/phaladeepika-deep-extraction.md, data/jyotish-books/sanjay-rath-case-studies.md, data/jyotish-books/saravali-deep-extraction.md, data/jyotish-books/uttara-kalamrita-deep-extraction.md, glowboard/deploy/install.bat, glowboard/deploy/package.json
+**Diff:** +2521 -443 across 31 files
+
+### 2026-04-22 17:21
+
+**Areas:** general
+**Files (20):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, data/jyotish-books/MASTER-REASONING-FRAMEWORK.md, data/jyotish-books/bphs-deep-extraction.md, data/jyotish-books/brihat-jataka-deep-extraction.md, data/jyotish-books/bv-raman-case-studies.md, data/jyotish-books/dasha-timing-deep-extraction.md, data/jyotish-books/kn-rao-case-studies.md, data/jyotish-books/kn-rao-jaimini-chara-dasha-deep-extraction.md, data/jyotish-books/kn-rao-karakamsha-deep-extraction.md, data/jyotish-books/kn-rao-learn-hindu-deep-extraction.md, data/jyotish-books/kn-rao-predictive-techniques-deep-extraction.md, data/jyotish-books/kn-rao-wheel-of-time-deep-extraction.md, data/jyotish-books/laghu-parashari-deep-extraction.md, data/jyotish-books/light-on-life-deep-extraction.md, data/jyotish-books/phaladeepika-deep-extraction.md, data/jyotish-books/sanjay-rath-case-studies.md, data/jyotish-books/saravali-deep-extraction.md, data/jyotish-books/uttara-kalamrita-deep-extraction.md, glowboard/deploy/install.bat, glowboard/deploy/package.json
+**Diff:** +2515 -443 across 30 files
+
 ### 2026-04-22 16:49
 
 **Areas:** general
