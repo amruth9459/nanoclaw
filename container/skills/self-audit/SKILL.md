@@ -127,3 +127,12 @@ _Next audit: tomorrow 3 AM_
 
 Use ⚠️ prefix on any line with a problem. Use 🚨 as the opener if there are critical issues (service down, repeated container failures, or security blocks).
 Send one message only. Keep under 300 words.
+
+## Related
+
+- [[SKILL|Check if any security blocks fired in the last 24h]]
+- [[2026-02-27-conversation-2240|Conversation]]
+- [[2026-02-27-conversation-1158|Conversation]]
+- [[REMOTE_SHELL_SETUP|📱 Remote Shell - Control Your Mac from Phone]]
+- [[SPEC|NanoClaw Specification]]
+- [[READY_TO_DEPLOY|🎯 Ready to Deploy - Balanced Security Mode]]

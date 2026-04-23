@@ -18,6 +18,7 @@ import * as sqliteVec from 'sqlite-vec';
 import { STORE_DIR } from './config.js';
 import { readEnvFile } from './env.js';
 import { logger } from './logger.js';
+import { validateBeforeIndex } from './semantic-index-validator.js';
 
 export { TaskType };
 
@@ -129,12 +130,28 @@ export interface IndexResult {
 
 /**
  * Index a text document. Skips chunks already indexed (by source + chunk_index).
+ * Validates content against RAG poisoning attacks before indexing.
  */
 export async function indexDocument(
   source: string,
   groupFolder: string,
   content: string,
+  options: { sourceUrl?: string; skipValidation?: boolean } = {},
 ): Promise<IndexResult> {
+  // RAG Poisoning Defense: validate content before indexing
+  if (!options.skipValidation) {
+    const validation = validateBeforeIndex(content, source, { sourceUrl: options.sourceUrl });
+    if (!validation.safe) {
+      logger.warn({
+        source,
+        groupFolder,
+        riskScore: validation.riskScore,
+        threats: validation.threats.map(t => t.type),
+      }, 'RAG validation blocked document indexing');
+      return { source, chunksIndexed: 0, chunksSkipped: 0 };
+    }
+  }
+
   const db = openVecDb();
   const chunks = chunkText(content);
   let indexed = 0;
@@ -224,17 +241,36 @@ export async function indexGroupFiles(groupFolder: string): Promise<void> {
   const GROUPS_DIR = path.join(process.cwd(), 'groups');
   const groupDir = path.join(GROUPS_DIR, groupFolder);
 
-  // OCR output JSON files
+  // Output files (OCR JSON + plain text knowledge)
   const ocrDir = path.join(groupDir, 'output');
   if (fs.existsSync(ocrDir)) {
-    for (const file of fs.readdirSync(ocrDir).filter(f => f.endsWith('.json'))) {
+    // Recursively find indexable files in output/ and subdirectories
+    const walkDir = (dir: string): string[] => {
+      const files: string[] = [];
+      for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+        const fullPath = path.join(dir, entry.name);
+        if (entry.isDirectory()) {
+          files.push(...walkDir(fullPath));
+        } else if (entry.name.endsWith('.json') || entry.name.endsWith('.txt')) {
+          files.push(fullPath);
+        }
+      }
+      return files;
+    };
+    for (const fullPath of walkDir(ocrDir)) {
+      const relPath = path.relative(ocrDir, fullPath);
       try {
-        const content = fs.readFileSync(path.join(ocrDir, file), 'utf-8');
-        const parsed = JSON.parse(content);
-        const text = parsed.text || content;
-        await indexDocument(`${groupFolder}/output/${file}`, groupFolder, text);
+        const content = fs.readFileSync(fullPath, 'utf-8');
+        let text: string;
+        if (fullPath.endsWith('.json')) {
+          const parsed = JSON.parse(content);
+          text = parsed.text || content;
+        } else {
+          text = content;
+        }
+        await indexDocument(`${groupFolder}/output/${relPath}`, groupFolder, text);
       } catch (err) {
-        logger.warn({ file, err }, 'Failed to index OCR file');
+        logger.warn({ file: relPath, err }, 'Failed to index output file');
       }
     }
   }

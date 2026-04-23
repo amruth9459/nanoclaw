@@ -625,3 +625,12 @@ npm run dev
 # or
 node dist/index.js
 ```
+
+## Related
+
+- [[SECURITY|NanoClaw Security Model]]
+- [[REQUIREMENTS|NanoClaw Requirements]]
+- [[security-review-remote-shell|Security Review: remote_shell MCP Tool]]
+- [[MEMORY|Memory - Main Group]]
+- [[2026-04-07-conversation-2232|Conversation]]
+- [[nanoclaw-whatsapp-integration|NanoClaw WhatsApp Integration]]

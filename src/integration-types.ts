@@ -15,7 +15,7 @@ export interface IntegrationContext {
   registerGroup: (jid: string, group: RegisteredGroup) => void;
   channels: Channel[];
   queue: GroupQueue;
-  sendMessage: (jid: string, text: string) => Promise<void>;
+  sendMessage: (jid: string, text: string, senderName?: string) => Promise<void>;
 }
 
 export interface ValidationResult {
@@ -53,7 +53,7 @@ export interface ChannelConfig {
 }
 
 export interface IpcHandlerContext {
-  sendMessage: (jid: string, text: string) => Promise<void>;
+  sendMessage: (jid: string, text: string, senderName?: string) => Promise<void>;
   registeredGroups: () => Record<string, RegisteredGroup>;
   registerGroup: (jid: string, group: RegisteredGroup) => void;
 }
@@ -70,6 +70,12 @@ export interface NanoClawIntegration {
   /** Returns true if this integration owns the given group folder */
   ownsGroup?(folder: string): boolean;
 
+  /**
+   * Handle a scheduled task host-side (no container/LLM needed).
+   * Return a result string if handled, or undefined to fall through to container execution.
+   */
+  handleScheduledTask?(taskId: string, chatJid: string, sendMessage: (jid: string, text: string, senderName?: string) => Promise<void>, sendMessageGetId: (jid: string, text: string, senderName?: string) => Promise<string | undefined>): Promise<string | undefined>;
+
   /** Set of IPC message type strings this integration handles */
   ipcMessageTypes?: Set<string>;
 
@@ -79,6 +85,12 @@ export interface NanoClawIntegration {
     groupFolder: string,
     ctx: IpcHandlerContext,
   ): Promise<void>;
+
+  /** Handle a WhatsApp reaction on a message */
+  handleReaction?(chatJid: string, reactedMessageId: string, senderJid: string, emoji: string): Promise<void>;
+
+  /** Handle a quote-reply to a message. Return true if handled (prevents normal processing). */
+  handleQuoteReply?(chatJid: string, quotedMessageId: string, message: NewMessage): Promise<boolean>;
 
   /**
    * Called each message loop tick. Returns JIDs to enqueue for processing.
@@ -148,6 +160,8 @@ export interface NanoClawIntegration {
     folder: string;
     trigger: string;
     requiresTrigger: boolean;
+    displayName?: string;
+    containerConfig?: import('./types.js').ContainerConfig;
   }>;
 
   /** Contribute to the main group kanban context summary */

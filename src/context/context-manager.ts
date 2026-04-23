@@ -12,6 +12,7 @@ import { codedContext, CodedFact, setSystemFact, learnFact } from './codified-co
 import { semanticSearch, SearchResult, indexConversationTurn } from './semantic-search.js';
 import { perplexity, PerplexityResult } from './perplexity-integration.js';
 import { MAIN_GROUP_FOLDER } from '../config.js';
+import { logger } from '../logger.js';
 
 export interface ContextQuery {
   query: string;
@@ -85,22 +86,26 @@ export class ContextManager {
 
     // TIER 3: Real-time web search (if allowed)
     if (allowWebSearch && perplexity.isConfigured()) {
-      const tier3Result = await this.queryTier3(options.query, options.preferRecent);
+      try {
+        const tier3Result = await this.queryTier3(options.query, options.preferRecent);
 
-      // Index the result for future tier 2 retrieval
-      await this.indexPerplexityResult(options.query, tier3Result);
+        // Index the result for future tier 2 retrieval
+        await this.indexPerplexityResult(options.query, tier3Result);
 
-      // Extract high-confidence facts for tier 1
-      await this.extractFactsFromPerplexity(tier3Result);
+        // Extract high-confidence facts for tier 1
+        await this.extractFactsFromPerplexity(tier3Result);
 
-      return {
-        answer: tier3Result.answer,
-        tier: 3,
-        confidence: 0.8, // Perplexity results are generally reliable
-        sources: tier3Result.sources.map(s => s.url),
-        perplexityResult: tier3Result,
-        latencyMs: Date.now() - startTime,
-      };
+        return {
+          answer: tier3Result.answer,
+          tier: 3,
+          confidence: 0.8, // Perplexity results are generally reliable
+          sources: tier3Result.sources.map(s => s.url),
+          perplexityResult: tier3Result,
+          latencyMs: Date.now() - startTime,
+        };
+      } catch (err) {
+        logger.warn({ err }, 'Tier 3 (Perplexity) search failed, falling through');
+      }
     }
 
     // No results found in any tier

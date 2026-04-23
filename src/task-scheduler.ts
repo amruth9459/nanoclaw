@@ -10,7 +10,8 @@ import {
   SCHEDULER_POLL_INTERVAL,
   TIMEZONE,
 } from './config.js';
-import { ContainerOutput, runContainerAgent, writeTasksSnapshot } from './container-runner.js';
+import { ContainerInput, ContainerOutput, runContainerAgent, writeTasksSnapshot } from './container-runner.js';
+import { runHostClaudeAgent, shouldUseHostRunner } from './host-runner.js';
 import {
   getAllTasks,
   getDueTasks,
@@ -33,7 +34,8 @@ export interface SchedulerDependencies {
   queue: GroupQueue;
   orchestrator?: ResourceOrchestrator;
   onProcess: (groupJid: string, proc: ChildProcess, containerName: string, groupFolder: string) => void;
-  sendMessage: (jid: string, text: string) => Promise<void>;
+  sendMessage: (jid: string, text: string, senderName?: string) => Promise<void>;
+  sendMessageGetId?: (jid: string, text: string, senderName?: string) => Promise<string | undefined>;
 }
 
 async function runTask(
@@ -90,6 +92,46 @@ async function runTask(
   let result: string | null = null;
   let error: string | null = null;
 
+  // Check if an integration handles this task host-side (no container needed)
+  for (const integration of getIntegrations()) {
+    if (integration.ownsGroup?.(task.group_folder) && integration.handleScheduledTask) {
+      try {
+        const sendGetId = deps.sendMessageGetId ?? (async (jid: string, text: string, senderName?: string) => {
+          await deps.sendMessage(jid, text, senderName);
+          return undefined;
+        });
+        const hostResult = await integration.handleScheduledTask(
+          task.id, task.chat_jid, deps.sendMessage, sendGetId,
+        );
+        if (hostResult !== undefined) {
+          result = hostResult;
+          const durationMs = Date.now() - startTime;
+          logTaskRun({ task_id: task.id, run_at: new Date().toISOString(), duration_ms: durationMs, status: 'success', result, error: null });
+          let nextRun: string | null = null;
+          if (task.schedule_type === 'cron') {
+            const interval = CronExpressionParser.parse(task.schedule_value, { tz: TIMEZONE });
+            nextRun = interval.next().toISOString();
+          }
+          updateTaskAfterRun(task.id, nextRun, result.slice(0, 200));
+          logger.info({ taskId: task.id, durationMs }, 'Task completed host-side');
+          return;
+        }
+      } catch (err) {
+        error = err instanceof Error ? err.message : String(err);
+        logger.error({ taskId: task.id, error }, 'Host-side task failed');
+        const durationMs = Date.now() - startTime;
+        logTaskRun({ task_id: task.id, run_at: new Date().toISOString(), duration_ms: durationMs, status: 'error', result: null, error });
+        let nextRun: string | null = null;
+        if (task.schedule_type === 'cron') {
+          const interval = CronExpressionParser.parse(task.schedule_value, { tz: TIMEZONE });
+          nextRun = interval.next().toISOString();
+        }
+        updateTaskAfterRun(task.id, nextRun, `Error: ${error}`);
+        return;
+      }
+    }
+  }
+
   // Track task agent lifecycle in orchestrator
   const taskDesignation = task.id.includes('bounty-hunter') ? 'bounty' : 'task';
   let orchType = 'nanoclaw';
@@ -130,54 +172,72 @@ async function runTask(
   deps.queue.setSpawnReason(task.chat_jid, taskPreview, true);
   deps.queue.setDesignation(task.chat_jid, taskDesignation, true);
 
+  // Build common input for both runners
+  const taskInput: ContainerInput = {
+    prompt: task.prompt,
+    sessionId,
+    groupFolder: task.group_folder,
+    chatJid: task.chat_jid,
+    isMain,
+    isScheduledTask: true,
+    designation: taskDesignation,
+    maxTurns: 25,  // Prevent runaway — 25 turns is plenty for any scheduled task
+  };
+
+  const useHost = shouldUseHostRunner(task.group_folder);
+  logger.info({ taskId: task.id, useHost }, 'Task runner selected');
+
   try {
-    const output = await runContainerAgent(
-      group,
-      {
-        prompt: task.prompt,
-        sessionId,
-        groupFolder: task.group_folder,
-        chatJid: task.chat_jid,
-        isMain,
-        isScheduledTask: true,
-        designation: taskDesignation,
-      },
-      (proc, containerName) => deps.onProcess(task.chat_jid, proc, containerName, task.group_folder),
-      async (streamedOutput: ContainerOutput) => {
-        if (streamedOutput.result) {
-          result = streamedOutput.result;
-          // Forward result to user (sendMessage handles formatting)
-          await deps.sendMessage(task.chat_jid, streamedOutput.result);
-          scheduleClose();
-        }
-        if (streamedOutput.status === 'success') {
-          // Track usage/cost for scheduled tasks (same as user messages)
-          if (streamedOutput.usage && !streamedOutput.isPartial) {
-            const costUsd = calculateCost(streamedOutput.usage);
-            const durationMs = Date.now() - startTime;
-            const purpose = task.id.includes('bounty-hunter') ? 'bounty' : 'task';
-            logUsage(task.group_folder, task.chat_jid, streamedOutput.usage, durationMs, true, costUsd, purpose);
-            logger.info({ taskId: task.id, costUsd, usage: streamedOutput.usage }, 'Task cost tracked');
+    let output: ContainerOutput;
+
+    if (useHost) {
+      // Host runner — main group trusted tasks run via Claude Code CLI
+      output = await runHostClaudeAgent(
+        group,
+        taskInput,
+        (proc, name) => deps.onProcess(task.chat_jid, proc, name, task.group_folder),
+      );
+    } else {
+      // Container runner — sandboxed execution with streaming callback
+      output = await runContainerAgent(
+        group,
+        taskInput,
+        (proc, containerName) => deps.onProcess(task.chat_jid, proc, containerName, task.group_folder),
+        async (streamedOutput: ContainerOutput) => {
+          if (streamedOutput.result && !streamedOutput.isPartial) {
+            result = streamedOutput.result;
+            await deps.sendMessage(task.chat_jid, streamedOutput.result);
+            scheduleClose();
+          } else if (streamedOutput.result && streamedOutput.isPartial) {
+            result = streamedOutput.result;
           }
-          deps.queue.notifyIdle(task.chat_jid);
-        }
-        if (streamedOutput.status === 'error') {
-          error = streamedOutput.error || 'Unknown error';
-        }
-      },
-    );
+          if (streamedOutput.status === 'success') {
+            if (streamedOutput.usage && !streamedOutput.isPartial) {
+              const costUsd = calculateCost(streamedOutput.usage);
+              const durationMs = Date.now() - startTime;
+              const purpose = task.id.includes('bounty-hunter') ? 'bounty' : 'task';
+              logUsage(task.group_folder, task.chat_jid, streamedOutput.usage, durationMs, true, costUsd, purpose);
+              logger.info({ taskId: task.id, costUsd, usage: streamedOutput.usage }, 'Task cost tracked');
+            }
+            deps.queue.notifyIdle(task.chat_jid);
+          }
+          if (streamedOutput.status === 'error') {
+            error = streamedOutput.error || 'Unknown error';
+          }
+        },
+      );
+    }
 
     if (closeTimer) clearTimeout(closeTimer);
 
     if (output.status === 'error') {
       error = output.error || 'Unknown error';
     } else if (output.result) {
-      // Messages are sent via MCP tool (IPC), result text is just logged
       result = output.result;
     }
 
     logger.info(
-      { taskId: task.id, durationMs: Date.now() - startTime },
+      { taskId: task.id, useHost, durationMs: Date.now() - startTime },
       'Task completed',
     );
   } catch (err) {
