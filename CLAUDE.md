@@ -18,8 +18,14 @@ Single Node.js process that connects to WhatsApp, routes messages to Claude Agen
 | `src/container-runner.ts` | Spawns agent containers with mounts |
 | `src/task-scheduler.ts` | Runs scheduled tasks |
 | `src/db.ts` | SQLite operations |
+| `src/conversation-history.ts` | Thread-scoped chat history for RAG chains |
+| `src/rag-chain.ts` | RAG query pipeline (contextualize → search → generate) |
+| `src/semantic-index.ts` | Vector storage + Gemini embeddings (768 dims) |
 | `groups/{name}/CLAUDE.md` | Per-group memory (isolated) |
 | `container/skills/agent-browser.md` | Browser automation tool (available to all agents via Bash) |
+| `docs/EXPERIMENTS.md` | Experiment log (read before starting experiments) |
+| `docs/journal/` | Auto-generated daily journals |
+| `~/Brain/` | Obsidian vault — shared knowledge (symlinked to NanoClaw) |
 
 ## Skills
 
@@ -28,6 +34,8 @@ Single Node.js process that connects to WhatsApp, routes messages to Claude Agen
 | `/setup` | First-time installation, authentication, service configuration |
 | `/customize` | Adding channels, integrations, changing behavior |
 | `/debug` | Container issues, logs, troubleshooting |
+| `/resume` | Deep session recovery — pick up where you left off |
+| `/wrap-up` | Structured session end — create handoff for next session |
 
 ## Development
 
@@ -73,6 +81,30 @@ When you discover something non-obvious that would help future sessions:
 - **NanoClaw learnings** → add to `groups/main/MEMORY.md` under `## Learned Facts` as `- **topic:** detail`
 - **Lexios learnings** → add to `~/Lexios/docs/LEARNINGS.md` under `## Learned Facts` as `- **topic:** detail`
 These feed into Claw's hot cache and benefit both desktop and container agents.
+
+## RAG Query (MCP Tool)
+
+The `rag_query` MCP tool provides conversational RAG over indexed documents. Available to all container agents.
+
+**Usage:**
+```
+rag_query(query: "What are the door specs?", thread_id: "session-123", top_k: 5)
+```
+
+**How it works:**
+1. Loads conversation history for `thread_id` (if provided)
+2. Contextualizes the query using chat history (Gemini Flash)
+3. Semantic search via sqlite-vec for relevant chunks
+4. Generates answer with source citations (Gemini Flash)
+5. Saves user/assistant turns to conversation history
+
+**Parameters:**
+- `query` (required): Natural language question
+- `thread_id` (optional): Reuse for follow-up questions in same conversation
+- `top_k` (optional, default 5): Number of source chunks to retrieve
+- `group_folder` (optional): Limit search to a specific group
+
+**IPC flow:** Container writes `.search.json` → host processes via `ragQuery()` → writes `.result.json` back.
 
 ## Integration Boundary
 
