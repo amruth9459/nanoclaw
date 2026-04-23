@@ -22,7 +22,7 @@ import {
 } from '../db.js';
 import { validateFileType } from '../file-validation.js';
 import { logger } from '../logger.js';
-import { Channel, OnInboundMessage, OnChatMetadata, RegisteredGroup } from '../types.js';
+import { Channel, OnInboundMessage, OnChatMetadata, RegisteredGroup, UIMetadata } from '../types.js';
 
 const GROUP_SYNC_INTERVAL_MS = 24 * 60 * 60 * 1000; // 24 hours
 
@@ -53,6 +53,8 @@ export interface WhatsAppChannelOpts {
   primary?: boolean;
   /** Called when connection is restored after being down for > 30s */
   onReconnect?: (downMs: number) => void;
+  /** Called when a user reacts to a message with an emoji */
+  onReaction?: (chatJid: string, messageId: string, senderJid: string, emoji: string) => void;
 }
 
 export class WhatsAppChannel implements Channel {
@@ -180,7 +182,8 @@ export class WhatsAppChannel implements Channel {
         exec(
           `osascript -e 'display notification "${msg}" with title "NanoClaw" sound name "Basso"'`,
         );
-        setTimeout(() => process.exit(1), 1000);
+        onFirstFail?.(new Error(msg));
+        onFirstFail = undefined;
       }
 
       if (connection === 'close') {
@@ -194,8 +197,9 @@ export class WhatsAppChannel implements Channel {
           this.scheduleReconnect();
         } else {
           logger.info({ channel: this.name }, 'Logged out. Run /setup to re-authenticate.');
-          if (this.isPrimary) process.exit(0);
-          // Secondary: just stop — don't bring down the whole process
+          // Don't crash process — let API/terminal keep running in degraded mode
+          onFirstFail?.(new Error(`${this.name}: logged out — run /setup to re-authenticate`));
+          onFirstFail = undefined;
         }
       } else if (connection === 'open') {
         this.connected = true;
@@ -304,13 +308,28 @@ export class WhatsAppChannel implements Channel {
         const inRegisteredGroup = Boolean(groups[chatJid]);
 
         // Extract text content for registered groups and for mention detection
-        const content =
-          msg.message?.conversation ||
-          msg.message?.extendedTextMessage?.text ||
-          msg.message?.imageMessage?.caption ||
-          msg.message?.videoMessage?.caption ||
-          msg.message?.documentMessage?.caption ||
-          '';
+        // Button/list responses are translated to "[button_id] display_text" so agents see actionable text
+        const buttonsResponse = msg.message?.buttonsResponseMessage;
+        const listResponse = msg.message?.listResponseMessage;
+
+        let content: string;
+        if (buttonsResponse) {
+          const btnId = buttonsResponse.selectedButtonId || '';
+          const btnText = buttonsResponse.selectedDisplayText || '';
+          content = `[${btnId}] ${btnText}`.trim();
+        } else if (listResponse) {
+          const rowId = listResponse.singleSelectReply?.selectedRowId || '';
+          const rowTitle = listResponse.title || '';
+          content = `[${rowId}] ${rowTitle}`.trim();
+        } else {
+          content =
+            msg.message?.conversation ||
+            msg.message?.extendedTextMessage?.text ||
+            msg.message?.imageMessage?.caption ||
+            msg.message?.videoMessage?.caption ||
+            msg.message?.documentMessage?.caption ||
+            '';
+        }
 
         // For non-registered chats: only proceed if open mentions is on and
         // the message @-mentions the assistant (text-only, no media download)
@@ -428,20 +447,48 @@ export class WhatsAppChannel implements Channel {
             media_path: effectiveMedia?.path ?? null,
             media_mimetype: effectiveMedia?.mimetype ?? null,
             media_size: effectiveMedia?.size ?? null,
+            quoted_message_id: contextInfo?.stanzaId ?? undefined,
           }, this.name);
         }
       }
     });
+
+    // Listen for emoji reactions on messages
+    this.sock.ev.on('messages.reaction', (reactions) => {
+      if (!this.opts.onReaction) return;
+      for (const { key, reaction } of reactions) {
+        if (!key.remoteJid || !key.id || !reaction.text) continue;
+        // reaction.key.participant is the sender of the reaction
+        const senderJid = reaction.key?.participant || reaction.key?.remoteJid || '';
+        this.translateJid(key.remoteJid).then((chatJid) => {
+          const resolveAndNotify = async () => {
+            const resolvedSender = senderJid.endsWith('@lid')
+              ? await this.translateJid(senderJid)
+              : senderJid;
+            this.opts.onReaction!(chatJid, key.id!, resolvedSender, reaction.text!);
+          };
+          resolveAndNotify().catch((err) =>
+            logger.warn({ err, chatJid: key.remoteJid }, 'Error processing reaction'),
+          );
+        });
+      }
+    });
   }
 
-  async sendMessage(jid: string, text: string): Promise<void> {
-    // Prefix bot messages with assistant name so users know who's speaking.
+  /** Last sent message ID (captured for IPC responseFile) */
+  private lastSentMessageId: string | undefined;
+
+  async sendMessage(jid: string, text: string, senderName?: string): Promise<void> {
+    // Prefix bot messages with display name so users know who's speaking.
     // On a shared number, prefix is also needed in DMs (including self-chat)
     // to distinguish bot output from user messages.
     // Skip only when the assistant has its own dedicated phone number.
+    const displayPrefix = senderName || ASSISTANT_NAME;
     const prefixed = ASSISTANT_HAS_OWN_NUMBER
       ? text
-      : `${ASSISTANT_NAME}: ${text}`;
+      : `${displayPrefix}: ${text}`;
+
+    this.lastSentMessageId = undefined;
 
     if (!this.connected) {
       this.outgoingQueue.push({ jid, text: prefixed });
@@ -449,14 +496,20 @@ export class WhatsAppChannel implements Channel {
       return;
     }
     try {
-      await this.sock.sendMessage(jid, { text: prefixed });
+      const sentMsg = await this.sock.sendMessage(jid, { text: prefixed });
+      this.lastSentMessageId = sentMsg?.key?.id ?? undefined;
       this.resetWatchdog(true); // outgoing message proves connection is alive
-      logger.info({ jid, length: prefixed.length }, 'Message sent');
+      logger.info({ jid, length: prefixed.length, messageId: this.lastSentMessageId }, 'Message sent');
     } catch (err) {
       // If send fails, queue it for retry on reconnect (transient during initial sync)
       this.outgoingQueue.push({ jid, text: prefixed });
       logger.info({ jid, err, queueSize: this.outgoingQueue.length }, 'Failed to send, message queued for retry');
     }
+  }
+
+  /** Get the message ID from the last sendMessage call */
+  getLastSentMessageId(): string | undefined {
+    return this.lastSentMessageId;
   }
 
   async sendFile(jid: string, buffer: Buffer, mimetype: string, filename: string, caption?: string): Promise<void> {
@@ -489,6 +542,46 @@ export class WhatsAppChannel implements Channel {
       await this.sock.sendMessage(jid, { document: buffer, mimetype, fileName: filename, caption: caption ?? '' });
     }
     logger.info({ jid, filename, mimetype, bytes: buffer.length }, 'File sent');
+  }
+
+  async sendInteractiveMessage(jid: string, ui: UIMetadata, senderName?: string): Promise<void> {
+    const displayPrefix = senderName || ASSISTANT_NAME;
+
+    if (!this.connected) {
+      // Fallback: queue as plain text with button labels
+      const buttonList = ui.buttons.map(b => `• ${b.title}`).join('\n');
+      const fallback = `${ui.body}\n\n${buttonList}${ui.footer ? '\n\n' + ui.footer : ''}`;
+      const prefixed = ASSISTANT_HAS_OWN_NUMBER ? fallback : `${displayPrefix}: ${fallback}`;
+      this.outgoingQueue.push({ jid, text: prefixed });
+      logger.info({ jid, queueSize: this.outgoingQueue.length }, 'WA disconnected, interactive message queued as text');
+      return;
+    }
+
+    try {
+      // WhatsApp interactive buttons via baileys proto
+      const buttonRows = ui.buttons.map((b) => ({
+        buttonId: b.id,
+        buttonText: { displayText: b.title },
+        type: 1 as const,
+      }));
+
+      const bodyPrefix = ASSISTANT_HAS_OWN_NUMBER ? '' : `${displayPrefix}: `;
+
+      await this.sock.sendMessage(jid, {
+        text: `${bodyPrefix}${ui.body}${ui.footer ? '\n\n' + ui.footer : ''}`,
+        buttons: buttonRows,
+        headerType: 1,
+      } as any); // baileys types don't fully expose buttons in the TS SDK
+
+      this.resetWatchdog(true);
+      logger.info({ jid, buttonCount: ui.buttons.length }, 'Interactive button message sent');
+    } catch (err) {
+      // Fallback: send as plain text if interactive message fails
+      logger.warn({ jid, err }, 'Interactive message failed, falling back to text');
+      const buttonList = ui.buttons.map(b => `[${b.id}] ${b.title}`).join('\n');
+      const fallback = `${ui.body}\n\n${buttonList}${ui.footer ? '\n\n' + ui.footer : ''}`;
+      await this.sendMessage(jid, fallback, senderName);
+    }
   }
 
   isConnected(): boolean {

@@ -1,4 +1,4 @@
-import { createHash } from 'crypto';
+import crypto, { createHash } from 'crypto';
 import fs from 'fs';
 import path from 'path';
 import Database from 'better-sqlite3';
@@ -6,6 +6,7 @@ import Database from 'better-sqlite3';
 import { CronExpressionParser } from 'cron-parser';
 
 import {
+  BRAIN_VAULT_PATH,
   DATA_DIR,
   GROUPS_DIR,
   IPC_POLL_INTERVAL,
@@ -36,13 +37,21 @@ import { HitlGate } from './hitl.js';
 import { getIntegration } from './integration-loader.js';
 import { logger } from './logger.js';
 import { indexDocument, semanticSearch } from './semantic-index.js';
-import { RegisteredGroup } from './types.js';
+import { ragQuery } from './rag-chain.js';
+import { sanitizeWebContent, detectPromptInjection } from './content-filter.js';
+import { spawnGate } from './spawn-gate.js';
+import { RegisteredGroup, UIMetadata } from './types.js';
 import { processIdentityIpc, signOutgoingMessage, recordUnsignedMessage } from './identity/ipc-handlers.js';
+import { handleCompetitiveIntelIpc } from './competitive-intel/ipc-handler.js';
+import { handleAutoresearchIpc } from './autoresearch/ipc-handler.js';
 
 export interface IpcDeps {
-  sendMessage: (jid: string, text: string) => Promise<void>;
+  sendMessage: (jid: string, text: string, senderName?: string) => Promise<void>;
+  /** Like sendMessage but returns the WhatsApp message ID. Used for IPC responseFile. */
+  sendMessageGetId?: (jid: string, text: string, senderName?: string) => Promise<string | undefined>;
   sendReaction?: (jid: string, messageId: string, senderJid: string, emoji: string) => Promise<void>;
   sendFile?: (jid: string, buffer: Buffer, mimetype: string, filename: string, caption?: string) => Promise<void>;
+  sendInteractiveMessage?: (jid: string, ui: UIMetadata, senderName?: string) => Promise<void>;
   registeredGroups: () => Record<string, RegisteredGroup>;
   registerGroup: (jid: string, group: RegisteredGroup) => void;
   syncGroupMetadata: (force: boolean) => Promise<void>;
@@ -178,7 +187,7 @@ export function startIpcWatcher(deps: IpcDeps): void {
         // ── Semantic search / index requests ─────────────────────────────────
         try {
           const searchFiles = fs.readdirSync(groupIpcDir)
-            .filter(f => f.endsWith('.search.json') || f.endsWith('.index.json'));
+            .filter(f => f.endsWith('.search.json') || f.endsWith('.index.json') || f.endsWith('.jyotish.json'));
           for (const file of searchFiles) {
             const filePath = path.join(groupIpcDir, file);
             try {
@@ -192,8 +201,21 @@ export function startIpcWatcher(deps: IpcDeps): void {
                 });
                 const rawRF = req.responseFile as string;
                 const responseFile = toHostIpcPath(rawRF, sourceGroup);
-                const response = results
-                  ? { results }
+
+                // Content Sanitization: scrub RAG results before returning to agent
+                let sanitizedResults = results;
+                if (results) {
+                  sanitizedResults = results.map(r => {
+                    const result = sanitizeWebContent(r.content, { sourceUrl: r.source });
+                    if (!result.safe) {
+                      logger.warn({ source: r.source, riskScore: result.riskScore }, 'RAG result sanitized — high risk content');
+                    }
+                    return { ...r, content: result.sanitized };
+                  });
+                }
+
+                const response = sanitizedResults
+                  ? { results: sanitizedResults }
                   : { error: 'Search failed — check ANTHROPIC_API_KEY and index status' };
                 fs.mkdirSync(path.dirname(responseFile), { recursive: true });
                 fs.writeFileSync(responseFile + '.tmp', JSON.stringify(response));
@@ -202,6 +224,71 @@ export function startIpcWatcher(deps: IpcDeps): void {
                 indexDocument(req.source, req.groupFolder, req.content).catch(err =>
                   logger.warn({ source: req.source, err }, 'Background indexing failed'),
                 );
+              } else if (req.type === 'rag_query') {
+                const rawRF = req.responseFile as string;
+                const responseFile = toHostIpcPath(rawRF, sourceGroup);
+                ragQuery(req.query, req.threadId, req.topK ?? 5, req.groupFolder)
+                  .then(result => {
+                    const response = { answer: result.answer, sources: result.sources, contextualizedQuery: result.contextualizedQuery };
+                    fs.mkdirSync(path.dirname(responseFile), { recursive: true });
+                    fs.writeFileSync(responseFile + '.tmp', JSON.stringify(response));
+                    fs.renameSync(responseFile + '.tmp', responseFile);
+                  })
+                  .catch(err => {
+                    logger.warn({ err, query: req.query }, 'RAG query failed');
+                    fs.mkdirSync(path.dirname(responseFile), { recursive: true });
+                    fs.writeFileSync(responseFile + '.tmp', JSON.stringify({ error: 'RAG query failed' }));
+                    fs.renameSync(responseFile + '.tmp', responseFile);
+                  });
+              } else if (req.type === 'jyotish_calculate' || req.type === 'compatibility' || req.type === 'interpret') {
+                const rawRF = req.responseFile as string;
+                const responseFile = toHostIpcPath(rawRF, sourceGroup);
+                const { spawn } = await import('child_process');
+                const venvPython = path.join(process.env.HOME ?? '', 'nanoclaw/services/jyotish/.venv/bin/python3');
+                const enginePath = path.join(process.env.HOME ?? '', 'nanoclaw/services/jyotish/engine.py');
+                // Build input — compatibility and interpret pass type through, chart strips it
+                const { requestId: _rid, responseFile: _rf, ...reqFields } = req;
+                const input = (req.type === 'compatibility' || req.type === 'interpret')
+                  ? JSON.stringify(reqFields)
+                  : JSON.stringify({
+                    year: req.year, month: req.month, day: req.day,
+                    hour: req.hour, minute: req.minute, second: req.second ?? 0,
+                    place_name: req.place_name ?? '', latitude: req.latitude, longitude: req.longitude,
+                    timezone_offset: req.timezone_offset, ayanamsa: req.ayanamsa ?? 'LAHIRI',
+                    divisional_charts: req.divisional_charts,
+                    analyses: req.analyses,
+                  });
+                const procTimeout = req.type === 'interpret' ? 90000 : 60000;
+                const proc = spawn(venvPython, [enginePath, '--ipc'], { timeout: procTimeout });
+                let stdout = '';
+                let stderr = '';
+                proc.stdout.on('data', (d: Buffer) => { stdout += d.toString(); });
+                proc.stderr.on('data', (d: Buffer) => { stderr += d.toString(); });
+                proc.stdin.write(input);
+                proc.stdin.end();
+                proc.on('close', (code: number | null) => {
+                  try {
+                    if (code === 0 && stdout) {
+                      // Find the JSON object in stdout (skip PyJHora path spam)
+                      const jsonStart = stdout.indexOf('{');
+                      const json = jsonStart >= 0 ? stdout.slice(jsonStart) : stdout;
+                      const result = JSON.parse(json);
+                      fs.mkdirSync(path.dirname(responseFile), { recursive: true });
+                      fs.writeFileSync(responseFile + '.tmp', JSON.stringify(result));
+                      fs.renameSync(responseFile + '.tmp', responseFile);
+                    } else {
+                      logger.warn({ code, stderr: stderr.slice(0, 500) }, 'Jyotish calculation failed');
+                      fs.mkdirSync(path.dirname(responseFile), { recursive: true });
+                      fs.writeFileSync(responseFile + '.tmp', JSON.stringify({ error: `Jyotish failed (code ${code}): ${stderr.slice(0, 200)}` }));
+                      fs.renameSync(responseFile + '.tmp', responseFile);
+                    }
+                  } catch (err) {
+                    logger.warn({ err, stdout: stdout.slice(0, 200) }, 'Jyotish parse error');
+                    fs.mkdirSync(path.dirname(responseFile), { recursive: true });
+                    fs.writeFileSync(responseFile + '.tmp', JSON.stringify({ error: 'Failed to parse jyotish output' }));
+                    fs.renameSync(responseFile + '.tmp', responseFile);
+                  }
+                });
               }
             } catch (err) {
               logger.warn({ file, sourceGroup, err }, 'Error processing semantic IPC file');
@@ -230,6 +317,8 @@ export function startIpcWatcher(deps: IpcDeps): void {
                   'task_tool', 'gsd_tool', 'gmail_cleanup', 'shared_items',
                   'token_refresh',
                   'generate_safety_brief', 'monitoring_log',
+                  'autoresearch',
+                  'competitive_intel_check',
                 ]);
 
                 // ── Identity IPC handlers ─────────────────────────────────
@@ -596,6 +685,49 @@ export function startIpcWatcher(deps: IpcDeps): void {
                   continue;
                 }
 
+                // ── Spawn Gate Approval (HITL for Task/TeamCreate after web content) ──
+                if (data.type === 'spawn_gate_approval' && data.responseFile) {
+                  const responseFile = toHostIpcPath(data.responseFile as string, sourceGroup);
+                  const mainJid = deps.getMainGroupJid?.();
+                  if (!mainJid) {
+                    logger.warn({ sourceGroup }, 'spawn_gate_approval: no main JID, auto-denying');
+                    writeIpcResponse(responseFile, { approved: false, reason: 'Main group JID not configured' });
+                    fs.unlinkSync(filePath);
+                    continue;
+                  }
+
+                  const toolName = data.toolName as string || 'Unknown';
+                  const description = data.description as string || '';
+                  const lowTrust = data.lowTrustSource as { url?: string; domain?: string; trustScore?: number } | undefined;
+                  const domain = lowTrust?.domain || 'unknown';
+                  const trustScore = lowTrust?.trustScore ?? 0;
+
+                  // Register with the spawn gate's own approval mechanism
+                  // (can't use HitlGate because rejection also needs to write a response)
+                  const token = crypto.randomBytes(4).toString('hex');
+                  spawnGateApprovals.set(token, { responseFile, toolName, sourceGroup, expiresAt: Date.now() + 120_000 });
+
+                  const preview = description.length > 200 ? description.slice(0, 200) + '...' : description;
+                  const msg = [
+                    '\u{1F6E1}\uFE0F *Spawn Gate — Approval Required*',
+                    '',
+                    `Agent wants to spawn *${toolName}* after fetching from a low-trust source.`,
+                    '',
+                    `*Source:* \`${domain}\` (Trust: ${trustScore}%)`,
+                    `*Agent:* ${sourceGroup}`,
+                    `*Action:* ${preview}`,
+                    '',
+                    `Reply *approve-spawn ${token}* to allow, or *reject-spawn ${token}* to block.`,
+                    `_(expires in 2 minutes)_`,
+                  ].join('\n');
+
+                  await deps.sendMessage(mainJid, msg);
+                  logger.info({ sourceGroup, toolName, domain, token }, 'Spawn gate: approval requested');
+
+                  fs.unlinkSync(filePath);
+                  continue;
+                }
+
                 if (data.type === 'react' && data.chatJid && data.messageId && data.emoji) {
                   // Authorization: non-main groups can only react in their own JID
                   const reactTargetGroup = registeredGroups[data.chatJid as string];
@@ -625,6 +757,12 @@ export function startIpcWatcher(deps: IpcDeps): void {
                 if (data.type === 'message' && data.chatJid && data.text) {
                   // Authorization: verify this group can send to this chatJid
                   const targetGroup = registeredGroups[data.chatJid];
+                  // Look up displayName for the source group (for custom bot prefix)
+                  const sourceGroupEntry = Object.values(registeredGroups).find(g => g.folder === sourceGroup);
+                  const senderName = sourceGroupEntry?.displayName;
+                  // Translate responseFile if present (for returning messageId)
+                  const rawRF = data.responseFile as string | undefined;
+                  const msgResponseFile = rawRF ? toHostIpcPath(rawRF, sourceGroup) : undefined;
 
                   if (isMain && !targetGroup) {
                     // HITL gate: main agent targeting an unregistered JID.
@@ -636,7 +774,7 @@ export function startIpcWatcher(deps: IpcDeps): void {
                         data.text,
                         sourceGroup,
                         (msg) => deps.sendMessage(mainJid, msg),
-                        () => deps.sendMessage(data.chatJid, data.text),
+                        () => deps.sendMessage(data.chatJid, data.text, senderName),
                       );
                     } else {
                       logger.warn(
@@ -666,12 +804,25 @@ export function startIpcWatcher(deps: IpcDeps): void {
                       recordUnsignedMessage(sourceGroup, data.text as string, data.chatJid as string).catch(() => {});
                     }
 
-                    await deps.sendMessage(data.chatJid, data.text);
+                    // Route: interactive message (buttons) or plain text
+                    const uiData = data.ui as UIMetadata | undefined;
+                    let messageId: string | undefined;
+                    if (uiData && deps.sendInteractiveMessage) {
+                      await deps.sendInteractiveMessage(data.chatJid, uiData, senderName);
+                    } else if (msgResponseFile && deps.sendMessageGetId) {
+                      messageId = await deps.sendMessageGetId(data.chatJid, data.text, senderName);
+                    } else {
+                      await deps.sendMessage(data.chatJid, data.text, senderName);
+                    }
                     deps.onAgentSendMessage?.(data.chatJid);
                     logger.info(
-                      { chatJid: data.chatJid, sourceGroup, signed: !!agentId },
+                      { chatJid: data.chatJid, sourceGroup, signed: !!agentId, messageId, hasUi: !!uiData },
                       'IPC message sent',
                     );
+                    // Write messageId to responseFile so container can track it
+                    if (msgResponseFile) {
+                      writeIpcResponse(msgResponseFile, { success: true, messageId: messageId ?? null });
+                    }
                   } else {
                     logger.warn(
                       { chatJid: data.chatJid, sourceGroup },
@@ -787,6 +938,62 @@ export function writeIpcResponse(responseFile: string, data: object): void {
   fs.renameSync(tmp, responseFile);
 }
 
+// ── Spawn Gate Approval (HITL for Task/TeamCreate after web content) ──────────
+
+interface PendingSpawnApproval {
+  responseFile: string;
+  toolName: string;
+  sourceGroup: string;
+  expiresAt: number;
+}
+
+const spawnGateApprovals = new Map<string, PendingSpawnApproval>();
+const SPAWN_APPROVAL_PATTERN = /\b(approve-spawn|reject-spawn)\s+([a-f0-9]{8})\b/i;
+
+/**
+ * Check if a message contains a spawn gate approval/rejection token.
+ * Writes the IPC response file so the container's polling hook unblocks.
+ * Returns true if the message was a spawn gate command (handled or not).
+ */
+export async function tryHandleSpawnApproval(
+  message: string,
+  notifyFn: (text: string) => Promise<void>,
+): Promise<boolean> {
+  // Cleanup expired approvals
+  const now = Date.now();
+  for (const [token, pending] of spawnGateApprovals) {
+    if (pending.expiresAt < now) {
+      spawnGateApprovals.delete(token);
+      logger.info({ token, toolName: pending.toolName }, 'Spawn gate: approval expired');
+    }
+  }
+
+  const match = message.match(SPAWN_APPROVAL_PATTERN);
+  if (!match) return false;
+
+  const [, action, token] = match;
+  const pending = spawnGateApprovals.get(token.toLowerCase());
+
+  if (!pending) {
+    await notifyFn(`No pending spawn approval found for token *${token}*. It may have expired.`);
+    return true;
+  }
+
+  spawnGateApprovals.delete(token.toLowerCase());
+
+  if (action.toLowerCase() === 'approve-spawn') {
+    writeIpcResponse(pending.responseFile, { approved: true });
+    await notifyFn(`\u2705 Spawn approved: *${pending.toolName}* in ${pending.sourceGroup}`);
+    logger.info({ token, toolName: pending.toolName, sourceGroup: pending.sourceGroup }, 'Spawn gate: approved');
+  } else {
+    writeIpcResponse(pending.responseFile, { approved: false, reason: 'User rejected' });
+    await notifyFn(`\u274C Spawn rejected: *${pending.toolName}* in ${pending.sourceGroup}`);
+    logger.info({ token, toolName: pending.toolName, sourceGroup: pending.sourceGroup }, 'Spawn gate: rejected');
+  }
+
+  return true;
+}
+
 async function processIpcMessage(
   data: Record<string, unknown>,
   groupFolder: string,
@@ -802,6 +1009,31 @@ async function processIpcMessage(
       const topic = data.topic as string;
       const knowledge = data.knowledge as string;
       if (topic && knowledge) {
+        // Spawn Gate: rate limit learns to prevent memory flooding
+        const learnRateCheck = spawnGate.checkLearnRate(groupFolder);
+        if (!learnRateCheck.allowed) {
+          logger.warn({ groupFolder, reason: learnRateCheck.reason }, 'SpawnGate blocked learn');
+          if (responseFile) writeIpcResponse(responseFile, { error: learnRateCheck.reason });
+          break;
+        }
+
+        // Memory Poisoning Defense: validate learned facts for prompt injection
+        const topicCheck = detectPromptInjection(topic);
+        const knowledgeCheck = detectPromptInjection(knowledge);
+        if (!topicCheck.safe || !knowledgeCheck.safe) {
+          const riskSource = !topicCheck.safe ? 'topic' : 'knowledge';
+          const riskScore = Math.max(topicCheck.riskScore, knowledgeCheck.riskScore);
+          logger.warn({
+            groupFolder,
+            topic,
+            riskSource,
+            riskScore,
+            threats: [...topicCheck.threats, ...knowledgeCheck.threats].map(t => t.type),
+          }, 'Memory poisoning attempt blocked — learn rejected');
+          if (responseFile) writeIpcResponse(responseFile, { error: 'Content blocked by security filter', riskScore });
+          break;
+        }
+
         const domain = (data.domain as string) || 'nanoclaw';
         saveLearn(domain, topic, knowledge);
 
@@ -843,6 +1075,19 @@ async function processIpcMessage(
 
         // Update hot cache so learning is visible immediately (no restart needed)
         learnFact(topic, knowledge, 0.85, 'learn');
+
+        // Write Obsidian Brain Vault note (non-blocking, fail-safe)
+        try {
+          const learnDir = path.join(BRAIN_VAULT_PATH, 'Learnings');
+          if (fs.existsSync(BRAIN_VAULT_PATH)) {
+            fs.mkdirSync(learnDir, { recursive: true });
+            const slug = topic.replace(/[^a-zA-Z0-9\-_ ]/g, '').replace(/\s+/g, '-').toLowerCase().slice(0, 80);
+            const date = new Date().toISOString().slice(0, 10);
+            const notePath = path.join(learnDir, `${date}_${slug}.md`);
+            const note = `---\ntags: [learning, ${domain}]\ndomain: ${domain}\ncreated: ${new Date().toISOString()}\nsource: ${groupFolder}\n---\n\n# ${topic}\n\n${knowledge}\n`;
+            fs.writeFileSync(notePath, note);
+          }
+        } catch { /* vault may not exist — that's fine */ }
 
         if (responseFile) writeIpcResponse(responseFile, { success: true, topic, knowledge_length: knowledge.length });
         logger.info({ groupFolder, domain, topic, length: knowledge.length }, 'Learn: saved');
@@ -1161,6 +1406,30 @@ async function processIpcMessage(
       break;
     }
 
+    // ── Competitive Intelligence (quarterly monitoring) ──────────
+    case 'competitive_intel_check': {
+      try {
+        const result = await handleCompetitiveIntelIpc(data as any);
+        if (responseFile) writeIpcResponse(responseFile, result);
+      } catch (err) {
+        logger.error({ err }, 'Competitive intel IPC handler error');
+        if (responseFile) writeIpcResponse(responseFile, { error: String(err) });
+      }
+      break;
+    }
+
+    // ── Autoresearch (experiment engine) ──────────────────────────
+    case 'autoresearch': {
+      try {
+        const result = await handleAutoresearchIpc(data as any);
+        if (responseFile) writeIpcResponse(responseFile, result);
+      } catch (err) {
+        logger.error({ err }, 'Autoresearch IPC handler error');
+        if (responseFile) writeIpcResponse(responseFile, { error: String(err) });
+      }
+      break;
+    }
+
     default:
       logger.warn({ type: data.type, groupFolder }, 'Unknown ClawWork IPC type');
   }
@@ -1210,6 +1479,13 @@ export async function processTaskIpc(
         data.schedule_value &&
         data.targetJid
       ) {
+        // Spawn Gate: rate limit + prompt injection check on scheduled tasks
+        const spawnCheck = await spawnGate.checkTaskSchedule(sourceGroup, data.prompt as string);
+        if (!spawnCheck.allowed) {
+          logger.warn({ sourceGroup, reason: spawnCheck.reason }, 'SpawnGate blocked schedule_task');
+          break;
+        }
+
         // Resolve the target group from JID
         const targetJid = data.targetJid as string;
         const targetGroupEntry = registeredGroups[targetJid];

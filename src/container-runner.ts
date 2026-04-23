@@ -64,6 +64,8 @@ export interface ContainerInput {
   personaContent?: string;
   /** Kanban task ID for dispatch status tracking */
   dispatchTaskId?: string;
+  /** Internal: prevents infinite OAuth retry loops */
+  _oauthRetried?: boolean;
   /** Personality tuning params (Phase 2 Karpathy). Injected into system prompt. */
   personalityParams?: {
     tone: 'concise' | 'balanced' | 'verbose';
@@ -366,6 +368,73 @@ export function readOAuthFromKeychain(): string | null {
   }
 }
 
+/** Update CLAUDE_CODE_OAUTH_TOKEN in .env file in-place. */
+function updateEnvToken(newToken: string): void {
+  const envFile = path.join(process.cwd(), '.env');
+  try {
+    let content = fs.readFileSync(envFile, 'utf-8');
+    if (content.includes('CLAUDE_CODE_OAUTH_TOKEN=')) {
+      content = content.replace(/^CLAUDE_CODE_OAUTH_TOKEN=.*$/m, `CLAUDE_CODE_OAUTH_TOKEN=${newToken}`);
+    } else {
+      content += `\nCLAUDE_CODE_OAUTH_TOKEN=${newToken}`;
+    }
+    fs.writeFileSync(envFile, content, 'utf-8');
+  } catch (err) {
+    logger.warn({ err }, 'OAuth hot-reload: failed to update .env');
+  }
+}
+
+/**
+ * Try to get a fresh OAuth token and persist it to .env.
+ * First reads the keychain (any token with >60s left).
+ * If stale/missing, runs oauth-keepalive.sh then re-reads.
+ * Returns true if the token was successfully refreshed.
+ */
+async function refreshAndUpdateOAuthToken(): Promise<boolean> {
+  logger.info('OAuth 401 detected — attempting hot token refresh');
+
+  // Step 1: read keychain with a looser expiry window (>60s instead of 30min)
+  try {
+    const creds = execSync(
+      'security find-generic-password -s "Claude Code-credentials" -a "amrut" -w',
+      { encoding: 'utf-8', timeout: 5000, stdio: ['ignore', 'pipe', 'ignore'] },
+    ).trim();
+    const parsed = JSON.parse(creds);
+    const token = parsed?.claudeAiOauth?.accessToken;
+    const expiresAt = parsed?.claudeAiOauth?.expiresAt ?? 0;
+    const secondsLeft = expiresAt / 1000 - Date.now() / 1000;
+    if (token && secondsLeft > 60) {
+      updateEnvToken(token);
+      logger.info({ secondsLeft: Math.floor(secondsLeft) }, 'OAuth hot-reload: refreshed from Keychain');
+      return true;
+    }
+    logger.warn({ secondsLeft: Math.floor(secondsLeft) }, 'OAuth hot-reload: keychain token expiring, running keepalive');
+  } catch (err) {
+    logger.warn({ err }, 'OAuth hot-reload: keychain read failed, running keepalive');
+  }
+
+  // Step 2: run oauth-keepalive.sh to get a fresh token
+  try {
+    await new Promise<void>((res, rej) => {
+      exec(
+        'bash /Users/amrut/nanoclaw/scripts/oauth-keepalive.sh',
+        { timeout: 30000 },
+        (err) => (err ? rej(err) : res()),
+      );
+    });
+    const freshToken = readOAuthFromKeychain();
+    if (freshToken) {
+      updateEnvToken(freshToken);
+      logger.info('OAuth hot-reload: refreshed via keepalive script');
+      return true;
+    }
+  } catch (err) {
+    logger.error({ err }, 'OAuth hot-reload: keepalive script failed');
+  }
+
+  return false;
+}
+
 function buildContainerArgs(
   mounts: VolumeMount[],
   containerName: string,
@@ -424,6 +493,14 @@ function buildContainerArgs(
     if (fs.existsSync(gwsTokenDir)) {
       toolModules.push('gws-tools');
     }
+  }
+
+  // Autoresearch tools available for all groups
+  toolModules.push('autoresearch-tools');
+
+  // Competitive intel tools available for main group
+  if (group.folder === 'main') {
+    toolModules.push('competitive-intel-tools');
   }
 
   if (toolModules.length > 0) {
@@ -810,6 +887,33 @@ export async function runContainerAgent(
       logger.debug({ logFile, verbose: isVerbose }, 'Container log written');
 
       if (code !== 0) {
+        // OAuth hot-reload: if 401/auth error and not already retried, refresh token and retry once
+        const combinedOutput = stdout + stderr;
+        if (!input._oauthRetried && isOAuthError(combinedOutput)) {
+          logger.warn(
+            { group: group.name, code },
+            'OAuth error detected — attempting hot token refresh and retry',
+          );
+          (async () => {
+            const refreshed = await refreshAndUpdateOAuthToken();
+            if (refreshed) {
+              input._oauthRetried = true;
+              resolve(runContainerAgent(group, input, onProcess, onOutput));
+            } else {
+              logger.error(
+                { group: group.name, code, duration, stderr, stdout, logFile },
+                'Container exited with OAuth error (refresh failed)',
+              );
+              resolve({
+                status: 'error',
+                result: null,
+                error: `Container exited with code ${code} (OAuth refresh failed): ${stderr.slice(-200)}`,
+              });
+            }
+          })();
+          return;
+        }
+
         logger.error(
           {
             group: group.name,

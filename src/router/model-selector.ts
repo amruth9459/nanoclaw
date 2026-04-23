@@ -23,10 +23,24 @@ export class ModelRegistry {
   }
 
   private registerDefaultModels(): void {
-    // Local SLMs (Small Language Models)
+    // Local SLMs (Small Language Models, <8GB)
     this.register({
-      id: 'qwen2.5-vl-7b',
-      name: 'Qwen 2.5 VL 7B',
+      id: 'glm-4.7-flash',
+      name: 'GLM 4.7 Flash',
+      tier: 'local-slm',
+      provider: 'local-mlx',
+      supportsVision: false,
+      maxTokens: 8192,
+      contextWindow: 200000,
+      avgLatencyMs: 40,
+      costPer1kTokens: 0,
+      requiresGpu: true,
+      memoryGb: 5,
+    });
+
+    this.register({
+      id: 'qwen3-vl:8b',
+      name: 'Qwen3 VL 8B',
       tier: 'local-slm',
       provider: 'local-mlx',
       supportsVision: true,
@@ -35,12 +49,12 @@ export class ModelRegistry {
       avgLatencyMs: 80,
       costPer1kTokens: 0,
       requiresGpu: true,
-      memoryGb: 8,
+      memoryGb: 6.1,
     });
 
     this.register({
-      id: 'qwen2.5-7b',
-      name: 'Qwen 2.5 7B',
+      id: 'qwen2.5-coder',
+      name: 'Qwen 2.5 Coder 7B',
       tier: 'local-slm',
       provider: 'local-mlx',
       supportsVision: false,
@@ -49,36 +63,64 @@ export class ModelRegistry {
       avgLatencyMs: 50,
       costPer1kTokens: 0,
       requiresGpu: true,
-      memoryGb: 7,
+      memoryGb: 4.7,
     });
 
-    // Local LLMs (Large Language Models)
     this.register({
-      id: 'qwen2.5-vl-72b',
-      name: 'Qwen 2.5 VL 72B',
+      id: 'llama3',
+      name: 'Llama 3 8B',
+      tier: 'local-slm',
+      provider: 'local-mlx',
+      supportsVision: false,
+      maxTokens: 8192,
+      contextWindow: 8192,
+      avgLatencyMs: 50,
+      costPer1kTokens: 0,
+      requiresGpu: true,
+      memoryGb: 4.7,
+    });
+
+    // Local LLMs (Large Language Models, 8-20GB)
+    this.register({
+      id: 'gemma4:26b',
+      name: 'Gemma 4 26B MoE',
+      tier: 'local-llm',
+      provider: 'local-mlx',
+      supportsVision: true,
+      maxTokens: 8192,
+      contextWindow: 256000,
+      avgLatencyMs: 200,
+      costPer1kTokens: 0,
+      requiresGpu: true,
+      memoryGb: 18,
+    });
+
+    this.register({
+      id: 'qwen3-vl:32b',
+      name: 'Qwen3 VL 32B',
       tier: 'local-llm',
       provider: 'local-mlx',
       supportsVision: true,
       maxTokens: 8192,
       contextWindow: 32768,
-      avgLatencyMs: 1200,
+      avgLatencyMs: 800,
       costPer1kTokens: 0,
       requiresGpu: true,
-      memoryGb: 80,
+      memoryGb: 20,
     });
 
     this.register({
-      id: 'llama-3.3-70b',
-      name: 'Llama 3.3 70B',
+      id: 'deepseek-coder-v2',
+      name: 'DeepSeek Coder V2',
       tier: 'local-llm',
       provider: 'local-mlx',
       supportsVision: false,
       maxTokens: 8192,
-      contextWindow: 131072,
-      avgLatencyMs: 1000,
+      contextWindow: 128000,
+      avgLatencyMs: 400,
       costPer1kTokens: 0,
       requiresGpu: true,
-      memoryGb: 75,
+      memoryGb: 8.9,
     });
 
     // Cloud Models
@@ -285,15 +327,16 @@ export class ModelSelector {
 
     // Task-specific selection
     if (tier === 'local-slm') {
-      return features.requiresVision ? 'qwen2.5-vl-7b' : 'qwen2.5-7b';
+      if (features.requiresVision) return 'qwen3-vl:8b';
+      if (features.requiresCode) return 'qwen2.5-coder';
+      return 'glm-4.7-flash'; // Fastest: 30B MoE/3B active, 200K context
     }
 
     if (tier === 'local-llm') {
-      if (features.requiresVision) return 'qwen2.5-vl-72b';
-      if (features.requiresCode || features.requiresReasoning) {
-        return 'llama-3.3-70b';
-      }
-      return 'llama-3.3-70b';
+      if (features.requiresVision) return 'gemma4:26b'; // Multimodal MoE
+      if (features.requiresCode) return 'deepseek-coder-v2';
+      if (features.requiresReasoning) return 'gemma4:26b';
+      return 'gemma4:26b'; // Best all-rounder locally
     }
 
     if (tier === 'cloud') {
@@ -339,7 +382,7 @@ export class ModelSelector {
 
     // SLM -> LLM
     if (tier === 'local-slm') {
-      return 'llama-3.3-70b';
+      return 'gemma4:26b';
     }
 
     // LLM -> Cloud

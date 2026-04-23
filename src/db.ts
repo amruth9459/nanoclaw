@@ -7,6 +7,8 @@ import { NewMessage, RegisteredGroup, ScheduledTask, TaskRunLog } from './types.
 import { logger } from './logger.js';
 import { getIntegrations } from './integration-loader.js';
 import { initMonitoringSchema } from './agent-monitoring-system.js';
+import { initCompetitiveIntelSchema } from './competitive-intel/persistence.js';
+import { initAutoresearchSchema } from './autoresearch/persistence.js';
 
 let db: Database.Database;
 
@@ -328,6 +330,13 @@ function createSchema(database: Database.Database): void {
     /* column already exists */
   }
 
+  // Add display_name to registered_groups (custom bot display name per group)
+  try {
+    database.exec(`ALTER TABLE registered_groups ADD COLUMN display_name TEXT`);
+  } catch {
+    /* column already exists */
+  }
+
   // Agent quality review tables
   database.exec(`
     CREATE TABLE IF NOT EXISTS agent_quality_reviews (
@@ -513,6 +522,8 @@ export function initDatabase(): void {
 
   createSchema(db);
   initMonitoringSchema(db);
+  initCompetitiveIntelSchema(db);
+  initAutoresearchSchema(db);
 
   // Migrate from JSON files if they exist
   migrateJsonState();
@@ -986,6 +997,7 @@ export function getRegisteredGroup(
         added_at: string;
         container_config: string | null;
         requires_trigger: number | null;
+        display_name: string | null;
       }
     | undefined;
   if (!row) return undefined;
@@ -995,6 +1007,7 @@ export function getRegisteredGroup(
     folder: row.folder,
     trigger: row.trigger_pattern,
     added_at: row.added_at,
+    displayName: row.display_name ?? undefined,
     containerConfig: row.container_config
       ? JSON.parse(row.container_config)
       : undefined,
@@ -1007,8 +1020,8 @@ export function setRegisteredGroup(
   group: RegisteredGroup,
 ): void {
   db.prepare(
-    `INSERT OR REPLACE INTO registered_groups (jid, name, folder, trigger_pattern, added_at, container_config, requires_trigger)
-     VALUES (?, ?, ?, ?, ?, ?, ?)`,
+    `INSERT OR REPLACE INTO registered_groups (jid, name, folder, trigger_pattern, added_at, container_config, requires_trigger, display_name)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
   ).run(
     jid,
     group.name,
@@ -1017,6 +1030,7 @@ export function setRegisteredGroup(
     group.added_at,
     group.containerConfig ? JSON.stringify(group.containerConfig) : null,
     group.requiresTrigger === undefined ? 1 : group.requiresTrigger ? 1 : 0,
+    group.displayName ?? null,
   );
 }
 
@@ -1031,6 +1045,7 @@ export function getAllRegisteredGroups(): Record<string, RegisteredGroup> {
     added_at: string;
     container_config: string | null;
     requires_trigger: number | null;
+    display_name: string | null;
   }>;
   const result: Record<string, RegisteredGroup> = {};
   for (const row of rows) {
@@ -1043,6 +1058,7 @@ export function getAllRegisteredGroups(): Record<string, RegisteredGroup> {
         ? JSON.parse(row.container_config)
         : undefined,
       requiresTrigger: row.requires_trigger === null ? undefined : row.requires_trigger === 1,
+      displayName: row.display_name ?? undefined,
     };
   }
   return result;
