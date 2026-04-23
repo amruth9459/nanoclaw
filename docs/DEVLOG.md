@@ -5,6 +5,516 @@
 
 ---
 
+### 2026-04-23 12:38
+
+**Areas:** general
+**Files (2):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut/memory/MEMORY.md
+**Diff:** +3019 -443 across 31 files
+
+### 2026-04-23 12:37
+
+**Areas:** general
+**Files (2):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut/memory/MEMORY.md
+**Diff:** +3013 -443 across 31 files
+
+### 2026-04-23 12:37
+
+**Areas:** general
+**Files (2):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut/memory/MEMORY.md
+**Diff:** +3007 -443 across 31 files
+
+### 2026-04-23 12:37
+
+**Areas:** general
+**Files (2):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut/memory/MEMORY.md
+**Diff:** +3001 -443 across 31 files
+
+### 2026-04-23 12:36
+
+**Areas:** general
+**Files (2):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut/memory/MEMORY.md
+**Diff:** +2995 -443 across 31 files
+
+### 2026-04-23 12:35
+
+**Areas:** general
+**Files (2):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut/memory/MEMORY.md
+**Diff:** +2989 -443 across 31 files
+
+### 2026-04-23 12:35
+
+**Areas:** general
+**Files (2):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut/memory/MEMORY.md
+**Diff:** +2983 -443 across 31 files
+
+### 2026-04-23 12:34
+
+**Areas:** general
+**Files (2):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut/memory/MEMORY.md
+**Diff:** +2977 -443 across 31 files
+
+### 2026-04-23 12:34
+
+**Areas:** general
+**Files (2):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut/memory/MEMORY.md
+**Diff:** +2971 -443 across 31 files
+
+### 2026-04-23 12:34
+
+**Areas:** general
+**Files (2):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut/memory/MEMORY.md
+**Diff:** +2965 -443 across 31 files
+
+### 2026-04-23 12:33
+
+**Areas:** general
+**Files (2):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut/memory/MEMORY.md
+**Diff:** +2959 -443 across 31 files
+
+### 2026-04-23 12:33
+
+**Areas:** general
+**Files (2):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut/memory/MEMORY.md
+**Diff:** +2953 -443 across 31 files
+
+### 2026-04-23 12:32
+
+**Areas:** general
+**Files (2):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut/memory/MEMORY.md
+**Diff:** +2947 -443 across 31 files
+
+### 2026-04-23 12:32
+
+**Areas:** general
+**Files (2):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut/memory/MEMORY.md
+**Diff:** +2941 -443 across 31 files
+
+### 2026-04-23 12:31
+
+**Areas:** general
+**Files (2):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut/memory/MEMORY.md
+**Diff:** +2935 -443 across 31 files
+
+### 2026-04-23 12:31
+
+**Areas:** general
+**Files (2):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut/memory/MEMORY.md
+**Diff:** +2929 -443 across 31 files
+
+### 2026-04-23 12:17
+
+**Areas:** general
+**Files (2):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut/memory/MEMORY.md
+**Diff:** +2923 -443 across 31 files
+
+### 2026-04-23 12:15
+
+**Areas:** general
+**Files (2):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut/memory/MEMORY.md
+**Diff:** +2917 -443 across 31 files
+
+### 2026-04-23 12:14
+
+**Areas:** general
+**Files (2):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut/memory/MEMORY.md
+**Diff:** +2911 -443 across 31 files
+
+### 2026-04-23 12:13
+
+**Areas:** general
+**Files (2):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut/memory/MEMORY.md
+**Diff:** +2905 -443 across 31 files
+
+### 2026-04-23 12:12
+
+**Areas:** general
+**Files (2):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut/memory/MEMORY.md
+**Diff:** +2899 -443 across 31 files
+
+### 2026-04-23 12:11
+
+**Areas:** general
+**Files (2):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut/memory/MEMORY.md
+**Diff:** +2893 -443 across 31 files
+
+### 2026-04-23 12:10
+
+**Areas:** general
+**Files (2):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut/memory/MEMORY.md
+**Diff:** +2887 -443 across 31 files
+
+### 2026-04-23 12:08
+
+**Areas:** general
+**Files (2):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut/memory/MEMORY.md
+**Diff:** +2881 -443 across 31 files
+
+### 2026-04-23 12:08
+
+**Areas:** general
+**Files (2):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut/memory/MEMORY.md
+**Diff:** +2875 -443 across 31 files
+
+### 2026-04-23 12:07
+
+**Areas:** general
+**Files (2):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut/memory/MEMORY.md
+**Diff:** +2869 -443 across 31 files
+
+### 2026-04-23 12:06
+
+**Areas:** general
+**Files (2):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut/memory/MEMORY.md
+**Diff:** +2863 -443 across 31 files
+
+### 2026-04-23 12:05
+
+**Areas:** general
+**Files (2):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut/memory/MEMORY.md
+**Diff:** +2857 -443 across 31 files
+
+### 2026-04-23 12:04
+
+**Areas:** general
+**Files (2):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut/memory/MEMORY.md
+**Diff:** +2851 -443 across 31 files
+
+### 2026-04-23 12:03
+
+**Areas:** general
+**Files (2):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut/memory/MEMORY.md
+**Diff:** +2845 -443 across 31 files
+
+### 2026-04-23 12:02
+
+**Areas:** general
+**Files (2):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut/memory/MEMORY.md
+**Diff:** +2839 -443 across 31 files
+
+### 2026-04-23 12:01
+
+**Areas:** general
+**Files (2):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut/memory/MEMORY.md
+**Diff:** +2833 -443 across 31 files
+
+### 2026-04-23 12:00
+
+**Areas:** general
+**Files (2):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut/memory/MEMORY.md
+**Diff:** +2827 -443 across 31 files
+
+### 2026-04-23 11:59
+
+**Areas:** general
+**Files (2):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut/memory/MEMORY.md
+**Diff:** +2821 -443 across 31 files
+
+### 2026-04-23 11:58
+
+**Areas:** general
+**Files (2):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut/memory/MEMORY.md
+**Diff:** +2815 -443 across 31 files
+
+### 2026-04-23 11:57
+
+**Areas:** general
+**Files (2):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut/memory/MEMORY.md
+**Diff:** +2809 -443 across 31 files
+
+### 2026-04-23 11:56
+
+**Areas:** general
+**Files (2):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut/memory/MEMORY.md
+**Diff:** +2803 -443 across 31 files
+
+### 2026-04-23 11:55
+
+**Areas:** general
+**Files (2):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut/memory/MEMORY.md
+**Diff:** +2797 -443 across 31 files
+
+### 2026-04-23 11:54
+
+**Areas:** general
+**Files (2):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut/memory/MEMORY.md
+**Diff:** +2791 -443 across 31 files
+
+### 2026-04-23 11:53
+
+**Areas:** general
+**Files (2):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut/memory/MEMORY.md
+**Diff:** +2785 -443 across 31 files
+
+### 2026-04-23 11:51
+
+**Areas:** general
+**Files (2):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut/memory/MEMORY.md
+**Diff:** +2779 -443 across 31 files
+
+### 2026-04-23 11:51
+
+**Areas:** general
+**Files (2):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut/memory/MEMORY.md
+**Diff:** +2773 -443 across 31 files
+
+### 2026-04-23 11:50
+
+**Areas:** general
+**Files (2):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut/memory/MEMORY.md
+**Diff:** +2767 -443 across 31 files
+
+### 2026-04-23 11:49
+
+**Areas:** general
+**Files (2):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut/memory/MEMORY.md
+**Diff:** +2761 -443 across 31 files
+
+### 2026-04-23 11:48
+
+**Areas:** general
+**Files (2):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut/memory/MEMORY.md
+**Diff:** +2755 -443 across 31 files
+
+### 2026-04-23 11:47
+
+**Areas:** general
+**Files (2):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut/memory/MEMORY.md
+**Diff:** +2749 -443 across 31 files
+
+### 2026-04-23 11:46
+
+**Areas:** general
+**Files (2):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut/memory/MEMORY.md
+**Diff:** +2743 -443 across 31 files
+
+### 2026-04-23 11:45
+
+**Areas:** general
+**Files (2):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut/memory/MEMORY.md
+**Diff:** +2737 -443 across 31 files
+
+### 2026-04-23 11:43
+
+**Areas:** general
+**Files (2):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut/memory/MEMORY.md
+**Diff:** +2731 -443 across 31 files
+
+### 2026-04-23 11:42
+
+**Areas:** general
+**Files (2):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut/memory/MEMORY.md
+**Diff:** +2725 -443 across 31 files
+
+### 2026-04-23 11:42
+
+**Areas:** general
+**Files (2):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut/memory/MEMORY.md
+**Diff:** +2719 -443 across 31 files
+
+### 2026-04-23 11:40
+
+**Areas:** general
+**Files (2):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut/memory/MEMORY.md
+**Diff:** +2713 -443 across 31 files
+
+### 2026-04-23 11:39
+
+**Areas:** general
+**Files (2):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut/memory/MEMORY.md
+**Diff:** +2707 -443 across 31 files
+
+### 2026-04-23 11:38
+
+**Areas:** general
+**Files (2):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut/memory/MEMORY.md
+**Diff:** +2701 -443 across 31 files
+
+### 2026-04-23 11:37
+
+**Areas:** general
+**Files (2):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut/memory/MEMORY.md
+**Diff:** +2695 -443 across 31 files
+
+### 2026-04-23 11:36
+
+**Areas:** general
+**Files (2):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut/memory/MEMORY.md
+**Diff:** +2689 -443 across 31 files
+
+### 2026-04-23 11:35
+
+**Areas:** general
+**Files (2):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut/memory/MEMORY.md
+**Diff:** +2683 -443 across 31 files
+
+### 2026-04-23 11:35
+
+**Areas:** general
+**Files (2):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut/memory/MEMORY.md
+**Diff:** +2677 -443 across 31 files
+
+### 2026-04-23 11:34
+
+**Areas:** general
+**Files (2):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut/memory/MEMORY.md
+**Diff:** +2671 -443 across 31 files
+
+### 2026-04-23 11:34
+
+**Areas:** general
+**Files (2):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut/memory/MEMORY.md
+**Diff:** +2665 -443 across 31 files
+
+### 2026-04-23 11:33
+
+**Areas:** general
+**Files (2):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut/memory/MEMORY.md
+**Diff:** +2659 -443 across 31 files
+
+### 2026-04-23 11:33
+
+**Areas:** general
+**Files (2):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut/memory/MEMORY.md
+**Diff:** +2653 -443 across 31 files
+
+### 2026-04-23 11:32
+
+**Areas:** general
+**Files (2):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut/memory/MEMORY.md
+**Diff:** +2647 -443 across 31 files
+
+### 2026-04-23 11:31
+
+**Areas:** general
+**Files (2):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut/memory/MEMORY.md
+**Diff:** +2641 -443 across 31 files
+
+### 2026-04-23 11:31
+
+**Areas:** general
+**Files (2):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut/memory/MEMORY.md
+**Diff:** +2635 -443 across 31 files
+
+### 2026-04-23 11:30
+
+**Areas:** general
+**Files (2):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut/memory/MEMORY.md
+**Diff:** +2629 -443 across 31 files
+
+### 2026-04-23 11:30
+
+**Areas:** general
+**Files (2):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut/memory/MEMORY.md
+**Diff:** +2623 -443 across 31 files
+
+### 2026-04-23 11:29
+
+**Areas:** general
+**Files (2):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut/memory/MEMORY.md
+**Diff:** +2617 -443 across 31 files
+
+### 2026-04-23 11:28
+
+**Areas:** general
+**Files (2):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut/memory/MEMORY.md
+**Diff:** +2611 -443 across 31 files
+
+### 2026-04-23 11:28
+
+**Areas:** general
+**Files (2):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut/memory/MEMORY.md
+**Diff:** +2605 -443 across 31 files
+
+### 2026-04-23 11:27
+
+**Areas:** general
+**Files (2):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut/memory/MEMORY.md
+**Diff:** +2599 -443 across 31 files
+
+### 2026-04-23 11:27
+
+**Areas:** general
+**Files (2):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut/memory/MEMORY.md
+**Diff:** +2593 -443 across 31 files
+
+### 2026-04-23 11:26
+
+**Areas:** general
+**Files (2):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut/memory/MEMORY.md
+**Diff:** +2587 -443 across 31 files
+
+### 2026-04-23 11:26
+
+**Areas:** general
+**Files (2):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut/memory/MEMORY.md
+**Diff:** +2581 -443 across 31 files
+
+### 2026-04-23 11:25
+
+**Areas:** general
+**Files (2):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut/memory/MEMORY.md
+**Diff:** +2575 -443 across 31 files
+
+### 2026-04-23 11:25
+
+**Areas:** general
+**Files (2):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut/memory/MEMORY.md
+**Diff:** +2569 -443 across 31 files
+
+### 2026-04-23 11:24
+
+**Areas:** general
+**Files (2):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut/memory/MEMORY.md
+**Diff:** +2563 -443 across 31 files
+
+### 2026-04-23 11:24
+
+**Areas:** general
+**Files (2):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut/memory/MEMORY.md
+**Diff:** +2557 -443 across 31 files
+
+### 2026-04-23 11:23
+
+**Areas:** general
+**Files (2):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut/memory/MEMORY.md
+**Diff:** +2551 -443 across 31 files
+
+### 2026-04-23 11:23
+
+**Areas:** general
+**Files (2):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut/memory/MEMORY.md
+**Diff:** +2545 -443 across 31 files
+
+### 2026-04-23 11:22
+
+**Areas:** general
+**Files (2):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut/memory/MEMORY.md
+**Diff:** +2539 -443 across 31 files
+
+### 2026-04-23 11:22
+
+**Areas:** general
+**Files (2):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut/memory/MEMORY.md
+**Diff:** +2533 -443 across 31 files
+
+### 2026-04-23 11:21
+
+**Areas:** general
+**Files (2):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut/memory/MEMORY.md
+**Diff:** +2527 -443 across 31 files
+
+### 2026-04-23 11:19
+
+**Areas:** general
+**Files (2):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut/memory/MEMORY.md
+**Diff:** +2521 -443 across 31 files
+
+### 2026-04-23 11:16
+
+**Areas:** general
+**Files (2):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut/memory/MEMORY.md
+**Diff:** +2515 -443 across 30 files
+
 ### 2026-04-23 11:06
 
 **Areas:** general
