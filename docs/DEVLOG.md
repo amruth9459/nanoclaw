@@ -5,6 +5,894 @@
 
 ---
 
+### 2026-04-22 23:50
+
+**Areas:** general
+**Files (1):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md
+**Diff:** +3397 -443 across 31 files
+
+### 2026-04-22 23:49
+
+**Areas:** general
+**Files (1):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md
+**Diff:** +3391 -443 across 31 files
+
+### 2026-04-22 23:49
+
+**Areas:** general
+**Files (1):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md
+**Diff:** +3385 -443 across 31 files
+
+### 2026-04-22 23:49
+
+**Areas:** general
+**Files (1):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md
+**Diff:** +3379 -443 across 31 files
+
+### 2026-04-22 23:49
+
+**Areas:** general
+**Files (1):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md
+**Diff:** +3373 -443 across 31 files
+
+### 2026-04-22 23:48
+
+**Areas:** general
+**Files (1):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md
+**Diff:** +3367 -443 across 31 files
+
+### 2026-04-22 23:48
+
+**Areas:** general
+**Files (1):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md
+**Diff:** +3361 -443 across 31 files
+
+### 2026-04-22 23:48
+
+**Areas:** general
+**Files (1):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md
+**Diff:** +3355 -443 across 31 files
+
+### 2026-04-22 23:48
+
+**Areas:** general
+**Files (1):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md
+**Diff:** +3349 -443 across 31 files
+
+### 2026-04-22 23:48
+
+**Areas:** general
+**Files (1):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md
+**Diff:** +3343 -443 across 31 files
+
+### 2026-04-22 23:48
+
+**Areas:** general
+**Files (1):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md
+**Diff:** +3337 -443 across 31 files
+
+### 2026-04-22 23:47
+
+**Areas:** general
+**Files (1):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md
+**Diff:** +3331 -443 across 31 files
+
+### 2026-04-22 23:47
+
+**Areas:** general
+**Files (1):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md
+**Diff:** +3325 -443 across 31 files
+
+### 2026-04-22 23:47
+
+**Areas:** general
+**Files (1):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md
+**Diff:** +3319 -443 across 31 files
+
+### 2026-04-22 23:46
+
+**Areas:** general
+**Files (1):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md
+**Diff:** +3313 -443 across 31 files
+
+### 2026-04-22 23:46
+
+**Areas:** general
+**Files (1):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md
+**Diff:** +3307 -443 across 31 files
+
+### 2026-04-22 23:46
+
+**Areas:** general
+**Files (1):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md
+**Diff:** +3301 -443 across 31 files
+
+### 2026-04-22 23:45
+
+**Areas:** general
+**Files (1):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md
+**Diff:** +3295 -443 across 31 files
+
+### 2026-04-22 23:45
+
+**Areas:** general
+**Files (1):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md
+**Diff:** +3289 -443 across 31 files
+
+### 2026-04-22 23:45
+
+**Areas:** general
+**Files (1):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md
+**Diff:** +3283 -443 across 31 files
+
+### 2026-04-22 23:45
+
+**Areas:** general
+**Files (1):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md
+**Diff:** +3277 -443 across 31 files
+
+### 2026-04-22 23:44
+
+**Areas:** general
+**Files (1):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md
+**Diff:** +3271 -443 across 31 files
+
+### 2026-04-22 23:44
+
+**Areas:** general
+**Files (1):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md
+**Diff:** +3265 -443 across 31 files
+
+### 2026-04-22 23:44
+
+**Areas:** general
+**Files (1):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md
+**Diff:** +3259 -443 across 31 files
+
+### 2026-04-22 23:44
+
+**Areas:** general
+**Files (1):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md
+**Diff:** +3253 -443 across 31 files
+
+### 2026-04-22 23:44
+
+**Areas:** general
+**Files (1):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md
+**Diff:** +3247 -443 across 31 files
+
+### 2026-04-22 23:43
+
+**Areas:** general
+**Files (1):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md
+**Diff:** +3241 -443 across 31 files
+
+### 2026-04-22 23:43
+
+**Areas:** general
+**Files (1):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md
+**Diff:** +3235 -443 across 31 files
+
+### 2026-04-22 23:43
+
+**Areas:** general
+**Files (1):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md
+**Diff:** +3229 -443 across 31 files
+
+### 2026-04-22 23:43
+
+**Areas:** general
+**Files (1):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md
+**Diff:** +3223 -443 across 31 files
+
+### 2026-04-22 23:43
+
+**Areas:** general
+**Files (1):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md
+**Diff:** +3217 -443 across 31 files
+
+### 2026-04-22 23:43
+
+**Areas:** general
+**Files (1):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md
+**Diff:** +3211 -443 across 31 files
+
+### 2026-04-22 23:43
+
+**Areas:** general
+**Files (1):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md
+**Diff:** +3205 -443 across 31 files
+
+### 2026-04-22 23:42
+
+**Areas:** general
+**Files (1):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md
+**Diff:** +3199 -443 across 31 files
+
+### 2026-04-22 23:42
+
+**Areas:** general
+**Files (1):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md
+**Diff:** +3193 -443 across 31 files
+
+### 2026-04-22 23:42
+
+**Areas:** general
+**Files (1):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md
+**Diff:** +3187 -443 across 31 files
+
+### 2026-04-22 23:42
+
+**Areas:** general
+**Files (1):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md
+**Diff:** +3181 -443 across 31 files
+
+### 2026-04-22 23:41
+
+**Areas:** general
+**Files (1):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md
+**Diff:** +3175 -443 across 31 files
+
+### 2026-04-22 23:41
+
+**Areas:** general
+**Files (1):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md
+**Diff:** +3169 -443 across 31 files
+
+### 2026-04-22 23:41
+
+**Areas:** general
+**Files (1):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md
+**Diff:** +3163 -443 across 31 files
+
+### 2026-04-22 23:41
+
+**Areas:** general
+**Files (1):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md
+**Diff:** +3157 -443 across 31 files
+
+### 2026-04-22 23:41
+
+**Areas:** general
+**Files (1):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md
+**Diff:** +3151 -443 across 31 files
+
+### 2026-04-22 23:41
+
+**Areas:** general
+**Files (1):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md
+**Diff:** +3145 -443 across 31 files
+
+### 2026-04-22 23:41
+
+**Areas:** general
+**Files (1):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md
+**Diff:** +3139 -443 across 31 files
+
+### 2026-04-22 23:41
+
+**Areas:** general
+**Files (1):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md
+**Diff:** +3133 -443 across 31 files
+
+### 2026-04-22 23:39
+
+**Areas:** general
+**Files (1):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md
+**Diff:** +3127 -443 across 31 files
+
+### 2026-04-22 23:39
+
+**Areas:** general
+**Files (1):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md
+**Diff:** +3121 -443 across 31 files
+
+### 2026-04-22 23:38
+
+**Areas:** general
+**Files (1):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md
+**Diff:** +3115 -443 across 31 files
+
+### 2026-04-22 23:38
+
+**Areas:** general
+**Files (1):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md
+**Diff:** +3109 -443 across 31 files
+
+### 2026-04-22 23:37
+
+**Areas:** general
+**Files (1):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md
+**Diff:** +3103 -443 across 31 files
+
+### 2026-04-22 23:36
+
+**Areas:** general
+**Files (1):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md
+**Diff:** +3097 -443 across 31 files
+
+### 2026-04-22 23:36
+
+**Areas:** general
+**Files (1):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md
+**Diff:** +3091 -443 across 31 files
+
+### 2026-04-22 23:35
+
+**Areas:** general
+**Files (1):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md
+**Diff:** +3085 -443 across 31 files
+
+### 2026-04-22 23:35
+
+**Areas:** general
+**Files (1):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md
+**Diff:** +3079 -443 across 31 files
+
+### 2026-04-22 23:35
+
+**Areas:** general
+**Files (1):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md
+**Diff:** +3073 -443 across 31 files
+
+### 2026-04-22 23:35
+
+**Areas:** general
+**Files (1):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md
+**Diff:** +3067 -443 across 31 files
+
+### 2026-04-22 23:34
+
+**Areas:** general
+**Files (1):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md
+**Diff:** +3061 -443 across 31 files
+
+### 2026-04-22 23:34
+
+**Areas:** general
+**Files (1):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md
+**Diff:** +3055 -443 across 31 files
+
+### 2026-04-22 23:34
+
+**Areas:** general
+**Files (1):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md
+**Diff:** +3049 -443 across 31 files
+
+### 2026-04-22 23:33
+
+**Areas:** general
+**Files (1):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md
+**Diff:** +3043 -443 across 31 files
+
+### 2026-04-22 23:33
+
+**Areas:** general
+**Files (1):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md
+**Diff:** +3037 -443 across 31 files
+
+### 2026-04-22 23:33
+
+**Areas:** general
+**Files (1):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md
+**Diff:** +3031 -443 across 31 files
+
+### 2026-04-22 23:32
+
+**Areas:** general
+**Files (1):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md
+**Diff:** +3025 -443 across 31 files
+
+### 2026-04-22 23:32
+
+**Areas:** general
+**Files (1):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md
+**Diff:** +3019 -443 across 31 files
+
+### 2026-04-22 23:32
+
+**Areas:** general
+**Files (1):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md
+**Diff:** +3013 -443 across 31 files
+
+### 2026-04-22 23:32
+
+**Areas:** general
+**Files (1):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md
+**Diff:** +3007 -443 across 31 files
+
+### 2026-04-22 23:32
+
+**Areas:** general
+**Files (1):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md
+**Diff:** +3001 -443 across 31 files
+
+### 2026-04-22 23:31
+
+**Areas:** general
+**Files (1):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md
+**Diff:** +2995 -443 across 31 files
+
+### 2026-04-22 23:31
+
+**Areas:** general
+**Files (1):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md
+**Diff:** +2989 -443 across 31 files
+
+### 2026-04-22 23:31
+
+**Areas:** general
+**Files (1):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md
+**Diff:** +2983 -443 across 31 files
+
+### 2026-04-22 23:31
+
+**Areas:** general
+**Files (1):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md
+**Diff:** +2977 -443 across 31 files
+
+### 2026-04-22 23:30
+
+**Areas:** general
+**Files (1):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md
+**Diff:** +2971 -443 across 31 files
+
+### 2026-04-22 23:30
+
+**Areas:** general
+**Files (1):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md
+**Diff:** +2965 -443 across 31 files
+
+### 2026-04-22 23:30
+
+**Areas:** general
+**Files (1):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md
+**Diff:** +2959 -443 across 31 files
+
+### 2026-04-22 23:29
+
+**Areas:** general
+**Files (1):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md
+**Diff:** +2953 -443 across 31 files
+
+### 2026-04-22 23:29
+
+**Areas:** general
+**Files (1):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md
+**Diff:** +2947 -443 across 31 files
+
+### 2026-04-22 23:29
+
+**Areas:** general
+**Files (1):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md
+**Diff:** +2941 -443 across 31 files
+
+### 2026-04-22 23:29
+
+**Areas:** general
+**Files (1):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md
+**Diff:** +2935 -443 across 31 files
+
+### 2026-04-22 23:29
+
+**Areas:** general
+**Files (1):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md
+**Diff:** +2929 -443 across 31 files
+
+### 2026-04-22 23:28
+
+**Areas:** general
+**Files (1):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md
+**Diff:** +2923 -443 across 31 files
+
+### 2026-04-22 23:28
+
+**Areas:** general
+**Files (1):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md
+**Diff:** +2917 -443 across 31 files
+
+### 2026-04-22 23:27
+
+**Areas:** general
+**Files (1):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md
+**Diff:** +2911 -443 across 31 files
+
+### 2026-04-22 23:27
+
+**Areas:** general
+**Files (1):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md
+**Diff:** +2905 -443 across 31 files
+
+### 2026-04-22 23:27
+
+**Areas:** general
+**Files (1):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md
+**Diff:** +2899 -443 across 31 files
+
+### 2026-04-22 23:26
+
+**Areas:** general
+**Files (1):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md
+**Diff:** +2893 -443 across 31 files
+
+### 2026-04-22 23:26
+
+**Areas:** general
+**Files (1):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md
+**Diff:** +2887 -443 across 31 files
+
+### 2026-04-22 23:26
+
+**Areas:** general
+**Files (1):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md
+**Diff:** +2881 -443 across 31 files
+
+### 2026-04-22 23:26
+
+**Areas:** general
+**Files (1):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md
+**Diff:** +2875 -443 across 31 files
+
+### 2026-04-22 23:25
+
+**Areas:** general
+**Files (1):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md
+**Diff:** +2869 -443 across 31 files
+
+### 2026-04-22 23:25
+
+**Areas:** general
+**Files (1):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md
+**Diff:** +2863 -443 across 31 files
+
+### 2026-04-22 23:25
+
+**Areas:** general
+**Files (1):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md
+**Diff:** +2857 -443 across 31 files
+
+### 2026-04-22 23:25
+
+**Areas:** general
+**Files (1):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md
+**Diff:** +2851 -443 across 31 files
+
+### 2026-04-22 23:25
+
+**Areas:** general
+**Files (1):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md
+**Diff:** +2845 -443 across 31 files
+
+### 2026-04-22 23:24
+
+**Areas:** general
+**Files (1):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md
+**Diff:** +2839 -443 across 31 files
+
+### 2026-04-22 23:24
+
+**Areas:** general
+**Files (1):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md
+**Diff:** +2833 -443 across 31 files
+
+### 2026-04-22 23:24
+
+**Areas:** general
+**Files (1):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md
+**Diff:** +2827 -443 across 31 files
+
+### 2026-04-22 23:23
+
+**Areas:** general
+**Files (1):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md
+**Diff:** +2821 -443 across 31 files
+
+### 2026-04-22 23:22
+
+**Areas:** general
+**Files (1):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md
+**Diff:** +2815 -443 across 31 files
+
+### 2026-04-22 23:22
+
+**Areas:** general
+**Files (1):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md
+**Diff:** +2809 -443 across 31 files
+
+### 2026-04-22 23:22
+
+**Areas:** general
+**Files (1):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md
+**Diff:** +2803 -443 across 31 files
+
+### 2026-04-22 23:22
+
+**Areas:** general
+**Files (1):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md
+**Diff:** +2797 -443 across 31 files
+
+### 2026-04-22 23:21
+
+**Areas:** general
+**Files (1):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md
+**Diff:** +2791 -443 across 31 files
+
+### 2026-04-22 23:20
+
+**Areas:** general
+**Files (1):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md
+**Diff:** +2785 -443 across 31 files
+
+### 2026-04-22 23:20
+
+**Areas:** general
+**Files (1):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md
+**Diff:** +2779 -443 across 31 files
+
+### 2026-04-22 23:20
+
+**Areas:** general
+**Files (1):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md
+**Diff:** +2773 -443 across 31 files
+
+### 2026-04-22 23:19
+
+**Areas:** general
+**Files (1):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md
+**Diff:** +2767 -443 across 31 files
+
+### 2026-04-22 23:19
+
+**Areas:** general
+**Files (1):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md
+**Diff:** +2761 -443 across 31 files
+
+### 2026-04-22 23:19
+
+**Areas:** general
+**Files (1):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md
+**Diff:** +2755 -443 across 31 files
+
+### 2026-04-22 23:18
+
+**Areas:** general
+**Files (1):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md
+**Diff:** +2749 -443 across 31 files
+
+### 2026-04-22 23:17
+
+**Areas:** general
+**Files (1):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md
+**Diff:** +2743 -443 across 31 files
+
+### 2026-04-22 23:16
+
+**Areas:** general
+**Files (1):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md
+**Diff:** +2737 -443 across 31 files
+
+### 2026-04-22 23:16
+
+**Areas:** general
+**Files (1):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md
+**Diff:** +2731 -443 across 31 files
+
+### 2026-04-22 23:15
+
+**Areas:** general
+**Files (1):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md
+**Diff:** +2725 -443 across 31 files
+
+### 2026-04-22 23:15
+
+**Areas:** general
+**Files (1):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md
+**Diff:** +2719 -443 across 31 files
+
+### 2026-04-22 23:14
+
+**Areas:** general
+**Files (1):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md
+**Diff:** +2713 -443 across 31 files
+
+### 2026-04-22 23:14
+
+**Areas:** general
+**Files (1):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md
+**Diff:** +2707 -443 across 31 files
+
+### 2026-04-22 23:13
+
+**Areas:** general
+**Files (1):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md
+**Diff:** +2701 -443 across 31 files
+
+### 2026-04-22 23:12
+
+**Areas:** general
+**Files (1):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md
+**Diff:** +2695 -443 across 31 files
+
+### 2026-04-22 23:11
+
+**Areas:** general
+**Files (1):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md
+**Diff:** +2689 -443 across 31 files
+
+### 2026-04-22 23:11
+
+**Areas:** general
+**Files (1):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md
+**Diff:** +2683 -443 across 31 files
+
+### 2026-04-22 23:11
+
+**Areas:** general
+**Files (1):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md
+**Diff:** +2677 -443 across 31 files
+
+### 2026-04-22 23:10
+
+**Areas:** general
+**Files (4):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, data/jyotish-books/MASTER-REASONING-FRAMEWORK.md, data/jyotish-books/bphs-deep-extraction.md, data/jyotish-books/brihat-jataka-deep-extraction.md
+**Diff:** +2671 -443 across 31 files
+
+### 2026-04-22 23:09
+
+**Areas:** general
+**Files (7):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, data/jyotish-books/MASTER-REASONING-FRAMEWORK.md, data/jyotish-books/bphs-deep-extraction.md, data/jyotish-books/brihat-jataka-deep-extraction.md, data/jyotish-books/bv-raman-case-studies.md, data/jyotish-books/dasha-timing-deep-extraction.md, data/jyotish-books/kn-rao-case-studies.md
+**Diff:** +2665 -443 across 31 files
+
+### 2026-04-22 23:09
+
+**Areas:** general
+**Files (8):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, data/jyotish-books/MASTER-REASONING-FRAMEWORK.md, data/jyotish-books/bphs-deep-extraction.md, data/jyotish-books/brihat-jataka-deep-extraction.md, data/jyotish-books/bv-raman-case-studies.md, data/jyotish-books/dasha-timing-deep-extraction.md, data/jyotish-books/kn-rao-case-studies.md, data/jyotish-books/kn-rao-jaimini-chara-dasha-deep-extraction.md
+**Diff:** +2659 -443 across 31 files
+
+### 2026-04-22 23:08
+
+**Areas:** general
+**Files (12):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, data/jyotish-books/MASTER-REASONING-FRAMEWORK.md, data/jyotish-books/bphs-deep-extraction.md, data/jyotish-books/brihat-jataka-deep-extraction.md, data/jyotish-books/bv-raman-case-studies.md, data/jyotish-books/dasha-timing-deep-extraction.md, data/jyotish-books/kn-rao-case-studies.md, data/jyotish-books/kn-rao-jaimini-chara-dasha-deep-extraction.md, data/jyotish-books/kn-rao-karakamsha-deep-extraction.md, data/jyotish-books/kn-rao-learn-hindu-deep-extraction.md, data/jyotish-books/kn-rao-predictive-techniques-deep-extraction.md, data/jyotish-books/kn-rao-wheel-of-time-deep-extraction.md
+**Diff:** +2653 -443 across 31 files
+
+### 2026-04-22 23:08
+
+**Areas:** general
+**Files (12):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, data/jyotish-books/MASTER-REASONING-FRAMEWORK.md, data/jyotish-books/bphs-deep-extraction.md, data/jyotish-books/brihat-jataka-deep-extraction.md, data/jyotish-books/bv-raman-case-studies.md, data/jyotish-books/dasha-timing-deep-extraction.md, data/jyotish-books/kn-rao-case-studies.md, data/jyotish-books/kn-rao-jaimini-chara-dasha-deep-extraction.md, data/jyotish-books/kn-rao-karakamsha-deep-extraction.md, data/jyotish-books/kn-rao-learn-hindu-deep-extraction.md, data/jyotish-books/kn-rao-predictive-techniques-deep-extraction.md, data/jyotish-books/kn-rao-wheel-of-time-deep-extraction.md
+**Diff:** +2647 -443 across 31 files
+
+### 2026-04-22 23:07
+
+**Areas:** general
+**Files (12):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, data/jyotish-books/MASTER-REASONING-FRAMEWORK.md, data/jyotish-books/bphs-deep-extraction.md, data/jyotish-books/brihat-jataka-deep-extraction.md, data/jyotish-books/bv-raman-case-studies.md, data/jyotish-books/dasha-timing-deep-extraction.md, data/jyotish-books/kn-rao-case-studies.md, data/jyotish-books/kn-rao-jaimini-chara-dasha-deep-extraction.md, data/jyotish-books/kn-rao-karakamsha-deep-extraction.md, data/jyotish-books/kn-rao-learn-hindu-deep-extraction.md, data/jyotish-books/kn-rao-predictive-techniques-deep-extraction.md, data/jyotish-books/kn-rao-wheel-of-time-deep-extraction.md
+**Diff:** +2641 -443 across 31 files
+
+### 2026-04-22 23:06
+
+**Areas:** general
+**Files (12):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, data/jyotish-books/MASTER-REASONING-FRAMEWORK.md, data/jyotish-books/bphs-deep-extraction.md, data/jyotish-books/brihat-jataka-deep-extraction.md, data/jyotish-books/bv-raman-case-studies.md, data/jyotish-books/dasha-timing-deep-extraction.md, data/jyotish-books/kn-rao-case-studies.md, data/jyotish-books/kn-rao-jaimini-chara-dasha-deep-extraction.md, data/jyotish-books/kn-rao-karakamsha-deep-extraction.md, data/jyotish-books/kn-rao-learn-hindu-deep-extraction.md, data/jyotish-books/kn-rao-predictive-techniques-deep-extraction.md, data/jyotish-books/kn-rao-wheel-of-time-deep-extraction.md
+**Diff:** +2635 -443 across 31 files
+
+### 2026-04-22 23:05
+
+**Areas:** general
+**Files (12):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, data/jyotish-books/MASTER-REASONING-FRAMEWORK.md, data/jyotish-books/bphs-deep-extraction.md, data/jyotish-books/brihat-jataka-deep-extraction.md, data/jyotish-books/bv-raman-case-studies.md, data/jyotish-books/dasha-timing-deep-extraction.md, data/jyotish-books/kn-rao-case-studies.md, data/jyotish-books/kn-rao-jaimini-chara-dasha-deep-extraction.md, data/jyotish-books/kn-rao-karakamsha-deep-extraction.md, data/jyotish-books/kn-rao-learn-hindu-deep-extraction.md, data/jyotish-books/kn-rao-predictive-techniques-deep-extraction.md, data/jyotish-books/kn-rao-wheel-of-time-deep-extraction.md
+**Diff:** +2629 -443 across 31 files
+
+### 2026-04-22 23:05
+
+**Areas:** general
+**Files (13):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, data/jyotish-books/MASTER-REASONING-FRAMEWORK.md, data/jyotish-books/bphs-deep-extraction.md, data/jyotish-books/brihat-jataka-deep-extraction.md, data/jyotish-books/bv-raman-case-studies.md, data/jyotish-books/dasha-timing-deep-extraction.md, data/jyotish-books/kn-rao-case-studies.md, data/jyotish-books/kn-rao-jaimini-chara-dasha-deep-extraction.md, data/jyotish-books/kn-rao-karakamsha-deep-extraction.md, data/jyotish-books/kn-rao-learn-hindu-deep-extraction.md, data/jyotish-books/kn-rao-predictive-techniques-deep-extraction.md, data/jyotish-books/kn-rao-wheel-of-time-deep-extraction.md, data/jyotish-books/laghu-parashari-deep-extraction.md
+**Diff:** +2623 -443 across 31 files
+
+### 2026-04-22 23:04
+
+**Areas:** general
+**Files (15):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, data/jyotish-books/MASTER-REASONING-FRAMEWORK.md, data/jyotish-books/bphs-deep-extraction.md, data/jyotish-books/brihat-jataka-deep-extraction.md, data/jyotish-books/bv-raman-case-studies.md, data/jyotish-books/dasha-timing-deep-extraction.md, data/jyotish-books/kn-rao-case-studies.md, data/jyotish-books/kn-rao-jaimini-chara-dasha-deep-extraction.md, data/jyotish-books/kn-rao-karakamsha-deep-extraction.md, data/jyotish-books/kn-rao-learn-hindu-deep-extraction.md, data/jyotish-books/kn-rao-predictive-techniques-deep-extraction.md, data/jyotish-books/kn-rao-wheel-of-time-deep-extraction.md, data/jyotish-books/laghu-parashari-deep-extraction.md, data/jyotish-books/light-on-life-deep-extraction.md, data/jyotish-books/phaladeepika-deep-extraction.md
+**Diff:** +2617 -443 across 31 files
+
+### 2026-04-22 23:02
+
+**Areas:** general
+**Files (15):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, data/jyotish-books/MASTER-REASONING-FRAMEWORK.md, data/jyotish-books/bphs-deep-extraction.md, data/jyotish-books/brihat-jataka-deep-extraction.md, data/jyotish-books/bv-raman-case-studies.md, data/jyotish-books/dasha-timing-deep-extraction.md, data/jyotish-books/kn-rao-case-studies.md, data/jyotish-books/kn-rao-jaimini-chara-dasha-deep-extraction.md, data/jyotish-books/kn-rao-karakamsha-deep-extraction.md, data/jyotish-books/kn-rao-learn-hindu-deep-extraction.md, data/jyotish-books/kn-rao-predictive-techniques-deep-extraction.md, data/jyotish-books/kn-rao-wheel-of-time-deep-extraction.md, data/jyotish-books/laghu-parashari-deep-extraction.md, data/jyotish-books/light-on-life-deep-extraction.md, data/jyotish-books/phaladeepika-deep-extraction.md
+**Diff:** +2611 -443 across 31 files
+
+### 2026-04-22 23:00
+
+**Areas:** general
+**Files (15):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, data/jyotish-books/MASTER-REASONING-FRAMEWORK.md, data/jyotish-books/bphs-deep-extraction.md, data/jyotish-books/brihat-jataka-deep-extraction.md, data/jyotish-books/bv-raman-case-studies.md, data/jyotish-books/dasha-timing-deep-extraction.md, data/jyotish-books/kn-rao-case-studies.md, data/jyotish-books/kn-rao-jaimini-chara-dasha-deep-extraction.md, data/jyotish-books/kn-rao-karakamsha-deep-extraction.md, data/jyotish-books/kn-rao-learn-hindu-deep-extraction.md, data/jyotish-books/kn-rao-predictive-techniques-deep-extraction.md, data/jyotish-books/kn-rao-wheel-of-time-deep-extraction.md, data/jyotish-books/laghu-parashari-deep-extraction.md, data/jyotish-books/light-on-life-deep-extraction.md, data/jyotish-books/phaladeepika-deep-extraction.md
+**Diff:** +2605 -443 across 31 files
+
+### 2026-04-22 22:58
+
+**Areas:** general
+**Files (15):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, data/jyotish-books/MASTER-REASONING-FRAMEWORK.md, data/jyotish-books/bphs-deep-extraction.md, data/jyotish-books/brihat-jataka-deep-extraction.md, data/jyotish-books/bv-raman-case-studies.md, data/jyotish-books/dasha-timing-deep-extraction.md, data/jyotish-books/kn-rao-case-studies.md, data/jyotish-books/kn-rao-jaimini-chara-dasha-deep-extraction.md, data/jyotish-books/kn-rao-karakamsha-deep-extraction.md, data/jyotish-books/kn-rao-learn-hindu-deep-extraction.md, data/jyotish-books/kn-rao-predictive-techniques-deep-extraction.md, data/jyotish-books/kn-rao-wheel-of-time-deep-extraction.md, data/jyotish-books/laghu-parashari-deep-extraction.md, data/jyotish-books/light-on-life-deep-extraction.md, data/jyotish-books/phaladeepika-deep-extraction.md
+**Diff:** +2599 -443 across 31 files
+
+### 2026-04-22 22:57
+
+**Areas:** general
+**Files (15):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, data/jyotish-books/MASTER-REASONING-FRAMEWORK.md, data/jyotish-books/bphs-deep-extraction.md, data/jyotish-books/brihat-jataka-deep-extraction.md, data/jyotish-books/bv-raman-case-studies.md, data/jyotish-books/dasha-timing-deep-extraction.md, data/jyotish-books/kn-rao-case-studies.md, data/jyotish-books/kn-rao-jaimini-chara-dasha-deep-extraction.md, data/jyotish-books/kn-rao-karakamsha-deep-extraction.md, data/jyotish-books/kn-rao-learn-hindu-deep-extraction.md, data/jyotish-books/kn-rao-predictive-techniques-deep-extraction.md, data/jyotish-books/kn-rao-wheel-of-time-deep-extraction.md, data/jyotish-books/laghu-parashari-deep-extraction.md, data/jyotish-books/light-on-life-deep-extraction.md, data/jyotish-books/phaladeepika-deep-extraction.md
+**Diff:** +2593 -443 across 31 files
+
+### 2026-04-22 22:54
+
+**Areas:** general
+**Files (15):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, data/jyotish-books/MASTER-REASONING-FRAMEWORK.md, data/jyotish-books/bphs-deep-extraction.md, data/jyotish-books/brihat-jataka-deep-extraction.md, data/jyotish-books/bv-raman-case-studies.md, data/jyotish-books/dasha-timing-deep-extraction.md, data/jyotish-books/kn-rao-case-studies.md, data/jyotish-books/kn-rao-jaimini-chara-dasha-deep-extraction.md, data/jyotish-books/kn-rao-karakamsha-deep-extraction.md, data/jyotish-books/kn-rao-learn-hindu-deep-extraction.md, data/jyotish-books/kn-rao-predictive-techniques-deep-extraction.md, data/jyotish-books/kn-rao-wheel-of-time-deep-extraction.md, data/jyotish-books/laghu-parashari-deep-extraction.md, data/jyotish-books/light-on-life-deep-extraction.md, data/jyotish-books/phaladeepika-deep-extraction.md
+**Diff:** +2587 -443 across 31 files
+
+### 2026-04-22 22:50
+
+**Areas:** general
+**Files (15):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, data/jyotish-books/MASTER-REASONING-FRAMEWORK.md, data/jyotish-books/bphs-deep-extraction.md, data/jyotish-books/brihat-jataka-deep-extraction.md, data/jyotish-books/bv-raman-case-studies.md, data/jyotish-books/dasha-timing-deep-extraction.md, data/jyotish-books/kn-rao-case-studies.md, data/jyotish-books/kn-rao-jaimini-chara-dasha-deep-extraction.md, data/jyotish-books/kn-rao-karakamsha-deep-extraction.md, data/jyotish-books/kn-rao-learn-hindu-deep-extraction.md, data/jyotish-books/kn-rao-predictive-techniques-deep-extraction.md, data/jyotish-books/kn-rao-wheel-of-time-deep-extraction.md, data/jyotish-books/laghu-parashari-deep-extraction.md, data/jyotish-books/light-on-life-deep-extraction.md, data/jyotish-books/phaladeepika-deep-extraction.md
+**Diff:** +2581 -443 across 31 files
+
+### 2026-04-22 22:50
+
+**Areas:** general
+**Files (15):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, data/jyotish-books/MASTER-REASONING-FRAMEWORK.md, data/jyotish-books/bphs-deep-extraction.md, data/jyotish-books/brihat-jataka-deep-extraction.md, data/jyotish-books/bv-raman-case-studies.md, data/jyotish-books/dasha-timing-deep-extraction.md, data/jyotish-books/kn-rao-case-studies.md, data/jyotish-books/kn-rao-jaimini-chara-dasha-deep-extraction.md, data/jyotish-books/kn-rao-karakamsha-deep-extraction.md, data/jyotish-books/kn-rao-learn-hindu-deep-extraction.md, data/jyotish-books/kn-rao-predictive-techniques-deep-extraction.md, data/jyotish-books/kn-rao-wheel-of-time-deep-extraction.md, data/jyotish-books/laghu-parashari-deep-extraction.md, data/jyotish-books/light-on-life-deep-extraction.md, data/jyotish-books/phaladeepika-deep-extraction.md
+**Diff:** +2575 -443 across 31 files
+
+### 2026-04-22 22:49
+
+**Areas:** general
+**Files (15):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, data/jyotish-books/MASTER-REASONING-FRAMEWORK.md, data/jyotish-books/bphs-deep-extraction.md, data/jyotish-books/brihat-jataka-deep-extraction.md, data/jyotish-books/bv-raman-case-studies.md, data/jyotish-books/dasha-timing-deep-extraction.md, data/jyotish-books/kn-rao-case-studies.md, data/jyotish-books/kn-rao-jaimini-chara-dasha-deep-extraction.md, data/jyotish-books/kn-rao-karakamsha-deep-extraction.md, data/jyotish-books/kn-rao-learn-hindu-deep-extraction.md, data/jyotish-books/kn-rao-predictive-techniques-deep-extraction.md, data/jyotish-books/kn-rao-wheel-of-time-deep-extraction.md, data/jyotish-books/laghu-parashari-deep-extraction.md, data/jyotish-books/light-on-life-deep-extraction.md, data/jyotish-books/phaladeepika-deep-extraction.md
+**Diff:** +2569 -443 across 31 files
+
+### 2026-04-22 22:47
+
+**Areas:** general
+**Files (15):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, data/jyotish-books/MASTER-REASONING-FRAMEWORK.md, data/jyotish-books/bphs-deep-extraction.md, data/jyotish-books/brihat-jataka-deep-extraction.md, data/jyotish-books/bv-raman-case-studies.md, data/jyotish-books/dasha-timing-deep-extraction.md, data/jyotish-books/kn-rao-case-studies.md, data/jyotish-books/kn-rao-jaimini-chara-dasha-deep-extraction.md, data/jyotish-books/kn-rao-karakamsha-deep-extraction.md, data/jyotish-books/kn-rao-learn-hindu-deep-extraction.md, data/jyotish-books/kn-rao-predictive-techniques-deep-extraction.md, data/jyotish-books/kn-rao-wheel-of-time-deep-extraction.md, data/jyotish-books/laghu-parashari-deep-extraction.md, data/jyotish-books/light-on-life-deep-extraction.md, data/jyotish-books/phaladeepika-deep-extraction.md
+**Diff:** +2563 -443 across 31 files
+
+### 2026-04-22 22:47
+
+**Areas:** general
+**Files (15):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, data/jyotish-books/MASTER-REASONING-FRAMEWORK.md, data/jyotish-books/bphs-deep-extraction.md, data/jyotish-books/brihat-jataka-deep-extraction.md, data/jyotish-books/bv-raman-case-studies.md, data/jyotish-books/dasha-timing-deep-extraction.md, data/jyotish-books/kn-rao-case-studies.md, data/jyotish-books/kn-rao-jaimini-chara-dasha-deep-extraction.md, data/jyotish-books/kn-rao-karakamsha-deep-extraction.md, data/jyotish-books/kn-rao-learn-hindu-deep-extraction.md, data/jyotish-books/kn-rao-predictive-techniques-deep-extraction.md, data/jyotish-books/kn-rao-wheel-of-time-deep-extraction.md, data/jyotish-books/laghu-parashari-deep-extraction.md, data/jyotish-books/light-on-life-deep-extraction.md, data/jyotish-books/phaladeepika-deep-extraction.md
+**Diff:** +2557 -443 across 31 files
+
+### 2026-04-22 22:45
+
+**Areas:** general
+**Files (15):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, data/jyotish-books/MASTER-REASONING-FRAMEWORK.md, data/jyotish-books/bphs-deep-extraction.md, data/jyotish-books/brihat-jataka-deep-extraction.md, data/jyotish-books/bv-raman-case-studies.md, data/jyotish-books/dasha-timing-deep-extraction.md, data/jyotish-books/kn-rao-case-studies.md, data/jyotish-books/kn-rao-jaimini-chara-dasha-deep-extraction.md, data/jyotish-books/kn-rao-karakamsha-deep-extraction.md, data/jyotish-books/kn-rao-learn-hindu-deep-extraction.md, data/jyotish-books/kn-rao-predictive-techniques-deep-extraction.md, data/jyotish-books/kn-rao-wheel-of-time-deep-extraction.md, data/jyotish-books/laghu-parashari-deep-extraction.md, data/jyotish-books/light-on-life-deep-extraction.md, data/jyotish-books/phaladeepika-deep-extraction.md
+**Diff:** +2551 -443 across 31 files
+
+### 2026-04-22 22:44
+
+**Areas:** general
+**Files (15):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, data/jyotish-books/MASTER-REASONING-FRAMEWORK.md, data/jyotish-books/bphs-deep-extraction.md, data/jyotish-books/brihat-jataka-deep-extraction.md, data/jyotish-books/bv-raman-case-studies.md, data/jyotish-books/dasha-timing-deep-extraction.md, data/jyotish-books/kn-rao-case-studies.md, data/jyotish-books/kn-rao-jaimini-chara-dasha-deep-extraction.md, data/jyotish-books/kn-rao-karakamsha-deep-extraction.md, data/jyotish-books/kn-rao-learn-hindu-deep-extraction.md, data/jyotish-books/kn-rao-predictive-techniques-deep-extraction.md, data/jyotish-books/kn-rao-wheel-of-time-deep-extraction.md, data/jyotish-books/laghu-parashari-deep-extraction.md, data/jyotish-books/light-on-life-deep-extraction.md, data/jyotish-books/phaladeepika-deep-extraction.md
+**Diff:** +2545 -443 across 31 files
+
+### 2026-04-22 22:42
+
+**Areas:** general
+**Files (15):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, data/jyotish-books/MASTER-REASONING-FRAMEWORK.md, data/jyotish-books/bphs-deep-extraction.md, data/jyotish-books/brihat-jataka-deep-extraction.md, data/jyotish-books/bv-raman-case-studies.md, data/jyotish-books/dasha-timing-deep-extraction.md, data/jyotish-books/kn-rao-case-studies.md, data/jyotish-books/kn-rao-jaimini-chara-dasha-deep-extraction.md, data/jyotish-books/kn-rao-karakamsha-deep-extraction.md, data/jyotish-books/kn-rao-learn-hindu-deep-extraction.md, data/jyotish-books/kn-rao-predictive-techniques-deep-extraction.md, data/jyotish-books/kn-rao-wheel-of-time-deep-extraction.md, data/jyotish-books/laghu-parashari-deep-extraction.md, data/jyotish-books/light-on-life-deep-extraction.md, data/jyotish-books/phaladeepika-deep-extraction.md
+**Diff:** +2539 -443 across 31 files
+
+### 2026-04-22 22:39
+
+**Areas:** general
+**Files (15):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, data/jyotish-books/MASTER-REASONING-FRAMEWORK.md, data/jyotish-books/bphs-deep-extraction.md, data/jyotish-books/brihat-jataka-deep-extraction.md, data/jyotish-books/bv-raman-case-studies.md, data/jyotish-books/dasha-timing-deep-extraction.md, data/jyotish-books/kn-rao-case-studies.md, data/jyotish-books/kn-rao-jaimini-chara-dasha-deep-extraction.md, data/jyotish-books/kn-rao-karakamsha-deep-extraction.md, data/jyotish-books/kn-rao-learn-hindu-deep-extraction.md, data/jyotish-books/kn-rao-predictive-techniques-deep-extraction.md, data/jyotish-books/kn-rao-wheel-of-time-deep-extraction.md, data/jyotish-books/laghu-parashari-deep-extraction.md, data/jyotish-books/light-on-life-deep-extraction.md, data/jyotish-books/phaladeepika-deep-extraction.md
+**Diff:** +2533 -443 across 31 files
+
+### 2026-04-22 22:35
+
+**Areas:** general
+**Files (15):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, data/jyotish-books/MASTER-REASONING-FRAMEWORK.md, data/jyotish-books/bphs-deep-extraction.md, data/jyotish-books/brihat-jataka-deep-extraction.md, data/jyotish-books/bv-raman-case-studies.md, data/jyotish-books/dasha-timing-deep-extraction.md, data/jyotish-books/kn-rao-case-studies.md, data/jyotish-books/kn-rao-jaimini-chara-dasha-deep-extraction.md, data/jyotish-books/kn-rao-karakamsha-deep-extraction.md, data/jyotish-books/kn-rao-learn-hindu-deep-extraction.md, data/jyotish-books/kn-rao-predictive-techniques-deep-extraction.md, data/jyotish-books/kn-rao-wheel-of-time-deep-extraction.md, data/jyotish-books/laghu-parashari-deep-extraction.md, data/jyotish-books/light-on-life-deep-extraction.md, data/jyotish-books/phaladeepika-deep-extraction.md
+**Diff:** +2527 -443 across 31 files
+
+### 2026-04-22 22:34
+
+**Areas:** general
+**Files (15):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, data/jyotish-books/MASTER-REASONING-FRAMEWORK.md, data/jyotish-books/bphs-deep-extraction.md, data/jyotish-books/brihat-jataka-deep-extraction.md, data/jyotish-books/bv-raman-case-studies.md, data/jyotish-books/dasha-timing-deep-extraction.md, data/jyotish-books/kn-rao-case-studies.md, data/jyotish-books/kn-rao-jaimini-chara-dasha-deep-extraction.md, data/jyotish-books/kn-rao-karakamsha-deep-extraction.md, data/jyotish-books/kn-rao-learn-hindu-deep-extraction.md, data/jyotish-books/kn-rao-predictive-techniques-deep-extraction.md, data/jyotish-books/kn-rao-wheel-of-time-deep-extraction.md, data/jyotish-books/laghu-parashari-deep-extraction.md, data/jyotish-books/light-on-life-deep-extraction.md, data/jyotish-books/phaladeepika-deep-extraction.md
+**Diff:** +2521 -443 across 31 files
+
+### 2026-04-22 22:33
+
+**Areas:** general
+**Files (15):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, data/jyotish-books/MASTER-REASONING-FRAMEWORK.md, data/jyotish-books/bphs-deep-extraction.md, data/jyotish-books/brihat-jataka-deep-extraction.md, data/jyotish-books/bv-raman-case-studies.md, data/jyotish-books/dasha-timing-deep-extraction.md, data/jyotish-books/kn-rao-case-studies.md, data/jyotish-books/kn-rao-jaimini-chara-dasha-deep-extraction.md, data/jyotish-books/kn-rao-karakamsha-deep-extraction.md, data/jyotish-books/kn-rao-learn-hindu-deep-extraction.md, data/jyotish-books/kn-rao-predictive-techniques-deep-extraction.md, data/jyotish-books/kn-rao-wheel-of-time-deep-extraction.md, data/jyotish-books/laghu-parashari-deep-extraction.md, data/jyotish-books/light-on-life-deep-extraction.md, data/jyotish-books/phaladeepika-deep-extraction.md
+**Diff:** +2515 -443 across 30 files
+
 ### 2026-04-22 22:30
 
 **Areas:** general
