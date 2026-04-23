@@ -141,3 +141,12 @@ launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/com.nanoclaw.plist
 # Rebuild after code changes
 npm run build && launchctl kickstart -k gui/$(id -u)/com.nanoclaw
 ```
+
+## Related
+
+- [[SKILL|Check if nanoclaw launchd service is running]]
+- [[REMOTE_SHELL_SETUP|📱 Remote Shell - Control Your Mac from Phone]]
+- [[READY_TO_DEPLOY|🎯 Ready to Deploy - Balanced Security Mode]]
+- [[2026-02-24-conversation-2341|Conversation]]
+- [[2026-02-26-conversation-1536|Conversation]]
+- [[SPEC|NanoClaw Specification]]

@@ -88,3 +88,12 @@ en0 (your WiFi/Ethernet) → Internet
 
 - [apple/container#469](https://github.com/apple/container/issues/469) — No network from container on macOS 26
 - [apple/container#656](https://github.com/apple/container/issues/656) — Cannot access internet URLs during building
+
+## Related
+
+- [[VNC_MAC_ARCHITECTURE|Full VNC Solution - Mac Native Architecture]]
+- [[CONTAINER_DB_LIMITATION|Container Database Query Limitation]]
+- [[DEBUG_CHECKLIST|NanoClaw Debug Checklist]]
+- [[2026-02-23-conversation-0556|Conversation]]
+- [[2026-02-24-conversation-2341|Conversation]]
+- [[SECURITY|NanoClaw Security Model]]
