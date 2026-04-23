@@ -202,8 +202,48 @@ export class GoalDecompositionEngine {
         source: 'internal',
       },
       async (selectedModelId) => {
-        // This would call actual model inference
-        // For now, return structured decomposition
+        // Call local Ollama for goal decomposition (free, fast)
+        try {
+          const response = await fetch('http://127.0.0.1:11434/api/chat', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              model: 'qwen2.5-coder:latest',
+              messages: [{ role: 'user', content: prompt }],
+              stream: false,
+              format: 'json',
+            }),
+          });
+          if (response.ok) {
+            const data = await response.json() as { message?: { content?: string } };
+            const content = data.message?.content || '';
+            const parsed = JSON.parse(content);
+            // Map parsed result to DecompositionResult format
+            return {
+              subGoals: (parsed.subGoals || []).map((sg: Record<string, unknown>, i: number) => ({
+                id: `subgoal_${Date.now()}_${i}`,
+                description: sg.description || '',
+                targetValue: sg.estimatedHours ? Number(sg.estimatedHours) * 50 : undefined,
+                status: 'active' as const,
+                priority: (sg.priority as string) || 'medium',
+                createdAt: Date.now(),
+                parentGoalId: goal.id,
+              })),
+              tasks: (parsed.tasks || []).map((t: Record<string, unknown>, i: number) => ({
+                id: `task_${Date.now()}_${i}`,
+                description: t.description || '',
+                complexity: t.complexity || 'moderate',
+                estimatedHours: Number(t.estimatedHours) || 4,
+                dependencies: (t.dependencies as string[]) || [],
+                priority: Number(t.priority) || 50,
+              })),
+              recommendedTeams: parsed.recommendedTeams || [],
+              criticalPath: parsed.criticalPath || [],
+            } as DecompositionResult;
+          }
+        } catch {
+          // Ollama unavailable — fall back to mock
+        }
         return this.mockDecomposition(goal);
       }
     );

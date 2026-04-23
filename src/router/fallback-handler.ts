@@ -179,16 +179,23 @@ export class FallbackHandler {
       }
     }
 
+    // Check if network is restricted (skip cloud tiers entirely)
+    const networkRestricted = process.env.NANOCLAW_NETWORK_RESTRICTED === '1';
+
     // Add tier escalation chain
     if (primaryTier === 'local-slm') {
-      // SLM -> LLM -> Cloud
-      chain.push({ modelId: 'llama-3.3-70b', tier: 'local-llm' });
-      chain.push({ modelId: 'claude-sonnet-4.6', tier: 'cloud' });
+      // SLM -> LLM -> Cloud (if network allows)
+      chain.push({ modelId: 'gemma4:26b', tier: 'local-llm' });
+      if (!networkRestricted) {
+        chain.push({ modelId: 'claude-sonnet-4.6', tier: 'cloud' });
+      }
     } else if (primaryTier === 'local-llm') {
-      // LLM -> Cloud (different providers)
-      chain.push({ modelId: 'claude-sonnet-4.6', tier: 'cloud' });
-      chain.push({ modelId: 'gemini-3-flash', tier: 'cloud' });
-    } else if (primaryTier === 'cloud') {
+      // LLM -> Cloud (if network allows)
+      if (!networkRestricted) {
+        chain.push({ modelId: 'claude-sonnet-4.6', tier: 'cloud' });
+        chain.push({ modelId: 'gemini-3-flash', tier: 'cloud' });
+      }
+    } else if (primaryTier === 'cloud' && !networkRestricted) {
       // Cloud -> different cloud providers
       if (primaryModelId.startsWith('claude')) {
         chain.push({ modelId: 'gemini-3-flash', tier: 'cloud' });

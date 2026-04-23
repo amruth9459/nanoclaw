@@ -5,6 +5,28 @@
  * Used when information is not in hot cache (Tier 1) or warm retrieval (Tier 2)
  */
 
+import { logger } from '../logger.js';
+
+/** Perplexity API response types */
+interface PerplexityApiChoice {
+  index: number;
+  message: { role: string; content: string };
+  finish_reason: 'stop' | 'length';
+}
+
+interface PerplexityApiResponse {
+  id: string;
+  model: string;
+  created: number;
+  choices: PerplexityApiChoice[];
+  citations?: string[]; // Array of source URLs
+  usage?: {
+    prompt_tokens: number;
+    completion_tokens: number;
+    total_tokens: number;
+  };
+}
+
 export interface PerplexitySearchOptions {
   query: string;
   model?: 'sonar' | 'sonar-pro' | 'sonar-reasoning';
@@ -70,21 +92,54 @@ export class PerplexityClient {
       search_recency_filter: options.searchRecencyFilter,
     };
 
-    // TODO: Implement actual API call
-    // const response = await fetch(`${this.baseUrl}/chat/completions`, {
-    //   method: 'POST',
-    //   headers: {
-    //     'Authorization': `Bearer ${this.apiKey}`,
-    //     'Content-Type': 'application/json',
-    //   },
-    //   body: JSON.stringify(payload),
-    // });
+    let response: Response;
+    try {
+      response = await fetch(`${this.baseUrl}/chat/completions`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${this.apiKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      });
+    } catch (err) {
+      logger.error({ err }, 'Perplexity API network error');
+      throw new Error(`Perplexity API request failed: ${err instanceof Error ? err.message : String(err)}`);
+    }
 
-    // Placeholder - shows structure of what would be returned
+    if (!response.ok) {
+      const body = await response.text().catch(() => 'unknown');
+      logger.error({ status: response.status, body }, 'Perplexity API error response');
+      throw new Error(`Perplexity API returned ${response.status}: ${body}`);
+    }
+
+    let data: PerplexityApiResponse;
+    try {
+      data = await response.json() as PerplexityApiResponse;
+    } catch {
+      throw new Error('Perplexity API returned invalid JSON');
+    }
+
+    const answer = data.choices?.[0]?.message?.content;
+    if (!answer) {
+      throw new Error('Perplexity API returned no answer in response');
+    }
+
+    // Map citations (URL strings) to source objects
+    const sources = (data.citations || []).map(url => ({
+      url,
+      title: new URL(url).hostname.replace(/^www\./, ''),
+      snippet: '',
+    }));
+
+    if (data.usage) {
+      logger.info({ model: data.model, tokens: data.usage.total_tokens }, 'Perplexity API call complete');
+    }
+
     return {
-      answer: 'Perplexity integration pending - API key required',
-      sources: [],
-      model,
+      answer,
+      sources,
+      model: data.model,
       searchedWeb: true,
     };
   }

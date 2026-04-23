@@ -19,6 +19,7 @@ import {
 } from './config.js';
 import { WhatsAppChannel } from './channels/whatsapp.js';
 import {
+  ContainerInput,
   ContainerOutput,
   isOAuthError,
   readOAuthFromKeychain,
@@ -55,9 +56,9 @@ import {
   updateTask,
   getDb,
 } from './db.js';
-// Local routing disabled while Max subscription is active
 // import { routeWithOpus, executeLocal } from './opus-router.js';
 import { calculateCost } from './economics.js';
+import { runHostClaudeAgent, shouldUseHostRunner } from './host-runner.js';
 // Dead code clusters — wired as enrichment/monitoring layers (non-blocking)
 import { contextManager, codedContext, setSystemFact, setCapability } from './context/index.js';
 import { pruneOldChunks } from './semantic-index.js';
@@ -67,6 +68,7 @@ import { classifyGoalHeuristic, extractGoalDetails } from './goal-classifier.js'
 import { ResponseTimeManager } from './response-time-manager.js';
 import { NanoClawOrchestrator } from './nanoclaw-orchestrator.js';
 import { listGroupFiles, startDashboard } from './dashboard.js';
+import { startApiServer, apiEvents } from './api-server.js';
 import { startThroughputMonitor } from './throughput-monitor.js';
 import { initNotificationRouter } from './notification-router.js';
 import { ResourceOrchestrator, AgentPriority } from './resource-orchestrator.js';
@@ -75,7 +77,7 @@ import { ImplementationGate } from './implementation-gate.js';
 import { DeliverableGate } from './deliverable-gate.js';
 import { GroupQueue } from './group-queue.js';
 import { HitlGate } from './hitl.js';
-import { startIpcWatcher } from './ipc.js';
+import { startIpcWatcher, tryHandleSpawnApproval } from './ipc.js';
 import { getIntegrations, loadIntegrations } from './integration-loader.js';
 import { findChannel, formatMessages, formatOutbound } from './router.js';
 import { startSchedulerLoop } from './task-scheduler.js';
@@ -161,6 +163,8 @@ function loadState(): void {
             trigger: g.trigger,
             added_at: new Date().toISOString(),
             requiresTrigger: g.requiresTrigger,
+            displayName: g.displayName,
+            containerConfig: g.containerConfig,
           });
         }
       }
@@ -441,6 +445,24 @@ async function processGroupMessages(chatJid: string): Promise<boolean> {
     return true;
   }
 
+  // Handle /runner command — toggle host runner on/off from WhatsApp
+  if (rawCmd === '/runner' || rawCmd.startsWith('/runner ')) {
+    const arg = rawCmd.replace('/runner', '').trim().toLowerCase();
+    if (arg === 'on' || arg === '1' || arg === 'host') {
+      process.env.USE_HOST_RUNNER = '1';
+      await channel.sendMessage(chatJid, 'Host runner *enabled* — using Claude Code CLI on host.');
+    } else if (arg === 'off' || arg === '0' || arg === 'container') {
+      process.env.USE_HOST_RUNNER = '0';
+      await channel.sendMessage(chatJid, 'Host runner *disabled* — using container sandbox.');
+    } else {
+      const current = shouldUseHostRunner(group.folder) ? 'host (Claude Code CLI)' : 'container (sandboxed)';
+      await channel.sendMessage(chatJid, `Runner: *${current}*\n\nUsage:\n/runner on — use host Claude Code CLI\n/runner off — use container sandbox`);
+    }
+    lastAgentTimestamp[chatJid] = lastMsgForCmd.timestamp;
+    saveState();
+    return true;
+  }
+
   const lastMsg = missedMessages[missedMessages.length - 1];
 
   let prompt = formatMessages(missedMessages);
@@ -526,15 +548,15 @@ async function processGroupMessages(chatJid: string): Promise<boolean> {
     }
   }
 
-  // Route decision: log which model the router would pick (monitoring-only)
+  // Route decision: select model tier based on message complexity
   let routingDecision: RoutingDecision | undefined;
   try {
     const strippedContent = lastMsg.content.replace(TRIGGER_PATTERN, '').trim();
     const routingCtx: RoutingContext = {
       taskType: 'conversation',
       userTier: 'internal',
-      costBudget: 'unlimited',
-      qualityNeeds: 'best',
+      costBudget: 'limited',
+      qualityNeeds: 'good',
       latencyNeeds: 'fast',
       source: (chatChannelSource.get(chatJid) || 'whatsapp') as import('./router/types.js').TaskSource,
       hasMedia: false,
@@ -543,7 +565,7 @@ async function processGroupMessages(chatJid: string): Promise<boolean> {
     routingDecision = await router.route(routingCtx);
     logger.info(
       { model: routingDecision.modelId, tier: routingDecision.modelTier, confidence: routingDecision.confidence, reasoning: routingDecision.reasoning },
-      'Routing decision (monitoring-only)',
+      'Routing decision',
     );
   } catch (err) {
     logger.warn({ err }, 'Router decision failed');
@@ -560,7 +582,7 @@ async function processGroupMessages(chatJid: string): Promise<boolean> {
       'Goal classification',
     );
 
-    // Multi-agent path (no-op until decomposition engine has real model calls)
+    // Multi-agent path: decompose complex goals into teams (uses local Ollama for decomposition)
     if (goalClass.shouldUseTeams && goalClass.confidence === 'high' && nanoClawOrchestrator) {
       try {
         const goalDetails = extractGoalDetails(strippedContent);
@@ -674,9 +696,73 @@ async function processGroupMessages(chatJid: string): Promise<boolean> {
     logger.warn({ err }, 'ResponseTimeManager startTask failed');
   }
 
-  // LOCAL ROUTING DISABLED — sending everything to cloud while Max subscription is active.
-  // To re-enable local routing, uncomment the block in this section.
-  // See src/opus-router.ts for the routing logic (uses Ollama for classification).
+  // LOCAL MODEL ROUTING: dispatch simple tasks to Ollama directly (free, fast)
+  // Falls through to container for cloud-tier tasks or if Ollama is unavailable
+  if (routingDecision && (routingDecision.modelTier === 'local-slm' || routingDecision.modelTier === 'local-llm')) {
+    try {
+      const ollamaUrl = process.env.OLLAMA_URL || 'http://127.0.0.1:11434';
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 60000);
+
+      // Build conversation from missed messages
+      const ollamaMessages: Array<{ role: string; content: string }> = [
+        { role: 'system', content: `You are ${ASSISTANT_NAME}, a helpful assistant. Be concise. Current date: ${new Date().toISOString().slice(0, 10)}.` },
+      ];
+      for (const msg of missedMessages) {
+        ollamaMessages.push({
+          role: msg.is_from_me ? 'assistant' : 'user',
+          content: msg.content.replace(TRIGGER_PATTERN, '').trim(),
+        });
+      }
+
+      const ollamaRes = await fetch(`${ollamaUrl}/v1/chat/completions`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: routingDecision.modelId,
+          messages: ollamaMessages,
+          max_tokens: 8192,  // Thinking models need headroom for reasoning + content
+          temperature: 0.7,
+        }),
+        signal: controller.signal,
+      });
+      clearTimeout(timeout);
+
+      if (ollamaRes.ok) {
+        const ollamaData = await ollamaRes.json() as {
+          choices?: Array<{ message?: { content?: string; reasoning?: string } }>;
+          usage?: { completion_tokens?: number; prompt_tokens?: number; total_tokens?: number };
+        };
+        // Some models (e.g., glm-4.7-flash) put output in reasoning field instead of content
+        const msg = ollamaData.choices?.[0]?.message;
+        const localResponse = (msg?.content || msg?.reasoning || '').trim() || undefined;
+        if (localResponse) {
+          // Send the local model response to user
+          const formatted = formatOutbound(localResponse);
+          await channel.sendMessage(chatJid, formatted);
+          await ackChannel.setTyping?.(chatJid, false);
+
+          // Log usage (zero cost for local models)
+          const tokens = ollamaData.usage?.total_tokens || 0;
+          const localStartTime = Date.now();
+          logUsage(group.folder, chatJid, { inputTokens: ollamaData.usage?.prompt_tokens || 0, outputTokens: ollamaData.usage?.completion_tokens || 0 }, 0, false, 0, determinePurpose(group.folder, chatJid));
+
+          logger.info(
+            { model: routingDecision.modelId, tier: routingDecision.modelTier, tokens, group: group.name },
+            'Local model response sent',
+          );
+
+          // Complete response time tracking
+          try { responseTimeManager.completeTask(); } catch { /* non-blocking */ }
+          return true;
+        }
+      }
+      // Ollama failed or empty response — fall through to container
+      logger.info({ model: routingDecision.modelId, status: ollamaRes.status }, 'Local model unavailable, falling through to container');
+    } catch (err) {
+      logger.info({ err, model: routingDecision.modelId }, 'Local model dispatch failed, falling through to container');
+    }
+  }
 
   // Track idle timer for closing stdin when agent is idle
   let idleTimer: ReturnType<typeof setTimeout> | null = null;
@@ -862,24 +948,35 @@ async function runAgent(
     // Resolve personality params for this group (Phase 2 Karpathy tuning)
     const personalityParams = getPersonalityParams(group.folder) ?? undefined;
 
-    const output = await runContainerAgent(
+    const useHostRunner = shouldUseHostRunner(group.folder);
+    const runnerFn = useHostRunner ? runHostClaudeAgent : runContainerAgent;
+
+    if (useHostRunner) {
+      logger.info({ group: group.name }, 'Using host Claude Code runner (subscription-safe)');
+    } else {
+      logger.info({ group: group.name }, 'Using container runner (sandboxed)');
+    }
+
+    const containerInput: ContainerInput = {
+      prompt,
+      sessionId,
+      groupFolder: group.folder,
+      chatJid,
+      isMain,
+      designation,
+      routingHint: routingDecisionHint ? {
+        suggestedModel: routingDecisionHint.modelId,
+        tier: routingDecisionHint.modelTier,
+        confidence: routingDecisionHint.confidence,
+        reasoning: routingDecisionHint.reasoning,
+      } : undefined,
+      maxTurns,
+      personalityParams,
+    };
+
+    const output = await runnerFn(
       group,
-      {
-        prompt,
-        sessionId,
-        groupFolder: group.folder,
-        chatJid,
-        isMain,
-        designation,
-        routingHint: routingDecisionHint ? {
-          suggestedModel: routingDecisionHint.modelId,
-          tier: routingDecisionHint.modelTier,
-          confidence: routingDecisionHint.confidence,
-          reasoning: routingDecisionHint.reasoning,
-        } : undefined,
-        maxTurns,
-        personalityParams,
-      },
+      containerInput,
       (proc, containerName) => {
         queue.registerProcess(chatJid, proc, containerName, group.folder);
         queue.setDesignation(chatJid, designation);
@@ -908,23 +1005,9 @@ async function runAgent(
         logger.info({ group: group.name, source: keychainToken ? 'keychain' : 'env' }, 'Token changed — retrying with fresh token');
         lastTokenPrefix = freshPrefix;
 
-        const retryOutput = await runContainerAgent(
+        const retryOutput = await runnerFn(
           group,
-          {
-            prompt,
-            sessionId, // Same session = conversation context preserved
-            groupFolder: group.folder,
-            chatJid,
-            isMain,
-            designation,
-            routingHint: routingDecisionHint ? {
-              suggestedModel: routingDecisionHint.modelId,
-              tier: routingDecisionHint.modelTier,
-              confidence: routingDecisionHint.confidence,
-              reasoning: routingDecisionHint.reasoning,
-            } : undefined,
-            maxTurns,
-          },
+          { ...containerInput, sessionId }, // Same session = context preserved
           (proc, containerName) => {
             queue.registerProcess(chatJid, proc, containerName, group.folder);
             queue.setDesignation(chatJid, designation);
@@ -1106,6 +1189,13 @@ async function startMessageLoop(): Promise<void> {
                 (text) => channel.sendMessage(chatJid, text),
               ).catch((err) =>
                 logger.warn({ err }, 'ImplementationGate approval handling error'),
+              );
+              // SpawnGate: handle approve-spawn / reject-spawn tokens
+              tryHandleSpawnApproval(
+                msg.content,
+                (text) => channel.sendMessage(chatJid, text),
+              ).catch((err) =>
+                logger.warn({ err }, 'SpawnGate approval handling error'),
               );
               // Integration gates (e.g. SandboxGate)
               for (const integ of getIntegrations()) {
@@ -1473,12 +1563,16 @@ TOOLS: find_freelance_gigs, find_bounties, propose_bounty, propose_deliverable, 
 }
 
 async function main(): Promise<void> {
-  // Startup: verify native modules are compatible with current Node version
+  // Startup: verify native modules are compatible with current Node version.
+  // require('better-sqlite3') only loads the JS wrapper; the native .node binary
+  // isn't loaded until new Database() is called. So we must instantiate one.
   {
     const { createRequire } = await import('module');
     const req = createRequire(import.meta.url);
     try {
-      req('better-sqlite3');
+      const Database = req('better-sqlite3');
+      const testDb = new Database(':memory:');
+      testDb.close();
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : String(err);
       if (msg.includes('NODE_MODULE_VERSION')) {
@@ -1491,11 +1585,16 @@ async function main(): Promise<void> {
             stdio: 'pipe',
             timeout: 60000,
           });
-          logger.info('better-sqlite3 rebuilt successfully — continuing startup');
+          logger.info('better-sqlite3 rebuilt successfully — restarting');
+          // After rebuild, the cached module is stale. Restart cleanly.
+          process.exit(0);
         } catch (rebuildErr) {
           logger.error({ err: rebuildErr }, 'FATAL: Failed to rebuild better-sqlite3');
           process.exit(1);
         }
+      } else {
+        // Some other error (not version mismatch) — let it proceed and fail naturally
+        logger.warn({ error: msg }, 'better-sqlite3 startup check failed (non-version issue)');
       }
     }
   }
@@ -1679,10 +1778,32 @@ Steps:
   const channelOpts = {
     onMessage: (_chatJid: string, msg: NewMessage, channelName?: string) => {
       storeMessage(msg);
+      apiEvents.emit('new_message', { jid: msg.chat_jid, message: msg });
       if (channelName) chatChannelSource.set(msg.chat_jid, channelName);
+      // Dispatch quote-replies to integrations (reactions handled separately)
+      if (msg.quoted_message_id && !msg.is_bot_message) {
+        (async () => {
+          for (const integration of getIntegrations()) {
+            if (integration.handleQuoteReply) {
+              const handled = await integration.handleQuoteReply(msg.chat_jid, msg.quoted_message_id!, msg);
+              if (handled) break;
+            }
+          }
+        })().catch((err) => logger.warn({ err, chatJid: msg.chat_jid }, 'Error in quote-reply handler'));
+      }
     },
     onChatMetadata: (chatJid: string, timestamp: string, name?: string, channel?: string, isGroup?: boolean) =>
       storeChatMetadata(chatJid, timestamp, name, channel, isGroup),
+    onReaction: (chatJid: string, messageId: string, senderJid: string, emoji: string) => {
+      // Dispatch reactions to integrations
+      (async () => {
+        for (const integration of getIntegrations()) {
+          if (integration.handleReaction) {
+            await integration.handleReaction(chatJid, messageId, senderJid, emoji);
+          }
+        }
+      })().catch((err) => logger.warn({ err, chatJid }, 'Error in reaction handler'));
+    },
     registeredGroups: () => registeredGroups,
   };
 
@@ -1702,7 +1823,10 @@ Steps:
     },
   });
   channels.push(whatsapp);
-  await whatsapp.connect();
+  await whatsapp.connect().catch((err: Error) => {
+    logger.error({ err: err.message }, 'Primary WhatsApp connect failed — running in degraded mode (API/terminal still available)');
+    channels.splice(channels.indexOf(whatsapp), 1);
+  });
 
   // Optional second WhatsApp number (enable with NANOCLAW_WA2=1)
   if (WA2_ENABLED) {
@@ -1773,48 +1897,45 @@ Steps:
 
   // Start subsystems (independently of connection handler)
   startDashboard(queue, (jid, text) => clawSend(jid, text), orchestrator, router);
+  startApiServer(queue, (jid, text) => clawSend(jid, text), orchestrator);
   startThroughputMonitor();
-  startSchedulerLoop({
-    registeredGroups: () => registeredGroups,
-    getSessions: () => sessions,
-    queue,
-    orchestrator,
-    onProcess: (groupJid, proc, containerName, groupFolder) => queue.registerProcess(groupJid, proc, containerName, groupFolder),
-    sendMessage: async (jid, rawText) => {
-      const text = formatOutbound(rawText);
-      if (text) await clawSend(jid, text).catch((err) =>
-        logger.warn({ jid, err }, 'Scheduler sendMessage failed'),
-      );
-    },
-  });
   // Helper: find WA2 channel (the secondary number, used as Claw's outbound identity)
   const findWa2 = () => channels.find((c) => c.name === 'whatsapp2' && c.isConnected());
 
   // Claw's outbound messages (IPC-originated) go through WA2 when available so
   // they trigger notifications — sending from the same number as the user gets
   // silenced by WhatsApp as "your own message". Falls back to WA1 if WA2 not in group.
-  const clawSend = async (jid: string, text: string): Promise<void> => {
+  const clawSend = async (jid: string, text: string, senderName?: string): Promise<void> => {
     // First, use ownsJid-based routing — respects registered group context
     // and prevents cross-channel contamination when a JID appears on multiple channels.
     const owned = findChannel(channels, jid);
-    if (owned?.isConnected()) return owned.sendMessage(jid, text);
+    if (owned?.isConnected()) { await owned.sendMessage(jid, text, senderName); return; }
 
     // For unregistered/guest JIDs, fall back to in-memory source then DB.
     const channelName = chatChannelSource.get(jid) || getChatChannel(jid);
     if (channelName) {
       const ch = channels.find((c) => c.name === channelName && c.isConnected());
-      if (ch) return ch.sendMessage(jid, text);
+      if (ch) { await ch.sendMessage(jid, text, senderName); return; }
     }
     // Fallback: prefer WA2 for notifications, then any channel
     const wa2 = findWa2();
     if (wa2) {
-      try { return await wa2.sendMessage(jid, text); } catch { /* WA2 not in group, fall through */ }
+      try { await wa2.sendMessage(jid, text, senderName); return; } catch { /* WA2 not in group, fall through */ }
     }
-    if (owned) return owned.sendMessage(jid, text); // owned but was disconnected earlier — retry
+    if (owned) { await owned.sendMessage(jid, text, senderName); return; } // owned but was disconnected earlier — retry
     // Last resort: try any connected channel (handles disconnected preferred channel)
     const anyConnected = channels.find((c) => c.isConnected());
     if (!anyConnected) throw new Error(`No connected channel for JID: ${jid}`);
-    return anyConnected.sendMessage(jid, text);
+    await anyConnected.sendMessage(jid, text, senderName);
+  };
+
+  // Like clawSend but returns the WhatsApp message ID (for IPC responseFile)
+  const clawSendGetId = async (jid: string, text: string, senderName?: string): Promise<string | undefined> => {
+    const owned = findChannel(channels, jid);
+    const ch = owned?.isConnected() ? owned : findWa2() ?? channels.find((c) => c.isConnected());
+    if (!ch) throw new Error(`No connected channel for JID: ${jid}`);
+    await ch.sendMessage(jid, text, senderName);
+    return ch.getLastSentMessageId?.();
   };
 
   const clawSendFile = async (jid: string, buffer: Buffer, mimetype: string, filename: string, caption?: string): Promise<void> => {
@@ -1839,6 +1960,22 @@ Steps:
     return ch.sendFile(jid, buffer, mimetype, filename, caption);
   };
 
+  // Start scheduler (after clawSendGetId is defined)
+  startSchedulerLoop({
+    registeredGroups: () => registeredGroups,
+    getSessions: () => sessions,
+    queue,
+    orchestrator,
+    onProcess: (groupJid, proc, containerName, groupFolder) => queue.registerProcess(groupJid, proc, containerName, groupFolder),
+    sendMessage: async (jid, rawText, senderName?) => {
+      const text = formatOutbound(rawText);
+      if (text) await clawSend(jid, text, senderName).catch((err) =>
+        logger.warn({ jid, err }, 'Scheduler sendMessage failed'),
+      );
+    },
+    sendMessageGetId: clawSendGetId,
+  });
+
   // Initialize notification router so /api/notify can send to WhatsApp
   initNotificationRouter(clawSend);
 
@@ -1854,6 +1991,7 @@ Steps:
 
   startIpcWatcher({
     sendMessage: clawSend,
+    sendMessageGetId: clawSendGetId,
     sendReaction: (jid, msgId, senderJid, emoji) => {
       // Respect the channel the chat arrived on (critical for guest DMs)
       const dbChannel = getChatChannel(jid);
@@ -1863,6 +2001,17 @@ Steps:
       return ch.sendReaction(jid, msgId, senderJid, emoji);
     },
     sendFile: clawSendFile,
+    sendInteractiveMessage: async (jid, ui, senderName) => {
+      const owned = findChannel(channels, jid);
+      const ch = owned?.isConnected() ? owned : (findWa2() ?? whatsapp);
+      if (ch?.sendInteractiveMessage) {
+        await ch.sendInteractiveMessage(jid, ui, senderName);
+      } else {
+        // Fallback: send as plain text with button labels
+        const buttonList = ui.buttons.map(b => `• ${b.title}`).join('\n');
+        await clawSend(jid, `${ui.body}\n\n${buttonList}${ui.footer ? '\n\n' + ui.footer : ''}`, senderName);
+      }
+    },
     registeredGroups: () => {
       // Merge guest groups so IPC auth allows guest agents to reply to their own chat
       const merged = { ...registeredGroups };

@@ -53,6 +53,7 @@ export interface RegisteredGroup {
   added_at: string;
   containerConfig?: ContainerConfig;
   requiresTrigger?: boolean; // Default: true for groups, false for solo chats
+  displayName?: string; // Custom display name for bot messages (e.g. "PLC Site Report")
 }
 
 export interface NewMessage {
@@ -68,6 +69,7 @@ export interface NewMessage {
   media_path?: string | null;
   media_mimetype?: string | null;
   media_size?: number | null;
+  quoted_message_id?: string; // WhatsApp stanzaId of the message being replied to
 }
 
 export interface ScheduledTask {
@@ -94,12 +96,28 @@ export interface TaskRunLog {
   error: string | null;
 }
 
+// --- Interactive UI metadata ---
+
+export interface UIButton {
+  id: string;     // Unique button ID returned on press (e.g. "approve", "reject")
+  title: string;  // Display text (max 20 chars for WhatsApp)
+}
+
+export interface UIMetadata {
+  type: 'buttons';
+  body: string;           // Main message text
+  footer?: string;        // Small footer text
+  buttons: UIButton[];    // 1-3 buttons
+}
+
 // --- Channel abstraction ---
 
 export interface Channel {
   name: string;
   connect(): Promise<void>;
-  sendMessage(jid: string, text: string): Promise<void>;
+  sendMessage(jid: string, text: string, senderName?: string): Promise<void>;
+  /** Get the message ID of the last sent message (channel-specific) */
+  getLastSentMessageId?(): string | undefined;
   /** Send a file (PDF, image, etc.) as a WhatsApp document/image message. */
   sendFile?(jid: string, buffer: Buffer, mimetype: string, filename: string, caption?: string): Promise<void>;
   isConnected(): boolean;
@@ -115,6 +133,8 @@ export interface Channel {
   ownPhoneJid?(): string | undefined;
   /** Update a WhatsApp group's description text. */
   updateGroupDescription?(jid: string, description: string): Promise<void>;
+  /** Send an interactive message (buttons/lists). Falls back to text if unsupported. */
+  sendInteractiveMessage?(jid: string, ui: UIMetadata, senderName?: string): Promise<void>;
 }
 
 // Callback type that channels use to deliver inbound messages

@@ -294,13 +294,13 @@ export class RouterFactory {
       models: {
         local: {
           slm: {
-            vision: 'qwen2.5-vl-7b',
-            text: 'qwen2.5-7b',
+            vision: 'qwen3-vl:8b',
+            text: 'glm-4.7-flash',
           },
           llm: {
-            vision: 'qwen2.5-vl-72b',
-            reasoning: 'llama-3.3-70b',
-            code: 'llama-3.3-70b',
+            vision: 'gemma4:26b',
+            reasoning: 'gemma4:26b',
+            code: 'deepseek-coder-v2',
           },
         },
         cloud: {
