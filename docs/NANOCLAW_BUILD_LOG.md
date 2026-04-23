@@ -1,11 +1,488 @@
 # NanoClaw — Daily Build Log
 
 *Living document — auto-generated from git history*
-*Last generated: 2026-03-24*
+*Last generated: 2026-04-18*
 
-**519 total commits** (218 meaningful) | 2026-01-31 to 2026-03-23
+**982 total commits** (228 meaningful) | 2026-01-31 to 2026-04-18
 
 ---
+
+## 2026-04-18
+
+### What Changed
+- 1 auto-backup commits (incremental saves)
+
+### Files (1 changed)
+- docs/DEVLOG.md
+
+### Stats
+- 6 insertions, 0 deletions
+
+## 2026-04-17
+
+### What Changed
+- 18 auto-backup commits (incremental saves)
+
+### Files (3 changed)
+- docs/DEVLOG.md
+- docs/NANOCLAW_BUILD_LOG.md
+- docs/NANOCLAW_PLATFORM.md
+
+### Stats
+- 856 insertions, 3 deletions
+
+## 2026-04-16
+
+### What Changed
+- 20 auto-backup commits (incremental saves)
+
+### Files (3 changed)
+- docs/DEVLOG.md
+- docs/NANOCLAW_BUILD_LOG.md
+- docs/NANOCLAW_PLATFORM.md
+
+### Stats
+- 973 insertions, 12 deletions
+
+## 2026-04-15
+
+### What Changed
+- 20 auto-backup commits (incremental saves)
+
+### Files (3 changed)
+- docs/DEVLOG.md
+- docs/NANOCLAW_BUILD_LOG.md
+- docs/NANOCLAW_PLATFORM.md
+
+### Stats
+- 680 insertions, 12 deletions
+
+## 2026-04-14
+
+### What Changed
+- 20 auto-backup commits (incremental saves)
+
+### Files (4 changed)
+- docs/DEVLOG.md
+- docs/NANOCLAW_BUILD_LOG.md
+- docs/NANOCLAW_CHANGELOG.md
+- docs/NANOCLAW_PLATFORM.md
+
+### Stats
+- 1047 insertions, 17 deletions
+
+## 2026-04-13
+
+### What Changed
+- 23 auto-backup commits (incremental saves)
+
+### Files (6 changed)
+- docs/DEVLOG.md
+- docs/NANOCLAW_BUILD_LOG.md
+- docs/NANOCLAW_CHANGELOG.md
+- docs/NANOCLAW_PLATFORM.md
+- scripts/setup-nn.sh
+- src/terminal-session.ts
+
+### Stats
+- 1424 insertions, 10 deletions
+
+## 2026-04-12
+
+### What Changed
+- [Agent] task_1775964178935_njqjb7h: Add RAG chat history and conversational query chains
+- (+22 auto-backup commits)
+
+### Files (107 changed)
+- .claude/hooks/memory-bridge.sh
+- .claude/hooks/safety-gate.sh
+- .claude/hooks/session-start.sh
+- .claude/hooks/write-gate.sh
+- CLAUDE.md
+- container/agent-runner/src/ipc-mcp-stdio.ts
+- container/skills/agent-browser/SKILL.md
+- container/skills/ollama/SKILL.md
+- container/skills/security-review/SKILL.md
+- container/skills/self-audit/SKILL.md
+- docs/APPLE-CONTAINER-NETWORKING.md
+- docs/DEBUG_CHECKLIST.md
+- docs/DEVLOG.md
+- docs/EXPERIMENTS.md
+- docs/FINE_TUNING_GUIDE.md
+- docs/NANOCLAW_BUILD_LOG.md
+- docs/NANOCLAW_CHANGELOG.md
+- docs/NANOCLAW_HARDENING_CHECKLIST.md
+- docs/NANOCLAW_PLATFORM.md
+- docs/R2_BACKUP_SECURITY.md
+- ... and 87 more
+
+### Stats
+- 6422 insertions, 190 deletions
+
+## 2026-04-11
+
+### What Changed
+- 21 auto-backup commits (incremental saves)
+
+### Files (3 changed)
+- docs/DEVLOG.md
+- docs/NANOCLAW_BUILD_LOG.md
+- docs/NANOCLAW_PLATFORM.md
+
+### Stats
+- 1384 insertions, 3 deletions
+
+## 2026-04-10
+
+### What Changed
+- 21 auto-backup commits (incremental saves)
+
+### Files (3 changed)
+- docs/DEVLOG.md
+- docs/NANOCLAW_BUILD_LOG.md
+- docs/NANOCLAW_PLATFORM.md
+
+### Stats
+- 1102 insertions, 3 deletions
+
+## 2026-04-09
+
+### What Changed
+- 22 auto-backup commits (incremental saves)
+
+### Files (3 changed)
+- docs/DEVLOG.md
+- docs/NANOCLAW_BUILD_LOG.md
+- docs/NANOCLAW_PLATFORM.md
+
+### Stats
+- 1540 insertions, 3 deletions
+
+## 2026-04-08
+
+### What Changed
+- 18 auto-backup commits (incremental saves)
+
+### Files (3 changed)
+- docs/DEVLOG.md
+- docs/NANOCLAW_BUILD_LOG.md
+- docs/NANOCLAW_PLATFORM.md
+
+### Stats
+- 575 insertions, 3 deletions
+
+## 2026-04-07
+
+### What Changed
+- 23 auto-backup commits (incremental saves)
+
+### Files (17 changed)
+- container/agent-runner/src/content-sanitizer.ts
+- container/agent-runner/src/index.ts
+- container/agent-runner/src/model-selector.ts
+- docs/DEVLOG.md
+- docs/NANOCLAW_BUILD_LOG.md
+- docs/NANOCLAW_PLATFORM.md
+- groups/main/CLAUDE.md
+- package-lock.json
+- src/content-filter.test.ts
+- src/content-filter.ts
+- src/index.ts
+- src/ipc.ts
+- src/semantic-index-validator.test.ts
+- src/semantic-index-validator.ts
+- src/semantic-index.ts
+- ... and 2 more
+
+### Stats
+- 3307 insertions, 580 deletions
+
+## 2026-04-06
+
+### What Changed
+- 21 auto-backup commits (incremental saves)
+
+### Files (4 changed)
+- docs/DEVLOG.md
+- docs/NANOCLAW_BUILD_LOG.md
+- docs/NANOCLAW_CHANGELOG.md
+- docs/NANOCLAW_PLATFORM.md
+
+### Stats
+- 1001 insertions, 5 deletions
+
+## 2026-04-05
+
+### What Changed
+- 18 auto-backup commits (incremental saves)
+
+### Files (4 changed)
+- docs/DEVLOG.md
+- docs/NANOCLAW_BUILD_LOG.md
+- docs/NANOCLAW_CHANGELOG.md
+- docs/NANOCLAW_PLATFORM.md
+
+### Stats
+- 200 insertions, 5 deletions
+
+## 2026-04-04
+
+### What Changed
+- Backup before upstream sync - PLC and agent-runner changes
+- (+23 auto-backup commits)
+
+### Files (83 changed)
+- .../NBU_MedicalClinic_Arch.ground-truth.json
+- .../NBU_MedicalClinic_Eng-HVAC.ground-truth.json
+- .../agent-runner/src/safe-action-classifier.ts
+- .claude/worktrees/agitated-haibt
+- .claude/worktrees/angry-hypatia
+- .claude/worktrees/bold-feistel
+- .claude/worktrees/busy-chatterjee
+- .claude/worktrees/charming-wilbur
+- .claude/worktrees/compassionate-mclaren
+- .claude/worktrees/condescending-lederberg
+- .claude/worktrees/condescending-torvalds
+- .claude/worktrees/dazzling-rosalind
+- .claude/worktrees/distracted-williams
+- .claude/worktrees/eloquent-wu
+- .claude/worktrees/festive-leavitt
+- .claude/worktrees/funny-kilby
+- .claude/worktrees/gifted-franklin
+- .claude/worktrees/gracious-bohr
+- .claude/worktrees/heuristic-kowalevski
+- .claude/worktrees/infallible-aryabhata
+- ... and 63 more
+
+### Stats
+- 3289 insertions, 68 deletions
+
+## 2026-04-03
+
+### What Changed
+- 19 auto-backup commits (incremental saves)
+
+### Files (4 changed)
+- docs/DEVLOG.md
+- docs/NANOCLAW_BUILD_LOG.md
+- docs/NANOCLAW_CHANGELOG.md
+- docs/NANOCLAW_PLATFORM.md
+
+### Stats
+- 120 insertions, 5 deletions
+
+## 2026-04-02
+
+### What Changed
+- [Agent] task_1775011649679_e2hk4n8: Add CatchMe skill with delightful personality
+- (+19 auto-backup commits)
+
+### Files (12 changed)
+- docs/DEVLOG.md
+- docs/NANOCLAW_BUILD_LOG.md
+- docs/NANOCLAW_CHANGELOG.md
+- docs/NANOCLAW_PLATFORM.md
+- skills/catchme/README.md
+- skills/catchme/__tests__/skill.test.ts
+- skills/catchme/achievements.ts
+- skills/catchme/cli-helpers.ts
+- skills/catchme/easter-eggs.ts
+- skills/catchme/formatters.ts
+- skills/catchme/skill.ts
+- vitest.config.ts
+
+### Stats
+- 1353 insertions, 6 deletions
+
+## 2026-04-01
+
+### What Changed
+- [Agent] task_user_3tier_arch: Complete Perplexity API integration for Tier 3 cold fetch
+- (+20 auto-backup commits)
+
+### Files (9 changed)
+- docs/DEVLOG.md
+- docs/NANOCLAW_BUILD_LOG.md
+- docs/NANOCLAW_PLATFORM.md
+- src/context/context-manager.ts
+- src/context/perplexity-integration.test.ts
+- src/context/perplexity-integration.ts
+- src/integrations/plc/db.ts
+- src/integrations/plc/index.ts
+- src/task-scheduler.ts
+
+### Stats
+- 536 insertions, 38 deletions
+
+## 2026-03-31
+
+### What Changed
+- 19 auto-backup commits (incremental saves)
+
+### Files (7 changed)
+- docs/DEVLOG.md
+- docs/NANOCLAW_BUILD_LOG.md
+- docs/NANOCLAW_CHANGELOG.md
+- docs/NANOCLAW_PLATFORM.md
+- scripts/nanoclaw-watchdog.sh
+- src/autoresearch/autoresearch-orchestrator.ts
+- src/autoresearch/mcp-tool.ts
+
+### Stats
+- 597 insertions, 8 deletions
+
+## 2026-03-30
+
+### What Changed
+- 10 auto-backup commits (incremental saves)
+
+### Files (4 changed)
+- docs/DEVLOG.md
+- docs/NANOCLAW_BUILD_LOG.md
+- docs/NANOCLAW_CHANGELOG.md
+- docs/NANOCLAW_PLATFORM.md
+
+### Stats
+- 173 insertions, 5 deletions
+
+## 2026-03-29
+
+### What Changed
+- 6 auto-backup commits (incremental saves)
+
+### Files (4 changed)
+- docs/DEVLOG.md
+- docs/NANOCLAW_BUILD_LOG.md
+- docs/NANOCLAW_CHANGELOG.md
+- docs/NANOCLAW_PLATFORM.md
+
+### Stats
+- 49 insertions, 5 deletions
+
+## 2026-03-28
+
+### What Changed
+- 8 auto-backup commits (incremental saves)
+
+### Files (4 changed)
+- docs/DEVLOG.md
+- docs/NANOCLAW_BUILD_LOG.md
+- docs/NANOCLAW_CHANGELOG.md
+- docs/NANOCLAW_PLATFORM.md
+
+### Stats
+- 212 insertions, 5 deletions
+
+## 2026-03-27
+
+### What Changed
+- [Agent] task_1774612141384_m5zwijo: Implement Avoice competitive intelligence monitoring
+- Merge PLC branch into current branch
+- (+11 auto-backup commits)
+
+### Files (18 changed)
+- .../__tests__/avoice-monitor.test.ts
+- docs/DEVLOG.md
+- docs/NANOCLAW_CHANGELOG.md
+- docs/NANOCLAW_PLATFORM.md
+- src/competitive-intel/README.md
+- src/competitive-intel/avoice-monitor.ts
+- src/competitive-intel/index.ts
+- src/competitive-intel/ipc-handler.ts
+- src/competitive-intel/persistence.ts
+- src/competitive-intel/types.ts
+- src/db.ts
+- src/index.ts
+- src/integration-types.ts
+- src/integrations/plc/db.ts
+- src/integrations/plc/index.ts
+- src/integrations/plc/ipc-handlers.ts
+- src/ipc.ts
+- src/task-scheduler.ts
+
+### Stats
+- 1895 insertions, 81 deletions
+
+## 2026-03-26
+
+### What Changed
+- [Agent] task_1774497485754_mm34hey: Add fine-tuning guide for construction ML models
+- [Agent] task_1774497485754_mm34hey: Add practical fine-tuning guide
+- (+17 auto-backup commits)
+
+### Files (74 changed)
+- CLAUDE.md
+- container/skills/plc-report/requirements.txt
+- docs/DEVLOG.md
+- docs/EXPERIMENTS.md
+- docs/FINE_TUNING_GUIDE.md
+- docs/NANOCLAW_BUILD_LOG.md
+- docs/NANOCLAW_CHANGELOG.md
+- docs/NANOCLAW_PLATFORM.md
+- docs/examples/fine_tune_example.py
+- docs/journal/2026-01-31.md
+- docs/journal/2026-02-01.md
+- docs/journal/2026-02-02.md
+- docs/journal/2026-02-03.md
+- docs/journal/2026-02-04.md
+- docs/journal/2026-02-05.md
+- docs/journal/2026-02-07.md
+- docs/journal/2026-02-08.md
+- docs/journal/2026-02-09.md
+- docs/journal/2026-02-10.md
+- docs/journal/2026-02-11.md
+- ... and 54 more
+
+### Stats
+- 9062 insertions, 43 deletions
+
+## 2026-03-25
+
+### What Changed
+- [Agent] Fix API connection errors in restricted network groups
+- (+13 auto-backup commits)
+
+### Files (10 changed)
+- config/router-config.json
+- container/agent-runner/src/autoresearch-tools.ts
+- docs/DEVLOG.md
+- docs/NANOCLAW_BUILD_LOG.md
+- docs/NANOCLAW_CHANGELOG.md
+- docs/NANOCLAW_PLATFORM.md
+- src/container-runner.ts
+- src/db.ts
+- src/ipc.ts
+- src/router/fallback-handler.ts
+
+### Stats
+- 517 insertions, 17 deletions
+
+## 2026-03-24
+
+### What Changed
+- [Agent] Implement autoresearch system for autonomous improvement loops
+- (+20 auto-backup commits)
+
+### Files (16 changed)
+- docs/DEVLOG.md
+- docs/NANOCLAW_BUILD_LOG.md
+- docs/NANOCLAW_CHANGELOG.md
+- docs/NANOCLAW_PLATFORM.md
+- src/autoresearch/README.md
+- src/autoresearch/__tests__/autoresearch.test.ts
+- src/autoresearch/autoresearch-orchestrator.ts
+- src/autoresearch/experiment-engine.ts
+- src/autoresearch/fitness-library.ts
+- src/autoresearch/index.ts
+- src/autoresearch/ipc-handler.ts
+- src/autoresearch/mcp-tool.ts
+- src/autoresearch/mutation-strategies.ts
+- src/autoresearch/persistence.ts
+- src/autoresearch/types.ts
+- src/index.ts
+
+### Stats
+- 3485 insertions, 7 deletions
 
 ## 2026-03-23
 
@@ -1305,3 +1782,12 @@
 
 ### Stats
 - 7119 insertions, 762 deletions
+
+## Related
+
+- [[CHANGELOG|Changelog]]
+- [[MEMORY_ARCHIVE_2026-03|Memory Archive 2026 03]]
+- [[KANBAN|Kanban]]
+- [[SPEC|Spec]]
+- [[ROADMAP|Roadmap]]
+- [[CHANGELOG|Changelog]]

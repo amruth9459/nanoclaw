@@ -1,6 +1,6 @@
 # NanoClaw Changelog
 
-*Version control document — auto-updated by `lexios/update-docs.py` (twice daily via NanoClaw scheduled task)*
+*Version control document — auto-updated by `nanoclaw/scripts/update-docs.py` (twice daily via launchd)*
 
 ## v0.14.0 — Context System + Auto-Deploy (2026-03-01)
 
@@ -202,6 +202,15 @@
 - **Repo:** `amruth9459/nanoclaw` (private fork)
 - **Upstream:** `gavrielc/nanoclaw`
 - **Branch:** main
-- **Total commits:** 224 (since Jan 2025)
+- **Total commits:** 917 (since Jan 2025)
 - **Primary language:** TypeScript
 - **Contributors:** amruth9459, gavrielc, community PRs
+
+## Related
+
+- [[PLATFORM|NanoClaw Platform Overview]]
+- [[README|Area: Infrastructure]]
+- [[2026-02-28|Journal: 2026-02-28]]
+- [[2026-04-07-conversation-2232|Conversation]]
+- [[2026-02-28-conversation-0051|Conversation]]
+- [[nanoclaw-whatsapp-integration|NanoClaw WhatsApp Integration]]
