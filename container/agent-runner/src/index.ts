@@ -544,8 +544,9 @@ function createContentSanitizationBashHook(chatJid: string, groupFolder: string)
 
     // Wrap the command to sanitize its output inline
     // Append a provenance marker that the agent will see in the output
-    const marker = `[SANITIZED CONTENT — Source: ${trust.domain} — Trust: ${trust.score}%]`;
-    const wrappedCommand = `{ echo "${marker}"; ${command}; }`;
+    const safeDomain = trust.domain.replace(/[^a-zA-Z0-9._\-:\/]/g, '_');
+    const marker = `[SANITIZED CONTENT — Source: ${safeDomain} — Trust: ${trust.score}%]`;
+    const wrappedCommand = `{ echo '${marker.replace(/'/g, "'\\''")}'; ${command}; }`;
 
     if (trust.tier === 'low') {
       log(`[CONTENT-SECURITY] Low-trust browser fetch: ${trust.domain} (${trust.score}%)`);
@@ -730,10 +731,13 @@ function createSpawnGateHook(
       return {};
     }
 
-    // Blocked — return a deny decision so the agent gets a clear error
+    // Blocked — return SDK-format deny so the tool call is actually rejected
     return {
-      decision: 'block' as const,
-      reason: `Spawn blocked: ${toolName} attempted after fetching from low-trust source ${lowTrustFetch.domain} (trust: ${lowTrustFetch.trustScore}%). HITL approval was denied or timed out.`,
+      hookSpecificOutput: {
+        hookEventName: 'PreToolUse',
+        permissionDecision: 'deny',
+        permissionDecisionReason: `Spawn blocked: ${toolName} attempted after fetching from low-trust source ${lowTrustFetch.domain} (trust: ${lowTrustFetch.trustScore}%). HITL approval was denied or timed out.`,
+      },
     };
   };
 }
@@ -956,6 +960,7 @@ async function runQuery(
     autoCommit?: HookCallback;
     autoTestEdit?: HookCallback;
     autoTestTrigger?: HookCallback;
+    webFetchTracker?: WebFetchContextTracker;
   },
 ): Promise<{ newSessionId?: string; lastAssistantUuid?: string; closedDuringQuery: boolean }> {
   const stream = new MessageStream();
@@ -992,8 +997,8 @@ async function runQuery(
   let messageCount = 0;
   let resultCount = 0;
 
-  // Spawn gate: track WebFetch/browser context for HITL gating of Task/TeamCreate
-  const webFetchTracker = new WebFetchContextTracker();
+  // Spawn gate: use shared tracker from caller so history persists across turns
+  const webFetchTracker = extraHooks?.webFetchTracker ?? new WebFetchContextTracker();
 
   // Load global CLAUDE.md as additional system context (shared across all groups)
   const globalClaudeMdPath = '/workspace/global/CLAUDE.md';
@@ -1431,6 +1436,7 @@ async function main(): Promise<void> {
   const autoTest = createAutoTestHook('/workspace/group');
   const autoCommitHook = createAutoCommitHook('/workspace/group');
   const safeActionHook = createSafeActionHook(containerInput.chatJid, containerInput.groupFolder);
+  const webFetchTracker = new WebFetchContextTracker();
 
   // Query loop: run query → wait for IPC message → run new query → repeat
   // Auth errors trigger IPC-based token refresh and in-place retry (no container restart).
@@ -1454,6 +1460,7 @@ async function main(): Promise<void> {
             autoCommit: autoCommitHook,
             autoTestEdit: autoTest.editHook,
             autoTestTrigger: autoTest.triggerHook,
+            webFetchTracker,
           });
           } finally { clearInterval(hb); }
           if (queryResult.newSessionId) {

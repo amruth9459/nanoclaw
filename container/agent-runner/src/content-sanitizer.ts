@@ -22,30 +22,30 @@ interface InjectionPattern {
 
 const INJECTION_PATTERNS: InjectionPattern[] = [
   // Instruction override attempts
-  { pattern: /\b(?:ignore|disregard|forget)\s+(?:all\s+)?(?:previous|prior|above|earlier)\s+(?:instructions?|prompts?|rules?|context)\b/i, label: 'instruction-override' },
-  { pattern: /\b(?:do\s+not\s+follow|override|bypass)\s+(?:your|the|any|all)\s+(?:instructions?|rules?|guidelines?|constraints?)\b/i, label: 'instruction-override' },
+  { pattern: /\b(?:ignore|disregard|forget)\s+(?:all\s+)?(?:previous|prior|above|earlier)\s+(?:instructions?|prompts?|rules?|context)\b/gi, label: 'instruction-override' },
+  { pattern: /\b(?:do\s+not\s+follow|override|bypass)\s+(?:your|the|any|all)\s+(?:instructions?|rules?|guidelines?|constraints?)\b/gi, label: 'instruction-override' },
 
   // Role manipulation
-  { pattern: /\byou\s+are\s+now\s+(?:a|an)\s+/i, label: 'role-manipulation' },
-  { pattern: /\bact\s+as\s+(?:a|an|if\s+you\s+(?:are|were))\s+/i, label: 'role-manipulation' },
-  { pattern: /\bpretend\s+(?:to\s+be|you\s+are)\s+/i, label: 'role-manipulation' },
-  { pattern: /\byou\s+(?:must|should|will)\s+(?:now\s+)?(?:act|behave|respond)\s+(?:as|like)\s+/i, label: 'role-manipulation' },
+  { pattern: /\byou\s+are\s+now\s+(?:a|an)\s+/gi, label: 'role-manipulation' },
+  { pattern: /\bact\s+as\s+(?:a|an|if\s+you\s+(?:are|were))\s+/gi, label: 'role-manipulation' },
+  { pattern: /\bpretend\s+(?:to\s+be|you\s+are)\s+/gi, label: 'role-manipulation' },
+  { pattern: /\byou\s+(?:must|should|will)\s+(?:now\s+)?(?:act|behave|respond)\s+(?:as|like)\s+/gi, label: 'role-manipulation' },
 
   // System/admin tag injection
-  { pattern: /\[(?:SYSTEM|ADMIN|OVERRIDE|ROOT|SUDO|INTERNAL)\]/i, label: 'tag-injection' },
-  { pattern: /\[\/(?:SYSTEM|ADMIN|OVERRIDE|ROOT|SUDO|INTERNAL)\]/i, label: 'tag-injection' },
+  { pattern: /\[(?:SYSTEM|ADMIN|OVERRIDE|ROOT|SUDO|INTERNAL)\]/gi, label: 'tag-injection' },
+  { pattern: /\[\/(?:SYSTEM|ADMIN|OVERRIDE|ROOT|SUDO|INTERNAL)\]/gi, label: 'tag-injection' },
 
   // Chat ML delimiter injection
-  { pattern: /<\|im_start\|>/i, label: 'delimiter-injection' },
-  { pattern: /<\|im_end\|>/i, label: 'delimiter-injection' },
-  { pattern: /<\|(?:system|user|assistant|endoftext)\|>/i, label: 'delimiter-injection' },
+  { pattern: /<\|im_start\|>/gi, label: 'delimiter-injection' },
+  { pattern: /<\|im_end\|>/gi, label: 'delimiter-injection' },
+  { pattern: /<\|(?:system|user|assistant|endoftext)\|>/gi, label: 'delimiter-injection' },
 
   // Jailbreak mode triggers
-  { pattern: /\bDAN\s+mode\b/i, label: 'jailbreak-mode' },
-  { pattern: /\bdeveloper\s+mode\b/i, label: 'jailbreak-mode' },
-  { pattern: /\bgod\s+mode\b/i, label: 'jailbreak-mode' },
-  { pattern: /\bjailbreak(?:ed)?\s+mode\b/i, label: 'jailbreak-mode' },
-  { pattern: /\bunrestricted\s+mode\b/i, label: 'jailbreak-mode' },
+  { pattern: /\bDAN\s+mode\b/gi, label: 'jailbreak-mode' },
+  { pattern: /\bdeveloper\s+mode\b/gi, label: 'jailbreak-mode' },
+  { pattern: /\bgod\s+mode\b/gi, label: 'jailbreak-mode' },
+  { pattern: /\bjailbreak(?:ed)?\s+mode\b/gi, label: 'jailbreak-mode' },
+  { pattern: /\bunrestricted\s+mode\b/gi, label: 'jailbreak-mode' },
 ];
 
 // Zero-width / invisible characters used to smuggle content past filters

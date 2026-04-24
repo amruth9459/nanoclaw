@@ -5,6 +5,108 @@
 
 ---
 
+### 2026-04-23 22:41
+
+**Areas:** general
+**Files (4):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_no_site_managers.md, .claude/projects/-Users-amrut/memory/MEMORY.md, .githooks/no-lexios-in-core.sh
+**Diff:** +2641 -774 across 34 files
+
+### 2026-04-23 22:40
+
+**Areas:** general
+**Files (4):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_no_site_managers.md, .claude/projects/-Users-amrut/memory/MEMORY.md, .githooks/no-lexios-in-core.sh
+**Diff:** +2635 -774 across 34 files
+
+### 2026-04-23 22:39
+
+**Areas:** general
+**Files (4):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_no_site_managers.md, .claude/projects/-Users-amrut/memory/MEMORY.md, .githooks/no-lexios-in-core.sh
+**Diff:** +2629 -774 across 34 files
+
+### 2026-04-23 22:32
+
+**Areas:** general
+**Files (3):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_no_site_managers.md, .claude/projects/-Users-amrut/memory/MEMORY.md
+**Diff:** +2623 -466 across 33 files
+
+### 2026-04-23 22:30
+
+**Areas:** general
+**Files (3):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_no_site_managers.md, .claude/projects/-Users-amrut/memory/MEMORY.md
+**Diff:** +2617 -466 across 33 files
+
+### 2026-04-23 22:30
+
+**Areas:** general
+**Files (3):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_no_site_managers.md, .claude/projects/-Users-amrut/memory/MEMORY.md
+**Diff:** +2611 -466 across 33 files
+
+### 2026-04-23 22:28
+
+**Areas:** general
+**Files (3):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_no_site_managers.md, .claude/projects/-Users-amrut/memory/MEMORY.md
+**Diff:** +2605 -466 across 33 files
+
+### 2026-04-23 22:28
+
+**Areas:** general
+**Files (3):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_no_site_managers.md, .claude/projects/-Users-amrut/memory/MEMORY.md
+**Diff:** +2598 -466 across 33 files
+
+### 2026-04-23 22:22
+
+**Areas:** general
+**Files (3):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_no_site_managers.md, .claude/projects/-Users-amrut/memory/MEMORY.md
+**Diff:** +2563 -443 across 31 files
+
+### 2026-04-23 22:21
+
+**Areas:** general
+**Files (3):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_no_site_managers.md, .claude/projects/-Users-amrut/memory/MEMORY.md
+**Diff:** +2557 -443 across 31 files
+
+### 2026-04-23 22:19
+
+**Areas:** general
+**Files (3):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_no_site_managers.md, .claude/projects/-Users-amrut/memory/MEMORY.md
+**Diff:** +2551 -443 across 31 files
+
+### 2026-04-23 22:15
+
+**Areas:** general
+**Files (3):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_no_site_managers.md, .claude/projects/-Users-amrut/memory/MEMORY.md
+**Diff:** +2545 -443 across 31 files
+
+### 2026-04-23 22:12
+
+**Areas:** general
+**Files (3):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_no_site_managers.md, .claude/projects/-Users-amrut/memory/MEMORY.md
+**Diff:** +2539 -443 across 31 files
+
+### 2026-04-23 22:09
+
+**Areas:** general
+**Files (3):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_no_site_managers.md, .claude/projects/-Users-amrut/memory/MEMORY.md
+**Diff:** +2533 -443 across 31 files
+
+### 2026-04-23 21:57
+
+**Areas:** general
+**Files (3):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_no_site_managers.md, .claude/projects/-Users-amrut/memory/MEMORY.md
+**Diff:** +2527 -443 across 31 files
+
+### 2026-04-23 21:57
+
+**Areas:** general
+**Files (3):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_no_site_managers.md, .claude/projects/-Users-amrut/memory/MEMORY.md
+**Diff:** +2521 -443 across 31 files
+
+### 2026-04-23 21:53
+
+**Areas:** general
+**Files (3):** .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_no_site_managers.md, .claude/projects/-Users-amrut/memory/MEMORY.md
+**Diff:** +2515 -443 across 30 files
+
 ### 2026-04-23 21:02
 
 **Areas:** general
