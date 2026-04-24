@@ -498,6 +498,9 @@ function buildContainerArgs(
   // Autoresearch tools available for all groups
   toolModules.push('autoresearch-tools');
 
+  // Astrology tools available for all groups
+  toolModules.push('astrology-tools');
+
   // Competitive intel tools available for main group
   if (group.folder === 'main') {
     toolModules.push('competitive-intel-tools');

@@ -2,7 +2,7 @@
 # Pre-commit hook: prevent integration-specific terms from leaking into core files.
 # Core files must go through src/integration-types.ts hooks instead.
 
-BLOCKED_TERMS='lexios|claw-lexios|ezdxf|ifcopenshell|lexios-prep'
+BLOCKED_TERMS='lexios|claw-lexios|ezdxf|ifcopenshell|lexios-prep|jyotish'
 
 # Core files to scan (staged diffs only)
 CORE_PATTERNS=(
