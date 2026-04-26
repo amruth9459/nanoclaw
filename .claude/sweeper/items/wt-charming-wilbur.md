@@ -5,7 +5,7 @@
 - **kind:** wt
 - **decision:** keep_open
 - **snapshot:** `2043cdc366d43943`
-- **reviewed_at:** 2026-04-26T14:50:42.214Z
+- **reviewed_at:** 2026-04-26T20:38:19.371Z
 
 ## Reason
 
@@ -17,7 +17,7 @@ Dirty — has uncommitted changes. Will not auto-remove.
 - branch=claude/charming-wilbur
 - head=29cbedc6
 - dirty=YES
-- last_commit=25d ago
+- last_commit=26d ago
 - merged_to_main=no
 - branch_exists=yes
 

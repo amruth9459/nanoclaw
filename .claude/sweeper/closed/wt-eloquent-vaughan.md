@@ -5,11 +5,11 @@
 - **kind:** wt
 - **decision:** proposed_close
 - **snapshot:** `2299ecedc48cd989`
-- **reviewed_at:** 2026-04-26T14:50:42.214Z
+- **reviewed_at:** 2026-04-26T20:38:19.371Z
 
 ## Reason
 
-Eligible for removal: stale 59d, clean.
+Eligible for removal: stale 60d, clean.
 
 ## Evidence
 
@@ -17,7 +17,7 @@ Eligible for removal: stale 59d, clean.
 - branch=claude/eloquent-vaughan
 - head=f3aabfb6
 - dirty=no
-- last_commit=59d ago
+- last_commit=60d ago
 - merged_to_main=no
 - branch_exists=yes
 

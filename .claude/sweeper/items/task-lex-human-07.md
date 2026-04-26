@@ -5,17 +5,17 @@
 - **kind:** task
 - **decision:** proposed_close
 - **snapshot:** `ee17c884779cdab0`
-- **reviewed_at:** 2026-04-26T14:50:39.921Z
+- **reviewed_at:** 2026-04-26T20:38:16.689Z
 
 ## Reason
 
-Completed 36d ago — eligible for archive.
+Completed 37d ago — eligible for archive.
 
 ## Evidence
 
 - status=completed
 - created 37d ago
-- completed 36d ago
+- completed 37d ago
 - assigned to Evidence Collector
 
 ## Payload

@@ -5,7 +5,7 @@
 - **kind:** task
 - **decision:** proposed_close
 - **snapshot:** `6b534409dd1e1421`
-- **reviewed_at:** 2026-04-26T14:50:39.921Z
+- **reviewed_at:** 2026-04-26T20:38:16.689Z
 
 ## Reason
 
@@ -14,7 +14,7 @@ Cancelled — eligible for archive.
 ## Evidence
 
 - status=cancelled
-- created 37d ago
+- created 38d ago
 - not completed
 - unassigned
 

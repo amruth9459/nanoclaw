@@ -5,7 +5,7 @@
 - **kind:** task
 - **decision:** keep_open
 - **snapshot:** `12be862bd5bf0c46`
-- **reviewed_at:** 2026-04-26T14:50:39.921Z
+- **reviewed_at:** 2026-04-26T20:38:16.689Z
 
 ## Reason
 
@@ -14,7 +14,7 @@ Active task — no closure criteria met.
 ## Evidence
 
 - status=done
-- created 43d ago
+- created 44d ago
 - not completed
 - assigned to Technical Writer
 

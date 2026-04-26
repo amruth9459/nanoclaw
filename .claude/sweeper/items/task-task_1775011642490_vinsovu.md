@@ -5,17 +5,17 @@
 - **kind:** task
 - **decision:** proposed_close
 - **snapshot:** `9d0f1ad0008a2547`
-- **reviewed_at:** 2026-04-26T14:50:39.921Z
+- **reviewed_at:** 2026-04-26T20:38:16.689Z
 
 ## Reason
 
-Completed 24d ago — eligible for archive.
+Completed 25d ago — eligible for archive.
 
 ## Evidence
 
 - status=completed
 - created 26d ago
-- completed 24d ago
+- completed 25d ago
 - assigned to Identity Graph Operator
 
 ## Payload

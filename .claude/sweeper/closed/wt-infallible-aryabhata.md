@@ -5,7 +5,7 @@
 - **kind:** wt
 - **decision:** proposed_close
 - **snapshot:** `e24e4e1e5e6bc5e1`
-- **reviewed_at:** 2026-04-26T14:50:42.214Z
+- **reviewed_at:** 2026-04-26T20:38:19.371Z
 
 ## Reason
 

@@ -5,17 +5,17 @@
 - **kind:** task
 - **decision:** proposed_close
 - **snapshot:** `944806f688ab871f`
-- **reviewed_at:** 2026-04-26T14:50:39.921Z
+- **reviewed_at:** 2026-04-26T20:38:16.689Z
 
 ## Reason
 
-Completed 39d ago — eligible for archive.
+Completed 40d ago — eligible for archive.
 
 ## Evidence
 
 - status=completed
 - created 41d ago
-- completed 39d ago
+- completed 40d ago
 - assigned to Report Distribution Agent
 
 ## Payload

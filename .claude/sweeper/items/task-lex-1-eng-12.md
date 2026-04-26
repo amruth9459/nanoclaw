@@ -5,7 +5,7 @@
 - **kind:** task
 - **decision:** keep_open
 - **snapshot:** `b9c521b12f688b03`
-- **reviewed_at:** 2026-04-26T14:50:39.921Z
+- **reviewed_at:** 2026-04-26T20:38:16.689Z
 
 ## Reason
 
@@ -14,8 +14,8 @@ Active task — no closure criteria met.
 ## Evidence
 
 - status=done
-- created 44d ago
-- completed 44d ago
+- created 45d ago
+- completed 45d ago
 - unassigned
 
 ## Payload
