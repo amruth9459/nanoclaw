@@ -1561,8 +1561,12 @@ async function main(): Promise<void> {
     personaRegistry = new PersonaRegistry(getDb());
     personaRegistry.initSchema();
     const count = await personaRegistry.scan();
-    const embedded = await personaRegistry.embedPersonas();
-    logger.info({ count, embedded }, 'Persona registry loaded with embeddings');
+    logger.info({ count }, 'Persona registry scanned');
+    // Embed in background — don't block startup on Gemini API
+    personaRegistry.embedPersonas().then(
+      (embedded) => logger.info({ embedded }, 'Persona embeddings loaded (background)'),
+      (err) => logger.warn({ err }, 'Persona embedding failed (non-blocking)'),
+    );
   } catch (err) {
     logger.warn({ err }, 'Persona registry init failed — auto-dispatch disabled');
   }
