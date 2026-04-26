@@ -41,7 +41,9 @@ MAX_CLAW_CHARS = 12000
 TOP_RELEVANT = 10
 SURPRISE_CANDIDATES = 25
 SHARED_DAYS = 14
-MODEL = "claude-haiku-4-5-20251001"
+# Sonnet for the surprise pass — finding non-obvious cross-graph connections
+# is reasoning, not structure extraction. Haiku underperforms here.
+MODEL = "claude-sonnet-4-6"
 
 
 def log(msg: str) -> None:
@@ -185,7 +187,7 @@ def call_haiku(api_key: str, prompt: str) -> dict:
         "https://api.anthropic.com/v1/messages",
         data=json.dumps({
             "model": MODEL,
-            "max_tokens": 1500,
+            "max_tokens": 2500,
             "system": (
                 "You are a graph-aware relevance scout. Return ONLY valid JSON. "
                 "No prose, no markdown fences."

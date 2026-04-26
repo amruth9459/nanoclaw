@@ -40,8 +40,10 @@ THEMES_DIR = BRAIN / "Inbox" / "themes"
 OUT = Path("/Users/amrut/nanoclaw/data/brain-themes.json")
 LOG = Path("/Users/amrut/nanoclaw/data/brain-themes.log")
 
-# Sonnet for theses (Haiku is too thin for cross-item synthesis).
-MODEL = "claude-sonnet-4-6"
+# Opus for theses — this is the highest-leverage stage. Cross-domain synthesis
+# is exactly where Opus's deeper multi-hop reasoning and tighter prose pay back.
+# 4 calls/day × Opus is still under $1, so quality wins outright.
+MODEL = "claude-opus-4-7"
 MIN_CLUSTER_SIZE = 3
 MAX_CLUSTERS = 4
 MAX_ITEMS_PER_CLUSTER = 8
@@ -187,7 +189,7 @@ def call_sonnet(api_key: str, prompt: str) -> dict:
         "https://api.anthropic.com/v1/messages",
         data=json.dumps({
             "model": MODEL,
-            "max_tokens": 1500,
+            "max_tokens": 3000,
             "system": (
                 "You are a strategist who writes tight, specific synthesis paragraphs. "
                 "You connect cross-domain signals into one paragraph the reader can "

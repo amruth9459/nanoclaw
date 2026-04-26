@@ -1540,20 +1540,23 @@ async function main(): Promise<void> {
 
   // Load integrations and initialize their DB schemas
   await loadIntegrations();
+  process.stderr.write('[BOOT] integrations loaded\n');
   {
     const { getDb } = await import('./db.js');
     const mainDb = getDb();
     for (const integration of getIntegrations()) {
+      process.stderr.write(`[BOOT] initDB: ${integration.name}\n`);
       integration.initDatabase(mainDb);
-      logger.info({ name: integration.name }, 'Integration DB initialized');
     }
   }
+  process.stderr.write('[BOOT] integration DBs initialized\n');
 
   // Load integration learnings into hot cache
   for (const integration of getIntegrations()) {
     const learningsPath = integration.getLearningsPath?.();
     if (learningsPath) codedContext.loadLearningsFromFile(learningsPath);
   }
+  process.stderr.write('[BOOT] learnings loaded, persona registry next\n');
 
   // Initialize persona registry (scans ~/.claude/agents/)
   try {
