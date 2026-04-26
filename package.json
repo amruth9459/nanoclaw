@@ -14,7 +14,10 @@
     "format:check": "prettier --check \"src/**/*.ts\"",
     "test": "vitest run",
     "test:watch": "vitest",
-    "watch": "tsx src/dev-watcher.ts"
+    "watch": "tsx src/dev-watcher.ts",
+    "sweeper:review": "tsx scripts/sweeper/review.ts",
+    "sweeper:apply": "tsx scripts/sweeper/apply.ts",
+    "sweeper:audit": "tsx scripts/sweeper/audit.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.78.0",
