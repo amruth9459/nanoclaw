@@ -35,6 +35,7 @@ sys.path.insert(0, str(REPO_ROOT))
 from services.wiki_compile.domains.brain import (  # noqa: E402
     BRAIN, CLAW_MIRROR, extract_entities,
 )
+from services.wiki_compile.identity import load_user_context  # noqa: E402
 
 DB_PATH = Path("/Users/amrut/nanoclaw/store/messages.db")
 CACHE_DIR = Path("/Users/amrut/nanoclaw/data/research-cache")
@@ -331,7 +332,10 @@ def build_prompt(item: dict, page: dict, today_blob: str) -> str:
         for lp in linked:
             parts.append(f"\n--- {lp['anchor']} ({lp['url']}) ---\n{lp['text']}")
         linked_block = "\n".join(parts)
-    return f"""You are reading a primary web page plus 0-N sub-pages it links to.
+    user_ctx = load_user_context()
+    return f"""{user_ctx['context_block']}
+
+You are reading a primary web page plus 0-N sub-pages it links to.
 Extract its structure as STRICT JSON. Use the LINKED PAGES to enrich your
 understanding (e.g. "linked_facts" pulls things only visible in sub-pages).
 
@@ -346,6 +350,9 @@ Schema:
   ],
   "potential_overlap_with_user_work": [
     {{"with": "<entity/topic from today's work>", "why": "<one sentence, specific>"}}
+  ],
+  "advances_which_goal": [                                    // grounded in USER LONG-TERM CONTEXT above
+    {{"goal": "<verbatim goal phrase from Goals & Motivations>", "how": "<one sentence>"}}
   ],
   "what_it_could_replace_or_extend": ["<existing tool/concept>", "..."],
   "open_questions": ["<thing the page hints at but doesn't resolve>", "..."], // for forward agenda
@@ -414,6 +421,12 @@ def render_note(item: dict, page: dict, analysis: dict) -> str:
         for o in overlap:
             parts.append(f"- **{o.get('with','?')}** — {o.get('why','')}")
         parts.append("")
+    goal_advance = analysis.get("advances_which_goal") or []
+    if goal_advance:
+        parts.append("## Advances long-term goal")
+        for g in goal_advance:
+            parts.append(f"- _{g.get('goal','?')}_ — {g.get('how','')}")
+        parts.append("")
     rep = analysis.get("what_it_could_replace_or_extend") or []
     if rep:
         parts.append("## Could replace / extend")
@@ -478,6 +491,7 @@ def main() -> int:
             "key_claims": (analysis.get("key_claims") or [])[:3],
             "linked_facts": (analysis.get("linked_facts") or [])[:5],
             "overlap": analysis.get("potential_overlap_with_user_work") or [],
+            "advances_goal": analysis.get("advances_which_goal") or [],
             "could_replace": analysis.get("what_it_could_replace_or_extend") or [],
             "open_questions": analysis.get("open_questions") or [],
             "freshness": analysis.get("freshness_signal", ""),

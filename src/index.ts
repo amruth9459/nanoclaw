@@ -1564,12 +1564,7 @@ async function main(): Promise<void> {
     personaRegistry = new PersonaRegistry(getDb());
     personaRegistry.initSchema();
     const count = await personaRegistry.scan();
-    logger.info({ count }, 'Persona registry scanned');
-    // Embed in background — don't block startup on Gemini API
-    personaRegistry.embedPersonas().then(
-      (embedded) => logger.info({ embedded }, 'Persona embeddings loaded (background)'),
-      (err) => logger.warn({ err }, 'Persona embedding failed (non-blocking)'),
-    );
+    logger.info({ count }, 'Persona registry scanned (embedding deferred)');
   } catch (err) {
     logger.warn({ err }, 'Persona registry init failed — auto-dispatch disabled');
   }
@@ -1619,6 +1614,7 @@ Steps:
     }
   }
 
+  process.stderr.write('[BOOT] tasks checked, initializing router\n');
   // Initialize enrichment/monitoring layers (non-blocking)
   try {
     router = RouterFactory.createProduction();
@@ -1693,6 +1689,7 @@ Steps:
     registeredGroups: () => registeredGroups,
   };
 
+  process.stderr.write('[BOOT] creating WA channels\n');
   // Create and connect channels
   whatsapp = new WhatsAppChannel({
     ...channelOpts,
@@ -1709,7 +1706,9 @@ Steps:
     },
   });
   channels.push(whatsapp);
-  await whatsapp.connect();
+  await whatsapp.connect().catch((err: Error) => {
+    logger.warn({ err: err.message }, 'WhatsApp primary not connected — run /setup to authenticate');
+  });
 
   // Optional second WhatsApp number (enable with NANOCLAW_WA2=1)
   if (WA2_ENABLED) {

@@ -31,6 +31,7 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO_ROOT))
 
 from services.wiki_compile.domains.brain import BRAIN  # noqa: E402
+from services.wiki_compile.identity import load_user_context  # noqa: E402
 
 RESEARCH_JSON = Path("/Users/amrut/nanoclaw/data/brain-research.json")
 DEEPLINKS_JSON = Path("/Users/amrut/nanoclaw/data/brain-deeplinks.json")
@@ -221,7 +222,13 @@ def build_theme_prompt(cluster: dict, today_entities: list[str]) -> str:
             f"- ({it['kind']}) {title}{url}\n  entities: {ents}\n  snippet: {snippet}"
         )
 
-    return f"""You are synthesizing a THEME from items the user has been collecting + active work topics.
+    user_ctx = load_user_context()
+    return f"""{user_ctx['context_block']}
+
+You are synthesizing a THEME from items the user has been collecting + active
+work topics. Weight everything against the USER LONG-TERM CONTEXT above —
+especially Goals & Motivations and Risk Tolerance. A theme that doesn't connect
+to a stated goal should be flagged as such, not invented.
 
 Anchor entity: {cluster['anchor_entity']}
 Today's active topics: {', '.join(today_entities[:15]) or '(none)'}
@@ -231,19 +238,22 @@ Items in this cluster:
 
 Write a synthesis paragraph (NOT a list) that:
 1. Names what's emerging — the actual pattern across these items, not just "they all mention X".
-2. Says what it implies for the user's CURRENT work specifically (mention named projects).
-3. Identifies one concrete next action the user should take this week.
+2. Connects (or honestly disconnects) the pattern to the user's stated goals.
+3. Says what it implies for the user's CURRENT work specifically (mention named projects).
+4. Identifies one concrete next action the user should take this week.
 
 Output schema (strict):
 {{
   "title": "<3-7 word theme title>",
   "thesis": "<one paragraph, 80-150 words, specific and grounded>",
+  "advances_goals": ["<verbatim goal phrases this advances; empty if it doesn't>"],
   "evidence": ["<2-4 bullets pointing to specific items in the cluster>"],
   "implication": "<one sentence: what changes in the user's work>",
-  "next_action": "<one sentence: a specific, executable next step>",
+  "next_action": "<one sentence: a specific, executable next step weighted by goal urgency>",
   "open_questions": ["<things the cluster doesn't resolve>", "..."]
 }}
-NO prose outside JSON. Empty arrays where appropriate.
+NO prose outside JSON. Empty arrays where appropriate. If the theme does NOT
+advance any stated goal, set advances_goals to [] and say so plainly in the thesis.
 """
 
 
@@ -271,6 +281,12 @@ def render_theme_note(date: str, cluster: dict, theme: dict) -> str:
     parts.append("## Thesis")
     parts.append(theme.get("thesis", ""))
     parts.append("")
+    advances = theme.get("advances_goals") or []
+    if advances:
+        parts.append("## Advances stated goals")
+        for g in advances:
+            parts.append(f"- {g}")
+        parts.append("")
     evidence = theme.get("evidence") or []
     if evidence:
         parts.append("## Evidence")
@@ -336,6 +352,7 @@ def main() -> int:
             "anchor_entity": cluster["anchor_entity"],
             "title": theme.get("title", ""),
             "thesis": theme.get("thesis", ""),
+            "advances_goals": theme.get("advances_goals") or [],
             "implication": theme.get("implication", ""),
             "next_action": theme.get("next_action", ""),
             "open_questions": theme.get("open_questions") or [],

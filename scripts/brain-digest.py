@@ -26,8 +26,29 @@ sys.path.insert(0, str(REPO_ROOT))
 from services.wiki_compile.domains.brain import (  # noqa: E402
     BRAIN, CLAW_MIRROR, extract_entities,
 )
+from services.wiki_compile.identity import load_user_context  # noqa: E402
 
-GRAPH_JSON = Path("/Users/amrut/nanoclaw/data/brain-wiki/.knowledge_graph/knowledge_graph.json")
+_GRAPH_DIR = Path("/Users/amrut/nanoclaw/data/brain-wiki/.knowledge_graph")
+GRAPH_JSON = (
+    _GRAPH_DIR / "knowledge_graph.canonical.json"
+    if (_GRAPH_DIR / "knowledge_graph.canonical.json").exists()
+    else _GRAPH_DIR / "knowledge_graph.json"
+)
+ALIASES_JSON = Path("/Users/amrut/nanoclaw/data/brain-aliases.json")
+
+
+def _load_alias_map() -> dict[str, str]:
+    if not ALIASES_JSON.exists():
+        return {}
+    try:
+        return json.loads(ALIASES_JSON.read_text()).get("alias_map", {}) or {}
+    except Exception:
+        return {}
+
+
+def canonicalize(names: set[str]) -> set[str]:
+    m = _load_alias_map()
+    return {m.get(n, n) for n in names}
 META_DIR = Path("/Users/amrut/nanoclaw/data/brain-wiki/.wiki_meta")
 LATEST = Path("/Users/amrut/nanoclaw/data/brain-digest.json")
 LOG = Path("/Users/amrut/nanoclaw/data/brain-digest.log")
@@ -127,7 +148,7 @@ def fresh_shared_items(today_entities: set[str], days: int = SHARED_DAYS) -> lis
     out: list[dict] = []
     for r in rows:
         text = " ".join(filter(None, [r["content"], r["notes"], r["url"]]))
-        ents = {e["name"] for e in extract_entities(text)}
+        ents = canonicalize({e["name"] for e in extract_entities(text)})
         overlap = today_entities & ents
         out.append({
             "id": r["id"],
@@ -149,7 +170,7 @@ def fresh_shared_items(today_entities: set[str], days: int = SHARED_DAYS) -> lis
 def find_relevant_notes(today_entities: set[str], meta: dict[str, dict]) -> list[dict]:
     ranked: list[dict] = []
     for slug, m in meta.items():
-        note_entities = set(m.get("entities", []))
+        note_entities = canonicalize(set(m.get("entities", [])))
         overlap = today_entities & note_entities
         if not overlap:
             continue
@@ -239,7 +260,10 @@ def build_surprise_prompt(today_entities: list[str], candidates: list[dict],
             continue
         rel_str = ", ".join(f"{t}({rt})" for t, rt in related[:5])
         neigh_lines.append(f"- {ent} ↔ {rel_str}")
-    return f"""Today's active topics:
+    user_ctx = load_user_context()
+    return f"""{user_ctx['context_block']}
+
+Today's active topics:
 {', '.join(today_entities[:30])}
 
 Candidate Brain notes (filtered by entity overlap):
@@ -257,15 +281,20 @@ Researched pages (LLM-summarised actual URL content):
 Graph neighbours of today's entities (1-hop):
 {chr(10).join(neigh_lines) or '(none)'}
 
-Find 3-6 SURPRISING / NON-OBVIOUS connections.
-Especially favour: a researched page that lights up an existing project,
-a deeplink that reveals a hidden bridge between today's work and a fresh share,
-or a fresh item that frames why something old now matters.
+Find 3-6 SURPRISING / NON-OBVIOUS connections, weighted against the USER
+LONG-TERM CONTEXT above. Favour insights that:
+  - Advance one of the user's stated goals (Goals & Motivations)
+  - Bridge today's work + a fresh share + a goal in one sentence
+  - Reveal that a fresh item changes the priority of an existing project
+
+If a connection doesn't tie to anything goal-relevant, skip it. Empty array is
+better than filler.
 
 Output schema (strict):
 {{
   "surprising_connections": [
     {{"a": "<entity or note>", "b": "<entity or note>",
+      "advances_goal": "<verbatim goal phrase or empty>",
       "insight": "<one sentence — why this matters TODAY>"}}
   ]
 }}
@@ -371,7 +400,11 @@ def render_digest(date: str, today_entities: list[str], relevant: list[dict],
     if surprise:
         lines.append("### Surprising connections (LLM pass)")
         for s in surprise:
-            lines.append(f"- **{s.get('a','?')}** ↔ **{s.get('b','?')}** — {s.get('insight','')}")
+            goal = s.get("advances_goal", "")
+            goal_tag = f" — _goal: {goal}_" if goal else ""
+            lines.append(
+                f"- **{s.get('a','?')}** ↔ **{s.get('b','?')}** — {s.get('insight','')}{goal_tag}"
+            )
         lines.append("")
     return "\n".join(lines) + "\n"
 
@@ -449,9 +482,9 @@ def main() -> int:
         log("no Claw shared content — abort")
         return 1
 
-    today_ents_list = [e["name"] for e in extract_entities(claw_text)]
-    today_ents = set(today_ents_list)
-    log(f"today's entities: {len(today_ents)} — {sorted(today_ents)[:10]}")
+    raw_ents = {e["name"] for e in extract_entities(claw_text)}
+    today_ents = canonicalize(raw_ents)
+    log(f"today's entities: {len(today_ents)} (canonicalized from {len(raw_ents)}) — {sorted(today_ents)[:10]}")
 
     meta = load_meta_index()
     relevant = find_relevant_notes(today_ents, meta)

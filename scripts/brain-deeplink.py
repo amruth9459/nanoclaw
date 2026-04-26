@@ -28,7 +28,27 @@ sys.path.insert(0, str(REPO_ROOT))
 
 from services.wiki_compile.domains.brain import extract_entities  # noqa: E402
 
-GRAPH_JSON = Path("/Users/amrut/nanoclaw/data/brain-wiki/.knowledge_graph/knowledge_graph.json")
+_GRAPH_DIR = Path("/Users/amrut/nanoclaw/data/brain-wiki/.knowledge_graph")
+GRAPH_JSON = (
+    _GRAPH_DIR / "knowledge_graph.canonical.json"
+    if (_GRAPH_DIR / "knowledge_graph.canonical.json").exists()
+    else _GRAPH_DIR / "knowledge_graph.json"
+)
+ALIASES_JSON = Path("/Users/amrut/nanoclaw/data/brain-aliases.json")
+
+
+def _load_alias_map() -> dict[str, str]:
+    if not ALIASES_JSON.exists():
+        return {}
+    try:
+        return json.loads(ALIASES_JSON.read_text()).get("alias_map", {}) or {}
+    except Exception:
+        return {}
+
+
+def canonicalize(names: set[str]) -> set[str]:
+    m = _load_alias_map()
+    return {m.get(n, n) for n in names}
 SHARED_MIRROR = Path("/Users/amrut/Brain/Groups/_claw-shared")
 DB_PATH = Path("/Users/amrut/nanoclaw/store/messages.db")
 OUT = Path("/Users/amrut/nanoclaw/data/brain-deeplinks.json")
@@ -159,8 +179,8 @@ def main() -> int:
     adj = build_adjacency(graph)
     log(f"adjacency: {len(adj)} nodes, {sum(len(v) for v in adj.values())} edges (capped)")
 
-    today = today_entities()
-    log(f"today's entities: {sorted(today)}")
+    today = canonicalize(today_entities())
+    log(f"today's entities (canonicalized): {sorted(today)}")
     if not today:
         OUT.write_text(json.dumps({"deeplinks": []}))
         return 0
@@ -170,7 +190,7 @@ def main() -> int:
 
     deeplinks: list[dict] = []
     for item in fresh:
-        item_ents = set(item["entities"])
+        item_ents = canonicalize(set(item["entities"]))
         if not item_ents:
             continue
         # If the item already has direct overlap, skip — it's already surfaced
