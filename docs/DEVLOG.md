@@ -5,6 +5,11 @@
 
 ---
 
+### 2026-04-26 14:59
+
+**Areas:** hooks
+**Files (8):** .claude/hooks/brain-digest-inject.sh, .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut-nanoclaw/memory/competitive_clawdi.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_no_site_managers.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_clawsweeper_roadmap.md, .claude/projects/-Users-amrut/memory/MEMORY.md, .claude/settings.json, .githooks/no-lexios-in-core.sh
+
 ### 2026-04-26 13:59
 
 **Areas:** hooks
