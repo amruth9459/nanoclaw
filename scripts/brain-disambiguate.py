@@ -35,12 +35,14 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO_ROOT))
 
+from services.wiki_compile.llm import call_claude  # noqa: E402
+
 GRAPH_JSON = Path("/Users/amrut/nanoclaw/data/brain-wiki/.knowledge_graph/knowledge_graph.json")
 GRAPH_CANONICAL = Path("/Users/amrut/nanoclaw/data/brain-wiki/.knowledge_graph/knowledge_graph.canonical.json")
 ALIASES_JSON = Path("/Users/amrut/nanoclaw/data/brain-aliases.json")
 LOG = Path("/Users/amrut/nanoclaw/data/brain-disambiguate.log")
 
-MODEL = "claude-sonnet-4-6"
+MODEL = "claude-opus-4-7"  # OAuth/plan quota; backoff handles rate limits
 MIN_MENTIONS_FOR_CANONICAL = 3
 MAX_GROUPS_PER_LLM_CALL = 25
 MAX_TOTAL_LLM_CALLS = 4
@@ -167,28 +169,16 @@ def candidate_groups(entities: dict[str, dict]) -> list[list[str]]:
 
 # ── LLM adjudication ────────────────────────────────────────────────────────
 def call_sonnet(api_key: str, prompt: str) -> dict:
-    req = urllib.request.Request(
-        "https://api.anthropic.com/v1/messages",
-        data=json.dumps({
-            "model": MODEL,
-            "max_tokens": 4000,
-            "system": (
-                "You merge synonymous entity surface forms. "
-                "Be conservative — when in doubt, keep separate. Return ONLY valid JSON."
-            ),
-            "messages": [{"role": "user", "content": prompt}],
-        }).encode(),
-        headers={
-            "x-api-key": api_key,
-            "anthropic-version": "2023-06-01",
-            "content-type": "application/json",
-        },
+    # Routes through claude CLI (OAuth/plan). api_key arg ignored.
+    return call_claude(
+        prompt,
+        model=MODEL,
+        system_prompt=(
+            "You merge synonymous entity surface forms. "
+            "Be conservative — when in doubt, keep separate. Return ONLY valid JSON."
+        ),
+        timeout=300,
     )
-    with urllib.request.urlopen(req, timeout=180) as r:
-        resp = json.loads(r.read())
-    text = resp["content"][0]["text"].strip()
-    text = re.sub(r"^```(?:json)?\s*|\s*```$", "", text, flags=re.MULTILINE).strip()
-    return json.loads(text)
 
 
 def build_adjudicate_prompt(groups: list[list[str]], entities: dict) -> str:

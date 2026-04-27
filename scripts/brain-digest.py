@@ -27,6 +27,7 @@ from services.wiki_compile.domains.brain import (  # noqa: E402
     BRAIN, CLAW_MIRROR, extract_entities,
 )
 from services.wiki_compile.identity import load_user_context  # noqa: E402
+from services.wiki_compile.llm import call_claude  # noqa: E402
 
 _GRAPH_DIR = Path("/Users/amrut/nanoclaw/data/brain-wiki/.knowledge_graph")
 GRAPH_JSON = (
@@ -62,9 +63,9 @@ MAX_CLAW_CHARS = 12000
 TOP_RELEVANT = 10
 SURPRISE_CANDIDATES = 25
 SHARED_DAYS = 14
-# Sonnet for the surprise pass — finding non-obvious cross-graph connections
-# is reasoning, not structure extraction. Haiku underperforms here.
-MODEL = "claude-sonnet-4-6"
+# Opus for the surprise pass — non-obvious cross-graph connections benefit from
+# deeper reasoning. OAuth/plan quota; the helper handles rate limits with backoff.
+MODEL = "claude-opus-4-7"
 
 
 def log(msg: str) -> None:
@@ -204,28 +205,15 @@ def graph_neighbours(entities: set[str], graph: dict) -> dict[str, list[tuple[st
 
 
 def call_haiku(api_key: str, prompt: str) -> dict:
-    req = urllib.request.Request(
-        "https://api.anthropic.com/v1/messages",
-        data=json.dumps({
-            "model": MODEL,
-            "max_tokens": 2500,
-            "system": (
-                "You are a graph-aware relevance scout. Return ONLY valid JSON. "
-                "No prose, no markdown fences."
-            ),
-            "messages": [{"role": "user", "content": prompt}],
-        }).encode(),
-        headers={
-            "x-api-key": api_key,
-            "anthropic-version": "2023-06-01",
-            "content-type": "application/json",
-        },
+    # Routes through claude CLI (OAuth/plan). api_key arg ignored.
+    return call_claude(
+        prompt,
+        model=MODEL,
+        system_prompt=(
+            "You are a graph-aware relevance scout. Return ONLY valid JSON. "
+            "No prose, no markdown fences."
+        ),
     )
-    with urllib.request.urlopen(req, timeout=120) as r:
-        resp = json.loads(r.read())
-    text = resp["content"][0]["text"].strip()
-    text = re.sub(r"^```(?:json)?\s*|\s*```$", "", text, flags=re.MULTILINE).strip()
-    return json.loads(text)
 
 
 def build_surprise_prompt(today_entities: list[str], candidates: list[dict],

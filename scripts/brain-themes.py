@@ -32,6 +32,7 @@ sys.path.insert(0, str(REPO_ROOT))
 
 from services.wiki_compile.domains.brain import BRAIN  # noqa: E402
 from services.wiki_compile.identity import load_user_context  # noqa: E402
+from services.wiki_compile.llm import call_claude  # noqa: E402
 
 RESEARCH_JSON = Path("/Users/amrut/nanoclaw/data/brain-research.json")
 DEEPLINKS_JSON = Path("/Users/amrut/nanoclaw/data/brain-deeplinks.json")
@@ -186,29 +187,17 @@ def cluster_by_entities(items: list[dict]) -> list[dict]:
 
 
 def call_sonnet(api_key: str, prompt: str) -> dict:
-    req = urllib.request.Request(
-        "https://api.anthropic.com/v1/messages",
-        data=json.dumps({
-            "model": MODEL,
-            "max_tokens": 3000,
-            "system": (
-                "You are a strategist who writes tight, specific synthesis paragraphs. "
-                "You connect cross-domain signals into one paragraph the reader can "
-                "act on. No fluff, no generic phrasing, no hedging. Return STRICT JSON."
-            ),
-            "messages": [{"role": "user", "content": prompt}],
-        }).encode(),
-        headers={
-            "x-api-key": api_key,
-            "anthropic-version": "2023-06-01",
-            "content-type": "application/json",
-        },
+    # Routes through claude CLI (OAuth/plan), NOT raw API. api_key arg ignored.
+    return call_claude(
+        prompt,
+        model=MODEL,
+        system_prompt=(
+            "You are a strategist who writes tight, specific synthesis paragraphs. "
+            "You connect cross-domain signals into one paragraph the reader can "
+            "act on. No fluff, no generic phrasing, no hedging. Return STRICT JSON."
+        ),
+        timeout=300,
     )
-    with urllib.request.urlopen(req, timeout=180) as r:
-        resp = json.loads(r.read())
-    text = resp["content"][0]["text"].strip()
-    text = re.sub(r"^```(?:json)?\s*|\s*```$", "", text, flags=re.MULTILINE).strip()
-    return json.loads(text)
 
 
 def build_theme_prompt(cluster: dict, today_entities: list[str]) -> str:

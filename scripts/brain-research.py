@@ -36,6 +36,7 @@ from services.wiki_compile.domains.brain import (  # noqa: E402
     BRAIN, CLAW_MIRROR, extract_entities,
 )
 from services.wiki_compile.identity import load_user_context  # noqa: E402
+from services.wiki_compile.llm import call_claude  # noqa: E402
 
 DB_PATH = Path("/Users/amrut/nanoclaw/store/messages.db")
 CACHE_DIR = Path("/Users/amrut/nanoclaw/data/research-cache")
@@ -50,7 +51,7 @@ FETCH_TIMEOUT = 15
 MAX_BODY_BYTES = 2_000_000
 MAX_TEXT_CHARS_FOR_LLM = 10_000    # primary page
 MAX_LINK_TEXT_CHARS = 3_500        # each link-followed page
-MODEL = "claude-sonnet-4-6"
+MODEL = "claude-opus-4-7"  # OAuth/plan quota, backoff handles rate limits
 SHARED_DAYS = 7
 USER_AGENT = "Mozilla/5.0 (Macintosh) brain-research/1.0"
 
@@ -240,29 +241,17 @@ def fetch_url(url: str, follow_links: bool = False) -> dict | None:
 
 
 def call_haiku(api_key: str, prompt: str) -> dict:
-    # Function name kept for stability — model is configurable via MODEL above.
-    req = urllib.request.Request(
-        "https://api.anthropic.com/v1/messages",
-        data=json.dumps({
-            "model": MODEL,
-            "max_tokens": 2000,
-            "system": (
-                "You analyze a single web page and return STRICT JSON describing "
-                "what it introduces. No markdown, no prose outside JSON."
-            ),
-            "messages": [{"role": "user", "content": prompt}],
-        }).encode(),
-        headers={
-            "x-api-key": api_key,
-            "anthropic-version": "2023-06-01",
-            "content-type": "application/json",
-        },
+    # Function name kept for stability with importers (brain-watch, backlog).
+    # Now routes through claude CLI (OAuth/plan quota), NOT the raw API.
+    # api_key arg is ignored — kept so existing callers don't break.
+    return call_claude(
+        prompt,
+        model=MODEL,
+        system_prompt=(
+            "You analyze a single web page and return STRICT JSON describing "
+            "what it introduces. No markdown, no prose outside JSON."
+        ),
     )
-    with urllib.request.urlopen(req, timeout=120) as r:
-        resp = json.loads(r.read())
-    text = resp["content"][0]["text"].strip()
-    text = re.sub(r"^```(?:json)?\s*|\s*```$", "", text, flags=re.MULTILINE).strip()
-    return json.loads(text)
 
 
 def today_claw_blob() -> str:
