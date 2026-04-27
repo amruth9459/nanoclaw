@@ -5,6 +5,90 @@
 
 ---
 
+### 2026-04-27 13:01
+
+**Areas:** hooks
+**Files (8):** .claude/hooks/brain-digest-inject.sh, .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut-nanoclaw/memory/competitive_clawdi.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_no_site_managers.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_clawsweeper_roadmap.md, .claude/projects/-Users-amrut/memory/MEMORY.md, .claude/settings.json, .githooks/no-lexios-in-core.sh
+**Diff:** +81 -2 across 3 files
+
+### 2026-04-27 12:16
+
+**Areas:** hooks
+**Files (8):** .claude/hooks/brain-digest-inject.sh, .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut-nanoclaw/memory/competitive_clawdi.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_no_site_managers.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_clawsweeper_roadmap.md, .claude/projects/-Users-amrut/memory/MEMORY.md, .claude/settings.json, .githooks/no-lexios-in-core.sh
+**Diff:** +75 -2 across 3 files
+
+### 2026-04-27 12:13
+
+**Areas:** hooks
+**Files (8):** .claude/hooks/brain-digest-inject.sh, .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut-nanoclaw/memory/competitive_clawdi.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_no_site_managers.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_clawsweeper_roadmap.md, .claude/projects/-Users-amrut/memory/MEMORY.md, .claude/settings.json, .githooks/no-lexios-in-core.sh
+**Diff:** +69 -2 across 3 files
+
+### 2026-04-27 12:10
+
+**Areas:** hooks
+**Files (8):** .claude/hooks/brain-digest-inject.sh, .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut-nanoclaw/memory/competitive_clawdi.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_no_site_managers.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_clawsweeper_roadmap.md, .claude/projects/-Users-amrut/memory/MEMORY.md, .claude/settings.json, .githooks/no-lexios-in-core.sh
+**Diff:** +63 -2 across 3 files
+
+### 2026-04-27 12:10
+
+**Areas:** hooks
+**Files (8):** .claude/hooks/brain-digest-inject.sh, .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut-nanoclaw/memory/competitive_clawdi.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_no_site_managers.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_clawsweeper_roadmap.md, .claude/projects/-Users-amrut/memory/MEMORY.md, .claude/settings.json, .githooks/no-lexios-in-core.sh
+**Diff:** +57 -2 across 3 files
+
+### 2026-04-27 12:08
+
+**Areas:** hooks
+**Files (8):** .claude/hooks/brain-digest-inject.sh, .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut-nanoclaw/memory/competitive_clawdi.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_no_site_managers.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_clawsweeper_roadmap.md, .claude/projects/-Users-amrut/memory/MEMORY.md, .claude/settings.json, .githooks/no-lexios-in-core.sh
+**Diff:** +51 -2 across 3 files
+
+### 2026-04-27 12:03
+
+**Areas:** hooks
+**Files (8):** .claude/hooks/brain-digest-inject.sh, .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut-nanoclaw/memory/competitive_clawdi.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_no_site_managers.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_clawsweeper_roadmap.md, .claude/projects/-Users-amrut/memory/MEMORY.md, .claude/settings.json, .githooks/no-lexios-in-core.sh
+**Diff:** +762 -719 across 294 files
+
+### 2026-04-27 12:01
+
+**Areas:** hooks
+**Files (8):** .claude/hooks/brain-digest-inject.sh, .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut-nanoclaw/memory/competitive_clawdi.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_no_site_managers.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_clawsweeper_roadmap.md, .claude/projects/-Users-amrut/memory/MEMORY.md, .claude/settings.json, .githooks/no-lexios-in-core.sh
+**Diff:** +756 -719 across 294 files
+
+### 2026-04-27 11:55
+
+**Areas:** hooks
+**Files (8):** .claude/hooks/brain-digest-inject.sh, .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut-nanoclaw/memory/competitive_clawdi.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_no_site_managers.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_clawsweeper_roadmap.md, .claude/projects/-Users-amrut/memory/MEMORY.md, .claude/settings.json, .githooks/no-lexios-in-core.sh
+**Diff:** +750 -719 across 294 files
+
+### 2026-04-27 11:50
+
+**Areas:** hooks
+**Files (8):** .claude/hooks/brain-digest-inject.sh, .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut-nanoclaw/memory/competitive_clawdi.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_no_site_managers.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_clawsweeper_roadmap.md, .claude/projects/-Users-amrut/memory/MEMORY.md, .claude/settings.json, .githooks/no-lexios-in-core.sh
+**Diff:** +744 -719 across 294 files
+
+### 2026-04-27 11:49
+
+**Areas:** hooks
+**Files (8):** .claude/hooks/brain-digest-inject.sh, .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut-nanoclaw/memory/competitive_clawdi.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_no_site_managers.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_clawsweeper_roadmap.md, .claude/projects/-Users-amrut/memory/MEMORY.md, .claude/settings.json, .githooks/no-lexios-in-core.sh
+**Diff:** +738 -719 across 294 files
+
+### 2026-04-27 11:47
+
+**Areas:** hooks
+**Files (8):** .claude/hooks/brain-digest-inject.sh, .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut-nanoclaw/memory/competitive_clawdi.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_no_site_managers.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_clawsweeper_roadmap.md, .claude/projects/-Users-amrut/memory/MEMORY.md, .claude/settings.json, .githooks/no-lexios-in-core.sh
+**Diff:** +732 -719 across 294 files
+
+### 2026-04-27 11:43
+
+**Areas:** hooks
+**Files (8):** .claude/hooks/brain-digest-inject.sh, .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut-nanoclaw/memory/competitive_clawdi.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_no_site_managers.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_clawsweeper_roadmap.md, .claude/projects/-Users-amrut/memory/MEMORY.md, .claude/settings.json, .githooks/no-lexios-in-core.sh
+**Diff:** +9 -2 across 3 files
+
+### 2026-04-27 11:38
+
+**Areas:** hooks
+**Files (8):** .claude/hooks/brain-digest-inject.sh, .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut-nanoclaw/memory/competitive_clawdi.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_no_site_managers.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_clawsweeper_roadmap.md, .claude/projects/-Users-amrut/memory/MEMORY.md, .claude/settings.json, .githooks/no-lexios-in-core.sh
+**Diff:** +3 -2 across 2 files
+
 ### 2026-04-27 11:00
 
 **Areas:** hooks
