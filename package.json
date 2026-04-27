@@ -14,7 +14,10 @@
     "format:check": "prettier --check \"src/**/*.ts\"",
     "test": "vitest run",
     "test:watch": "vitest",
-    "watch": "tsx src/dev-watcher.ts"
+    "watch": "tsx src/dev-watcher.ts",
+    "sweeper:review": "tsx scripts/sweeper/review.ts",
+    "sweeper:apply": "tsx scripts/sweeper/apply.ts",
+    "sweeper:audit": "tsx scripts/sweeper/audit.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.78.0",
@@ -32,7 +35,7 @@
     "pino-roll": "^4.0.0",
     "qrcode": "^1.5.4",
     "qrcode-terminal": "^0.12.0",
-    "sqlite-vec": "^0.1.7-alpha.2",
+    "sqlite-vec": "^0.1.9",
     "twilio": "^5.12.2",
     "yaml": "^2.8.2",
     "zod": "^4.3.6"

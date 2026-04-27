@@ -95,10 +95,16 @@ export async function embedText(
 ): Promise<Float32Array> {
   const client = getClient();
   const model = client.getGenerativeModel({ model: 'gemini-embedding-001' });
-  const result = await model.embedContent({
-    content: { role: 'user', parts: [{ text: text.slice(0, 2048) }] },
-    taskType,
-  });
+  const timeoutMs = 15000;
+  const result = await Promise.race([
+    model.embedContent({
+      content: { role: 'user', parts: [{ text: text.slice(0, 2048) }] },
+      taskType,
+    }),
+    new Promise<never>((_, reject) =>
+      setTimeout(() => reject(new Error(`Gemini embedding timed out after ${timeoutMs}ms`)), timeoutMs),
+    ),
+  ]);
   // Gemini returns 3072 dims natively; truncate to DIMS (MRL-safe)
   const raw = result.embedding.values;
   const values = raw.length > DIMS ? raw.slice(0, DIMS) : raw;
