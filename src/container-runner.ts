@@ -328,8 +328,15 @@ function readSecrets(): Record<string, string> {
   // NOTE: ANTHROPIC_API_KEY intentionally NOT passed to containers — use OAuth only
   // so container sessions are covered by the Pro subscription (no API billing).
   // API key is still used host-side by judge-system.ts and semantic-index.ts.
+  //
+  // ANTHROPIC_BASE_URL + ANTHROPIC_AUTH_TOKEN are opt-in passthroughs for routing
+  // containers to non-Anthropic providers (DeepSeek, OpenRouter, local LM Studio
+  // via Anthropic-compatible proxies). Set both together; leave both unset for
+  // default Claude routing. When BASE_URL is set, AUTH_TOKEN supersedes OAuth
+  // for that endpoint.
   const fromEnvFile = readEnvFile(['CLAUDE_CODE_OAUTH_TOKEN',
-    'OPENAI_API_KEY', 'GOOGLE_API_KEY']);
+    'OPENAI_API_KEY', 'GOOGLE_API_KEY',
+    'ANTHROPIC_BASE_URL', 'ANTHROPIC_AUTH_TOKEN']);
 
   // Keychain-first: on macOS, always try reading the freshest token from Keychain
   // (maintained by Claude Code desktop). Falls back to .env if Keychain is unavailable.
