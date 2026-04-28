@@ -53,6 +53,31 @@ function getUsageByGroup(since: string): UsageByGroup[] {
   `).all(since) as UsageByGroup[];
 }
 
+interface UsageByProvider {
+  provider: string;
+  total_cost: number;
+  run_count: number;
+}
+
+function getUsageByProvider(since: string): UsageByProvider[] {
+  const db = getDb();
+  try {
+    return db.prepare(`
+      SELECT
+        COALESCE(provider, 'anthropic') as provider,
+        COALESCE(SUM(cost_usd), 0) as total_cost,
+        COUNT(*) as run_count
+      FROM usage_logs
+      WHERE run_at >= ?
+      GROUP BY provider
+      ORDER BY total_cost DESC
+    `).all(since) as UsageByProvider[];
+  } catch {
+    // Schema may pre-date provider column
+    return [];
+  }
+}
+
 function getDispatchResults(since: string): DispatchResult[] {
   const db = getDb();
   try {
@@ -161,6 +186,19 @@ export function generateEveningReport(): string {
     lines.push(`*Cost:* $${usage.total_cost.toFixed(2)}${costParts.length > 0 ? ` (${costParts.join(', ')})` : ''}`);
   } else {
     lines.push('*Cost:* $0.00');
+  }
+
+  // Per-provider breakdown (visible only when non-anthropic traffic exists)
+  const byProvider = getUsageByProvider(since);
+  if (byProvider.length > 1 || byProvider.some(p => p.provider !== 'anthropic')) {
+    const parts = byProvider.map(p => {
+      const tag = p.provider === 'anthropic' ? '' : ' ~est';
+      return `${p.provider}: ${p.run_count} runs, $${p.total_cost.toFixed(2)}${tag}`;
+    });
+    lines.push(`*By provider:* ${parts.join(' · ')}`);
+    if (byProvider.some(p => p.provider !== 'anthropic')) {
+      lines.push(`  _(non-anthropic costs are upper-bound estimates using Sonnet pricing)_`);
+    }
   }
 
   // Dispatch results

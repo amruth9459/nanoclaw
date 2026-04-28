@@ -57,7 +57,7 @@ import {
 } from './db.js';
 // Local routing disabled while Max subscription is active
 // import { routeWithOpus, executeLocal } from './opus-router.js';
-import { calculateCost } from './economics.js';
+import { calculateCost, getActiveProvider } from './economics.js';
 // Dead code clusters — wired as enrichment/monitoring layers (non-blocking)
 import { contextManager, codedContext, setSystemFact, setCapability } from './context/index.js';
 import { pruneOldChunks } from './semantic-index.js';
@@ -766,7 +766,7 @@ async function processGroupMessages(chatJid: string): Promise<boolean> {
   if (finalUsage) {
     const costUsd = calculateCost(finalUsage);
     const durationMs = Date.now() - runStartTime;
-    logUsage(group.folder, chatJid, finalUsage, durationMs, false, costUsd, determinePurpose(group.folder, chatJid));
+    logUsage(group.folder, chatJid, finalUsage, durationMs, false, costUsd, determinePurpose(group.folder, chatJid), getActiveProvider());
   }
 
   if (output === 'error' || hadError) {
