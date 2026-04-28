@@ -314,6 +314,15 @@ function createSchema(database: Database.Database): void {
     /* column already exists */
   }
 
+  // Add provider tracking to usage_logs (anthropic | custom — anything routed
+  // via ANTHROPIC_BASE_URL passthrough). Cost numbers for non-anthropic are
+  // rough estimates using Sonnet pricing until per-provider tables are added.
+  try {
+    database.exec(`ALTER TABLE usage_logs ADD COLUMN provider TEXT DEFAULT 'anthropic'`);
+  } catch {
+    /* column already exists */
+  }
+
   // Add project tracking to tasks
   try {
     database.exec(`ALTER TABLE tasks ADD COLUMN project TEXT DEFAULT 'nanoclaw'`);
@@ -1098,11 +1107,12 @@ export function logUsage(
   isTask: boolean,
   costUsd: number,
   purpose: string = 'conversation',
+  provider: string = 'anthropic',
 ): void {
   const now = new Date().toISOString();
   db.prepare(`
-    INSERT INTO usage_logs (group_id, chat_jid, run_at, input_tokens, output_tokens, cache_read_tokens, cache_write_tokens, cost_usd, duration_ms, is_task, purpose)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    INSERT INTO usage_logs (group_id, chat_jid, run_at, input_tokens, output_tokens, cache_read_tokens, cache_write_tokens, cost_usd, duration_ms, is_task, purpose, provider)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `).run(
     groupId,
     chatJid,
@@ -1115,6 +1125,7 @@ export function logUsage(
     durationMs,
     isTask ? 1 : 0,
     purpose,
+    provider,
   );
 }
 

@@ -19,7 +19,7 @@ import {
   logUsage,
   updateTaskAfterRun,
 } from './db.js';
-import { calculateCost } from './economics.js';
+import { calculateCost, getActiveProvider } from './economics.js';
 import { cleanupOldMedia } from './media-cleanup.js';
 import { GroupQueue } from './group-queue.js';
 import { logger } from './logger.js';
@@ -156,7 +156,7 @@ async function runTask(
             const costUsd = calculateCost(streamedOutput.usage);
             const durationMs = Date.now() - startTime;
             const purpose = task.id.includes('bounty-hunter') ? 'bounty' : 'task';
-            logUsage(task.group_folder, task.chat_jid, streamedOutput.usage, durationMs, true, costUsd, purpose);
+            logUsage(task.group_folder, task.chat_jid, streamedOutput.usage, durationMs, true, costUsd, purpose, getActiveProvider());
             logger.info({ taskId: task.id, costUsd, usage: streamedOutput.usage }, 'Task cost tracked');
           }
           deps.queue.notifyIdle(task.chat_jid);
