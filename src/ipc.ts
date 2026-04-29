@@ -458,6 +458,15 @@ export function startIpcWatcher(deps: IpcDeps): void {
 
                 // ── Streaming Messages (from integration layer) ────────────
                 if (data.type === 'streaming_message' && data.chatJid && data.text) {
+                  // Authorization: non-main groups can only stream to their own JID
+                  if (!isMain) {
+                    const streamGroup = registeredGroups[data.chatJid as string];
+                    if (!streamGroup || streamGroup.folder !== sourceGroup) {
+                      logger.warn({ chatJid: data.chatJid, sourceGroup }, 'SECURITY: streaming_message to unauthorized JID blocked');
+                      fs.unlinkSync(filePath);
+                      continue;
+                    }
+                  }
                   try {
                     await deps.sendMessage(data.chatJid as string, data.text as string);
                     logger.debug({ chatJid: data.chatJid, preview: (data.text as string).slice(0, 50) }, 'Sent streaming message');
@@ -1028,12 +1037,18 @@ async function processIpcMessage(
     // ── Shared Items Inbox ─────────────────────────────────────────
     case 'shared_items': {
       const action = data.action as string;
+      // Determine the group's chat JID for scoping
+      const isMainShared = groupFolder === MAIN_GROUP_FOLDER;
+      // Find this group's chat JID for scoping shared items
+      const allGroups = deps.registeredGroups();
+      const groupChatJid = Object.entries(allGroups).find(([, g]) => (g as any).folder === groupFolder)?.[0] ?? '';
       try {
         switch (action) {
           case 'list': {
             const status = (data.status as string) || 'new';
             const limit = typeof data.limit === 'number' ? data.limit : 20;
-            const items = getSharedItems(status, limit);
+            const allItems = getSharedItems(status, limit * (isMainShared ? 1 : 5)); // over-fetch for filtering
+            const items = isMainShared ? allItems : allItems.filter(i => i.chat_jid === groupChatJid);
             if (items.length === 0) {
               if (responseFile) writeIpcResponse(responseFile, { result: `No ${status} items in your shared inbox.` });
             } else {
@@ -1049,6 +1064,7 @@ async function processIpcMessage(
             if (!id) { if (responseFile) writeIpcResponse(responseFile, { error: 'Missing id' }); break; }
             const item = getSharedItemById(id);
             if (!item) { if (responseFile) writeIpcResponse(responseFile, { error: `Item not found: ${id}` }); break; }
+            if (!isMainShared && item.chat_jid !== groupChatJid) { if (responseFile) writeIpcResponse(responseFile, { error: `Item not found: ${id}` }); break; }
             if (responseFile) writeIpcResponse(responseFile, { result: JSON.stringify(item, null, 2) });
             break;
           }
@@ -1056,6 +1072,8 @@ async function processIpcMessage(
             const id = data.id as string;
             const notes = data.notes as string | undefined;
             if (!id) { if (responseFile) writeIpcResponse(responseFile, { error: 'Missing id' }); break; }
+            const existing = getSharedItemById(id);
+            if (!isMainShared && existing?.chat_jid !== groupChatJid) { if (responseFile) writeIpcResponse(responseFile, { error: `Item not found: ${id}` }); break; }
             const ok = updateSharedItemStatus(id, 'triaged', notes);
             if (responseFile) writeIpcResponse(responseFile, { result: ok ? `Item ${id} triaged.` : `Item not found: ${id}` });
             break;
@@ -1064,6 +1082,8 @@ async function processIpcMessage(
             const id = data.id as string;
             const notes = data.notes as string | undefined;
             if (!id) { if (responseFile) writeIpcResponse(responseFile, { error: 'Missing id' }); break; }
+            const existing = getSharedItemById(id);
+            if (!isMainShared && existing?.chat_jid !== groupChatJid) { if (responseFile) writeIpcResponse(responseFile, { error: `Item not found: ${id}` }); break; }
             const ok = updateSharedItemStatus(id, 'acted_on', notes);
             if (responseFile) writeIpcResponse(responseFile, { result: ok ? `Item ${id} marked as acted_on.` : `Item not found: ${id}` });
             break;
@@ -1071,6 +1091,8 @@ async function processIpcMessage(
           case 'archive': {
             const id = data.id as string;
             if (!id) { if (responseFile) writeIpcResponse(responseFile, { error: 'Missing id' }); break; }
+            const existing = getSharedItemById(id);
+            if (!isMainShared && existing?.chat_jid !== groupChatJid) { if (responseFile) writeIpcResponse(responseFile, { error: `Item not found: ${id}` }); break; }
             const ok = updateSharedItemStatus(id, 'archived');
             if (responseFile) writeIpcResponse(responseFile, { result: ok ? `Item ${id} archived.` : `Item not found: ${id}` });
             break;

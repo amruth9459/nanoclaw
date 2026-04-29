@@ -16,7 +16,18 @@ export function formatMessages(messages: NewMessage[]): string {
     // If there's media, add metadata about it
     if (m.media_type && m.media_path) {
       const mediaPath = m.media_path.replace(/^.*\/media\//, '/workspace/media/');
-      const mediaInfo = `[${m.media_type}: ${mediaPath}]`;
+      let mediaInfo = `[${m.media_type}: ${mediaPath}]`;
+      // For videos, include keyframe paths so the agent can view the video content
+      if (m.media_type === 'video') {
+        const frames: string[] = [];
+        for (let i = 0; i < 4; i++) {
+          const frameName = `${mediaPath}.frame${i}.jpg`;
+          frames.push(frameName);
+        }
+        mediaInfo += ` [keyframes: ${frames.join(', ')}]`;
+        // Also include audio transcription file if it exists
+        mediaInfo += ` [audio transcript: ${mediaPath}.audio.ogg.txt]`;
+      }
       content = content ? `${mediaInfo} ${content}` : mediaInfo;
     }
 

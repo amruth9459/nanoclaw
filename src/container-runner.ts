@@ -294,9 +294,9 @@ function buildVolumeMounts(
     readonly: false,
   });
 
-  // Media directory (read-only): shared media files (images, documents, etc.)
-  // Mounted read-only to prevent agents from tampering with media files
-  const mediaDir = path.join(STORE_DIR, 'media');
+  // Media directory (read-only): main sees all media, guests only see their own group's media
+  const mediaBase = path.join(STORE_DIR, 'media');
+  const mediaDir = isMain ? mediaBase : path.join(mediaBase, group.folder);
   fs.mkdirSync(mediaDir, { recursive: true });
   mounts.push({
     hostPath: mediaDir,

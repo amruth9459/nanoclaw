@@ -182,15 +182,50 @@ function saveState(): void {
 }
 
 function registerGroup(jid: string, group: RegisteredGroup): void {
+  const isMain = group.folder === MAIN_GROUP_FOLDER;
+
+  // Non-main groups get isolation by default
+  if (!isMain && !group.containerConfig) {
+    group.containerConfig = { isolatedPersona: true, networkRestricted: false };
+  } else if (!isMain && group.containerConfig && !(group.containerConfig as any).isolatedPersona) {
+    (group.containerConfig as any).isolatedPersona = true;
+  }
+
   registeredGroups[jid] = group;
   setRegisteredGroup(jid, group);
 
-  // Create group folder
+  // Create group folder structure
   const groupDir = path.join(DATA_DIR, '..', 'groups', group.folder);
   fs.mkdirSync(path.join(groupDir, 'logs'), { recursive: true });
 
+  // Create per-group media directory for container isolation
+  if (!isMain) {
+    fs.mkdirSync(path.join(STORE_DIR, 'media', group.folder), { recursive: true });
+  }
+
+  // Create default CLAUDE.md with isolation rules for non-main groups
+  const claudeMdPath = path.join(groupDir, 'CLAUDE.md');
+  if (!isMain && !fs.existsSync(claudeMdPath)) {
+    const defaultClaudeMd = `# ${group.name}
+
+## Isolation Rules (CRITICAL)
+- **This group is FULLY ISOLATED** from all other groups
+- NEVER read, reference, or expose files from other group folders
+- NEVER mention the admin's other projects or personal details
+- NEVER access directories outside \`groups/${group.folder}/\`
+- NEVER discuss tasks, dispatch logs, or work from other groups
+- NEVER fabricate or hallucinate capabilities you don't have
+
+## Instructions
+- Be helpful, thorough, and proactive
+- Use all available tools (Bash, Read, Write, WebSearch, etc.)
+- If a task is complex, break it down and work through it step by step
+`;
+    fs.writeFileSync(claudeMdPath, defaultClaudeMd);
+  }
+
   logger.info(
-    { jid, name: group.name, folder: group.folder },
+    { jid, name: group.name, folder: group.folder, isolated: !isMain },
     'Group registered',
   );
 }
@@ -212,13 +247,15 @@ function getOrCreateGuestGroup(chatJid: string): RegisteredGroup {
     folder,
     trigger: `@${ASSISTANT_NAME}`,
     added_at: new Date().toISOString(),
+    containerConfig: { isolatedPersona: true, networkRestricted: false },
   };
 
   guestGroups.set(chatJid, group);
 
-  // Create group directory (mirrors what registerGroup does for real groups)
+  // Create group directory with full isolation structure
   const groupDir = path.join(GROUPS_DIR, folder);
   fs.mkdirSync(path.join(groupDir, 'logs'), { recursive: true });
+  fs.mkdirSync(path.join(STORE_DIR, 'media', folder), { recursive: true });
 
   // Copy CLAUDE.md from the guest template on first contact
   const claudeMdPath = path.join(groupDir, 'CLAUDE.md');
@@ -226,10 +263,24 @@ function getOrCreateGuestGroup(chatJid: string): RegisteredGroup {
     const templatePath = path.join(GROUPS_DIR, 'guest-template', 'CLAUDE.md');
     if (fs.existsSync(templatePath)) {
       fs.copyFileSync(templatePath, claudeMdPath);
+    } else {
+      // No template — create default with isolation rules
+      fs.writeFileSync(claudeMdPath, `# Guest Assistant
+
+## Isolation Rules (CRITICAL)
+- **This group is FULLY ISOLATED** from all other groups
+- NEVER read, reference, or expose files from other group folders
+- NEVER mention the admin's other projects or personal details
+- NEVER access directories outside \`groups/${folder}/\`
+- NEVER discuss tasks, dispatch logs, or work from other groups
+- NEVER fabricate or hallucinate capabilities you don't have
+
+Be helpful, thorough, and proactive. Use all available tools.
+`);
     }
   }
 
-  logger.info({ chatJid, folder, name: chatName }, 'Guest group created');
+  logger.info({ chatJid, folder, name: chatName }, 'Guest group created (isolated)');
   return group;
 }
 
@@ -600,15 +651,21 @@ async function processGroupMessages(chatJid: string): Promise<boolean> {
   queue.setSpawnReason(chatJid, spawnReason);
 
   // Auto-capture user tasks to kanban board
-  // Detects imperative/request messages and creates tracked task records
+  // Each group's tasks are scoped to their own project namespace — no cross-contamination
   if (!lastMsg.is_from_me) {
     const taskContent = lastMsg.content.replace(TRIGGER_PATTERN, '').trim();
     if (isUserTask(taskContent)) {
       try {
-        let project = 'nanoclaw';
-        for (const integration of getIntegrations()) {
-          const p = integration.determineProject?.(group.folder);
-          if (p) { project = p; break; }
+        // Scope project to group folder for guests — admin groups use integration-determined project
+        let project: string;
+        if (isMainGroup) {
+          project = 'nanoclaw';
+          for (const integration of getIntegrations()) {
+            const p = integration.determineProject?.(group.folder);
+            if (p) { project = p; break; }
+          }
+        } else {
+          project = group.folder; // Guest tasks namespaced to their own group
         }
         createTaskRecord({
           description: taskContent.slice(0, 200),
@@ -616,7 +673,7 @@ async function processGroupMessages(chatJid: string): Promise<boolean> {
           source: 'user',
           priority: 3,
         });
-        logger.info({ groupFolder: group.folder, preview: taskContent.slice(0, 80) }, 'Auto-captured user task to kanban');
+        logger.info({ groupFolder: group.folder, project, preview: taskContent.slice(0, 80) }, 'Auto-captured user task to kanban');
       } catch (err) {
         logger.warn({ err }, 'Failed to auto-capture user task');
       }
@@ -624,13 +681,14 @@ async function processGroupMessages(chatJid: string): Promise<boolean> {
   }
 
   // Auto-capture shared items (links, media, strategic thinking)
+  // Guest group items are scoped — stored with their group's chat_jid so they never appear in main's inbox
   for (const msg of missedMessages) {
     if (msg.is_from_me) continue;
     try {
       const items = detectSharedItems(msg);
       for (const item of items) {
         if (storeSharedItem(item)) {
-          logger.info({ itemId: item.id, type: item.item_type, category: item.category }, 'Auto-captured shared item');
+          logger.info({ itemId: item.id, type: item.item_type, category: item.category, group: group.folder }, 'Auto-captured shared item');
         }
       }
     } catch (err) {

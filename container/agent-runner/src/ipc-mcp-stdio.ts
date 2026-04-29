@@ -74,6 +74,10 @@ server.tool(
   'List all registered WhatsApp groups with their JIDs. Use this to find the target_jid for cross-group messaging via send_message.',
   {},
   async () => {
+    // Non-main groups can only see their own group
+    if (!isMain) {
+      return { content: [{ type: 'text' as const, text: `Your group: ${chatJid}` }] };
+    }
     const groupsFile = path.join(IPC_DIR, 'available_groups.json');
     try {
       if (!fs.existsSync(groupsFile)) {
@@ -395,7 +399,7 @@ Returns the most relevant text chunks for your query.`,
     const requestFile = path.join(IPC_DIR, `${requestId}.search.json`);
     const responseFile = path.join(IPC_DIR, `${requestId}.result.json`);
 
-    const request = {
+    const request: Record<string, unknown> = {
       type: 'semantic_search',
       requestId,
       query: args.query,
@@ -403,6 +407,10 @@ Returns the most relevant text chunks for your query.`,
       groupFolder: args.group_folder,
       responseFile,
     };
+    // Non-main groups can only search their own group's data
+    if (!isMain) {
+      request.groupFolder = groupFolder;
+    }
 
     // Write request
     const tmp = `${requestFile}.tmp`;

@@ -677,7 +677,7 @@ async function runQuery(
   const clawEmailAppPassword = (containerInput.secrets as Record<string, string> | undefined)?.['CLAW_EMAIL_APP_PASSWORD'] || '';
   const clawRedditPass = (containerInput.secrets as Record<string, string> | undefined)?.['CLAW_REDDIT_PASS'] || '';
   const clawRedditClientSecret = (containerInput.secrets as Record<string, string> | undefined)?.['CLAW_REDDIT_CLIENT_SECRET'] || '';
-  if (clawName || clawEmail || clawRedditUser) {
+  if (containerInput.isMain && (clawName || clawEmail || clawRedditUser)) {
     const identityLines: string[] = ['\n\n## Your Outreach Identity'];
     identityLines.push('You have a separate human-sounding identity for all external communications.');
     identityLines.push('Use this identity — not your own name — for Reddit posts, cold emails, and any public-facing work.');
@@ -798,9 +798,10 @@ async function runQuery(
             NANOCLAW_CHAT_JID: containerInput.chatJid,
             NANOCLAW_GROUP_FOLDER: containerInput.groupFolder,
             NANOCLAW_IS_MAIN: containerInput.isMain ? '1' : '0',
-            ...(clawName ? { CLAW_NAME: clawName } : {}),
-            ...(clawEmail ? { CLAW_EMAIL: clawEmail } : {}),
-            ...(clawRedditUser ? { CLAW_REDDIT_USER: clawRedditUser } : {}),
+            // Only pass identity env vars to main group (security isolation)
+            ...(containerInput.isMain && clawName ? { CLAW_NAME: clawName } : {}),
+            ...(containerInput.isMain && clawEmail ? { CLAW_EMAIL: clawEmail } : {}),
+            ...(containerInput.isMain && clawRedditUser ? { CLAW_REDDIT_USER: clawRedditUser } : {}),
           },
         },
       },

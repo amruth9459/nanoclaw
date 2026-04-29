@@ -39,6 +39,7 @@ interface MediaInfo {
   path: string;
   mimetype: string;
   size: number;
+  transcription?: string;
 }
 
 export interface WhatsAppChannelOpts {
@@ -417,12 +418,40 @@ export class WhatsAppChannel implements Channel {
             ? fromMe
             : content.startsWith(`${ASSISTANT_NAME}:`);
 
+          // Append audio transcription to message content
+          let messageContent = fullContent || (effectiveMedia ? `[${effectiveMedia.type}]` : '');
+          if (effectiveMedia?.transcription) {
+            messageContent = messageContent
+              ? `${messageContent}\n[Voice transcription: ${effectiveMedia.transcription}]`
+              : `[Voice transcription: ${effectiveMedia.transcription}]`;
+          }
+
+          // Copy media to per-group subdirectory for container isolation
+          if (effectiveMedia?.path) {
+            const groupEntry = Object.entries(this.opts.registeredGroups()).find(([jid]) => jid === chatJid);
+            if (groupEntry) {
+              const groupMediaDir = path.join(MEDIA_DIR, groupEntry[1].folder);
+              fs.mkdirSync(groupMediaDir, { recursive: true });
+              const destPath = path.join(groupMediaDir, path.basename(effectiveMedia.path));
+              if (!fs.existsSync(destPath)) {
+                try { fs.copyFileSync(effectiveMedia.path, destPath); } catch { /* best effort */ }
+                // Also copy any sidecar files (transcriptions, thumbnails, frames)
+                for (const suffix of ['.txt', '.thumb.jpg', '.frame0.jpg', '.frame1.jpg', '.frame2.jpg', '.frame3.jpg', '.audio.ogg', '.audio.ogg.txt']) {
+                  const sidecar = effectiveMedia.path + suffix;
+                  if (fs.existsSync(sidecar)) {
+                    try { fs.copyFileSync(sidecar, destPath + suffix); } catch { /* best effort */ }
+                  }
+                }
+              }
+            }
+          }
+
           this.opts.onMessage(chatJid, {
             id: msg.key.id || '',
             chat_jid: chatJid,
             sender,
             sender_name: senderName,
-            content: fullContent || (effectiveMedia ? `[${effectiveMedia.type}]` : ''),
+            content: messageContent,
             timestamp,
             is_from_me: fromMe,
             is_bot_message: isBotMessage,
@@ -662,10 +691,17 @@ export class WhatsAppChannel implements Channel {
         mimetype = messageContent.imageMessage.mimetype || 'image/jpeg';
         extension = mimetype.split('/')[1] || 'jpg';
         fileSize = Number(messageContent.imageMessage.fileLength || 0);
+      } else if (messageContent.stickerMessage) {
+        mediaType = 'image';
+        mimetype = messageContent.stickerMessage.mimetype || 'image/webp';
+        extension = mimetype.includes('webp') ? 'webp' : 'png';
+        fileSize = Number(messageContent.stickerMessage.fileLength || 0);
       } else if (messageContent.videoMessage) {
-        mediaType = 'video';
+        // WhatsApp sends GIFs as videoMessage with gifPlayback=true
+        const isGif = messageContent.videoMessage.gifPlayback;
+        mediaType = isGif ? 'image' : 'video';
         mimetype = messageContent.videoMessage.mimetype || 'video/mp4';
-        extension = mimetype.split('/')[1] || 'mp4';
+        extension = isGif ? 'gif' : (mimetype.split('/')[1] || 'mp4');
         fileSize = Number(messageContent.videoMessage.fileLength || 0);
       } else if (messageContent.audioMessage) {
         mediaType = 'audio';
@@ -757,6 +793,47 @@ export class WhatsAppChannel implements Channel {
         }
       }
 
+      // ── Video: extract keyframes + transcribe audio track ────────────
+      if (mediaType === 'video') {
+        try {
+          // Extract up to 4 evenly-spaced keyframes so the agent can see the video
+          const duration = (() => {
+            try {
+              const out = execSync(
+                `ffprobe -v error -show_entries format=duration -of csv=p=0 "${filePath}"`,
+                { stdio: 'pipe', timeout: 10000 },
+              ).toString().trim();
+              return parseFloat(out) || 10;
+            } catch { return 10; }
+          })();
+          const frameCount = Math.min(4, Math.max(1, Math.floor(duration / 3)));
+          for (let i = 0; i < frameCount; i++) {
+            const timestamp = Math.min(duration * (i + 1) / (frameCount + 1), duration - 0.5);
+            const framePath = `${filePath}.frame${i}.jpg`;
+            execSync(
+              `ffmpeg -i "${filePath}" -ss ${timestamp.toFixed(2)} -vframes 1 -q:v 2 "${framePath}" -y`,
+              { stdio: 'pipe', timeout: 15000 },
+            );
+            if (process.platform === 'darwin' && fs.existsSync(framePath)) {
+              try { execSync(`sips --resampleHeightWidthMax 1568 "${framePath}"`, { stdio: 'pipe', timeout: 10000 }); } catch {}
+            }
+          }
+          // Keep backward-compatible thumbnail
+          const thumbPath = `${filePath}.thumb.jpg`;
+          if (!fs.existsSync(thumbPath) && fs.existsSync(`${filePath}.frame0.jpg`)) {
+            fs.copyFileSync(`${filePath}.frame0.jpg`, thumbPath);
+          }
+          // Extract audio track for transcription
+          const audioTrack = `${filePath}.audio.ogg`;
+          try {
+            execSync(`ffmpeg -i "${filePath}" -vn -acodec libopus -y "${audioTrack}"`, { stdio: 'pipe', timeout: 30000 });
+          } catch { /* no audio track or ffmpeg issue */ }
+          logger.info({ messageId, frameCount, duration: duration.toFixed(1) }, 'Video frames extracted');
+        } catch {
+          // ffmpeg not available or failed
+        }
+      }
+
       logger.info({
         messageId,
         mediaType,
@@ -765,11 +842,65 @@ export class WhatsAppChannel implements Channel {
         path: filePath
       }, 'Media downloaded and saved');
 
+      // ── Transcribe audio using local mlx-whisper (Apple Silicon) ────
+      // Falls back to OpenAI Whisper API if local model unavailable
+      let transcription: string | undefined;
+      const transcribeTargets: string[] = [];
+      if (mediaType === 'audio') transcribeTargets.push(filePath);
+      // Also transcribe video audio tracks
+      if (mediaType === 'video') {
+        const audioTrack = `${filePath}.audio.ogg`;
+        if (fs.existsSync(audioTrack)) transcribeTargets.push(audioTrack);
+      }
+
+      for (const target of transcribeTargets) {
+        try {
+          // Try local mlx-whisper first (fast, free, private)
+          const venvPython = path.join(process.cwd(), '.venv', 'bin', 'python3');
+          const transcribeScript = path.join(process.cwd(), 'scripts', 'transcribe.py');
+          if (fs.existsSync(venvPython) && fs.existsSync(transcribeScript)) {
+            const result = execSync(`"${venvPython}" "${transcribeScript}" "${target}"`, {
+              stdio: 'pipe',
+              timeout: 120000, // 2 min for large files
+              env: { ...process.env, TOKENIZERS_PARALLELISM: 'false' },
+            }).toString().trim();
+            if (result) {
+              transcription = result;
+              fs.writeFileSync(`${target}.txt`, transcription);
+              logger.info({ messageId, chars: transcription.length, method: 'mlx-whisper' }, 'Audio transcribed (local)');
+            }
+          } else {
+            // Fallback: OpenAI Whisper API
+            const apiKey = process.env.OPENAI_API_KEY;
+            if (apiKey) {
+              const FormData = (await import('form-data')).default;
+              const form = new FormData();
+              form.append('file', fs.createReadStream(target), { filename: path.basename(target), contentType: 'audio/ogg' });
+              form.append('model', 'whisper-1');
+              const resp = await fetch('https://api.openai.com/v1/audio/transcriptions', {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${apiKey}`, ...form.getHeaders() },
+                body: form as any,
+              });
+              if (resp.ok) {
+                const json = await resp.json() as { text: string };
+                transcription = json.text;
+                fs.writeFileSync(`${target}.txt`, transcription);
+                logger.info({ messageId, chars: transcription.length, method: 'openai' }, 'Audio transcribed (API)');
+              }
+            }
+          }
+        } catch (err) {
+          logger.warn({ err, messageId, target }, 'Audio transcription error (non-fatal)');
+        }
+      }
+
       return {
         type: mediaType,
         path: filePath,
         mimetype,
         size: buffer.length,
+        transcription,
       };
     } catch (err) {
       logger.error({ err, messageId: msg.key.id }, 'Failed to download media');
