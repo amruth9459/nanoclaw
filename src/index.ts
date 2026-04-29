@@ -1473,6 +1473,27 @@ TOOLS: find_freelance_gigs, find_bounties, propose_bounty, propose_deliverable, 
 }
 
 async function main(): Promise<void> {
+  // Single-instance guard — prevent launchd from running duplicates
+  const pidFile = path.join(STORE_DIR, 'nanoclaw.pid');
+  {
+    try {
+      const existingPid = fs.readFileSync(pidFile, 'utf-8').trim();
+      if (existingPid) {
+        try {
+          process.kill(Number(existingPid), 0); // Check if process exists
+          logger.error({ existingPid }, 'Another NanoClaw instance is already running — exiting');
+          process.exit(0); // Exit cleanly so launchd doesn't restart immediately
+        } catch {
+          // Process doesn't exist — stale pid file, continue
+        }
+      }
+    } catch {
+      // No pid file — first run
+    }
+    fs.writeFileSync(pidFile, String(process.pid));
+    process.on('exit', () => { try { fs.unlinkSync(pidFile); } catch {} });
+  }
+
   // Startup: verify native modules are compatible with current Node version
   {
     const { createRequire } = await import('module');

@@ -166,7 +166,8 @@ def fetch_new_rows(state: dict) -> list[sqlite3.Row]:
         params = (state["last_seen_created_at"],)
     rows = list(conn.execute(
         f"SELECT id, item_type, content, url, sender_name, category, status, "
-        f"created_at, notes FROM shared_items {where} ORDER BY created_at ASC",
+        f"created_at, notes, media_path, media_type FROM shared_items {where} "
+        f"ORDER BY created_at ASC",
         params,
     ))
     conn.close()
@@ -176,16 +177,21 @@ def fetch_new_rows(state: dict) -> list[sqlite3.Row]:
 
 def make_research_payload(row: sqlite3.Row) -> dict:
     """Match brain-research.py's `item` shape so we can reuse build_prompt etc."""
+    # Some columns may not exist in older row_factory results — use dict() with .get()
+    rd = dict(row)
     return {
-        "id": row["id"],
-        "url": row["url"],
-        "category": row["category"],
-        "status": row["status"],
-        "shared_at": row["created_at"],
-        "title": (row["content"] or row["url"] or row["id"])[:120].strip(),
-        "notes": (row["notes"] or "")[:300],
+        "id": rd.get("id"),
+        "url": rd.get("url"),
+        "category": rd.get("category"),
+        "status": rd.get("status"),
+        "shared_at": rd.get("created_at"),
+        "title": (rd.get("content") or rd.get("url") or rd.get("id") or "")[:120].strip(),
+        "notes": (rd.get("notes") or "")[:300],
         "entities": [],
         "overlap": 0,
+        "media_path": rd.get("media_path"),
+        "media_type": rd.get("media_type"),
+        "item_type": rd.get("item_type"),
     }
 
 
@@ -216,32 +222,65 @@ def emit_whatsapp(title: str, body: str, note_path: Path) -> None:
 
 
 def process_one(row: sqlite3.Row, today_ents: set[str], api_key: str) -> bool:
-    """Returns True iff a notification was emitted (goal-relevant or overlap)."""
+    """Returns True iff a notification was emitted (goal-relevant or overlap).
+    Dispatches to URL fetch / metadata-only / image-vision based on what the
+    shared_item provides.
+    """
+    from services.wiki_compile.llm import call_claude, analyze_image  # local import
     item = make_research_payload(row)
     url = item["url"]
-    if not url or not url.startswith(("http://", "https://")):
-        log(f"  skip {row['id']}: no http(s) URL")
-        return False
-
-    log(f"  fetching {url[:80]}")
-    page = brain_research.fetch_url(url, follow_links=True)
-    if not page:
-        log(f"  fetch failed for {row['id']}")
-        return False
-
+    media_path = item.get("media_path")
     today_blob = today_claw_text()
+    page: dict | None = None
+    analysis: dict | None = None
+    mode: str = "url"
+
     try:
-        prompt = brain_research.build_prompt(item, page, today_blob)
-        analysis = brain_research.call_haiku(api_key, prompt)
+        if url and url.startswith(("http://", "https://")):
+            log(f"  fetching {url[:80]}")
+            page = brain_research.fetch_url(url, follow_links=True)
+            if page and page.get("blocked"):
+                log(f"  blocked/paywall — falling back to metadata-only")
+                mode = "metadata"
+                analysis = call_claude(
+                    brain_research.build_metadata_only_prompt(item, today_blob),
+                    model=brain_research.MODEL,
+                )
+            elif page is not None:
+                analysis = brain_research.call_haiku(
+                    api_key, brain_research.build_prompt(item, page, today_blob),
+                )
+            else:
+                log(f"  fetch failed — falling back to metadata-only")
+                mode = "metadata"
+                analysis = call_claude(
+                    brain_research.build_metadata_only_prompt(item, today_blob),
+                    model=brain_research.MODEL,
+                )
+        elif media_path and Path(media_path).exists():
+            log(f"  image: {media_path}")
+            mode = "image"
+            analysis = analyze_image(
+                media_path,
+                brain_research.build_image_prompt(item, today_blob),
+                model=brain_research.MODEL,
+            )
+        else:
+            log(f"  skip {row['id']}: no usable URL or readable image at {media_path}")
+            return False
     except Exception as e:
-        log(f"  Sonnet analysis failed for {row['id']}: {e}")
+        log(f"  analysis failed for {row['id']} ({mode}): {e}")
+        return False
+
+    if not analysis:
         return False
 
     slug = re.sub(r"[^a-zA-Z0-9_\-]", "", row["id"])
     note_path = RESEARCH_DIR / f"{slug}.md"
     note_path.parent.mkdir(parents=True, exist_ok=True)
-    note_path.write_text(brain_research.render_note(item, page, analysis))
-    log(f"  wrote {note_path.name}")
+    page_for_render = page or {"final_url": url or media_path or "", "linked_pages": []}
+    note_path.write_text(brain_research.render_note(item, page_for_render, analysis))
+    log(f"  wrote {note_path.name} [{mode}]")
 
     advances_goal = analysis.get("advances_which_goal") or []
     overlap_with_work = analysis.get("potential_overlap_with_user_work") or []

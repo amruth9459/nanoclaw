@@ -36,7 +36,7 @@ from services.wiki_compile.domains.brain import (  # noqa: E402
     BRAIN, CLAW_MIRROR, extract_entities,
 )
 from services.wiki_compile.identity import load_user_context  # noqa: E402
-from services.wiki_compile.llm import call_claude  # noqa: E402
+from services.wiki_compile.llm import call_claude, analyze_image  # noqa: E402
 
 DB_PATH = Path("/Users/amrut/nanoclaw/store/messages.db")
 CACHE_DIR = Path("/Users/amrut/nanoclaw/data/research-cache")
@@ -58,6 +58,14 @@ USER_AGENT = "Mozilla/5.0 (Macintosh) brain-research/1.0"
 SCRIPT_RE = re.compile(r"<(script|style|nav|footer|header)[^>]*>.*?</\1>", re.DOTALL | re.IGNORECASE)
 TAG_RE = re.compile(r"<[^>]+>")
 WHITESPACE_RE = re.compile(r"\s+")
+PAYWALL_PATTERNS = re.compile(
+    r"(subscribe to (read|continue)|sign in to (read|continue)|members only|"
+    r"this content is for (members|subscribers)|paywall|create a free account|"
+    r"register to (read|view)|already a subscriber|continue reading\b.{0,40}\bsubscribe|"
+    r"just a moment\.\.\.|enable javascript and cookies|verify you are human)",
+    re.IGNORECASE,
+)
+MIN_USEFUL_CONTENT_CHARS = 400
 LINK_RE = re.compile(
     r'<a\s+(?:[^>]*?\s+)?href=(["\'])([^"\']+)\1[^>]*>(.*?)</a>',
     re.DOTALL | re.IGNORECASE,
@@ -181,10 +189,20 @@ def follow_share_redirect(url: str) -> str:
         return url
 
 
+def is_paywall_or_blocked(text: str) -> bool:
+    """Heuristic: response is too short OR matches paywall/CDN-challenge patterns."""
+    if not text or len(text.strip()) < MIN_USEFUL_CONTENT_CHARS:
+        return True
+    return bool(PAYWALL_PATTERNS.search(text[:3000]))
+
+
 def fetch_url(url: str, follow_links: bool = False) -> dict | None:
     """Fetch a URL. If follow_links, also fetch up to MAX_LINK_FOLLOWS_PER_ITEM
     same-domain links found in the body, attaching their text under
     `linked_pages: [{url, anchor, text}]` for richer downstream analysis.
+
+    Returns None on hard failure. For paywall/blocked content, returns the dict
+    with `blocked: True` so caller can decide to fall back to metadata-only.
     """
     cached = cache_get(url)
     if cached and ("linked_pages" in cached or not follow_links):
@@ -208,12 +226,14 @@ def fetch_url(url: str, follow_links: bool = False) -> dict | None:
         is_html = "html" in ctype.lower()
         text = html_to_text(body) if is_html else body
         text = text[:MAX_TEXT_CHARS_FOR_LLM]
+        blocked = is_paywall_or_blocked(text)
         payload: dict = {
             "url": url,
             "final_url": final_url,
             "fetched_at": datetime.now().isoformat(timespec="seconds"),
             "content_type": ctype,
             "text": text,
+            "blocked": blocked,
         }
         if follow_links and is_html:
             link_targets = extract_internal_links(body, final_url)
@@ -279,8 +299,10 @@ def select_items() -> list[dict]:
     conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
     rows = list(conn.execute(
-        "SELECT id, content, url, category, status, created_at, notes "
-        "FROM shared_items WHERE created_at >= ? AND url IS NOT NULL AND url != '' "
+        "SELECT id, content, url, category, status, created_at, notes, "
+        "media_path, media_type, item_type "
+        "FROM shared_items WHERE created_at >= ? "
+        "AND ((url IS NOT NULL AND url != '') OR (media_path IS NOT NULL AND media_path != '')) "
         "ORDER BY created_at DESC",
         (cutoff,),
     ))
@@ -301,6 +323,9 @@ def select_items() -> list[dict]:
             "notes": (r["notes"] or "")[:300],
             "entities": sorted(ents)[:10],
             "overlap": overlap,
+            "media_path": r["media_path"],
+            "media_type": r["media_type"],
+            "item_type": r["item_type"],
         }))
 
     # Already-acted-on items are lower priority; new/triaged win.
@@ -310,6 +335,100 @@ def select_items() -> list[dict]:
         x[1]["shared_at"] or "",
     ))
     return [s[1] for s in scored[:MAX_FETCHES_PER_RUN]]
+
+
+def build_metadata_only_prompt(item: dict, today_blob: str) -> str:
+    """Used when fetch failed or returned a paywall/CDN-challenge page. Analyse
+    based on the WhatsApp link-preview title (in `content`) + user's triage
+    notes + category alone — no page body available.
+    """
+    user_ctx = load_user_context()
+    return f"""{user_ctx['context_block']}
+
+You are analysing a shared link whose target page **could not be fetched**
+(paywall, CDN challenge, share.google redirect that requires JS, or expired URL).
+
+You only have:
+  - The WhatsApp link-preview title (`{item.get('title','')}`)
+  - The user-tagged category: {item.get('category','?')}
+  - The user's triage notes (if any)
+
+Do your best from those signals; mark anything that needs verification.
+Schema is the same as the full-fetch case, but mark `freshness_signal` clearly
+that this was metadata-only.
+
+Schema:
+{{
+  "what_it_is": "<1-2 sentences inferred from title/category/notes; mark uncertain bits>",
+  "category": "<your best classification>",
+  "key_claims": ["<infer or empty>"],
+  "introduces_entities": ["<proper nouns mentioned in title/notes>"],
+  "linked_facts": [],
+  "potential_overlap_with_user_work": [
+    {{"with": "<entity from today's work>", "why": "<short>"}}
+  ],
+  "advances_which_goal": [
+    {{"goal": "<verbatim goal>", "how": "<short>"}}
+  ],
+  "what_it_could_replace_or_extend": [],
+  "open_questions": ["<things that need resolving — fetch alternative URL? archive.org snapshot?>"],
+  "freshness_signal": "METADATA-ONLY analysis — page body unavailable. <one sentence on confidence>"
+}}
+NO prose outside JSON.
+
+=== USER'S TODAY WORK (excerpt) ===
+{today_blob[:3000]}
+
+=== USER'S TRIAGE NOTES ===
+{item.get('notes') or '(none)'}
+
+=== ITEM ===
+Title: {item.get('title','')}
+URL (unreachable): {item.get('url') or '(no URL — image)'}
+Category: {item.get('category')}
+"""
+
+
+def build_image_prompt(item: dict, today_blob: str) -> str:
+    user_ctx = load_user_context()
+    return f"""{user_ctx['context_block']}
+
+The item shared was an image (no URL). Analyse the image content + the user's
+triage notes + the WhatsApp message context.
+
+Extract structure as STRICT JSON. Pull any visible text via vision; if it looks
+like a screenshot of a tweet/article/code, capture the substance.
+
+Schema:
+{{
+  "what_it_is": "<1-2 sentences>",
+  "category": "<screenshot|photo|diagram|chart|code|whiteboard|other>",
+  "text_extracted": "<text visible in the image, verbatim, capped at 800 chars>",
+  "key_claims": ["<factual claims visible in the image>"],
+  "introduces_entities": ["<proper nouns visible>"],
+  "linked_facts": [],
+  "potential_overlap_with_user_work": [
+    {{"with": "<entity>", "why": "<short>"}}
+  ],
+  "advances_which_goal": [
+    {{"goal": "<verbatim goal>", "how": "<short>"}}
+  ],
+  "what_it_could_replace_or_extend": [],
+  "open_questions": [],
+  "freshness_signal": "<one sentence — does the user already know this?>"
+}}
+NO prose outside JSON.
+
+=== USER'S TODAY WORK (excerpt) ===
+{today_blob[:3000]}
+
+=== USER'S TRIAGE NOTES ===
+{item.get('notes') or '(none)'}
+
+=== ITEM (image only, no URL) ===
+Title from WhatsApp: {item.get('title','')}
+Category: {item.get('category')}
+"""
 
 
 def build_prompt(item: dict, page: dict, today_blob: str) -> str:
@@ -454,27 +573,60 @@ def main() -> int:
     written = 0
     summaries: list[dict] = []
     for item in items:
-        url = item["url"]
-        if not url:
-            continue
-        page = fetch_url(url, follow_links=True)
-        if not page:
-            continue
+        url = item.get("url")
+        media_path = item.get("media_path")
+        page: dict | None = None
+        analysis: dict | None = None
+        mode = "url"
+
         try:
-            prompt = build_prompt(item, page, today_blob)
-            analysis = call_haiku(api_key, prompt)
+            if url and url.strip():
+                page = fetch_url(url, follow_links=True)
+                if page and page.get("blocked"):
+                    log(f"  blocked/paywall {item['id']}: falling back to metadata-only")
+                    mode = "metadata"
+                    analysis = call_claude(
+                        build_metadata_only_prompt(item, today_blob),
+                        model=MODEL,
+                    )
+                elif page is not None:
+                    analysis = call_haiku(api_key, build_prompt(item, page, today_blob))
+                    mode = "url"
+                else:
+                    log(f"  fetch failed {item['id']}: falling back to metadata-only")
+                    mode = "metadata"
+                    analysis = call_claude(
+                        build_metadata_only_prompt(item, today_blob),
+                        model=MODEL,
+                    )
+            elif media_path and Path(media_path).exists():
+                log(f"  image: {media_path}")
+                mode = "image"
+                analysis = analyze_image(
+                    media_path, build_image_prompt(item, today_blob), model=MODEL,
+                )
+            else:
+                log(f"  skip {item['id']}: no URL and no readable image at {media_path}")
+                continue
         except Exception as e:
-            log(f"  Haiku FAIL {item['id']}: {e}")
+            log(f"  analyse FAIL {item['id']} ({mode}): {e}")
             continue
+
+        if not analysis:
+            continue
+
         slug = re.sub(r"[^a-zA-Z0-9_\-]", "", item["id"])
         path = RESEARCH_DIR / f"{slug}.md"
-        path.write_text(render_note(item, page, analysis))
-        log(f"  wrote {path.name}: {analysis.get('what_it_is', '?')[:60]}")
+        # render_note expects `page` dict; provide minimal stub for non-URL paths
+        page_for_render = page or {"final_url": url or "", "linked_pages": []}
+        path.write_text(render_note(item, page_for_render, analysis))
+        log(f"  wrote {path.name} [{mode}]: {analysis.get('what_it_is', '?')[:60]}")
         written += 1
         summaries.append({
             "id": item["id"],
             "title": item["title"],
-            "url": page.get("final_url", url),
+            "url": (page.get("final_url") if page else url) or media_path or "",
+            "mode": mode,
             "what_it_is": analysis.get("what_it_is", ""),
             "category": analysis.get("category", item.get("category", "?")),
             "key_claims": (analysis.get("key_claims") or [])[:3],
@@ -485,7 +637,7 @@ def main() -> int:
             "open_questions": analysis.get("open_questions") or [],
             "freshness": analysis.get("freshness_signal", ""),
             "shared_at": item["shared_at"],
-            "linked_pages_count": len(page.get("linked_pages") or []),
+            "linked_pages_count": len(page.get("linked_pages") or []) if page else 0,
             "note_path": str(path),
         })
 
