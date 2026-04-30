@@ -684,6 +684,17 @@ export async function runContainerAgent(
     // graceful _close sentinel has time to trigger before the hard kill fires.
     const timeoutMs = Math.max(configTimeout, IDLE_TIMEOUT + 30_000);
 
+    // Absolute maximum lifetime — no container runs longer than this, regardless of heartbeats
+    const MAX_CONTAINER_LIFETIME_MS = 2 * 60 * 60 * 1000; // 2 hours
+    const absoluteDeadline = setTimeout(() => {
+      logger.warn({ group: group.name, containerName, lifetimeHours: (MAX_CONTAINER_LIFETIME_MS / 3600000).toFixed(1) },
+        'Container hit absolute lifetime limit — killing');
+      timedOut = true;
+      exec(stopContainer(containerName), { timeout: 15000 }, (err) => {
+        if (err) container.kill('SIGKILL');
+      });
+    }, MAX_CONTAINER_LIFETIME_MS);
+
     const killOnTimeout = () => {
       timedOut = true;
       logger.error({ group: group.name, containerName }, 'Container timeout, stopping gracefully');
@@ -705,6 +716,7 @@ export async function runContainerAgent(
 
     container.on('close', (code) => {
       clearTimeout(timeout);
+      clearTimeout(absoluteDeadline);
       // Remove stopped container immediately to free Apple Virtualization VM file descriptors.
       // Without this, stopped VMs leak FDs and eventually cause ENFILE system-wide.
       removeContainer(containerName);
