@@ -76,29 +76,26 @@ export async function classifyGoalWithAI(userMessage: string): Promise<GoalClass
 }
 
 function buildClassificationPrompt(userMessage: string): string {
-  return `Analyze this user request and determine if it requires a multi-agent team or can be handled by a single agent.
+  return `Classify the OVERALL TASK complexity based on the full context below. The latest message may be short ("go", "continue", "what else") but the actual work may be complex.
 
-User Request: "${userMessage}"
+Context:
+"""
+${userMessage}
+"""
+
+IMPORTANT: Judge by the WORK BEING DONE, not just the latest message. A short "continue" in the context of an active job search with cover letters is EXPERT level, not trivial.
 
 Consider:
-1. Complexity - Does it involve multiple distinct phases or specializations?
-2. Scope - Is it a single task or a multi-step project?
-3. Skills Required - Does it need different types of expertise (research, development, marketing, etc.)?
-4. Time Investment - Is this a quick task or a substantial project?
-5. Deliverables - Does it produce one thing or multiple outputs?
+1. What is the actual task being executed? (look at active tasks, not just the latest message)
+2. Does it require research, verification, multiple deliverables?
+3. Does it need deep reasoning, strategy, or professional-quality output?
 
-TEAM INDICATORS:
-✓ Earning goals with specific $ amounts (e.g., "earn $5,000")
-✓ Building multiple products/MVPs
-✓ Multi-phase projects (research → build → deploy)
-✓ Requires different specialists (frontend + backend + testing)
-✓ Time-bound complex projects
-✓ Full-stack or end-to-end implementations
-
-SINGLE AGENT INDICATORS:
-✓ Simple questions (What/How/Why)
-✓ Quick searches or file operations
-✓ Single bug fixes or code reviews
+COMPLEXITY LEVELS:
+- trivial: greetings, yes/no, simple acknowledgments with NO active task
+- simple: single factual question, quick lookup
+- moderate: research with analysis, document review, code writing
+- complex: multi-step project, multiple deliverables, requires planning
+- expert: job search + cover letters, business strategy, deep research with verification + professional deliverables
 ✓ Conversational responses
 ✓ Reading/analyzing existing content
 

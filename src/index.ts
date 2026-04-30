@@ -660,11 +660,30 @@ async function processGroupMessages(chatJid: string): Promise<boolean> {
     logger.warn({ err }, 'Router decision failed');
   }
 
-  // Goal classification: tag message complexity
+  // Goal classification: tag message complexity using FULL context
+  // Not just the latest message — include recent conversation + active tasks
   let goalComplexity = '';
   try {
     const strippedContent = lastMsg.content.replace(TRIGGER_PATTERN, '').trim();
-    const goalClass = await classifyGoalWithAI(strippedContent);
+
+    // Build context for classifier: recent messages + active tasks
+    let classifierContext = strippedContent;
+    if (missedMessages.length > 1) {
+      const recentContext = missedMessages.slice(-3).map(m => m.content.slice(0, 200)).join('\n');
+      classifierContext = `Recent conversation:\n${recentContext}\n\nLatest message: ${strippedContent}`;
+    }
+    // Check for active tasks in this group
+    try {
+      const tasksPath = path.join(GROUPS_DIR, group.folder, 'tasks.md');
+      if (fs.existsSync(tasksPath)) {
+        const tasks = fs.readFileSync(tasksPath, 'utf-8').slice(0, 500);
+        if (tasks.includes('In Progress')) {
+          classifierContext += `\n\nActive tasks in progress:\n${tasks.slice(0, 500)}`;
+        }
+      }
+    } catch { /* best effort */ }
+
+    const goalClass = await classifyGoalWithAI(classifierContext);
     goalComplexity = goalClass.estimatedComplexity;
     logger.info(
       { shouldUseTeams: goalClass.shouldUseTeams, complexity: goalClass.estimatedComplexity, goalType: goalClass.detectedGoalType, confidence: goalClass.confidence },
@@ -844,12 +863,19 @@ async function processGroupMessages(chatJid: string): Promise<boolean> {
       }
 
       if (finalText.trim()) {
+        // Validate URLs before sending — strip dead links
+        const { validateUrlsInText } = await import('./url-validator.js');
+        const { text: validatedText, stripped } = await validateUrlsInText(finalText, 'strip');
+        if (stripped > 0) {
+          logger.info({ group: group.name, stripped }, 'Stripped dead URLs from output');
+        }
+
         // Truncate if too long for WhatsApp (max ~65K chars)
         const maxLen = 60000;
-        const truncated = finalText.length > maxLen
-          ? finalText.slice(0, maxLen) + '\n\n[Truncated — full output saved to file]'
-          : finalText;
-        logger.info({ group: group.name, totalChars: finalText.length }, 'Streaming complete');
+        const truncated = validatedText.length > maxLen
+          ? validatedText.slice(0, maxLen) + '\n\n[Truncated — full output saved to file]'
+          : validatedText;
+        logger.info({ group: group.name, totalChars: validatedText.length }, 'Streaming complete');
         await channel.sendMessage(chatJid, truncated);
         outputSentToUser = true;
       }

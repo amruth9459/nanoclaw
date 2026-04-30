@@ -538,7 +538,24 @@ export function startIpcWatcher(deps: IpcDeps): void {
                     if (rfPath) writeIpcResponse(rfPath, { success: false, error: 'Channel does not support file sending' });
                   } else {
                     try {
-                      const buffer = fs.readFileSync(hostPath);
+                      const rawBuffer = fs.readFileSync(hostPath);
+                      let buffer: Buffer = rawBuffer;
+
+                      // Validate URLs in document files before sending
+                      try {
+                        const { validateUrlsInFile } = await import('./url-validator.js');
+                        const validation = await validateUrlsInFile(hostPath, rawBuffer);
+                        if (validation.stripped > 0) {
+                          buffer = validation.buffer as Buffer; // Use cleaned buffer for text files
+                          logger.info({ file: path.basename(hostPath), stripped: validation.stripped }, 'Stripped dead URLs from file');
+                          // For DOCX (can't rewrite), send a warning with the file
+                          if (validation.report && hostPath.endsWith('.docx')) {
+                            const warningJid = data.chatJid as string;
+                            try { await deps.sendMessage(warningJid, validation.report); } catch { /* best effort */ }
+                          }
+                        }
+                      } catch { /* URL validation is best-effort — don't block file send */ }
+
                       const MIME_MAP: Record<string, string> = {
                         '.pdf': 'application/pdf', '.docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
                         '.xlsx': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', '.csv': 'text/csv',
@@ -685,7 +702,18 @@ export function startIpcWatcher(deps: IpcDeps): void {
                       recordUnsignedMessage(sourceGroup, data.text as string, data.chatJid as string).catch(() => {});
                     }
 
-                    await deps.sendMessage(data.chatJid, data.text);
+                    // Validate URLs in outgoing messages before sending
+                    let msgText = data.text as string;
+                    try {
+                      const { validateUrlsInText } = await import('./url-validator.js');
+                      const { text: validated, stripped } = await validateUrlsInText(msgText, 'strip');
+                      if (stripped > 0) {
+                        msgText = validated;
+                        logger.info({ sourceGroup, stripped }, 'Stripped dead URLs from IPC message');
+                      }
+                    } catch { /* best effort */ }
+
+                    await deps.sendMessage(data.chatJid, msgText);
                     deps.onAgentSendMessage?.(data.chatJid);
                     logger.info(
                       { chatJid: data.chatJid, sourceGroup, signed: !!agentId },
