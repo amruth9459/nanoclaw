@@ -40,15 +40,38 @@ const server = new McpServer({
   version: '1.0.0',
 });
 
+// Message discipline — soft limit with escalating warnings, hard limit as safety net
+const SOFT_LIMIT = isMain ? 20 : 3;
+const HARD_LIMIT = isMain ? 50 : 10;
+let messagesSentThisQuery = 0;
+
 server.tool(
   'send_message',
-  "Send a message to the user or group immediately while you're still running. Use this for progress updates or to send multiple messages. You can call this multiple times. Note: when running as a scheduled task, your final output is NOT sent to the user — use this tool if you need to communicate with the user or group. Main group agents can send to other groups using target_jid (get JIDs from list_groups).",
+  `Send a message to the user's WhatsApp. The user sees this on their phone — be respectful of their attention.
+RULES:
+- Consolidate output into ONE message per task. Don't send working notes.
+- Use send_file for documents/files — those are separate and unlimited.
+- Your final response is sent automatically — you don't need send_message for it.
+- Only use send_message for: (1) progress on long tasks, (2) proactive suggestions after delivery.`,
   {
     text: z.string().describe('The message text to send'),
     sender: z.string().optional().describe('Your role/identity name (e.g. "Researcher"). When set, messages appear from a dedicated bot in Telegram.'),
     target_jid: z.string().optional().describe('(Main group only) Send to a different group by JID. Get JIDs from list_groups. Defaults to current group.'),
   },
   async (args) => {
+    messagesSentThisQuery++;
+
+    // Hard block — absolute safety net
+    if (messagesSentThisQuery > HARD_LIMIT) {
+      return { content: [{ type: 'text' as const, text: `Message blocked — you've sent ${HARD_LIMIT} messages this session. Put remaining content in your final response (it's sent automatically).` }] };
+    }
+
+    // Soft warning — nudge toward consolidation
+    let warning = '';
+    if (messagesSentThisQuery > SOFT_LIMIT) {
+      warning = ` ⚠️ You've sent ${messagesSentThisQuery} messages — consolidate remaining output. The user's WhatsApp is getting cluttered.`;
+    }
+
     // Main group can target other groups; non-main always sends to own group
     const targetJid = (isMain && args.target_jid) ? args.target_jid : chatJid;
 
@@ -59,13 +82,13 @@ server.tool(
       sender: args.sender || undefined,
       groupFolder,
       timestamp: new Date().toISOString(),
-      agent_id: agentId, // Cryptographic identity for message signing (host-side)
+      agent_id: agentId,
     };
 
     writeIpcFile(MESSAGES_DIR, data);
 
     const targetNote = targetJid !== chatJid ? ` (to ${targetJid})` : '';
-    return { content: [{ type: 'text' as const, text: `Message sent${targetNote}.` }] };
+    return { content: [{ type: 'text' as const, text: `Message sent${targetNote}.${warning}` }] };
   },
 );
 

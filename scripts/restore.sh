@@ -88,6 +88,13 @@ mkdir -p "$HOME/Downloads/Final report"
 rclone copy "${R2_REMOTE}:${R2_BUCKET}/home/Downloads-Final-report/" "$HOME/Downloads/Final report/" \
     "${RCLONE_FLAGS[@]}" || echo "WARN: ~/Downloads/Final report restore failed"
 
+# ~/Library/LaunchAgents (macOS only — VPS / Linux can ignore)
+if [ -d "$HOME/Library/LaunchAgents" ] || [ "$(uname)" = "Darwin" ]; then
+    mkdir -p "$HOME/Library/LaunchAgents"
+    rclone copy "${R2_REMOTE}:${R2_BUCKET}/home/LaunchAgents/" "$HOME/Library/LaunchAgents/" \
+        "${RCLONE_FLAGS[@]}" || echo "WARN: LaunchAgents restore failed"
+fi
+
 # ---------- Step 3: Run integration restore hooks ----------
 
 for hook in ~/*/integrations/nanoclaw/restore-hook.sh; do

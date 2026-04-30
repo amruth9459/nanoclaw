@@ -208,6 +208,16 @@ if [ -d "$HOME/Downloads/Final report" ]; then
         && log "copied ~/Downloads/Final report/"
 fi
 
+# ~/Library/LaunchAgents — only NanoClaw + Lexios plists (so bootstrap can rehydrate services)
+LAUNCHD_TMP=$(mktemp -d)
+cp "$HOME/Library/LaunchAgents/"com.nanoclaw.*.plist "$LAUNCHD_TMP/" 2>/dev/null || true
+cp "$HOME/Library/LaunchAgents/"com.lexios.*.plist "$LAUNCHD_TMP/" 2>/dev/null || true
+if [ -n "$(ls -A "$LAUNCHD_TMP" 2>/dev/null)" ]; then
+    r2_copy "$LAUNCHD_TMP/" "home/LaunchAgents/" \
+        && log "copied LaunchAgents plists"
+fi
+rm -rf "$LAUNCHD_TMP"
+
 # ---------- Step 3: Generate + upload contingency doc to Google Drive ----------
 
 CONTINGENCY_DOC="${NANOCLAW_DIR}/data/contingency.md"

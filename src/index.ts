@@ -821,31 +821,39 @@ async function processGroupMessages(chatJid: string): Promise<boolean> {
     // (routingDecision passed through as 5th arg for container metadata)
 
     // Handle streaming chunks (partial results)
+    // Buffer chunks and send as ONE message when the agent finishes a turn
     if (result.status === 'streaming' && result.isPartial && result.result) {
       const raw = typeof result.result === 'string' ? result.result : JSON.stringify(result.result);
-      // Strip <internal>...</internal> blocks — agent uses these for internal reasoning
       const text = raw.replace(/<internal>[\s\S]*?<\/internal>/g, '').trim();
 
       if (text) {
         streamingBuffer += text;
-        logger.info({ group: group.name }, `Streaming chunk: ${text.slice(0, 300)}...`);
-        await channel.sendMessage(chatJid, text);
-        outputSentToUser = true;
         streamingChunksSent = true;
+        logger.info({ group: group.name }, `Streaming chunk: ${text.slice(0, 300)}...`);
         resetIdleTimer();
       }
     }
-    // Handle final result — suppress if:
-    // 1. Streaming chunks already delivered the content, OR
-    // 2. Agent used send_message IPC to deliver the content directly
-    else if (result.result && !streamingChunksSent && !ipcMessageSentThisRun.has(chatJid)) {
-      const raw = typeof result.result === 'string' ? result.result : JSON.stringify(result.result);
-      const text = raw.replace(/<internal>[\s\S]*?<\/internal>/g, '').trim();
-      logger.info({ group: group.name }, `Agent output: ${raw.slice(0, 200)}`);
-      if (text) {
-        await channel.sendMessage(chatJid, text);
+    // Handle final result — send accumulated buffer as ONE message
+    else if (result.status !== 'streaming') {
+      // Combine buffer + final result into one message
+      let finalText = streamingBuffer;
+      if (result.result && !ipcMessageSentThisRun.has(chatJid)) {
+        const raw = typeof result.result === 'string' ? result.result : JSON.stringify(result.result);
+        const extra = raw.replace(/<internal>[\s\S]*?<\/internal>/g, '').trim();
+        if (extra && !streamingChunksSent) finalText = extra;
+      }
+
+      if (finalText.trim()) {
+        // Truncate if too long for WhatsApp (max ~65K chars)
+        const maxLen = 60000;
+        const truncated = finalText.length > maxLen
+          ? finalText.slice(0, maxLen) + '\n\n[Truncated — full output saved to file]'
+          : finalText;
+        logger.info({ group: group.name, totalChars: finalText.length }, 'Streaming complete');
+        await channel.sendMessage(chatJid, truncated);
         outputSentToUser = true;
       }
+      streamingBuffer = '';
       resetIdleTimer();
     }
 

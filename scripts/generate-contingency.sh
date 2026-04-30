@@ -13,6 +13,22 @@ NOW=$(date '+%Y-%m-%d %H:%M %Z')
 # Helper: get DB value safely
 dbval() { sqlite3 "$DB" "$1" 2>/dev/null || echo "N/A"; }
 
+# Pull live R2 credentials from rclone config so the contingency doc is self-contained.
+# This file lives in private Google Drive — safe to inline secrets.
+RCLONE_CONF="${HOME}/.config/rclone/rclone.conf"
+get_rclone_val() {
+    awk -v section="$1" -v key="$2" '
+        /^\[/ { in_sec = ($0 == "[" section "]") }
+        in_sec && $0 ~ "^" key " *=" { sub(/^[^=]*= */, ""); print; exit }
+    ' "$RCLONE_CONF" 2>/dev/null
+}
+R2_ACCESS_KEY=$(get_rclone_val r2 access_key_id)
+R2_SECRET_KEY=$(get_rclone_val r2 secret_access_key)
+R2_ENDPOINT=$(get_rclone_val r2 endpoint)
+[ -z "$R2_ACCESS_KEY" ] && R2_ACCESS_KEY="MISSING-from-rclone-conf"
+[ -z "$R2_SECRET_KEY" ] && R2_SECRET_KEY="MISSING-from-rclone-conf"
+[ -z "$R2_ENDPOINT" ] && R2_ENDPOINT="https://b6a5767fe078a25e1a0f15cdf6c91fd4.r2.cloudflarestorage.com"
+
 # Gather live stats
 MSG_COUNT=$(dbval "SELECT count(*) FROM messages;")
 CHAT_COUNT=$(dbval "SELECT count(*) FROM chats;")
@@ -61,59 +77,31 @@ cat > "$OUTPUT" << DOCEOF
 
 ## Quick Recovery (Complete System Loss)
 
-If you lose your Mac entirely, follow these steps on a fresh machine:
-
-### Prerequisites
+If you lose your Mac (or want to spin up on a VPS / second machine), run **one command** on the new box:
 
 \`\`\`bash
-# 1. Install Homebrew
-/bin/bash -c "\$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-
-# 2. Install dependencies
-brew install node@20 rclone git cloudflared
-
-# 3. Install Docker Desktop (or Apple Container)
-# Download from https://www.docker.com/products/docker-desktop/
-
-# 4. Configure rclone with R2 credentials
-rclone config create r2 s3 \\
-  provider Cloudflare \\
-  access_key_id YOUR_R2_ACCESS_KEY \\
-  secret_access_key YOUR_R2_SECRET_KEY \\
-  endpoint https://b6a5767fe078a25e1a0f15cdf6c91fd4.r2.cloudflarestorage.com
-
-# 5. Configure rclone with Google Drive
-rclone config create gdrive drive
+R2_ACCESS_KEY='${R2_ACCESS_KEY}' \\
+R2_SECRET_KEY='${R2_SECRET_KEY}' \\
+R2_ENDPOINT='${R2_ENDPOINT}' \\
+bash <(curl -fsSL https://raw.githubusercontent.com/amruth9459/nanoclaw/main/scripts/bootstrap.sh)
 \`\`\`
 
-### Restore
+That's it. The bootstrap script handles:
+1. Installing Homebrew (macOS) or apt deps (Linux) — rclone, git, node@20, python3, cloudflared
+2. Configuring rclone with the R2 creds above
+3. Restoring \`~/.ssh\` (keys, config, known_hosts) from R2
+4. Cloning + restoring NanoClaw (\`~/nanoclaw\`) — runtime data, groups/, store/, .env
+5. Cloning + restoring Lexios (\`~/Lexios\`) — corpus, work/, .env, Python venv
+6. Restoring \`~/Brain\` (Obsidian vault), \`~/Downloads/Final report\` (HPM 523), \`~/Library/LaunchAgents\` (services)
+7. Building NanoClaw (\`npm install && npm run build\`) + the agent container
+8. Loading all launchd services (macOS only)
 
+**Supported targets:** macOS (full), Linux/VPS via apt-get (everything except launchd + Docker container).
+
+If you're already on the box and just want to refresh state without bootstrapping:
 \`\`\`bash
-# Clone repos + pull all state from R2
-curl -fsSL https://raw.githubusercontent.com/amruth9459/nanoclaw/main/scripts/restore.sh | bash
-
-# Or if you have the repo:
 cd ~/nanoclaw && ./scripts/restore.sh
-\`\`\`
-
-### Post-Restore
-
-\`\`\`bash
-cd ~/nanoclaw
-npm install
-npm run build
-./container/build.sh
-
-# Copy launchd plists (they're NOT in the R2 backup)
-# See "LaunchD Services" section below for the plist files
-
-launchctl load ~/Library/LaunchAgents/com.nanoclaw.plist
-launchctl load ~/Library/LaunchAgents/com.nanoclaw.backup.plist
-launchctl load ~/Library/LaunchAgents/com.nanoclaw.cloudflared.plist
-launchctl load ~/Library/LaunchAgents/com.nanoclaw.mlx-server.plist
-
-# Verify
-tail -f ~/nanoclaw/logs/current.log
+cd ~/Lexios && ./scripts/restore.sh
 \`\`\`
 
 ---

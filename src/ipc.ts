@@ -539,7 +539,17 @@ export function startIpcWatcher(deps: IpcDeps): void {
                   } else {
                     try {
                       const buffer = fs.readFileSync(hostPath);
-                      const mimetype = (data.mimetype as string) || 'application/octet-stream';
+                      const MIME_MAP: Record<string, string> = {
+                        '.pdf': 'application/pdf', '.docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                        '.xlsx': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', '.csv': 'text/csv',
+                        '.png': 'image/png', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.gif': 'image/gif',
+                        '.mp4': 'video/mp4', '.mp3': 'audio/mpeg', '.ogg': 'audio/ogg',
+                        '.txt': 'text/plain', '.json': 'application/json', '.html': 'text/html',
+                        '.py': 'text/x-python', '.js': 'text/javascript', '.ts': 'text/typescript',
+                        '.zip': 'application/zip', '.pptx': 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+                      };
+                      const ext = path.extname(hostPath).toLowerCase();
+                      const mimetype = (data.mimetype as string) || MIME_MAP[ext] || 'application/octet-stream';
                       const filename = (data.filename as string) || path.basename(hostPath);
                       const caption = (data.caption as string) || undefined;
                       const targetJid = (data.chatJid as string);
