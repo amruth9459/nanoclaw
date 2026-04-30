@@ -37,7 +37,17 @@ TASK_LIST=$(dbval "SELECT id || ' (' || schedule_type || ': ' || schedule_value 
 DB_SIZE=$(du -sh "$DB" 2>/dev/null | cut -f1 || echo "N/A")
 STORE_SIZE=$(du -sh "${NANOCLAW_DIR}/store" 2>/dev/null | cut -f1 || echo "N/A")
 GROUPS_SIZE=$(du -sh "${NANOCLAW_DIR}/groups" 2>/dev/null | cut -f1 || echo "N/A")
-R2_SIZE=$(timeout 30 rclone size r2:nanoclaw-backup --json --max-depth 0 2>/dev/null | grep -o '"bytes":[0-9]*' | cut -d: -f2 || echo "0")
+# Portable 30s timeout via background + kill (macOS lacks GNU `timeout`)
+_rclone_size() {
+    rclone size r2:nanoclaw-backup --json 2>/dev/null &
+    local pid=$!
+    ( sleep 30; kill "$pid" 2>/dev/null ) &
+    local watcher=$!
+    wait "$pid" 2>/dev/null
+    kill "$watcher" 2>/dev/null
+}
+R2_SIZE=$(_rclone_size | grep -o '"bytes":[0-9]*' | cut -d: -f2 || echo "0")
+[ -z "$R2_SIZE" ] && R2_SIZE="0"
 R2_MB=$(( ${R2_SIZE:-0} / 1048576 ))
 
 NODE_VER=$(node --version 2>/dev/null || echo "not installed")
