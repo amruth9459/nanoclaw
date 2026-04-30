@@ -102,13 +102,16 @@ export class WhatsAppChannel implements Channel {
       this.watchdogStrikes++;
       if (this.watchdogStrikes >= WhatsAppChannel.WATCHDOG_MAX_STRIKES) {
         // Known baileys bug: messages.upsert stops firing after hours while
-        // connection stays up. Socket reconnect within the same process doesn't
-        // fix it — only a full process restart does. Let launchd restart us.
+        // connection stays up. Full socket teardown + reconnect as last resort.
         logger.error(
           { channel: this.name, strikes: this.watchdogStrikes },
-          'Watchdog: messages.upsert dead after multiple reconnects — forcing process restart',
+          'Watchdog: messages.upsert dead — tearing down socket for full reconnect',
         );
-        process.exit(1);
+        this.watchdogStrikes = 0;
+        try { this.sock?.end(undefined); } catch {}
+        this.connected = false;
+        this.scheduleReconnect();
+        return; // Don't kill the process — active agents would be lost
       }
       logger.warn(
         { channel: this.name, strike: this.watchdogStrikes },
@@ -196,8 +199,8 @@ export class WhatsAppChannel implements Channel {
         if (shouldReconnect) {
           this.scheduleReconnect();
         } else {
-          logger.info({ channel: this.name }, 'Logged out. Run /setup to re-authenticate.');
-          if (this.isPrimary) process.exit(0);
+          logger.error({ channel: this.name }, 'Logged out. Run /setup to re-authenticate.');
+          // Don't exit — keep process alive for active agents. WA will be unavailable but agents keep working.
           // Secondary: just stop — don't bring down the whole process
         }
       } else if (connection === 'open') {

@@ -62,6 +62,8 @@ export interface ContainerInput {
   personaId?: string;
   /** Full persona markdown content (read from ~/.claude/agents/ on host, passed via stdin) */
   personaContent?: string;
+  /** Model override: 'sonnet' | 'opus' | 'haiku'. Read from containerConfig.model. */
+  model?: 'sonnet' | 'opus' | 'haiku';
   /** Kanban task ID for dispatch status tracking */
   dispatchTaskId?: string;
   /** Personality tuning params (Phase 2 Karpathy). Injected into system prompt. */

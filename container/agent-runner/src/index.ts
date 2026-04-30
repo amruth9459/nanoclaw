@@ -30,6 +30,8 @@ interface ContainerInput {
   isScheduledTask?: boolean;
   secrets?: Record<string, string>;
   maxTurns?: number;
+  /** Model override: 'sonnet' | 'opus' | 'haiku'. Default: inherit from subscription. */
+  model?: 'sonnet' | 'opus' | 'haiku';
   personaId?: string;
   /** Full persona markdown content (read from ~/.claude/agents/ on host) */
   personaContent?: string;
@@ -767,6 +769,7 @@ async function runQuery(
       resume: sessionId,
       resumeSessionAt: resumeAt,
       ...(containerInput.maxTurns ? { maxTurns: containerInput.maxTurns } : {}),
+      ...(containerInput.model ? { model: containerInput.model } : {}),
       systemPrompt: (globalClaudeMd || personaMd || personalityPrompt)
         ? { type: 'preset' as const, preset: 'claude_code' as const, append: [personaMd, globalClaudeMd, personalityPrompt].filter(Boolean).join('\n\n') }
         : undefined,
@@ -1006,6 +1009,16 @@ async function main(): Promise<void> {
           }
           break; // Query succeeded — exit auth-retry loop
         } catch (err) {
+          const errMsg = err instanceof Error ? err.message : String(err);
+
+          // Session resume failure — clear session and retry fresh
+          if (sessionId && (errMsg.includes('already in use') || errMsg.includes('error_during_execution') || errMsg.includes('Session ID') || errMsg.includes('session'))) {
+            log(`Session resume failed (${errMsg.slice(0, 80)}), retrying without session`);
+            sessionId = undefined;
+            resumeAt = undefined;
+            continue; // Retry the auth-retry loop with no session
+          }
+
           if (!isAuthError(err) || authRetries >= AUTH_RETRY_MAX) {
             throw err; // Not auth or exhausted retries — propagate
           }

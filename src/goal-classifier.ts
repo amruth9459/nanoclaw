@@ -21,44 +21,56 @@ export interface GoalClassification {
  */
 export async function classifyGoalWithAI(userMessage: string): Promise<GoalClassification> {
   try {
-    const ollama = MLXBackendFactory.create();
-
-    // Check if Ollama is available
-    const available = await ollama.isAvailable();
-    if (!available) {
-      return classifyGoalHeuristic(userMessage);
+    // Read API key from env or .env file
+    let apiKey = process.env.ANTHROPIC_API_KEY;
+    if (!apiKey) {
+      try {
+        const { readEnvFile } = await import('./env.js');
+        apiKey = readEnvFile(['ANTHROPIC_API_KEY']).ANTHROPIC_API_KEY;
+      } catch { /* no .env */ }
     }
+    if (!apiKey) return classifyGoalHeuristic(userMessage);
 
-    const classificationPrompt = buildClassificationPrompt(userMessage);
+    const start = Date.now();
+    const resp = await Promise.race([
+      fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: {
+          'x-api-key': apiKey,
+          'anthropic-version': '2023-06-01',
+          'content-type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: 'claude-haiku-4-5-20251001',
+          max_tokens: 150,
+          temperature: 0,
+          messages: [{ role: 'user', content: buildClassificationPrompt(userMessage) }],
+        }),
+      }),
+      new Promise<never>((_, reject) => setTimeout(() => reject(new Error('timeout')), 3000)),
+    ]);
 
-    // Call local model via Ollama (zero cost)
-    const response = await ollama.inference({
-      modelId: 'qwen2.5-coder',
-      prompt: classificationPrompt,
-      maxTokens: 200,
-      temperature: 0.1,
-    });
+    if (!resp.ok) return classifyGoalHeuristic(userMessage);
 
-    console.log(`[GoalClassifier] Ollama response (${response.latencyMs}ms, ${response.tokensThroughput.toFixed(0)} tok/s): ${response.text.slice(0, 100)}`);
+    const data = await resp.json() as { content: Array<{ text: string }> };
+    const text = data.content?.[0]?.text || '';
+    const latency = Date.now() - start;
 
-    // Parse JSON response
-    const jsonMatch = response.text.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) {
-      console.warn('[GoalClassifier] Ollama returned non-JSON, falling back to heuristic');
-      return classifyGoalHeuristic(userMessage);
-    }
+    const jsonMatch = text.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) return classifyGoalHeuristic(userMessage);
 
     const parsed = JSON.parse(jsonMatch[0]) as Partial<GoalClassification>;
-
-    return {
+    const result: GoalClassification = {
       shouldUseTeams: parsed.shouldUseTeams ?? false,
       confidence: parsed.confidence ?? 'medium',
-      reasoning: parsed.reasoning ?? 'Classified by local model',
+      reasoning: parsed.reasoning ?? 'Classified by Haiku',
       estimatedComplexity: parsed.estimatedComplexity ?? 'moderate',
       detectedGoalType: parsed.detectedGoalType,
     };
+
+    console.log(`[GoalClassifier] Haiku (${latency}ms): ${result.estimatedComplexity} — ${result.reasoning?.slice(0, 80)}`);
+    return result;
   } catch (error) {
-    console.error('[GoalClassifier] AI classification failed, using heuristic fallback:', error);
     return classifyGoalHeuristic(userMessage);
   }
 }
@@ -124,6 +136,12 @@ export function classifyGoalHeuristic(userMessage: string): GoalClassification {
     // Explicit multi-phase requests
     /(?:first|then|next|after that|finally)/i,
     /(?:phase \d+|step \d+|stage \d+)/i,
+
+    // Multi-deliverable chains (find X, then do Y)
+    /(?:find|search|get).*(?:,|then|and).*(?:build|create|write|list|generate)/i,
+    // Job search patterns (complex by nature — matching, filtering, producing)
+    /(?:find|search|get).*(?:jobs?|roles?|positions?).*(?:match|fit|profile|resume)/i,
+    /(?:build|create|write|draft).*(?:cover letter|resume|CV).*(?:for|based on)/i,
   ];
 
   // Medium-confidence indicators
@@ -139,6 +157,17 @@ export function classifyGoalHeuristic(userMessage: string): GoalClassification {
 
     // Time-bound projects
     /(?:by|before|within).*(?:\d+.*(?:weeks?|months?|days?)|deadline)/i,
+
+    // Multi-output tasks (create/build/write N things)
+    /(?:build|create|write|draft|generate).*(?:top \d+|for (?:each|all|every)|\d+.*(?:letters?|reports?|documents?))/i,
+    /(?:find|search|identify).*(?:all|every|top \d+).*(?:jobs?|roles?|positions?|candidates?|companies?)/i,
+
+    // Research + produce deliverable
+    /(?:research|analyze|investigate|review).*(?:write|create|build|produce|generate)/i,
+    /(?:research|analyze).*(?:detailed|comprehensive|in-depth)/i,
+
+    // Strategic/planning deliverables
+    /(?:create|build|write|draft).*(?:business plan|strategy|proposal|pitch deck|financial.*projections?)/i,
   ];
 
   // Low-confidence (might need teams)

@@ -5,6 +5,294 @@
 
 ---
 
+### 2026-04-29 22:00
+
+**Areas:** hooks
+**Files (19):** .claude/hooks/brain-digest-inject.sh, .claude/projects/-Users-amrut-Lexios/memory/MEMORY.md, .claude/projects/-Users-amrut-Lexios/memory/lexios_strategic_frame.md, .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut-nanoclaw/memory/competitive_clawdi.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_hpm523_rigor.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_no_site_managers.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_user_writing_style.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_clawsweeper_roadmap.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_drafts_inventory.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_state_report.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_subject_background.md, .claude/projects/-Users-amrut/memory/MEMORY.md, .claude/settings.json, .githooks/no-lexios-in-core.sh, Brain/Inbox/synthesis/2026-04-29-a2ui-lexios-vision.md, Brain/Inbox/synthesis/2026-04-29-cold-call-shortlist.md, Downloads/Final report/HPM523_Audit_Report.md, Downloads/Final report/HPM523_Final_Paper_Draft.md
+**Diff:** +468 -51 across 10 files
+
+### 2026-04-29 21:58
+
+**Areas:** hooks
+**Files (19):** .claude/hooks/brain-digest-inject.sh, .claude/projects/-Users-amrut-Lexios/memory/MEMORY.md, .claude/projects/-Users-amrut-Lexios/memory/lexios_strategic_frame.md, .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut-nanoclaw/memory/competitive_clawdi.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_hpm523_rigor.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_no_site_managers.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_user_writing_style.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_clawsweeper_roadmap.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_drafts_inventory.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_state_report.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_subject_background.md, .claude/projects/-Users-amrut/memory/MEMORY.md, .claude/settings.json, .githooks/no-lexios-in-core.sh, Brain/Inbox/synthesis/2026-04-29-a2ui-lexios-vision.md, Brain/Inbox/synthesis/2026-04-29-cold-call-shortlist.md, Downloads/Final report/HPM523_Audit_Report.md, Downloads/Final report/HPM523_Final_Paper_Draft.md
+**Diff:** +444 -50 across 9 files
+
+### 2026-04-29 21:56
+
+**Areas:** hooks
+**Files (19):** .claude/hooks/brain-digest-inject.sh, .claude/projects/-Users-amrut-Lexios/memory/MEMORY.md, .claude/projects/-Users-amrut-Lexios/memory/lexios_strategic_frame.md, .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut-nanoclaw/memory/competitive_clawdi.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_hpm523_rigor.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_no_site_managers.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_user_writing_style.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_clawsweeper_roadmap.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_drafts_inventory.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_state_report.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_subject_background.md, .claude/projects/-Users-amrut/memory/MEMORY.md, .claude/settings.json, .githooks/no-lexios-in-core.sh, Brain/Inbox/synthesis/2026-04-29-a2ui-lexios-vision.md, Brain/Inbox/synthesis/2026-04-29-cold-call-shortlist.md, Downloads/Final report/HPM523_Audit_Report.md, Downloads/Final report/HPM523_Final_Paper_Draft.md
+**Diff:** +438 -50 across 9 files
+
+### 2026-04-29 21:53
+
+**Areas:** hooks
+**Files (19):** .claude/hooks/brain-digest-inject.sh, .claude/projects/-Users-amrut-Lexios/memory/MEMORY.md, .claude/projects/-Users-amrut-Lexios/memory/lexios_strategic_frame.md, .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut-nanoclaw/memory/competitive_clawdi.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_hpm523_rigor.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_no_site_managers.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_user_writing_style.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_clawsweeper_roadmap.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_drafts_inventory.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_state_report.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_subject_background.md, .claude/projects/-Users-amrut/memory/MEMORY.md, .claude/settings.json, .githooks/no-lexios-in-core.sh, Brain/Inbox/synthesis/2026-04-29-a2ui-lexios-vision.md, Brain/Inbox/synthesis/2026-04-29-cold-call-shortlist.md, Downloads/Final report/HPM523_Audit_Report.md, Downloads/Final report/HPM523_Final_Paper_Draft.md
+**Diff:** +432 -50 across 9 files
+
+### 2026-04-29 21:52
+
+**Areas:** hooks
+**Files (19):** .claude/hooks/brain-digest-inject.sh, .claude/projects/-Users-amrut-Lexios/memory/MEMORY.md, .claude/projects/-Users-amrut-Lexios/memory/lexios_strategic_frame.md, .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut-nanoclaw/memory/competitive_clawdi.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_hpm523_rigor.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_no_site_managers.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_user_writing_style.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_clawsweeper_roadmap.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_drafts_inventory.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_state_report.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_subject_background.md, .claude/projects/-Users-amrut/memory/MEMORY.md, .claude/settings.json, .githooks/no-lexios-in-core.sh, Brain/Inbox/synthesis/2026-04-29-a2ui-lexios-vision.md, Brain/Inbox/synthesis/2026-04-29-cold-call-shortlist.md, Downloads/Final report/HPM523_Audit_Report.md, Downloads/Final report/HPM523_Final_Paper_Draft.md
+**Diff:** +426 -50 across 9 files
+
+### 2026-04-29 21:52
+
+**Areas:** hooks
+**Files (19):** .claude/hooks/brain-digest-inject.sh, .claude/projects/-Users-amrut-Lexios/memory/MEMORY.md, .claude/projects/-Users-amrut-Lexios/memory/lexios_strategic_frame.md, .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut-nanoclaw/memory/competitive_clawdi.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_hpm523_rigor.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_no_site_managers.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_user_writing_style.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_clawsweeper_roadmap.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_drafts_inventory.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_state_report.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_subject_background.md, .claude/projects/-Users-amrut/memory/MEMORY.md, .claude/settings.json, .githooks/no-lexios-in-core.sh, Brain/Inbox/synthesis/2026-04-29-a2ui-lexios-vision.md, Brain/Inbox/synthesis/2026-04-29-cold-call-shortlist.md, Downloads/Final report/HPM523_Audit_Report.md, Downloads/Final report/HPM523_Final_Paper_Draft.md
+**Diff:** +420 -50 across 9 files
+
+### 2026-04-29 21:51
+
+**Areas:** hooks
+**Files (19):** .claude/hooks/brain-digest-inject.sh, .claude/projects/-Users-amrut-Lexios/memory/MEMORY.md, .claude/projects/-Users-amrut-Lexios/memory/lexios_strategic_frame.md, .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut-nanoclaw/memory/competitive_clawdi.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_hpm523_rigor.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_no_site_managers.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_user_writing_style.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_clawsweeper_roadmap.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_drafts_inventory.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_state_report.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_subject_background.md, .claude/projects/-Users-amrut/memory/MEMORY.md, .claude/settings.json, .githooks/no-lexios-in-core.sh, Brain/Inbox/synthesis/2026-04-29-a2ui-lexios-vision.md, Brain/Inbox/synthesis/2026-04-29-cold-call-shortlist.md, Downloads/Final report/HPM523_Audit_Report.md, Downloads/Final report/HPM523_Final_Paper_Draft.md
+**Diff:** +414 -50 across 9 files
+
+### 2026-04-29 21:51
+
+**Areas:** hooks
+**Files (19):** .claude/hooks/brain-digest-inject.sh, .claude/projects/-Users-amrut-Lexios/memory/MEMORY.md, .claude/projects/-Users-amrut-Lexios/memory/lexios_strategic_frame.md, .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut-nanoclaw/memory/competitive_clawdi.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_hpm523_rigor.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_no_site_managers.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_user_writing_style.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_clawsweeper_roadmap.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_drafts_inventory.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_state_report.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_subject_background.md, .claude/projects/-Users-amrut/memory/MEMORY.md, .claude/settings.json, .githooks/no-lexios-in-core.sh, Brain/Inbox/synthesis/2026-04-29-a2ui-lexios-vision.md, Brain/Inbox/synthesis/2026-04-29-cold-call-shortlist.md, Downloads/Final report/HPM523_Audit_Report.md, Downloads/Final report/HPM523_Final_Paper_Draft.md
+**Diff:** +408 -50 across 9 files
+
+### 2026-04-29 21:49
+
+**Areas:** hooks
+**Files (19):** .claude/hooks/brain-digest-inject.sh, .claude/projects/-Users-amrut-Lexios/memory/MEMORY.md, .claude/projects/-Users-amrut-Lexios/memory/lexios_strategic_frame.md, .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut-nanoclaw/memory/competitive_clawdi.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_hpm523_rigor.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_no_site_managers.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_user_writing_style.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_clawsweeper_roadmap.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_drafts_inventory.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_state_report.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_subject_background.md, .claude/projects/-Users-amrut/memory/MEMORY.md, .claude/settings.json, .githooks/no-lexios-in-core.sh, Brain/Inbox/synthesis/2026-04-29-a2ui-lexios-vision.md, Brain/Inbox/synthesis/2026-04-29-cold-call-shortlist.md, Downloads/Final report/HPM523_Audit_Report.md, Downloads/Final report/HPM523_Final_Paper_Draft.md
+**Diff:** +402 -50 across 9 files
+
+### 2026-04-29 21:48
+
+**Areas:** hooks
+**Files (19):** .claude/hooks/brain-digest-inject.sh, .claude/projects/-Users-amrut-Lexios/memory/MEMORY.md, .claude/projects/-Users-amrut-Lexios/memory/lexios_strategic_frame.md, .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut-nanoclaw/memory/competitive_clawdi.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_hpm523_rigor.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_no_site_managers.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_user_writing_style.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_clawsweeper_roadmap.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_drafts_inventory.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_state_report.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_subject_background.md, .claude/projects/-Users-amrut/memory/MEMORY.md, .claude/settings.json, .githooks/no-lexios-in-core.sh, Brain/Inbox/synthesis/2026-04-29-a2ui-lexios-vision.md, Brain/Inbox/synthesis/2026-04-29-cold-call-shortlist.md, Downloads/Final report/HPM523_Audit_Report.md, Downloads/Final report/HPM523_Final_Paper_Draft.md
+**Diff:** +390 -51 across 9 files
+
+### 2026-04-29 21:47
+
+**Areas:** hooks
+**Files (19):** .claude/hooks/brain-digest-inject.sh, .claude/projects/-Users-amrut-Lexios/memory/MEMORY.md, .claude/projects/-Users-amrut-Lexios/memory/lexios_strategic_frame.md, .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut-nanoclaw/memory/competitive_clawdi.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_hpm523_rigor.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_no_site_managers.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_user_writing_style.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_clawsweeper_roadmap.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_drafts_inventory.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_state_report.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_subject_background.md, .claude/projects/-Users-amrut/memory/MEMORY.md, .claude/settings.json, .githooks/no-lexios-in-core.sh, Brain/Inbox/synthesis/2026-04-29-a2ui-lexios-vision.md, Brain/Inbox/synthesis/2026-04-29-cold-call-shortlist.md, Downloads/Final report/HPM523_Audit_Report.md, Downloads/Final report/HPM523_Final_Paper_Draft.md
+**Diff:** +384 -51 across 9 files
+
+### 2026-04-29 21:46
+
+**Areas:** hooks
+**Files (19):** .claude/hooks/brain-digest-inject.sh, .claude/projects/-Users-amrut-Lexios/memory/MEMORY.md, .claude/projects/-Users-amrut-Lexios/memory/lexios_strategic_frame.md, .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut-nanoclaw/memory/competitive_clawdi.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_hpm523_rigor.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_no_site_managers.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_user_writing_style.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_clawsweeper_roadmap.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_drafts_inventory.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_state_report.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_subject_background.md, .claude/projects/-Users-amrut/memory/MEMORY.md, .claude/settings.json, .githooks/no-lexios-in-core.sh, Brain/Inbox/synthesis/2026-04-29-a2ui-lexios-vision.md, Brain/Inbox/synthesis/2026-04-29-cold-call-shortlist.md, Downloads/Final report/HPM523_Audit_Report.md, Downloads/Final report/HPM523_Final_Paper_Draft.md
+**Diff:** +378 -51 across 9 files
+
+### 2026-04-29 21:44
+
+**Areas:** hooks
+**Files (19):** .claude/hooks/brain-digest-inject.sh, .claude/projects/-Users-amrut-Lexios/memory/MEMORY.md, .claude/projects/-Users-amrut-Lexios/memory/lexios_strategic_frame.md, .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut-nanoclaw/memory/competitive_clawdi.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_hpm523_rigor.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_no_site_managers.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_user_writing_style.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_clawsweeper_roadmap.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_drafts_inventory.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_state_report.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_subject_background.md, .claude/projects/-Users-amrut/memory/MEMORY.md, .claude/settings.json, .githooks/no-lexios-in-core.sh, Brain/Inbox/synthesis/2026-04-29-a2ui-lexios-vision.md, Brain/Inbox/synthesis/2026-04-29-cold-call-shortlist.md, Downloads/Final report/HPM523_Audit_Report.md, Downloads/Final report/HPM523_Final_Paper_Draft.md
+**Diff:** +335 -19 across 9 files
+
+### 2026-04-29 21:43
+
+**Areas:** hooks
+**Files (19):** .claude/hooks/brain-digest-inject.sh, .claude/projects/-Users-amrut-Lexios/memory/MEMORY.md, .claude/projects/-Users-amrut-Lexios/memory/lexios_strategic_frame.md, .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut-nanoclaw/memory/competitive_clawdi.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_hpm523_rigor.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_no_site_managers.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_user_writing_style.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_clawsweeper_roadmap.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_drafts_inventory.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_state_report.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_subject_background.md, .claude/projects/-Users-amrut/memory/MEMORY.md, .claude/settings.json, .githooks/no-lexios-in-core.sh, Brain/Inbox/synthesis/2026-04-29-a2ui-lexios-vision.md, Brain/Inbox/synthesis/2026-04-29-cold-call-shortlist.md, Downloads/Final report/HPM523_Audit_Report.md, Downloads/Final report/HPM523_Final_Paper_Draft.md
+**Diff:** +329 -19 across 9 files
+
+### 2026-04-29 21:42
+
+**Areas:** hooks
+**Files (19):** .claude/hooks/brain-digest-inject.sh, .claude/projects/-Users-amrut-Lexios/memory/MEMORY.md, .claude/projects/-Users-amrut-Lexios/memory/lexios_strategic_frame.md, .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut-nanoclaw/memory/competitive_clawdi.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_hpm523_rigor.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_no_site_managers.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_user_writing_style.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_clawsweeper_roadmap.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_drafts_inventory.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_state_report.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_subject_background.md, .claude/projects/-Users-amrut/memory/MEMORY.md, .claude/settings.json, .githooks/no-lexios-in-core.sh, Brain/Inbox/synthesis/2026-04-29-a2ui-lexios-vision.md, Brain/Inbox/synthesis/2026-04-29-cold-call-shortlist.md, Downloads/Final report/HPM523_Audit_Report.md, Downloads/Final report/HPM523_Final_Paper_Draft.md
+**Diff:** +323 -19 across 9 files
+
+### 2026-04-29 21:42
+
+**Areas:** hooks
+**Files (19):** .claude/hooks/brain-digest-inject.sh, .claude/projects/-Users-amrut-Lexios/memory/MEMORY.md, .claude/projects/-Users-amrut-Lexios/memory/lexios_strategic_frame.md, .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut-nanoclaw/memory/competitive_clawdi.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_hpm523_rigor.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_no_site_managers.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_user_writing_style.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_clawsweeper_roadmap.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_drafts_inventory.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_state_report.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_subject_background.md, .claude/projects/-Users-amrut/memory/MEMORY.md, .claude/settings.json, .githooks/no-lexios-in-core.sh, Brain/Inbox/synthesis/2026-04-29-a2ui-lexios-vision.md, Brain/Inbox/synthesis/2026-04-29-cold-call-shortlist.md, Downloads/Final report/HPM523_Audit_Report.md, Downloads/Final report/HPM523_Final_Paper_Draft.md
+**Diff:** +317 -19 across 9 files
+
+### 2026-04-29 21:41
+
+**Areas:** hooks
+**Files (19):** .claude/hooks/brain-digest-inject.sh, .claude/projects/-Users-amrut-Lexios/memory/MEMORY.md, .claude/projects/-Users-amrut-Lexios/memory/lexios_strategic_frame.md, .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut-nanoclaw/memory/competitive_clawdi.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_hpm523_rigor.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_no_site_managers.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_user_writing_style.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_clawsweeper_roadmap.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_drafts_inventory.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_state_report.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_subject_background.md, .claude/projects/-Users-amrut/memory/MEMORY.md, .claude/settings.json, .githooks/no-lexios-in-core.sh, Brain/Inbox/synthesis/2026-04-29-a2ui-lexios-vision.md, Brain/Inbox/synthesis/2026-04-29-cold-call-shortlist.md, Downloads/Final report/HPM523_Audit_Report.md, Downloads/Final report/HPM523_Final_Paper_Draft.md
+**Diff:** +311 -19 across 9 files
+
+### 2026-04-29 21:36
+
+**Areas:** hooks
+**Files (19):** .claude/hooks/brain-digest-inject.sh, .claude/projects/-Users-amrut-Lexios/memory/MEMORY.md, .claude/projects/-Users-amrut-Lexios/memory/lexios_strategic_frame.md, .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut-nanoclaw/memory/competitive_clawdi.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_hpm523_rigor.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_no_site_managers.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_user_writing_style.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_clawsweeper_roadmap.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_drafts_inventory.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_state_report.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_subject_background.md, .claude/projects/-Users-amrut/memory/MEMORY.md, .claude/settings.json, .githooks/no-lexios-in-core.sh, Brain/Inbox/synthesis/2026-04-29-a2ui-lexios-vision.md, Brain/Inbox/synthesis/2026-04-29-cold-call-shortlist.md, Downloads/Final report/HPM523_Audit_Report.md, Downloads/Final report/HPM523_Final_Paper_Draft.md
+**Diff:** +287 -19 across 8 files
+
+### 2026-04-29 21:35
+
+**Areas:** hooks
+**Files (19):** .claude/hooks/brain-digest-inject.sh, .claude/projects/-Users-amrut-Lexios/memory/MEMORY.md, .claude/projects/-Users-amrut-Lexios/memory/lexios_strategic_frame.md, .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut-nanoclaw/memory/competitive_clawdi.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_hpm523_rigor.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_no_site_managers.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_user_writing_style.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_clawsweeper_roadmap.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_drafts_inventory.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_state_report.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_subject_background.md, .claude/projects/-Users-amrut/memory/MEMORY.md, .claude/settings.json, .githooks/no-lexios-in-core.sh, Brain/Inbox/synthesis/2026-04-29-a2ui-lexios-vision.md, Brain/Inbox/synthesis/2026-04-29-cold-call-shortlist.md, Downloads/Final report/HPM523_Audit_Report.md, Downloads/Final report/HPM523_Final_Paper_Draft.md
+**Diff:** +281 -19 across 8 files
+
+### 2026-04-29 21:35
+
+**Areas:** hooks
+**Files (19):** .claude/hooks/brain-digest-inject.sh, .claude/projects/-Users-amrut-Lexios/memory/MEMORY.md, .claude/projects/-Users-amrut-Lexios/memory/lexios_strategic_frame.md, .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut-nanoclaw/memory/competitive_clawdi.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_hpm523_rigor.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_no_site_managers.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_user_writing_style.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_clawsweeper_roadmap.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_drafts_inventory.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_state_report.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_subject_background.md, .claude/projects/-Users-amrut/memory/MEMORY.md, .claude/settings.json, .githooks/no-lexios-in-core.sh, Brain/Inbox/synthesis/2026-04-29-a2ui-lexios-vision.md, Brain/Inbox/synthesis/2026-04-29-cold-call-shortlist.md, Downloads/Final report/HPM523_Audit_Report.md, Downloads/Final report/HPM523_Final_Paper_Draft.md
+**Diff:** +275 -19 across 8 files
+
+### 2026-04-29 21:31
+
+**Areas:** hooks
+**Files (19):** .claude/hooks/brain-digest-inject.sh, .claude/projects/-Users-amrut-Lexios/memory/MEMORY.md, .claude/projects/-Users-amrut-Lexios/memory/lexios_strategic_frame.md, .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut-nanoclaw/memory/competitive_clawdi.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_hpm523_rigor.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_no_site_managers.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_user_writing_style.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_clawsweeper_roadmap.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_drafts_inventory.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_state_report.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_subject_background.md, .claude/projects/-Users-amrut/memory/MEMORY.md, .claude/settings.json, .githooks/no-lexios-in-core.sh, Brain/Inbox/synthesis/2026-04-29-a2ui-lexios-vision.md, Brain/Inbox/synthesis/2026-04-29-cold-call-shortlist.md, Downloads/Final report/HPM523_Audit_Report.md, Downloads/Final report/HPM523_Final_Paper_Draft.md
+**Diff:** +269 -19 across 8 files
+
+### 2026-04-29 21:31
+
+**Areas:** hooks
+**Files (19):** .claude/hooks/brain-digest-inject.sh, .claude/projects/-Users-amrut-Lexios/memory/MEMORY.md, .claude/projects/-Users-amrut-Lexios/memory/lexios_strategic_frame.md, .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut-nanoclaw/memory/competitive_clawdi.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_hpm523_rigor.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_no_site_managers.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_user_writing_style.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_clawsweeper_roadmap.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_drafts_inventory.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_state_report.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_subject_background.md, .claude/projects/-Users-amrut/memory/MEMORY.md, .claude/settings.json, .githooks/no-lexios-in-core.sh, Brain/Inbox/synthesis/2026-04-29-a2ui-lexios-vision.md, Brain/Inbox/synthesis/2026-04-29-cold-call-shortlist.md, Downloads/Final report/HPM523_Audit_Report.md, Downloads/Final report/HPM523_Final_Paper_Draft.md
+**Diff:** +263 -19 across 8 files
+
+### 2026-04-29 21:31
+
+**Areas:** hooks
+**Files (19):** .claude/hooks/brain-digest-inject.sh, .claude/projects/-Users-amrut-Lexios/memory/MEMORY.md, .claude/projects/-Users-amrut-Lexios/memory/lexios_strategic_frame.md, .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut-nanoclaw/memory/competitive_clawdi.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_hpm523_rigor.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_no_site_managers.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_user_writing_style.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_clawsweeper_roadmap.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_drafts_inventory.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_state_report.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_subject_background.md, .claude/projects/-Users-amrut/memory/MEMORY.md, .claude/settings.json, .githooks/no-lexios-in-core.sh, Brain/Inbox/synthesis/2026-04-29-a2ui-lexios-vision.md, Brain/Inbox/synthesis/2026-04-29-cold-call-shortlist.md, Downloads/Final report/HPM523_Audit_Report.md, Downloads/Final report/HPM523_Final_Paper_Draft.md
+**Diff:** +257 -19 across 8 files
+
+### 2026-04-29 21:30
+
+**Areas:** hooks
+**Files (19):** .claude/hooks/brain-digest-inject.sh, .claude/projects/-Users-amrut-Lexios/memory/MEMORY.md, .claude/projects/-Users-amrut-Lexios/memory/lexios_strategic_frame.md, .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut-nanoclaw/memory/competitive_clawdi.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_hpm523_rigor.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_no_site_managers.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_user_writing_style.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_clawsweeper_roadmap.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_drafts_inventory.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_state_report.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_subject_background.md, .claude/projects/-Users-amrut/memory/MEMORY.md, .claude/settings.json, .githooks/no-lexios-in-core.sh, Brain/Inbox/synthesis/2026-04-29-a2ui-lexios-vision.md, Brain/Inbox/synthesis/2026-04-29-cold-call-shortlist.md, Downloads/Final report/HPM523_Audit_Report.md, Downloads/Final report/HPM523_Final_Paper_Draft.md
+**Diff:** +251 -19 across 8 files
+
+### 2026-04-29 21:30
+
+**Areas:** hooks
+**Files (17):** .claude/hooks/brain-digest-inject.sh, .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut-nanoclaw/memory/competitive_clawdi.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_hpm523_rigor.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_no_site_managers.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_user_writing_style.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_clawsweeper_roadmap.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_drafts_inventory.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_state_report.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_subject_background.md, .claude/projects/-Users-amrut/memory/MEMORY.md, .claude/settings.json, .githooks/no-lexios-in-core.sh, Brain/Inbox/synthesis/2026-04-29-a2ui-lexios-vision.md, Brain/Inbox/synthesis/2026-04-29-cold-call-shortlist.md, Downloads/Final report/HPM523_Audit_Report.md, Downloads/Final report/HPM523_Final_Paper_Draft.md
+**Diff:** +245 -19 across 8 files
+
+### 2026-04-29 21:29
+
+**Areas:** hooks
+**Files (17):** .claude/hooks/brain-digest-inject.sh, .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut-nanoclaw/memory/competitive_clawdi.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_hpm523_rigor.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_no_site_managers.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_user_writing_style.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_clawsweeper_roadmap.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_drafts_inventory.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_state_report.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_subject_background.md, .claude/projects/-Users-amrut/memory/MEMORY.md, .claude/settings.json, .githooks/no-lexios-in-core.sh, Brain/Inbox/synthesis/2026-04-29-a2ui-lexios-vision.md, Brain/Inbox/synthesis/2026-04-29-cold-call-shortlist.md, Downloads/Final report/HPM523_Audit_Report.md, Downloads/Final report/HPM523_Final_Paper_Draft.md
+**Diff:** +239 -19 across 8 files
+
+### 2026-04-29 21:27
+
+**Areas:** hooks
+**Files (16):** .claude/hooks/brain-digest-inject.sh, .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut-nanoclaw/memory/competitive_clawdi.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_hpm523_rigor.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_no_site_managers.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_user_writing_style.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_clawsweeper_roadmap.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_drafts_inventory.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_state_report.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_subject_background.md, .claude/projects/-Users-amrut/memory/MEMORY.md, .claude/settings.json, .githooks/no-lexios-in-core.sh, Brain/Inbox/synthesis/2026-04-29-cold-call-shortlist.md, Downloads/Final report/HPM523_Audit_Report.md, Downloads/Final report/HPM523_Final_Paper_Draft.md
+**Diff:** +231 -18 across 8 files
+
+### 2026-04-29 21:25
+
+**Areas:** hooks
+**Files (16):** .claude/hooks/brain-digest-inject.sh, .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut-nanoclaw/memory/competitive_clawdi.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_hpm523_rigor.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_no_site_managers.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_user_writing_style.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_clawsweeper_roadmap.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_drafts_inventory.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_state_report.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_subject_background.md, .claude/projects/-Users-amrut/memory/MEMORY.md, .claude/settings.json, .githooks/no-lexios-in-core.sh, Brain/Inbox/synthesis/2026-04-29-cold-call-shortlist.md, Downloads/Final report/HPM523_Audit_Report.md, Downloads/Final report/HPM523_Final_Paper_Draft.md
+**Diff:** +225 -18 across 8 files
+
+### 2026-04-29 21:23
+
+**Areas:** hooks
+**Files (16):** .claude/hooks/brain-digest-inject.sh, .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut-nanoclaw/memory/competitive_clawdi.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_hpm523_rigor.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_no_site_managers.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_user_writing_style.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_clawsweeper_roadmap.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_drafts_inventory.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_state_report.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_subject_background.md, .claude/projects/-Users-amrut/memory/MEMORY.md, .claude/settings.json, .githooks/no-lexios-in-core.sh, Brain/Inbox/synthesis/2026-04-29-cold-call-shortlist.md, Downloads/Final report/HPM523_Audit_Report.md, Downloads/Final report/HPM523_Final_Paper_Draft.md
+**Diff:** +219 -18 across 8 files
+
+### 2026-04-29 21:22
+
+**Areas:** hooks
+**Files (15):** .claude/hooks/brain-digest-inject.sh, .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut-nanoclaw/memory/competitive_clawdi.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_hpm523_rigor.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_no_site_managers.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_user_writing_style.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_clawsweeper_roadmap.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_drafts_inventory.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_state_report.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_subject_background.md, .claude/projects/-Users-amrut/memory/MEMORY.md, .claude/settings.json, .githooks/no-lexios-in-core.sh, Downloads/Final report/HPM523_Audit_Report.md, Downloads/Final report/HPM523_Final_Paper_Draft.md
+**Diff:** +183 -18 across 8 files
+
+### 2026-04-29 21:21
+
+**Areas:** hooks
+**Files (15):** .claude/hooks/brain-digest-inject.sh, .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut-nanoclaw/memory/competitive_clawdi.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_hpm523_rigor.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_no_site_managers.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_user_writing_style.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_clawsweeper_roadmap.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_drafts_inventory.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_state_report.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_subject_background.md, .claude/projects/-Users-amrut/memory/MEMORY.md, .claude/settings.json, .githooks/no-lexios-in-core.sh, Downloads/Final report/HPM523_Audit_Report.md, Downloads/Final report/HPM523_Final_Paper_Draft.md
+**Diff:** +177 -18 across 8 files
+
+### 2026-04-29 21:21
+
+**Areas:** hooks
+**Files (15):** .claude/hooks/brain-digest-inject.sh, .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut-nanoclaw/memory/competitive_clawdi.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_hpm523_rigor.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_no_site_managers.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_user_writing_style.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_clawsweeper_roadmap.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_drafts_inventory.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_state_report.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_subject_background.md, .claude/projects/-Users-amrut/memory/MEMORY.md, .claude/settings.json, .githooks/no-lexios-in-core.sh, Downloads/Final report/HPM523_Audit_Report.md, Downloads/Final report/HPM523_Final_Paper_Draft.md
+**Diff:** +171 -18 across 8 files
+
+### 2026-04-29 21:05
+
+**Areas:** hooks
+**Files (15):** .claude/hooks/brain-digest-inject.sh, .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut-nanoclaw/memory/competitive_clawdi.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_hpm523_rigor.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_no_site_managers.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_user_writing_style.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_clawsweeper_roadmap.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_drafts_inventory.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_state_report.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_subject_background.md, .claude/projects/-Users-amrut/memory/MEMORY.md, .claude/settings.json, .githooks/no-lexios-in-core.sh, Downloads/Final report/HPM523_Audit_Report.md, Downloads/Final report/HPM523_Final_Paper_Draft.md
+**Diff:** +162 -18 across 7 files
+
+### 2026-04-29 21:04
+
+**Areas:** hooks
+**Files (15):** .claude/hooks/brain-digest-inject.sh, .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut-nanoclaw/memory/competitive_clawdi.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_hpm523_rigor.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_no_site_managers.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_user_writing_style.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_clawsweeper_roadmap.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_drafts_inventory.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_state_report.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_subject_background.md, .claude/projects/-Users-amrut/memory/MEMORY.md, .claude/settings.json, .githooks/no-lexios-in-core.sh, Downloads/Final report/HPM523_Audit_Report.md, Downloads/Final report/HPM523_Final_Paper_Draft.md
+**Diff:** +153 -18 across 6 files
+
+### 2026-04-29 21:04
+
+**Areas:** hooks
+**Files (15):** .claude/hooks/brain-digest-inject.sh, .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut-nanoclaw/memory/competitive_clawdi.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_hpm523_rigor.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_no_site_managers.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_user_writing_style.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_clawsweeper_roadmap.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_drafts_inventory.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_state_report.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_subject_background.md, .claude/projects/-Users-amrut/memory/MEMORY.md, .claude/settings.json, .githooks/no-lexios-in-core.sh, Downloads/Final report/HPM523_Audit_Report.md, Downloads/Final report/HPM523_Final_Paper_Draft.md
+**Diff:** +147 -18 across 6 files
+
+### 2026-04-29 21:02
+
+**Areas:** hooks
+**Files (15):** .claude/hooks/brain-digest-inject.sh, .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut-nanoclaw/memory/competitive_clawdi.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_hpm523_rigor.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_no_site_managers.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_user_writing_style.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_clawsweeper_roadmap.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_drafts_inventory.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_state_report.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_subject_background.md, .claude/projects/-Users-amrut/memory/MEMORY.md, .claude/settings.json, .githooks/no-lexios-in-core.sh, Downloads/Final report/HPM523_Audit_Report.md, Downloads/Final report/HPM523_Final_Paper_Draft.md
+**Diff:** +141 -18 across 6 files
+
+### 2026-04-29 21:01
+
+**Areas:** hooks
+**Files (15):** .claude/hooks/brain-digest-inject.sh, .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut-nanoclaw/memory/competitive_clawdi.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_hpm523_rigor.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_no_site_managers.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_user_writing_style.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_clawsweeper_roadmap.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_drafts_inventory.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_state_report.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_subject_background.md, .claude/projects/-Users-amrut/memory/MEMORY.md, .claude/settings.json, .githooks/no-lexios-in-core.sh, Downloads/Final report/HPM523_Audit_Report.md, Downloads/Final report/HPM523_Final_Paper_Draft.md
+**Diff:** +135 -18 across 6 files
+
+### 2026-04-29 20:58
+
+**Areas:** hooks
+**Files (15):** .claude/hooks/brain-digest-inject.sh, .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut-nanoclaw/memory/competitive_clawdi.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_hpm523_rigor.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_no_site_managers.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_user_writing_style.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_clawsweeper_roadmap.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_drafts_inventory.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_state_report.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_subject_background.md, .claude/projects/-Users-amrut/memory/MEMORY.md, .claude/settings.json, .githooks/no-lexios-in-core.sh, Downloads/Final report/HPM523_Audit_Report.md, Downloads/Final report/HPM523_Final_Paper_Draft.md
+**Diff:** +106 -8 across 4 files
+
+### 2026-04-29 20:57
+
+**Areas:** hooks
+**Files (15):** .claude/hooks/brain-digest-inject.sh, .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut-nanoclaw/memory/competitive_clawdi.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_hpm523_rigor.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_no_site_managers.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_user_writing_style.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_clawsweeper_roadmap.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_drafts_inventory.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_state_report.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_subject_background.md, .claude/projects/-Users-amrut/memory/MEMORY.md, .claude/settings.json, .githooks/no-lexios-in-core.sh, Downloads/Final report/HPM523_Audit_Report.md, Downloads/Final report/HPM523_Final_Paper_Draft.md
+**Diff:** +100 -8 across 4 files
+
+### 2026-04-29 20:57
+
+**Areas:** hooks
+**Files (15):** .claude/hooks/brain-digest-inject.sh, .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut-nanoclaw/memory/competitive_clawdi.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_hpm523_rigor.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_no_site_managers.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_user_writing_style.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_clawsweeper_roadmap.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_drafts_inventory.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_state_report.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_subject_background.md, .claude/projects/-Users-amrut/memory/MEMORY.md, .claude/settings.json, .githooks/no-lexios-in-core.sh, Downloads/Final report/HPM523_Audit_Report.md, Downloads/Final report/HPM523_Final_Paper_Draft.md
+**Diff:** +94 -8 across 4 files
+
+### 2026-04-29 20:57
+
+**Areas:** hooks
+**Files (15):** .claude/hooks/brain-digest-inject.sh, .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut-nanoclaw/memory/competitive_clawdi.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_hpm523_rigor.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_no_site_managers.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_user_writing_style.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_clawsweeper_roadmap.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_drafts_inventory.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_state_report.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_subject_background.md, .claude/projects/-Users-amrut/memory/MEMORY.md, .claude/settings.json, .githooks/no-lexios-in-core.sh, Downloads/Final report/HPM523_Audit_Report.md, Downloads/Final report/HPM523_Final_Paper_Draft.md
+**Diff:** +88 -8 across 4 files
+
+### 2026-04-29 20:56
+
+**Areas:** hooks
+**Files (15):** .claude/hooks/brain-digest-inject.sh, .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut-nanoclaw/memory/competitive_clawdi.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_hpm523_rigor.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_no_site_managers.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_user_writing_style.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_clawsweeper_roadmap.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_drafts_inventory.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_state_report.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_subject_background.md, .claude/projects/-Users-amrut/memory/MEMORY.md, .claude/settings.json, .githooks/no-lexios-in-core.sh, Downloads/Final report/HPM523_Audit_Report.md, Downloads/Final report/HPM523_Final_Paper_Draft.md
+**Diff:** +82 -8 across 4 files
+
+### 2026-04-29 20:55
+
+**Areas:** hooks
+**Files (15):** .claude/hooks/brain-digest-inject.sh, .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut-nanoclaw/memory/competitive_clawdi.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_hpm523_rigor.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_no_site_managers.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_user_writing_style.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_clawsweeper_roadmap.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_drafts_inventory.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_state_report.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_subject_background.md, .claude/projects/-Users-amrut/memory/MEMORY.md, .claude/settings.json, .githooks/no-lexios-in-core.sh, Downloads/Final report/HPM523_Audit_Report.md, Downloads/Final report/HPM523_Final_Paper_Draft.md
+**Diff:** +76 -8 across 4 files
+
+### 2026-04-29 20:54
+
+**Areas:** hooks
+**Files (15):** .claude/hooks/brain-digest-inject.sh, .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut-nanoclaw/memory/competitive_clawdi.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_hpm523_rigor.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_no_site_managers.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_user_writing_style.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_clawsweeper_roadmap.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_drafts_inventory.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_state_report.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_subject_background.md, .claude/projects/-Users-amrut/memory/MEMORY.md, .claude/settings.json, .githooks/no-lexios-in-core.sh, Downloads/Final report/HPM523_Audit_Report.md, Downloads/Final report/HPM523_Final_Paper_Draft.md
+**Diff:** +70 -8 across 4 files
+
+### 2026-04-29 20:53
+
+**Areas:** hooks
+**Files (15):** .claude/hooks/brain-digest-inject.sh, .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut-nanoclaw/memory/competitive_clawdi.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_hpm523_rigor.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_no_site_managers.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_user_writing_style.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_clawsweeper_roadmap.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_drafts_inventory.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_state_report.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_subject_background.md, .claude/projects/-Users-amrut/memory/MEMORY.md, .claude/settings.json, .githooks/no-lexios-in-core.sh, Downloads/Final report/HPM523_Audit_Report.md, Downloads/Final report/HPM523_Final_Paper_Draft.md
+**Diff:** +64 -8 across 4 files
+
+### 2026-04-29 20:52
+
+**Areas:** hooks
+**Files (15):** .claude/hooks/brain-digest-inject.sh, .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut-nanoclaw/memory/competitive_clawdi.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_hpm523_rigor.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_no_site_managers.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_user_writing_style.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_clawsweeper_roadmap.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_drafts_inventory.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_state_report.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_subject_background.md, .claude/projects/-Users-amrut/memory/MEMORY.md, .claude/settings.json, .githooks/no-lexios-in-core.sh, Downloads/Final report/HPM523_Audit_Report.md, Downloads/Final report/HPM523_Final_Paper_Draft.md
+**Diff:** +58 -8 across 4 files
+
+### 2026-04-29 20:49
+
+**Areas:** hooks
+**Files (15):** .claude/hooks/brain-digest-inject.sh, .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut-nanoclaw/memory/competitive_clawdi.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_hpm523_rigor.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_no_site_managers.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_user_writing_style.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_clawsweeper_roadmap.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_drafts_inventory.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_state_report.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_subject_background.md, .claude/projects/-Users-amrut/memory/MEMORY.md, .claude/settings.json, .githooks/no-lexios-in-core.sh, Downloads/Final report/HPM523_Audit_Report.md, Downloads/Final report/HPM523_Final_Paper_Draft.md
+**Diff:** +52 -8 across 4 files
+
+### 2026-04-29 20:46
+
+**Areas:** hooks
+**Files (15):** .claude/hooks/brain-digest-inject.sh, .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut-nanoclaw/memory/competitive_clawdi.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_hpm523_rigor.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_no_site_managers.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_user_writing_style.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_clawsweeper_roadmap.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_drafts_inventory.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_state_report.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_subject_background.md, .claude/projects/-Users-amrut/memory/MEMORY.md, .claude/settings.json, .githooks/no-lexios-in-core.sh, Downloads/Final report/HPM523_Audit_Report.md, Downloads/Final report/HPM523_Final_Paper_Draft.md
+**Diff:** +10 -2 across 2 files
+
 ### 2026-04-29 20:05
 
 **Areas:** hooks

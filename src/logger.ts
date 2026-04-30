@@ -62,8 +62,14 @@ process.on('uncaughtException', (err: NodeJS.ErrnoException) => {
     logger.warn({ err }, 'EPIPE (non-fatal, write target disconnected)');
     return;
   }
+  // EADDRINUSE is non-fatal — another instance holds the port, we'll retry
+  if (err.code === 'EADDRINUSE') {
+    logger.warn({ err }, 'EADDRINUSE (port in use, non-fatal)');
+    return;
+  }
   logger.fatal({ err }, 'Uncaught exception');
-  process.exit(1);
+  // Don't exit immediately — let active agents finish via SIGTERM handler
+  process.kill(process.pid, 'SIGTERM');
 });
 
 process.on('unhandledRejection', (reason) => {

@@ -63,7 +63,7 @@ import { contextManager, codedContext, setSystemFact, setCapability } from './co
 import { pruneOldChunks } from './semantic-index.js';
 import { RouterFactory, type UniversalRouter } from './router/index.js';
 import type { RoutingContext, RoutingDecision } from './router/types.js';
-import { classifyGoalHeuristic, extractGoalDetails } from './goal-classifier.js';
+import { classifyGoalWithAI, classifyGoalHeuristic, extractGoalDetails } from './goal-classifier.js';
 import { ResponseTimeManager } from './response-time-manager.js';
 import { NanoClawOrchestrator } from './nanoclaw-orchestrator.js';
 import { listGroupFiles, startDashboard } from './dashboard.js';
@@ -216,10 +216,34 @@ function registerGroup(jid: string, group: RegisteredGroup): void {
 - NEVER discuss tasks, dispatch logs, or work from other groups
 - NEVER fabricate or hallucinate capabilities you don't have
 
-## Instructions
-- Be helpful, thorough, and proactive
-- Use all available tools (Bash, Read, Write, WebSearch, etc.)
-- If a task is complex, break it down and work through it step by step
+## Execution Framework (MANDATORY)
+
+Every task follows this structure:
+
+### 1. Understand → Plan
+- Restate the request to confirm understanding
+- Break into numbered steps with clear deliverables
+- If anything is ambiguous, ask ONE focused question — don't guess
+
+### 2. Execute → Verify
+- Work through each step sequentially using tools aggressively
+- Cross-verify every claim — open URLs, check data, confirm facts
+- Save intermediate work to \`/workspace/group/\` so nothing is lost
+- Send progress updates on long tasks
+
+### 3. Deliver → Structured Output
+- Final output is ALWAYS structured: tables, numbered lists, formatted documents
+- Save deliverables as files in \`/workspace/group/output/\`
+- Include sources, links, and evidence for every claim
+
+### 4. Follow Through
+- Track open items in \`/workspace/group/tasks.md\`
+- On next session, check tasks.md for continuity
+
+## Quality Standards
+- NO vague suggestions — concrete actions with specific details
+- NO hallucinated data — if you can't verify it, say so explicitly
+- NO walls of text — structured, scannable, actionable
 `;
     fs.writeFileSync(claudeMdPath, defaultClaudeMd);
   }
@@ -264,7 +288,7 @@ function getOrCreateGuestGroup(chatJid: string): RegisteredGroup {
     if (fs.existsSync(templatePath)) {
       fs.copyFileSync(templatePath, claudeMdPath);
     } else {
-      // No template — create default with isolation rules
+      // No template — create default with isolation + execution framework
       fs.writeFileSync(claudeMdPath, `# Guest Assistant
 
 ## Isolation Rules (CRITICAL)
@@ -275,7 +299,13 @@ function getOrCreateGuestGroup(chatJid: string): RegisteredGroup {
 - NEVER discuss tasks, dispatch logs, or work from other groups
 - NEVER fabricate or hallucinate capabilities you don't have
 
-Be helpful, thorough, and proactive. Use all available tools.
+## Execution Framework
+1. **Understand → Plan**: Restate the request, break into steps, ask if unclear
+2. **Execute → Verify**: Use tools aggressively, cross-verify claims, save work to files
+3. **Deliver → Structured**: Tables, lists, files in /workspace/group/output/ — never walls of text
+4. **Follow Through**: Track open items in /workspace/group/tasks.md
+
+NO vague suggestions. NO hallucinated data. Concrete actions with evidence.
 `);
     }
   }
@@ -394,6 +424,36 @@ function pickAckEmoji(content: string): string {
     }
   }
   return DEFAULT_EMOJIS[Math.floor(Math.random() * DEFAULT_EMOJIS.length)];
+}
+
+/**
+ * Intelligent model routing: pick the right model for the task complexity.
+ * - expert/complex tasks → opus (deep reasoning, multi-step planning)
+ * - moderate tasks → sonnet (good balance)
+ * - simple/trivial → haiku (fast, cheap)
+ * Group-level override in containerConfig.model takes priority.
+ */
+function resolveModel(
+  complexity: string,
+  group: RegisteredGroup,
+): 'sonnet' | 'opus' | 'haiku' | undefined {
+  // Group-level override always wins
+  const groupModel = (group.containerConfig as any)?.model;
+  if (groupModel) return groupModel;
+
+  // Route by complexity
+  switch (complexity) {
+    case 'expert':
+    case 'complex':
+      return 'opus';
+    case 'moderate':
+      return 'sonnet';
+    case 'simple':
+    case 'trivial':
+      return 'sonnet';
+    default:
+      return 'sonnet'; // default to sonnet, never leave unset
+  }
 }
 
 /** Determine the purpose of an agent run for cost tracking. */
@@ -604,7 +664,7 @@ async function processGroupMessages(chatJid: string): Promise<boolean> {
   let goalComplexity = '';
   try {
     const strippedContent = lastMsg.content.replace(TRIGGER_PATTERN, '').trim();
-    const goalClass = classifyGoalHeuristic(strippedContent);
+    const goalClass = await classifyGoalWithAI(strippedContent);
     goalComplexity = goalClass.estimatedComplexity;
     logger.info(
       { shouldUseTeams: goalClass.shouldUseTeams, complexity: goalClass.estimatedComplexity, goalType: goalClass.detectedGoalType, confidence: goalClass.confidence },
@@ -804,7 +864,7 @@ async function processGroupMessages(chatJid: string): Promise<boolean> {
     if (result.status === 'error') {
       hadError = true;
     }
-  }, routingDecision);
+  }, routingDecision, undefined, undefined, goalComplexity);
 
   await ackChannel.setTyping?.(chatJid, false);
   if (idleTimer) clearTimeout(idleTimer);
@@ -836,8 +896,11 @@ async function processGroupMessages(chatJid: string): Promise<boolean> {
     }
     // Roll back cursor so retries can re-process these messages
     lastAgentTimestamp[chatJid] = previousCursor;
+    // Clear stale session so retry starts fresh (prevents session resume loops)
+    delete sessions[group.folder];
+    try { const { deleteSession } = await import('./db.js'); deleteSession(group.folder); } catch { /* best effort */ }
     saveState();
-    logger.warn({ group: group.name }, 'Agent error, rolled back message cursor for retry');
+    logger.warn({ group: group.name }, 'Agent error, rolled back cursor + cleared session for clean retry');
     return false;
   }
 
@@ -852,6 +915,7 @@ async function runAgent(
   routingDecisionHint?: RoutingDecision,
   designationOverride?: string,
   maxTurns?: number,
+  complexity?: string,
 ): Promise<'success' | 'error'> {
   const isMain = group.folder === MAIN_GROUP_FOLDER;
   const sessionId = sessions[group.folder];
@@ -936,6 +1000,7 @@ async function runAgent(
           reasoning: routingDecisionHint.reasoning,
         } : undefined,
         maxTurns,
+        model: resolveModel(complexity || '', group),
         personalityParams,
       },
       (proc, containerName) => {
@@ -982,6 +1047,7 @@ async function runAgent(
               reasoning: routingDecisionHint.reasoning,
             } : undefined,
             maxTurns,
+            model: resolveModel(complexity || '', group),
           },
           (proc, containerName) => {
             queue.registerProcess(chatJid, proc, containerName, group.folder);
@@ -1743,15 +1809,19 @@ Steps:
   // Prune semantic index chunks older than 6 months (non-blocking)
   try { pruneOldChunks(); } catch { /* non-blocking */ }
 
-  // Graceful shutdown handlers
+  // Graceful shutdown handlers — wait for active agents before dying
   const shutdown = async (signal: string) => {
     logger.info({ signal }, 'Shutdown signal received');
+    // Stop accepting new work
+    try { autoDispatcher?.stop(); } catch { /* non-blocking */ }
+    // Wait for active container agents to finish (up to 5 min)
+    logger.info('Waiting for active agents to finish before shutdown...');
+    await queue.shutdown(300000); // 5 min for agents to complete
     orchestrator.destroy();
     try { nanoClawOrchestrator?.destroy(); } catch { /* non-blocking */ }
-    try { autoDispatcher?.stop(); } catch { /* non-blocking */ }
     try { await contextManager.persist(); } catch { /* non-blocking */ }
-    await queue.shutdown(10000);
     for (const ch of channels) await ch.disconnect();
+    logger.info('Graceful shutdown complete');
     process.exit(0);
   };
   process.on('SIGTERM', () => shutdown('SIGTERM'));
