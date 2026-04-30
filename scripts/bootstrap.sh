@@ -9,11 +9,11 @@ set -euo pipefail
 # launchd services. Idempotent — safe to re-run.
 #
 # Usage (interactive — prompts for R2 creds):
-#   curl -fsSL https://raw.githubusercontent.com/amruth9459/nanoclaw/main/scripts/bootstrap.sh | bash
+#   curl -fsSL https://raw.githubusercontent.com/amruth9459/nanoclaw/claw/cost-by-provider/scripts/bootstrap.sh | bash
 #
 # Usage (non-interactive — pre-set creds via env):
 #   R2_ACCESS_KEY=... R2_SECRET_KEY=... R2_ENDPOINT=https://....r2.cloudflarestorage.com \
-#     bash <(curl -fsSL https://raw.githubusercontent.com/amruth9459/nanoclaw/main/scripts/bootstrap.sh)
+#     bash <(curl -fsSL https://raw.githubusercontent.com/amruth9459/nanoclaw/claw/cost-by-provider/scripts/bootstrap.sh)
 #
 # The R2 creds live in your private Google Drive copy of NanoClaw-Contingency.md.
 # ----------------------------------------------------------------------
@@ -108,6 +108,18 @@ chmod 700 "$HOME/.ssh"
 # Pre-trust github.com so the SSH clone for Lexios doesn't prompt
 ssh-keyscan -t rsa,ecdsa,ed25519 github.com >> "$HOME/.ssh/known_hosts" 2>/dev/null || true
 sort -u -o "$HOME/.ssh/known_hosts" "$HOME/.ssh/known_hosts" 2>/dev/null || true
+
+# Test mode: exit here after proving deps + rclone + R2 + ~/.ssh restore work.
+# Skips the heavy clone/build/launchd steps (~144 GB pull, npm install, container build).
+if [ "${BOOTSTRAP_TEST:-0}" = "1" ]; then
+    say "BOOTSTRAP_TEST=1 — early exit after R2 + ssh verified"
+    echo "  rclone remote 'r2': configured"
+    echo "  R2 bucket reachable: $(rclone lsd r2:${R2_BUCKET}/latest/ | wc -l | tr -d ' ') top-level dirs"
+    echo "  ~/.ssh files restored: $(ls "$HOME/.ssh" 2>/dev/null | wc -l | tr -d ' ')"
+    echo ""
+    echo "Test mode complete. Re-run without BOOTSTRAP_TEST=1 to do the full restore."
+    exit 0
+fi
 
 # ---------- Step 4: Clone + restore NanoClaw ----------
 

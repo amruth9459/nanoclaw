@@ -93,7 +93,7 @@ If you lose your Mac (or want to spin up on a VPS / second machine), run **one c
 R2_ACCESS_KEY='${R2_ACCESS_KEY}' \\
 R2_SECRET_KEY='${R2_SECRET_KEY}' \\
 R2_ENDPOINT='${R2_ENDPOINT}' \\
-bash <(curl -fsSL https://raw.githubusercontent.com/amruth9459/nanoclaw/main/scripts/bootstrap.sh)
+bash <(curl -fsSL https://raw.githubusercontent.com/amruth9459/nanoclaw/claw/cost-by-provider/scripts/bootstrap.sh)
 \`\`\`
 
 That's it. The bootstrap script handles:
