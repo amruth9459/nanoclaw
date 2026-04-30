@@ -181,6 +181,33 @@ if [ -f "$NANOCLAW_DIR/.env" ]; then
     rm -rf "$tmp_env"
 fi
 
+# ---------- Step 2b: Home dirs not covered elsewhere ----------
+# Critical user data outside the nanoclaw/Lexios trees. On restore,
+# permissions for ~/.ssh must be reset (chmod 600 id_rsa, 700 ~/.ssh).
+
+# ~/Brain — Obsidian vault (Daily, Inbox, Architecture, synthesis notes)
+if [ -d "$HOME/Brain" ]; then
+    r2_copy "$HOME/Brain/" "home/Brain/" \
+        --exclude ".obsidian/workspace*" \
+        --exclude ".obsidian/cache/**" \
+        --exclude ".trash/**" \
+        && log "copied ~/Brain/"
+fi
+
+# ~/.ssh — private keys, config, known_hosts (Tailscale, NN server, GitHub)
+if [ -d "$HOME/.ssh" ]; then
+    r2_copy "$HOME/.ssh/" "home/ssh/" \
+        --exclude "agent" \
+        --exclude "*.old" \
+        && log "copied ~/.ssh/"
+fi
+
+# ~/Downloads/Final report — HPM 523 coursework (graded paper, drafts)
+if [ -d "$HOME/Downloads/Final report" ]; then
+    r2_copy "$HOME/Downloads/Final report/" "home/Downloads-Final-report/" \
+        && log "copied ~/Downloads/Final report/"
+fi
+
 # ---------- Step 3: Generate + upload contingency doc to Google Drive ----------
 
 CONTINGENCY_DOC="${NANOCLAW_DIR}/data/contingency.md"

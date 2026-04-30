@@ -30,6 +30,8 @@ RUN apt-get update && apt-get install -y \
     ffmpeg \
     python3-pip \
     sqlite3 \
+    pandoc \
+    wkhtmltopdf \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Python libraries (base + any integration deps from skills/*/requirements.txt)

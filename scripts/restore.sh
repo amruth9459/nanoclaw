@@ -63,6 +63,31 @@ rclone copy "${R2_REMOTE}:${R2_BUCKET}/nanoclaw/env/" /tmp/nanoclaw-env-restore/
     --progress 2>/dev/null && mv /tmp/nanoclaw-env-restore/dot-env "$NANOCLAW_DIR/.env" && rm -rf /tmp/nanoclaw-env-restore \
     || echo "WARN: no .env found in R2 (you may need to create one)"
 
+# ---------- Step 2b: Restore home dirs (Brain, .ssh, coursework) ----------
+
+echo ""
+echo "Restoring home dirs from R2..."
+
+mkdir -p "$HOME/Brain"
+rclone copy "${R2_REMOTE}:${R2_BUCKET}/home/Brain/" "$HOME/Brain/" \
+    "${RCLONE_FLAGS[@]}" || echo "WARN: ~/Brain restore failed"
+
+mkdir -p "$HOME/.ssh"
+rclone copy "${R2_REMOTE}:${R2_BUCKET}/home/ssh/" "$HOME/.ssh/" \
+    "${RCLONE_FLAGS[@]}" && {
+    # rclone doesn't preserve sensitive perms — reset them
+    chmod 700 "$HOME/.ssh"
+    [ -f "$HOME/.ssh/id_rsa" ] && chmod 600 "$HOME/.ssh/id_rsa"
+    [ -f "$HOME/.ssh/config" ] && chmod 600 "$HOME/.ssh/config"
+    [ -f "$HOME/.ssh/known_hosts" ] && chmod 644 "$HOME/.ssh/known_hosts"
+    [ -f "$HOME/.ssh/id_rsa.pub" ] && chmod 644 "$HOME/.ssh/id_rsa.pub"
+    echo "~/.ssh restored and permissions reset"
+} || echo "WARN: ~/.ssh restore failed"
+
+mkdir -p "$HOME/Downloads/Final report"
+rclone copy "${R2_REMOTE}:${R2_BUCKET}/home/Downloads-Final-report/" "$HOME/Downloads/Final report/" \
+    "${RCLONE_FLAGS[@]}" || echo "WARN: ~/Downloads/Final report restore failed"
+
 # ---------- Step 3: Run integration restore hooks ----------
 
 for hook in ~/*/integrations/nanoclaw/restore-hook.sh; do
