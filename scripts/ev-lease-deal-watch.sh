@@ -55,6 +55,18 @@ honda-locator-prologue|https://automobiles.honda.com/tools/inventory-search?mode
 cadillac-locator-lyriq|https://www.cadillac.com/find-my-inventory?model=lyriq&zip=30135
 bmw-locator-i4|https://www.bmwusa.com/inventory.html#!/SR/i4/30135
 volvo-locator-ex90|https://www.volvocars.com/us/cars/ex90-electric/inventory?zipCode=30135
+swapalease-ev-national|https://www.swapalease.com/lease/search.aspx?fuel=electric&maxmopay=400&minmocount=18
+leasetrader-ev-national|https://www.leasetrader.com/search-results?fuel=electric&max_payment=400
+tesla-used-inventory|https://www.tesla.com/inventory/used/m3?zip=30135&range=300
+tesla-used-modely|https://www.tesla.com/inventory/used/my?zip=30135&range=300
+carvana-blazer-ev-valuation|https://www.carvana.com/sell-my-car
+vroom-blazer-ev-valuation|https://www.vroom.com/sell
+polestar-4-inventory|https://www.polestar.com/us/polestar-4/build/
+lucid-gravity-inventory|https://lucidmotors.com/gravity
+cadillac-vistiq-inventory|https://www.cadillac.com/electric-suvs/vistiq
+sonic-automotive-news|https://www.sonicautomotive.com/about/newsroom
+autonation-news|https://newsroom.autonation.com/
+hertz-car-sales|https://www.hertzcarsales.com/
 "
 
 echo "Fetching $(date)..."
