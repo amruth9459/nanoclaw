@@ -389,12 +389,13 @@ function buildContainerArgs(
     args.push('-e', 'HOME=/home/node');
   }
 
-  // Network isolation: non-main containers default to restricted network (no external internet).
-  // Main container keeps internet access for web browsing, API calls, etc.
-  // Set networkRestricted=false explicitly to opt out for a non-main group.
-  // Requires the nanoclaw-restricted Docker network to exist (run setup-egress.sh first).
-  const isMainGroup = group.folder === 'main';
-  const networkRestricted = group.containerConfig?.networkRestricted ?? !isMainGroup;
+  // Network: containers default to full internet (most groups need WebFetch + Anthropic API).
+  // Set containerConfig.networkRestricted=true to opt INTO the hostOnly nanoclaw-restricted
+  // network for sandboxed groups (e.g. untrusted guests). Note: hostOnly mode blocks egress
+  // entirely including api.anthropic.com — agents on this network cannot make LLM calls.
+  // Default flipped 2026-05-05 after the prior `!isMainGroup` default caused all non-main
+  // scheduled tasks to time out at API egress.
+  const networkRestricted = group.containerConfig?.networkRestricted ?? false;
   if (networkRestricted) {
     args.push('--network', 'nanoclaw-restricted');
     args.push('-e', 'NANOCLAW_NETWORK_RESTRICTED=1');
