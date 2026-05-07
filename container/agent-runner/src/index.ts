@@ -781,7 +781,8 @@ async function runQuery(
         'TeamCreate', 'TeamDelete', 'SendMessage',
         'TodoWrite', 'ToolSearch', 'Skill',
         'NotebookEdit',
-        'mcp__nanoclaw__*'
+        'mcp__nanoclaw__*',
+        'mcp__gmail__*'
       ],
       env: sdkEnv,
       permissionMode: 'bypassPermissions',
@@ -806,6 +807,12 @@ async function runQuery(
             ...(containerInput.isMain && clawEmail ? { CLAW_EMAIL: clawEmail } : {}),
             ...(containerInput.isMain && clawRedditUser ? { CLAW_REDDIT_USER: clawRedditUser } : {}),
           },
+        },
+        // Gmail MCP — uses ~/.gmail-mcp credentials mounted at /home/node/.gmail-mcp
+        // Available when ~/.gmail-mcp/credentials.json exists on host (mounted into container)
+        gmail: {
+          command: 'npx',
+          args: ['-y', '@gongrzhe/server-gmail-autoauth-mcp'],
         },
       },
       hooks: {

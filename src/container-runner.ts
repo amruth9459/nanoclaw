@@ -284,6 +284,18 @@ function buildVolumeMounts(
     readonly: false,
   });
 
+  // Gmail credentials directory (mounted RW so MCP can refresh OAuth tokens).
+  // Only mounted if ~/.gmail-mcp/ exists on host. Containers without this mount
+  // will not have Gmail tools available — graceful degradation.
+  const gmailDir = path.join(process.env.HOME || '', '.gmail-mcp');
+  if (fs.existsSync(gmailDir)) {
+    mounts.push({
+      hostPath: gmailDir,
+      containerPath: '/home/node/.gmail-mcp',
+      readonly: false,
+    });
+  }
+
   // Per-group IPC namespace: each group gets its own IPC directory
   // This prevents cross-group privilege escalation via IPC
   const groupIpcDir = path.join(DATA_DIR, 'ipc', group.folder);
