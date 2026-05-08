@@ -849,7 +849,7 @@ async function processGroupMessages(chatJid: string): Promise<boolean> {
       const isNoise = !text || text === '.' || text.length < 3
         || /^(?:acknowledged|standing by|safety|constraints?\s+(?:noted|understood|active))/i.test(text)
         || /^\(?(?:safety|here when you need|standing by|constraints)/i.test(text)
-        || /^(?:let me |checking|searching|verifying|looking|reading|i'll |i will |now let me|good[,.]? (?:let|now)|perfect[,.]? (?:let|now)|great[,.]? (?:let|now)|no (?:csv|file|data|result)s? found)/i.test(text)
+        || /^(?:let me |i need to |checking|searching|verifying|looking|reading|i'll |i will |now let me|good[,.]? (?:let|now)|perfect[,.]? (?:let|now)|great[,.]? (?:let|now)|no (?:csv|file|data|result)s? found|i (?:can see|found|notice|understand)|the (?:research|search|task|agent) )/i.test(text)
         || (/\.{3,}$/.test(text) && text.length < 150); // Short messages ending in "..." are narration
       if (text && !isNoise) {
         streamingBuffer += text;
