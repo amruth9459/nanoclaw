@@ -845,9 +845,12 @@ async function processGroupMessages(chatJid: string): Promise<boolean> {
       const raw = typeof result.result === 'string' ? result.result : JSON.stringify(result.result);
       const text = raw.replace(/<internal>[\s\S]*?<\/internal>/g, '').trim();
 
-      // Filter out noise: warmup dots, safety acknowledgments, empty responses
+      // Filter out noise: warmup dots, safety acknowledgments, narration, empty responses
       const isNoise = !text || text === '.' || text.length < 3
-        || /^(?:acknowledged|standing by|safety|constraints?\s+(?:noted|understood|active))/i.test(text);
+        || /^(?:acknowledged|standing by|safety|constraints?\s+(?:noted|understood|active))/i.test(text)
+        || /^\(?(?:safety|here when you need|standing by|constraints)/i.test(text)
+        || /^(?:let me |checking|searching|verifying|looking|reading|i'll |i will |now let me|good[,.]? (?:let|now)|perfect[,.]? (?:let|now)|great[,.]? (?:let|now)|no (?:csv|file|data|result)s? found)/i.test(text)
+        || (/\.{3,}$/.test(text) && text.length < 150); // Short messages ending in "..." are narration
       if (text && !isNoise) {
         streamingBuffer += text;
         streamingChunksSent = true;

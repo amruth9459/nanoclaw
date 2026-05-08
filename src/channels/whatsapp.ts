@@ -413,13 +413,12 @@ export class WhatsAppChannel implements Channel {
           const senderName = msg.pushName || sender.split('@')[0];
 
           const fromMe = msg.key.fromMe || false;
-          // Detect bot messages: with own number, fromMe is reliable
-          // since only the bot sends from that number.
-          // With shared number, bot messages carry the assistant name prefix
-          // (even in DMs/self-chat) so we check for that.
+          // Detect bot messages: with own number, fromMe is reliable.
+          // With shared number, use prefix check BUT only if fromMe is true —
+          // otherwise quoted replies from other users ("> Claw: ...") get misclassified.
           const isBotMessage = ASSISTANT_HAS_OWN_NUMBER
             ? fromMe
-            : content.startsWith(`${ASSISTANT_NAME}:`);
+            : fromMe && content.startsWith(`${ASSISTANT_NAME}:`);
 
           // Append audio transcription to message content
           let messageContent = fullContent || (effectiveMedia ? `[${effectiveMedia.type}]` : '');

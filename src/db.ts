@@ -764,19 +764,20 @@ export function getNewMessages(
   if (jids.length === 0) return { messages: [], newTimestamp: lastTimestamp };
 
   const placeholders = jids.map(() => '?').join(',');
-  // Filter bot messages using both the is_bot_message flag AND the content
-  // prefix as a backstop for messages written before the migration ran.
+  // Filter bot messages using is_bot_message flag only.
+  // Previously also checked content NOT LIKE 'Claw:%' as a backstop, but this
+  // caused false positives on quoted replies (user quoting bot → starts with "Claw:").
   const sql = `
     SELECT id, chat_jid, sender, sender_name, content, timestamp, media_type, media_path, media_mimetype, media_size
     FROM messages
     WHERE timestamp > ? AND chat_jid IN (${placeholders})
-      AND is_bot_message = 0 AND content NOT LIKE ?
+      AND is_bot_message = 0
     ORDER BY timestamp
   `;
 
   const rows = db
     .prepare(sql)
-    .all(lastTimestamp, ...jids, `${botPrefix}:%`) as NewMessage[];
+    .all(lastTimestamp, ...jids) as NewMessage[];
 
   let newTimestamp = lastTimestamp;
   for (const row of rows) {
@@ -791,18 +792,16 @@ export function getMessagesSince(
   sinceTimestamp: string,
   botPrefix: string,
 ): NewMessage[] {
-  // Filter bot messages using both the is_bot_message flag AND the content
-  // prefix as a backstop for messages written before the migration ran.
   const sql = `
     SELECT id, chat_jid, sender, sender_name, content, timestamp, media_type, media_path, media_mimetype, media_size
     FROM messages
     WHERE chat_jid = ? AND timestamp > ?
-      AND is_bot_message = 0 AND content NOT LIKE ?
+      AND is_bot_message = 0
     ORDER BY timestamp
   `;
   return db
     .prepare(sql)
-    .all(chatJid, sinceTimestamp, `${botPrefix}:%`) as NewMessage[];
+    .all(chatJid, sinceTimestamp) as NewMessage[];
 }
 
 export function createTask(
