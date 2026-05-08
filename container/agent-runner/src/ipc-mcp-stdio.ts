@@ -20,6 +20,7 @@ const chatJid = process.env.NANOCLAW_CHAT_JID!;
 const groupFolder = process.env.NANOCLAW_GROUP_FOLDER!;
 const isMain = process.env.NANOCLAW_IS_MAIN === '1';
 const agentId = process.env.NANOCLAW_AGENT_ID; // Cryptographic agent identity (may be undefined during migration)
+const isScheduledTask = process.env.NANOCLAW_IS_SCHEDULED_TASK === '1';
 
 function writeIpcFile(dir: string, data: object): string {
   fs.mkdirSync(dir, { recursive: true });
@@ -41,8 +42,9 @@ const server = new McpServer({
 });
 
 // Message discipline — soft limit with escalating warnings, hard limit as safety net
-const SOFT_LIMIT = isMain ? 20 : 3;
-const HARD_LIMIT = isMain ? 50 : 10;
+// Scheduled tasks get the strictest limits — they run unattended and must not spam
+const SOFT_LIMIT = isScheduledTask ? 1 : isMain ? 20 : 3;
+const HARD_LIMIT = isScheduledTask ? 2 : isMain ? 50 : 8;
 let messagesSentThisQuery = 0;
 
 server.tool(

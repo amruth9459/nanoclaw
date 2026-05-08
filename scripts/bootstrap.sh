@@ -90,12 +90,21 @@ else
     [ -n "${R2_ACCESS_KEY:-}" ] && [ -n "${R2_SECRET_KEY:-}" ] && [ -n "${R2_ENDPOINT:-}" ] \
         || die "R2 credentials missing"
 
-    rclone config create r2 s3 \
-        provider Cloudflare \
-        access_key_id "$R2_ACCESS_KEY" \
-        secret_access_key "$R2_SECRET_KEY" \
-        endpoint "$R2_ENDPOINT" \
-        --non-interactive >/dev/null
+    # Write rclone.conf directly — works across rclone versions without
+    # depending on flags like --non-interactive (added in 1.62, missing on
+    # Ubuntu 22.04's stock 1.53).
+    RCLONE_CONF_DIR="$HOME/.config/rclone"
+    mkdir -p "$RCLONE_CONF_DIR"
+    chmod 700 "$RCLONE_CONF_DIR"
+    cat >> "$RCLONE_CONF_DIR/rclone.conf" <<RCLONE_EOF
+[r2]
+type = s3
+provider = Cloudflare
+access_key_id = ${R2_ACCESS_KEY}
+secret_access_key = ${R2_SECRET_KEY}
+endpoint = ${R2_ENDPOINT}
+RCLONE_EOF
+    chmod 600 "$RCLONE_CONF_DIR/rclone.conf"
     say "rclone 'r2' configured"
 fi
 

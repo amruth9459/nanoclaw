@@ -845,11 +845,16 @@ async function processGroupMessages(chatJid: string): Promise<boolean> {
       const raw = typeof result.result === 'string' ? result.result : JSON.stringify(result.result);
       const text = raw.replace(/<internal>[\s\S]*?<\/internal>/g, '').trim();
 
-      if (text) {
+      // Filter out noise: warmup dots, safety acknowledgments, empty responses
+      const isNoise = !text || text === '.' || text.length < 3
+        || /^(?:acknowledged|standing by|safety|constraints?\s+(?:noted|understood|active))/i.test(text);
+      if (text && !isNoise) {
         streamingBuffer += text;
         streamingChunksSent = true;
         logger.info({ group: group.name }, `Streaming chunk: ${text.slice(0, 300)}...`);
         resetIdleTimer();
+      } else if (isNoise && text) {
+        logger.debug({ group: group.name, noise: text.slice(0, 50) }, 'Filtered noise from output');
       }
     }
     // Handle final result — send accumulated buffer as ONE message
