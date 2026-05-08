@@ -5,6 +5,126 @@
 
 ---
 
+### 2026-05-07 21:53
+
+**Areas:** hooks
+**Files (20):** .claude/hooks/brain-digest-inject.sh, .claude/projects/-Users-amrut-Lexios/memory/MEMORY.md, .claude/projects/-Users-amrut-Lexios/memory/lexios_strategic_frame.md, .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut-nanoclaw/memory/competitive_clawdi.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_hpm523_rigor.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_no_site_managers.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_session_learnings.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_user_writing_style.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_clawsweeper_roadmap.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_drafts_inventory.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_state_report.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_subject_background.md, .claude/projects/-Users-amrut/memory/MEMORY.md, .claude/settings.json, .config/ghostty/config, .config/ghostty/launch.sh, .config/ghostty/migrate-tmux.sh, .config/zellij/config.kdl, .config/zellij/layouts/sidebar.kdl
+**Diff:** +149 -6 across 4 files
+
+### 2026-05-07 21:51
+
+**Areas:** hooks
+**Files (20):** .claude/hooks/brain-digest-inject.sh, .claude/projects/-Users-amrut-Lexios/memory/MEMORY.md, .claude/projects/-Users-amrut-Lexios/memory/lexios_strategic_frame.md, .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut-nanoclaw/memory/competitive_clawdi.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_hpm523_rigor.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_no_site_managers.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_session_learnings.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_user_writing_style.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_clawsweeper_roadmap.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_drafts_inventory.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_state_report.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_subject_background.md, .claude/projects/-Users-amrut/memory/MEMORY.md, .claude/settings.json, .config/ghostty/config, .config/ghostty/launch.sh, .config/ghostty/migrate-tmux.sh, .config/zellij/config.kdl, .config/zellij/layouts/sidebar.kdl
+**Diff:** +129 -2 across 3 files
+
+### 2026-05-07 21:51
+
+**Areas:** hooks
+**Files (20):** .claude/hooks/brain-digest-inject.sh, .claude/projects/-Users-amrut-Lexios/memory/MEMORY.md, .claude/projects/-Users-amrut-Lexios/memory/lexios_strategic_frame.md, .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut-nanoclaw/memory/competitive_clawdi.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_hpm523_rigor.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_no_site_managers.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_session_learnings.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_user_writing_style.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_clawsweeper_roadmap.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_drafts_inventory.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_state_report.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_subject_background.md, .claude/projects/-Users-amrut/memory/MEMORY.md, .claude/settings.json, .config/ghostty/config, .config/ghostty/launch.sh, .config/ghostty/migrate-tmux.sh, .config/zellij/config.kdl, .config/zellij/layouts/sidebar.kdl
+**Diff:** +123 -2 across 3 files
+
+### 2026-05-07 21:49
+
+**Areas:** hooks
+**Files (20):** .claude/hooks/brain-digest-inject.sh, .claude/projects/-Users-amrut-Lexios/memory/MEMORY.md, .claude/projects/-Users-amrut-Lexios/memory/lexios_strategic_frame.md, .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut-nanoclaw/memory/competitive_clawdi.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_hpm523_rigor.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_no_site_managers.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_session_learnings.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_user_writing_style.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_clawsweeper_roadmap.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_drafts_inventory.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_state_report.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_subject_background.md, .claude/projects/-Users-amrut/memory/MEMORY.md, .claude/settings.json, .config/ghostty/config, .config/ghostty/launch.sh, .config/ghostty/migrate-tmux.sh, .config/zellij/config.kdl, .config/zellij/layouts/sidebar.kdl
+**Diff:** +117 -2 across 3 files
+
+### 2026-05-07 21:48
+
+**Areas:** hooks
+**Files (20):** .claude/hooks/brain-digest-inject.sh, .claude/projects/-Users-amrut-Lexios/memory/MEMORY.md, .claude/projects/-Users-amrut-Lexios/memory/lexios_strategic_frame.md, .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut-nanoclaw/memory/competitive_clawdi.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_hpm523_rigor.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_no_site_managers.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_session_learnings.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_user_writing_style.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_clawsweeper_roadmap.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_drafts_inventory.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_state_report.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_subject_background.md, .claude/projects/-Users-amrut/memory/MEMORY.md, .claude/settings.json, .config/ghostty/config, .config/ghostty/launch.sh, .config/ghostty/migrate-tmux.sh, .config/zellij/config.kdl, .config/zellij/layouts/sidebar.kdl
+**Diff:** +111 -2 across 3 files
+
+### 2026-05-07 21:42
+
+**Areas:** hooks
+**Files (20):** .claude/hooks/brain-digest-inject.sh, .claude/projects/-Users-amrut-Lexios/memory/MEMORY.md, .claude/projects/-Users-amrut-Lexios/memory/lexios_strategic_frame.md, .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut-nanoclaw/memory/competitive_clawdi.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_hpm523_rigor.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_no_site_managers.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_session_learnings.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_user_writing_style.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_clawsweeper_roadmap.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_drafts_inventory.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_state_report.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_subject_background.md, .claude/projects/-Users-amrut/memory/MEMORY.md, .claude/settings.json, .config/ghostty/config, .config/ghostty/launch.sh, .config/zellij/config.kdl, .config/zellij/layouts/sidebar.kdl, .githooks/no-lexios-in-core.sh
+**Diff:** +105 -2 across 3 files
+
+### 2026-05-07 21:40
+
+**Areas:** hooks
+**Files (20):** .claude/hooks/brain-digest-inject.sh, .claude/projects/-Users-amrut-Lexios/memory/MEMORY.md, .claude/projects/-Users-amrut-Lexios/memory/lexios_strategic_frame.md, .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut-nanoclaw/memory/competitive_clawdi.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_hpm523_rigor.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_no_site_managers.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_session_learnings.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_user_writing_style.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_clawsweeper_roadmap.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_drafts_inventory.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_state_report.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_subject_background.md, .claude/projects/-Users-amrut/memory/MEMORY.md, .claude/settings.json, .config/ghostty/config, .config/ghostty/launch.sh, .config/zellij/config.kdl, .config/zellij/layouts/sidebar.kdl, .githooks/no-lexios-in-core.sh
+**Diff:** +99 -2 across 3 files
+
+### 2026-05-07 21:36
+
+**Areas:** hooks
+**Files (20):** .claude/hooks/brain-digest-inject.sh, .claude/projects/-Users-amrut-Lexios/memory/MEMORY.md, .claude/projects/-Users-amrut-Lexios/memory/lexios_strategic_frame.md, .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut-nanoclaw/memory/competitive_clawdi.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_hpm523_rigor.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_no_site_managers.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_session_learnings.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_user_writing_style.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_clawsweeper_roadmap.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_drafts_inventory.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_state_report.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_subject_background.md, .claude/projects/-Users-amrut/memory/MEMORY.md, .claude/settings.json, .config/ghostty/config, .config/ghostty/launch.sh, .config/zellij/config.kdl, .config/zellij/layouts/sidebar.kdl, .githooks/no-lexios-in-core.sh
+**Diff:** +93 -2 across 3 files
+
+### 2026-05-07 21:34
+
+**Areas:** hooks
+**Files (20):** .claude/hooks/brain-digest-inject.sh, .claude/projects/-Users-amrut-Lexios/memory/MEMORY.md, .claude/projects/-Users-amrut-Lexios/memory/lexios_strategic_frame.md, .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut-nanoclaw/memory/competitive_clawdi.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_hpm523_rigor.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_no_site_managers.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_session_learnings.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_user_writing_style.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_clawsweeper_roadmap.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_drafts_inventory.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_state_report.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_subject_background.md, .claude/projects/-Users-amrut/memory/MEMORY.md, .claude/settings.json, .config/ghostty/config, .config/ghostty/launch.sh, .config/zellij/config.kdl, .config/zellij/layouts/sidebar.kdl, .githooks/no-lexios-in-core.sh
+**Diff:** +87 -2 across 3 files
+
+### 2026-05-07 21:34
+
+**Areas:** hooks
+**Files (20):** .claude/hooks/brain-digest-inject.sh, .claude/projects/-Users-amrut-Lexios/memory/MEMORY.md, .claude/projects/-Users-amrut-Lexios/memory/lexios_strategic_frame.md, .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut-nanoclaw/memory/competitive_clawdi.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_hpm523_rigor.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_no_site_managers.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_session_learnings.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_user_writing_style.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_clawsweeper_roadmap.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_drafts_inventory.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_state_report.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_subject_background.md, .claude/projects/-Users-amrut/memory/MEMORY.md, .claude/settings.json, .config/ghostty/config, .config/ghostty/launch.sh, .config/zellij/config.kdl, .config/zellij/layouts/sidebar.kdl, .githooks/no-lexios-in-core.sh
+**Diff:** +81 -2 across 3 files
+
+### 2026-05-07 21:33
+
+**Areas:** hooks
+**Files (20):** .claude/hooks/brain-digest-inject.sh, .claude/projects/-Users-amrut-Lexios/memory/MEMORY.md, .claude/projects/-Users-amrut-Lexios/memory/lexios_strategic_frame.md, .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut-nanoclaw/memory/competitive_clawdi.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_hpm523_rigor.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_no_site_managers.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_session_learnings.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_user_writing_style.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_clawsweeper_roadmap.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_drafts_inventory.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_state_report.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_subject_background.md, .claude/projects/-Users-amrut/memory/MEMORY.md, .claude/settings.json, .config/ghostty/config, .config/ghostty/launch.sh, .config/zellij/config.kdl, .config/zellij/layouts/sidebar.kdl, .githooks/no-lexios-in-core.sh
+**Diff:** +75 -2 across 3 files
+
+### 2026-05-07 21:32
+
+**Areas:** hooks
+**Files (20):** .claude/hooks/brain-digest-inject.sh, .claude/projects/-Users-amrut-Lexios/memory/MEMORY.md, .claude/projects/-Users-amrut-Lexios/memory/lexios_strategic_frame.md, .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut-nanoclaw/memory/competitive_clawdi.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_hpm523_rigor.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_no_site_managers.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_session_learnings.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_user_writing_style.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_clawsweeper_roadmap.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_drafts_inventory.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_state_report.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_subject_background.md, .claude/projects/-Users-amrut/memory/MEMORY.md, .claude/settings.json, .config/ghostty/config, .config/ghostty/launch.sh, .config/zellij/config.kdl, .config/zellij/layouts/sidebar.kdl, .githooks/no-lexios-in-core.sh
+**Diff:** +69 -2 across 3 files
+
+### 2026-05-07 21:25
+
+**Areas:** hooks
+**Files (20):** .claude/hooks/brain-digest-inject.sh, .claude/projects/-Users-amrut-Lexios/memory/MEMORY.md, .claude/projects/-Users-amrut-Lexios/memory/lexios_strategic_frame.md, .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut-nanoclaw/memory/competitive_clawdi.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_hpm523_rigor.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_no_site_managers.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_session_learnings.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_user_writing_style.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_clawsweeper_roadmap.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_drafts_inventory.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_state_report.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_subject_background.md, .claude/projects/-Users-amrut/memory/MEMORY.md, .claude/settings.json, .config/ghostty/config, .config/zellij/config.kdl, .config/zellij/layouts/sidebar.kdl, .githooks/no-lexios-in-core.sh, Brain/Inbox/synthesis/2026-04-29-a2ui-lexios-vision.md
+**Diff:** +63 -2 across 3 files
+
+### 2026-05-07 21:25
+
+**Areas:** hooks
+**Files (20):** .claude/hooks/brain-digest-inject.sh, .claude/projects/-Users-amrut-Lexios/memory/MEMORY.md, .claude/projects/-Users-amrut-Lexios/memory/lexios_strategic_frame.md, .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut-nanoclaw/memory/competitive_clawdi.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_hpm523_rigor.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_no_site_managers.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_session_learnings.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_user_writing_style.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_clawsweeper_roadmap.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_drafts_inventory.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_state_report.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_subject_background.md, .claude/projects/-Users-amrut/memory/MEMORY.md, .claude/settings.json, .config/ghostty/config, .config/zellij/config.kdl, .config/zellij/layouts/sidebar.kdl, .githooks/no-lexios-in-core.sh, Brain/Inbox/synthesis/2026-04-29-a2ui-lexios-vision.md
+**Diff:** +57 -2 across 3 files
+
+### 2026-05-07 21:25
+
+**Areas:** hooks
+**Files (20):** .claude/hooks/brain-digest-inject.sh, .claude/projects/-Users-amrut-Lexios/memory/MEMORY.md, .claude/projects/-Users-amrut-Lexios/memory/lexios_strategic_frame.md, .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut-nanoclaw/memory/competitive_clawdi.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_hpm523_rigor.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_no_site_managers.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_session_learnings.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_user_writing_style.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_clawsweeper_roadmap.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_drafts_inventory.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_state_report.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_subject_background.md, .claude/projects/-Users-amrut/memory/MEMORY.md, .claude/settings.json, .config/ghostty/config, .config/zellij/config.kdl, .config/zellij/layouts/sidebar.kdl, .githooks/no-lexios-in-core.sh, Brain/Inbox/synthesis/2026-04-29-a2ui-lexios-vision.md
+**Diff:** +51 -2 across 3 files
+
+### 2026-05-07 21:24
+
+**Areas:** hooks
+**Files (20):** .claude/hooks/brain-digest-inject.sh, .claude/projects/-Users-amrut-Lexios/memory/MEMORY.md, .claude/projects/-Users-amrut-Lexios/memory/lexios_strategic_frame.md, .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut-nanoclaw/memory/competitive_clawdi.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_hpm523_rigor.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_no_site_managers.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_session_learnings.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_user_writing_style.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_clawsweeper_roadmap.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_drafts_inventory.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_state_report.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_subject_background.md, .claude/projects/-Users-amrut/memory/MEMORY.md, .claude/settings.json, .config/ghostty/config, .config/zellij/config.kdl, .config/zellij/layouts/sidebar.kdl, .githooks/no-lexios-in-core.sh, Brain/Inbox/synthesis/2026-04-29-a2ui-lexios-vision.md
+**Diff:** +45 -2 across 3 files
+
+### 2026-05-07 21:22
+
+**Areas:** hooks
+**Files (20):** .claude/hooks/brain-digest-inject.sh, .claude/projects/-Users-amrut-Lexios/memory/MEMORY.md, .claude/projects/-Users-amrut-Lexios/memory/lexios_strategic_frame.md, .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut-nanoclaw/memory/competitive_clawdi.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_hpm523_rigor.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_no_site_managers.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_session_learnings.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_user_writing_style.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_clawsweeper_roadmap.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_drafts_inventory.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_state_report.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_subject_background.md, .claude/projects/-Users-amrut/memory/MEMORY.md, .claude/settings.json, .config/ghostty/config, .config/zellij/config.kdl, .config/zellij/layouts/sidebar.kdl, .githooks/no-lexios-in-core.sh, Brain/Inbox/synthesis/2026-04-29-a2ui-lexios-vision.md
+**Diff:** +39 -2 across 3 files
+
+### 2026-05-07 21:19
+
+**Areas:** hooks
+**Files (20):** .claude/hooks/brain-digest-inject.sh, .claude/projects/-Users-amrut-Lexios/memory/MEMORY.md, .claude/projects/-Users-amrut-Lexios/memory/lexios_strategic_frame.md, .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut-nanoclaw/memory/competitive_clawdi.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_hpm523_rigor.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_no_site_managers.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_session_learnings.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_user_writing_style.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_clawsweeper_roadmap.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_drafts_inventory.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_state_report.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_subject_background.md, .claude/projects/-Users-amrut/memory/MEMORY.md, .claude/settings.json, .config/ghostty/config, .config/zellij/config.kdl, .config/zellij/layouts/sidebar.kdl, .githooks/no-lexios-in-core.sh, Brain/Inbox/synthesis/2026-04-29-a2ui-lexios-vision.md
+**Diff:** +33 -2 across 3 files
+
+### 2026-05-07 21:17
+
+**Areas:** hooks
+**Files (20):** .claude/hooks/brain-digest-inject.sh, .claude/projects/-Users-amrut-Lexios/memory/MEMORY.md, .claude/projects/-Users-amrut-Lexios/memory/lexios_strategic_frame.md, .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut-nanoclaw/memory/competitive_clawdi.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_hpm523_rigor.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_no_site_managers.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_session_learnings.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_user_writing_style.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_clawsweeper_roadmap.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_drafts_inventory.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_state_report.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_subject_background.md, .claude/projects/-Users-amrut/memory/MEMORY.md, .claude/settings.json, .config/ghostty/config, .config/zellij/config.kdl, .githooks/no-lexios-in-core.sh, Brain/Inbox/synthesis/2026-04-29-a2ui-lexios-vision.md, Brain/Inbox/synthesis/2026-04-29-cold-call-shortlist.md
+**Diff:** +27 -2 across 3 files
+
+### 2026-05-07 21:14
+
+**Areas:** hooks
+**Files (20):** .claude/hooks/brain-digest-inject.sh, .claude/projects/-Users-amrut-Lexios/memory/MEMORY.md, .claude/projects/-Users-amrut-Lexios/memory/lexios_strategic_frame.md, .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut-nanoclaw/memory/competitive_clawdi.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_hpm523_rigor.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_no_site_managers.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_session_learnings.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_user_writing_style.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_clawsweeper_roadmap.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_drafts_inventory.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_state_report.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_subject_background.md, .claude/projects/-Users-amrut/memory/MEMORY.md, .claude/settings.json, .config/ghostty/config, .config/zellij/config.kdl, .githooks/no-lexios-in-core.sh, Brain/Inbox/synthesis/2026-04-29-a2ui-lexios-vision.md, Brain/Inbox/synthesis/2026-04-29-cold-call-shortlist.md
+**Diff:** +21 -2 across 2 files
+
 ### 2026-05-07 21:05
 
 **Areas:** hooks

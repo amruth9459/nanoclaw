@@ -47,13 +47,23 @@ if [ "$PLATFORM" = macos ]; then
     brew install rclone git node@20 python@3.12 cloudflared 2>&1 | tail -5 || true
     brew link --overwrite --force node@20 2>/dev/null || true
 elif [ "$PLATFORM" = linux ]; then
+    # Use sudo if needed; if we're root or sudo is missing, run directly.
+    if [ "$(id -u)" -eq 0 ] || ! command -v sudo &>/dev/null; then
+        SUDO=""
+    else
+        SUDO="sudo"
+    fi
     if command -v apt-get &>/dev/null; then
-        sudo apt-get update -qq
-        sudo apt-get install -y -qq curl git python3 python3-venv python3-pip rclone unzip
+        $SUDO apt-get update -qq
+        $SUDO apt-get install -y -qq curl git python3 python3-venv python3-pip rclone unzip
         # Node 20 via NodeSource
         if ! command -v node &>/dev/null; then
-            curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
-            sudo apt-get install -y -qq nodejs
+            if [ -n "$SUDO" ]; then
+                curl -fsSL https://deb.nodesource.com/setup_20.x | $SUDO -E bash -
+            else
+                curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
+            fi
+            $SUDO apt-get install -y -qq nodejs
         fi
     else
         die "Only apt-get-based Linux is supported in bootstrap. Install rclone/git/node/python3 manually then re-run."
