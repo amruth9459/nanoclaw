@@ -156,6 +156,7 @@ r2_copy "$NANOCLAW_DIR/groups/" "nanoclaw/groups/" \
     --exclude "ggml/**" \
     --exclude "gguf/**" \
     --exclude "node_modules/**" \
+    --exclude ".archive/**" \
     && log "copied groups/"
 
 # data/ — session state (exclude transient IPC json)
