@@ -5,6 +5,24 @@
 
 ---
 
+### 2026-05-13 16:52
+
+**Areas:** hooks
+**Files (20):** .cache/zellij/permissions.kdl, .claude/hooks/brain-digest-inject.sh, .claude/hooks/image-safe-gate.sh, .claude/projects/-Users-amrut-Lexios/memory/MEMORY.md, .claude/projects/-Users-amrut-Lexios/memory/lexios_strategic_frame.md, .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut-nanoclaw/memory/competitive_clawdi.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_hpm523_rigor.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_no_site_managers.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_session_learnings.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_user_writing_style.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_clawsweeper_roadmap.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_drafts_inventory.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_state_report.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_subject_background.md, .claude/projects/-Users-amrut/memory/MEMORY.md, .claude/projects/-Users-amrut/memory/project_image_gate_coverage_followup.md, .claude/projects/-Users-amrut/memory/reference_image_safe_gate.md, .claude/settings.json, .config/ghostty/config
+**Diff:** +33 -2 across 3 files
+
+### 2026-05-13 16:35
+
+**Areas:** hooks
+**Files (20):** .cache/zellij/permissions.kdl, .claude/hooks/brain-digest-inject.sh, .claude/hooks/image-safe-gate.sh, .claude/projects/-Users-amrut-Lexios/memory/MEMORY.md, .claude/projects/-Users-amrut-Lexios/memory/lexios_strategic_frame.md, .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut-nanoclaw/memory/competitive_clawdi.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_hpm523_rigor.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_no_site_managers.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_session_learnings.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_user_writing_style.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_clawsweeper_roadmap.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_drafts_inventory.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_state_report.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_subject_background.md, .claude/projects/-Users-amrut/memory/MEMORY.md, .claude/projects/-Users-amrut/memory/project_image_gate_coverage_followup.md, .claude/projects/-Users-amrut/memory/reference_image_safe_gate.md, .claude/settings.json, .config/ghostty/config
+**Diff:** +27 -2 across 3 files
+
+### 2026-05-13 15:54
+
+**Areas:** hooks
+**Files (20):** .cache/zellij/permissions.kdl, .claude/hooks/brain-digest-inject.sh, .claude/hooks/image-safe-gate.sh, .claude/projects/-Users-amrut-Lexios/memory/MEMORY.md, .claude/projects/-Users-amrut-Lexios/memory/lexios_strategic_frame.md, .claude/projects/-Users-amrut-nanoclaw/memory/MEMORY.md, .claude/projects/-Users-amrut-nanoclaw/memory/competitive_clawdi.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_hpm523_rigor.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_no_site_managers.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_session_learnings.md, .claude/projects/-Users-amrut-nanoclaw/memory/feedback_user_writing_style.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_clawsweeper_roadmap.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_drafts_inventory.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_state_report.md, .claude/projects/-Users-amrut-nanoclaw/memory/project_hpm523_subject_background.md, .claude/projects/-Users-amrut/memory/MEMORY.md, .claude/projects/-Users-amrut/memory/project_image_gate_coverage_followup.md, .claude/projects/-Users-amrut/memory/reference_image_safe_gate.md, .claude/settings.json, .config/ghostty/config
+**Diff:** +21 -2 across 2 files
+
 ### 2026-05-13 15:39
 
 **Areas:** hooks
