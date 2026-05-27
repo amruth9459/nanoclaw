@@ -1751,7 +1751,10 @@ async function main(): Promise<void> {
     personaRegistry = new PersonaRegistry(getDb());
     personaRegistry.initSchema();
     const count = await personaRegistry.scan();
-    logger.info({ count }, 'Persona registry scanned (embedding deferred)');
+    logger.info({ count }, 'Persona registry scanned (embedding in background)');
+    personaRegistry.embedPersonas()
+      .then(n => logger.info({ embedded: n }, 'Persona embeddings ready'))
+      .catch(err => logger.error({ err }, 'Persona embedding background failed'));
   } catch (err) {
     logger.warn({ err }, 'Persona registry init failed — auto-dispatch disabled');
   }
