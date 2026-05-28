@@ -74,6 +74,12 @@ When you discover something non-obvious that would help future sessions:
 - **Lexios learnings** → add to `~/Lexios/docs/LEARNINGS.md` under `## Learned Facts` as `- **topic:** detail`
 These feed into Claw's hot cache and benefit both desktop and container agents.
 
+## Cloudflare Integration
+
+Agents can deploy to Cloudflare and register domains via `cloudflare_*` MCP tools.
+Setup, tool reference, and HITL flow live in [docs/CLOUDFLARE_INTEGRATION.md](docs/CLOUDFLARE_INTEGRATION.md).
+Account creation is the only step that can't be done via API — sign up once at dash.cloudflare.com.
+
 ## Integration Boundary
 
 Core files (`src/*.ts`, `container/Dockerfile`, `container/agent-runner/src/ipc-mcp-stdio.ts`) must NEVER reference integration-specific names (e.g. `lexios`, `ezdxf`, `ifcopenshell`). All integration logic goes through `src/integration-types.ts` hooks. Integration-specific code lives in `src/integrations/`, `container/skills/`, `scripts/`, `groups/`, and `docs/`. A pre-commit hook (`.githooks/no-lexios-in-core.sh`) enforces this.
