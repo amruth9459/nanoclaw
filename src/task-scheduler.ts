@@ -41,12 +41,29 @@ const SILENCE_SENTINELS: RegExp[] = [
   /^(claw:\s*)?no new (roles?|opportunities|leads?|listings?|matches|deals?|items?) found.*$/i,
   /^(claw:\s*)?nothing( new)? to report\.?\s*$/i,
   /^(claw:\s*)?no actionable (findings|results?|opportunities)\.?\s*$/i,
+  // Pre-work narration that some agents emit as their final result
+  /^(claw:\s*)?i'?ll (generate|run|check|verify|create|prepare|review|fetch|search) /i,
+  /^(claw:\s*)?let me (check|verify|generate|run|prepare|review) /i,
+  /^(claw:\s*)?running (the )?(daily |morning |evening |security |nightly )?(report|briefing|audit|scan|check|review)/i,
+  /^(claw:\s*)?generating (the )?(daily |morning |evening |security |nightly )?(report|briefing)/i,
+];
+
+// Safety acknowledgment messages — agents echoing safety-pulse reminders.
+// These can be longer than the silence-sentinel guard (bullet lists), so
+// matched separately with no length cap.
+const SAFETY_ACK_PATTERNS: RegExp[] = [
+  /^(claw:\s*)?safety (constraints?|reminder)s? (acknowledged|noted|active)/i,
+  /^(claw:\s*)?acknowledged[.!]?\s*all (safety )?constraints/i,
+  /^(claw:\s*)?standing by[.!]?\s*$/i,
 ];
 
 function isSilenceSentinel(text: string | null | undefined): boolean {
   if (!text) return false;
   const trimmed = text.trim();
-  if (trimmed.length > 200) return false; // real findings are longer
+  // Safety acks: any length, since the bullet list is all boilerplate
+  if (SAFETY_ACK_PATTERNS.some(re => re.test(trimmed))) return true;
+  // Other sentinels only match short messages — real reports are long
+  if (trimmed.length > 500) return false;
   return SILENCE_SENTINELS.some(re => re.test(trimmed));
 }
 
