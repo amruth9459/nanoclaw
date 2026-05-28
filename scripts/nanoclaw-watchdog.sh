@@ -7,18 +7,20 @@ PLIST="$HOME/Library/LaunchAgents/com.nanoclaw.plist"
 
 log() { echo "$(date '+%Y-%m-%d %H:%M:%S') $1" >> "$LOG"; }
 
-# Check if com.nanoclaw is loaded and running
-STATUS=$(launchctl list 2>/dev/null | grep "com.nanoclaw " | awk '{print $1}')
+# launchctl print is the only reliable way to check service state on macOS 13+
+# (launchctl list omits some caffeinate-wrapped LaunchAgents)
+DOMAIN="gui/$(id -u)/com.nanoclaw"
+PRINT_OUT=$(launchctl print "$DOMAIN" 2>/dev/null)
 
-if [ -z "$STATUS" ]; then
-    log "WARN: com.nanoclaw not registered — loading plist"
-    launchctl load -w "$PLIST" 2>>"$LOG"
-elif [ "$STATUS" = "-" ]; then
+if [ -z "$PRINT_OUT" ]; then
+    log "WARN: com.nanoclaw not registered — bootstrapping plist"
+    launchctl bootstrap "gui/$(id -u)" "$PLIST" 2>>"$LOG"
+elif echo "$PRINT_OUT" | grep -q "state = not running"; then
     log "WARN: com.nanoclaw registered but not running (crashed) — kickstarting"
-    launchctl kickstart gui/$(id -u)/com.nanoclaw 2>>"$LOG"
-else
-    # Running — check if it's actually responsive (port 8080 or 3002)
-    if ! lsof -i :8080 -t >/dev/null 2>&1 && ! lsof -i :3002 -t >/dev/null 2>&1; then
-        log "WARN: com.nanoclaw running (PID $STATUS) but no ports open — may be stuck"
+    launchctl kickstart "$DOMAIN" 2>>"$LOG"
+elif echo "$PRINT_OUT" | grep -q "state = running"; then
+    # Running — verify responsiveness via DashClaw port
+    if ! lsof -i :3002 -t >/dev/null 2>&1 && ! lsof -i :8080 -t >/dev/null 2>&1; then
+        log "WARN: com.nanoclaw running but no ports open — may be stuck"
     fi
 fi

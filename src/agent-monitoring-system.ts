@@ -213,10 +213,20 @@ export async function generateDailySafetyBrief(targetDate?: string): Promise<str
     brief += `✅ No flagged actions today.\n`;
   }
 
-  // Store brief
+  // Store brief — ON CONFLICT UPDATE keeps the latest brief for the day,
+  // preventing UNIQUE constraint race when two IPC processes generate the same date.
   db.prepare(`
     INSERT INTO safety_briefs (date, total_actions, flagged_actions, high_risk_actions, self_modifications, intent_drifts, resource_abuses, brief_text, sent_at)
     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+    ON CONFLICT(date) DO UPDATE SET
+      total_actions = excluded.total_actions,
+      flagged_actions = excluded.flagged_actions,
+      high_risk_actions = excluded.high_risk_actions,
+      self_modifications = excluded.self_modifications,
+      intent_drifts = excluded.intent_drifts,
+      resource_abuses = excluded.resource_abuses,
+      brief_text = excluded.brief_text,
+      sent_at = excluded.sent_at
   `).run(
     date,
     actionStats.total,
