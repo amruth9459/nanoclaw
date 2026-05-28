@@ -40,8 +40,16 @@ export function stripInternalTags(text: string): string {
   return text.replace(/<internal>[\s\S]*?<\/internal>/g, '').trim();
 }
 
+// Zero-width and similar invisible characters. Agents sometimes emit U+200B
+// alone as a "silent finish" signal — naive .trim() doesn't strip these, so
+// the orchestrator was sending "Claw: ​" (just the prefix + ZWS) as actual
+// WhatsApp messages.
+const INVISIBLE_CHARS = /[\u200B\u200C\u200D\u2060\uFEFF\u00AD]/g;
+
 export function formatOutbound(rawText: string): string {
-  const text = stripInternalTags(rawText);
+  const text = stripInternalTags(rawText)
+    .replace(INVISIBLE_CHARS, '')
+    .trim();
   if (!text) return '';
   return text;
 }

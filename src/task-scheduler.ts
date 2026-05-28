@@ -27,6 +27,29 @@ import { getIntegrations } from './integration-loader.js';
 import { AgentPriority, ResourceOrchestrator } from './resource-orchestrator.js';
 import { RegisteredGroup, ScheduledTask } from './types.js';
 
+/**
+ * Silence sentinels — when a scheduled task's final result matches one of
+ * these, it's an "internal" signal that there's nothing actionable to report.
+ * Don't forward it as a WhatsApp message (caused 119/139 = 86% of EV-lease
+ * group messages over 7d to be spam).
+ *
+ * Also matches the "Claw: " prefix that sendMessage adds in non-shared-number mode.
+ */
+const SILENCE_SENTINELS: RegExp[] = [
+  /^(claw:\s*)?no response requested\.?\s*$/i,
+  /^(claw:\s*)?silent pass( completed)?[.!]?\s*$/i,
+  /^(claw:\s*)?no new (roles?|opportunities|leads?|listings?|matches|deals?|items?) found.*$/i,
+  /^(claw:\s*)?nothing( new)? to report\.?\s*$/i,
+  /^(claw:\s*)?no actionable (findings|results?|opportunities)\.?\s*$/i,
+];
+
+function isSilenceSentinel(text: string | null | undefined): boolean {
+  if (!text) return false;
+  const trimmed = text.trim();
+  if (trimmed.length > 200) return false; // real findings are longer
+  return SILENCE_SENTINELS.some(re => re.test(trimmed));
+}
+
 export interface SchedulerDependencies {
   registeredGroups: () => Record<string, RegisteredGroup>;
   getSessions: () => Record<string, string>;
@@ -149,8 +172,19 @@ async function runTask(
       async (streamedOutput: ContainerOutput) => {
         if (streamedOutput.result) {
           result = streamedOutput.result;
-          // Forward result to user (sendMessage handles formatting)
-          await deps.sendMessage(task.chat_jid, streamedOutput.result);
+          // Only forward the FINAL result (isPartial=false). Forwarding every
+          // streaming chunk caused intermediate "thinking" messages and same-
+          // content duplicates (the partial chunk + the final chunk both fire).
+          // Also drop "silence sentinel" outputs that the agent uses to signal
+          // no action needed — they shouldn't reach the user.
+          if (!streamedOutput.isPartial && !isSilenceSentinel(streamedOutput.result)) {
+            await deps.sendMessage(task.chat_jid, streamedOutput.result);
+          } else if (streamedOutput.isPartial) {
+            logger.debug({ taskId: task.id }, 'Skipping partial streaming chunk');
+          } else {
+            logger.info({ taskId: task.id, sentinel: streamedOutput.result.slice(0, 80) },
+              'Task returned silence sentinel — not forwarding to chat');
+          }
           scheduleClose();
         }
         if (streamedOutput.status === 'success') {

@@ -843,7 +843,7 @@ async function processGroupMessages(chatJid: string): Promise<boolean> {
     // Buffer chunks and send as ONE message when the agent finishes a turn
     if (result.status === 'streaming' && result.isPartial && result.result) {
       const raw = typeof result.result === 'string' ? result.result : JSON.stringify(result.result);
-      const text = raw.replace(/<internal>[\s\S]*?<\/internal>/g, '').trim();
+      const text = formatOutbound(raw);
 
       // Filter out noise: warmup dots, safety acknowledgments, narration, empty responses
       const isNoise = !text || text === '.' || text.length < 3
@@ -866,11 +866,14 @@ async function processGroupMessages(chatJid: string): Promise<boolean> {
       let finalText = streamingBuffer;
       if (result.result && !ipcMessageSentThisRun.has(chatJid)) {
         const raw = typeof result.result === 'string' ? result.result : JSON.stringify(result.result);
-        const extra = raw.replace(/<internal>[\s\S]*?<\/internal>/g, '').trim();
+        const extra = formatOutbound(raw);
         if (extra && !streamingChunksSent) finalText = extra;
       }
 
-      if (finalText.trim()) {
+      // formatOutbound already strips invisible chars + <internal> tags;
+      // run again in case streamingBuffer accumulated ZWS-only chunks.
+      finalText = formatOutbound(finalText);
+      if (finalText) {
         // Validate URLs before sending — strip dead links
         const { validateUrlsInText } = await import('./url-validator.js');
         const { text: validatedText, stripped } = await validateUrlsInText(finalText, 'strip');
