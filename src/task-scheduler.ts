@@ -120,8 +120,11 @@ async function runTask(
   const scheduleClose = () => {
     if (closeTimer) return; // already scheduled
     closeTimer = setTimeout(() => {
-      logger.debug({ taskId: task.id }, 'Closing task container after result');
-      deps.queue.closeStdin(task.chat_jid);
+      logger.debug({ taskId: task.id, groupFolder: task.group_folder }, 'Closing task container after result');
+      // Scheduled tasks live in the activeTask slot; closeStdin gates on state.active
+      // which is only set for user-message containers. closeTaskStdin writes the
+      // sentinel by group folder directly.
+      deps.queue.closeTaskStdin(task.group_folder);
     }, TASK_CLOSE_DELAY_MS);
   };
 
@@ -160,6 +163,11 @@ async function runTask(
             logger.info({ taskId: task.id, costUsd, usage: streamedOutput.usage }, 'Task cost tracked');
           }
           deps.queue.notifyIdle(task.chat_jid);
+          // Tasks that signal success without populating `result` (e.g. agent sent
+          // the WhatsApp reply via MCP tool, then returned silent success) won't
+          // hit the result-branch above. Schedule close here too — otherwise
+          // the container sits until the 2h max-lifetime cap.
+          if (!streamedOutput.isPartial) scheduleClose();
         }
         if (streamedOutput.status === 'error') {
           error = streamedOutput.error || 'Unknown error';

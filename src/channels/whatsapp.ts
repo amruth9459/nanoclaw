@@ -73,8 +73,13 @@ export class WhatsAppChannel implements Channel {
   private reconnectTimer: ReturnType<typeof setTimeout> | null = null;
   private watchdogTimer: ReturnType<typeof setTimeout> | null = null;
   private watchdogStrikes = 0;
+  private heartbeatTimer: ReturnType<typeof setInterval> | null = null;
   private static readonly WATCHDOG_MS = 15 * 60 * 1000; // 15 minutes — allow quiet periods without false alarms
   private static readonly WATCHDOG_MAX_STRIKES = 3; // after 3 failed reconnects (~45 min), force-exit process
+  private static readonly HEARTBEAT_MS = 5 * 60 * 1000; // 5 min — active presence ping so watchdog doesn't fire on quiet periods
+  // LRU of outbound messages for retry-receipt honoring (Baileys getMessage)
+  private sentMessageCache: Map<string, any> = new Map();
+  private static readonly SENT_CACHE_MAX = 500;
   // Stored so reconnect attempts can still resolve the original connect() Promise
   private connectResolve?: () => void;
   // Track when connection dropped to report downtime on reconnect
@@ -91,6 +96,15 @@ export class WhatsAppChannel implements Channel {
       this.connectResolve = resolve;
       this.connectInternal(resolve, reject).catch(reject);
     });
+  }
+
+  /** Insert into sent-message LRU; evict oldest when full. */
+  private cacheSentMessage(id: string, message: any): void {
+    this.sentMessageCache.set(id, message);
+    if (this.sentMessageCache.size > WhatsAppChannel.SENT_CACHE_MAX) {
+      const oldest = this.sentMessageCache.keys().next().value;
+      if (oldest) this.sentMessageCache.delete(oldest);
+    }
   }
 
   /** Re-arm the watchdog timer. Only resets the strike counter when
@@ -162,6 +176,13 @@ export class WhatsAppChannel implements Channel {
       browser: Browsers.macOS('Chrome'),
       version,
       keepAliveIntervalMs: 15_000, // ping every 15s (default ~30s) — keeps NAT mappings alive
+      // Honor retry-receipts from recipients whose Signal session lapsed: Baileys
+      // calls getMessage to re-encrypt our outbound message. Without this, a
+      // session-not-found at the receiver = permanent silent drop on our side.
+      getMessage: async (key) => {
+        if (!key.id) return undefined;
+        return this.sentMessageCache.get(key.id) ?? undefined;
+      },
     });
 
     this.sock.ev.on('connection.update', (update) => {
@@ -191,6 +212,7 @@ export class WhatsAppChannel implements Channel {
 
       if (connection === 'close') {
         this.connected = false;
+        if (this.heartbeatTimer) { clearInterval(this.heartbeatTimer); this.heartbeatTimer = null; }
         if (this.disconnectedAt === null) this.disconnectedAt = Date.now();
         const reason = (lastDisconnect?.error as any)?.output?.statusCode;
         const shouldReconnect = reason !== DisconnectReason.loggedOut;
@@ -211,6 +233,18 @@ export class WhatsAppChannel implements Channel {
 
         // Announce availability so WhatsApp relays subsequent presence updates (typing indicators)
         this.sock.sendPresenceUpdate('available').catch(() => {});
+
+        // Active 5-min heartbeat: many days messages.upsert goes quiet for hours
+        // even when the socket is healthy. Send a periodic presence update to
+        // both keep the pipeline warm and confirm liveness — succeeds → reset
+        // watchdog, fails → let watchdog detect the dead socket.
+        if (this.heartbeatTimer) clearInterval(this.heartbeatTimer);
+        this.heartbeatTimer = setInterval(() => {
+          if (!this.connected || !this.sock) return;
+          this.sock.sendPresenceUpdate('available')
+            .then(() => this.resetWatchdog())
+            .catch((err) => logger.debug({ err }, 'Presence heartbeat failed'));
+        }, WhatsAppChannel.HEARTBEAT_MS);
 
         // Build LID to phone mapping from auth state for self-chat translation
         if (this.sock.user) {
@@ -482,8 +516,10 @@ export class WhatsAppChannel implements Channel {
       return;
     }
     try {
-      await this.sock.sendMessage(jid, { text: prefixed });
+      const sent = await this.sock.sendMessage(jid, { text: prefixed });
       this.resetWatchdog(true); // outgoing message proves connection is alive
+      // Cache for retry-receipt honoring (getMessage above)
+      if (sent?.key?.id && sent.message) this.cacheSentMessage(sent.key.id, sent.message);
       logger.info({ jid, length: prefixed.length }, 'Message sent');
     } catch (err) {
       // If send fails, queue it for retry on reconnect (transient during initial sync)

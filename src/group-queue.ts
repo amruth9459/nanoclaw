@@ -339,6 +339,24 @@ export class GroupQueue {
     }
   }
 
+  /**
+   * Send the close sentinel to a task container. Scheduled tasks use the
+   * activeTask slot, not the active slot, so closeStdin() above (which gates
+   * on state.active) is a no-op for them. This method writes the sentinel
+   * by group folder directly, with no state gating — used by task-scheduler
+   * once a task emits its result.
+   */
+  closeTaskStdin(groupFolder: string): void {
+    if (!groupFolder) return;
+    const inputDir = path.join(DATA_DIR, 'ipc', groupFolder, 'input');
+    try {
+      fs.mkdirSync(inputDir, { recursive: true });
+      fs.writeFileSync(path.join(inputDir, '_close'), '');
+    } catch {
+      // ignore
+    }
+  }
+
   private async runForGroup(
     groupJid: string,
     reason: 'messages' | 'drain',
