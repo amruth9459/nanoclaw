@@ -20,6 +20,7 @@ import {
 } from './db.js';
 import { getIntegrations } from './integration-loader.js';
 import { logger } from './logger.js';
+import { observerGuard } from './observer-guard.js';
 import { GroupQueue } from './group-queue.js';
 import { ResourceOrchestrator } from './resource-orchestrator.js';
 import type { UniversalRouter } from './router/index.js';
@@ -223,6 +224,7 @@ function apiStatus(queue: GroupQueue) {
     securityEvents: secEvents,
     recentErrors,
     logLines: logLines.slice(-100),
+    observerGuard: observerGuard.getStats(),
   };
 }
 
@@ -731,6 +733,40 @@ async function refresh() {
             '<div>' +
               '<div style="font-size:0.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.05em">Queue</div>' +
               '<div style="font-size:1.3rem;font-weight:700;color:' + (rs.queuedAgents > 0 ? 'var(--yellow)' : 'var(--green)') + ';margin:0.25rem 0">' + rs.queuedAgents + ' waiting</div>' +
+            '</div>' +
+          '</div>' +
+        '</div>';
+      })() : ''}
+      <!-- Observer Guard -->
+      \${status.observerGuard ? (function() {
+        var og = status.observerGuard;
+        var cap = og.config.maxConcurrentTasks;
+        var act = og.activeExecutions;
+        var actColor = act < cap * 0.75 ? 'var(--green)' : act < cap ? 'var(--yellow)' : '#ef4444';
+        var b = og.blocks;
+        var c = og.counters;
+        return '<div class="card full">' +
+          '<h2>🛡️ Observer Guard <span class="pill ' + (act > 0 ? 'green' : 'yellow') + '">' + act + ' / ' + cap + ' active</span></h2>' +
+          '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-top:0.75rem">' +
+            '<div>' +
+              '<div style="font-size:0.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.05em">Active Tasks</div>' +
+              '<div style="font-size:1.3rem;font-weight:700;color:' + actColor + ';margin:0.25rem 0">' + act + ' / ' + cap + '</div>' +
+              '<div style="font-size:0.7rem;color:var(--muted)">per-group cap ' + og.config.maxConcurrentPerGroup + '</div>' +
+            '</div>' +
+            '<div>' +
+              '<div style="font-size:0.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.05em">Blocks</div>' +
+              '<div style="font-size:1.3rem;font-weight:700;color:' + (b.total > 0 ? 'var(--yellow)' : 'var(--green)') + ';margin:0.25rem 0">' + b.total + '</div>' +
+              '<div style="font-size:0.7rem;color:var(--muted)">re-entry ' + b.reentrancy + ' · cap ' + (b.globalLimit + b.groupLimit) + ' · shed ' + b.tailSample + ' · throttle ' + b.failureThrottle + '</div>' +
+            '</div>' +
+            '<div>' +
+              '<div style="font-size:0.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.05em">Throttled</div>' +
+              '<div style="font-size:1.3rem;font-weight:700;color:' + (og.throttledTasks.length > 0 ? '#ef4444' : 'var(--green)') + ';margin:0.25rem 0">' + og.throttledTasks.length + '</div>' +
+              '<div style="font-size:0.7rem;color:var(--muted)">timeouts ' + c.timeouts + '</div>' +
+            '</div>' +
+            '<div>' +
+              '<div style="font-size:0.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.05em">Runs</div>' +
+              '<div style="font-size:1.3rem;font-weight:700;color:var(--accent);margin:0.25rem 0">' + c.completed + ' ✓</div>' +
+              '<div style="font-size:0.7rem;color:var(--muted)">' + c.started + ' started · ' + c.failed + ' failed</div>' +
             '</div>' +
           '</div>' +
         '</div>';

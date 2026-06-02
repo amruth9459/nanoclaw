@@ -24,6 +24,7 @@ import { cleanupOldMedia } from './media-cleanup.js';
 import { GroupQueue } from './group-queue.js';
 import { logger } from './logger.js';
 import { getIntegrations } from './integration-loader.js';
+import { observerGuard } from './observer-guard.js';
 import { AgentPriority, ResourceOrchestrator } from './resource-orchestrator.js';
 import { RegisteredGroup, ScheduledTask } from './types.js';
 
@@ -81,6 +82,20 @@ async function runTask(
   deps: SchedulerDependencies,
 ): Promise<void> {
   const startTime = Date.now();
+
+  // Observer Guard, Layers 1–3: admission control. This is a synchronous
+  // read-then-decide; the matching startExecution() below commits the slot.
+  // There must be NO `await` between this check and startExecution() so the
+  // concurrency accounting stays race-free on the event loop.
+  const decision = observerGuard.shouldRunTask(task);
+  if (!decision.allow) {
+    logger.info(
+      { taskId: task.id, group: task.group_folder, layer: decision.layer, reason: decision.reason },
+      'Scheduled task blocked by Observer Guard',
+    );
+    return;
+  }
+
   const groupDir = path.join(GROUPS_DIR, task.group_folder);
   fs.mkdirSync(groupDir, { recursive: true });
 
@@ -109,6 +124,12 @@ async function runTask(
     });
     return;
   }
+
+  // Observer Guard: commit the concurrency slot and apply the Layer-5
+  // lazy-start stagger before any container work begins. Registration is
+  // synchronous (happens before this promise's first await), so a burst of
+  // due tasks is counted correctly even while staggering.
+  await observerGuard.startExecution(task.id, task.group_folder);
 
   // Update tasks snapshot for container to read (filtered by group)
   const isMain = task.group_folder === MAIN_GROUP_FOLDER;
@@ -245,10 +266,15 @@ async function runTask(
     logger.error({ taskId: task.id, error }, 'Task failed');
   }
 
+  const durationMs = Date.now() - startTime;
+
+  // Observer Guard: release the concurrency slot and update Layer-3 failure/
+  // throttle state. Done before orchestrator release so the slot is freed even
+  // if that call rejects.
+  observerGuard.endExecution(task.id, !error, durationMs);
+
   // Release orchestrator tracking
   await deps.orchestrator?.releaseAgent(agentId, error ? 'error' : 'completed');
-
-  const durationMs = Date.now() - startTime;
 
   logTaskRun({
     task_id: task.id,
@@ -330,4 +356,33 @@ export function startSchedulerLoop(deps: SchedulerDependencies): void {
   };
 
   loop();
+
+  // ── Observer Guard, Layer 4: timeout monitoring + self-cleaning ───────────
+  // Runs on its own cadence (independent of the 60s scheduler poll) so a stuck
+  // task is detected promptly. Tasks past the limit are wound down via the
+  // task close sentinel; metrics for deleted tasks are pruned.
+  const GUARD_MONITOR_INTERVAL = 30000;
+  const monitorLoop = () => {
+    try {
+      const timedOut = observerGuard.getTimedOutTasks();
+      for (const t of timedOut) {
+        logger.warn(
+          { taskId: t.taskId, groupFolder: t.groupFolder, ageMs: t.ageMs },
+          'Observer Guard: killing timed-out task',
+        );
+        // Wind the task container down via its IPC close sentinel. The
+        // container's own hard timeout is the ultimate backstop.
+        deps.queue.closeTaskStdin(t.groupFolder);
+      }
+
+      // Self-cleaning: drop failure/throttle metrics for tasks that no longer
+      // exist so the guard doesn't accumulate state for deleted schedules.
+      const knownTaskIds = new Set(getAllTasks().map((t) => t.id));
+      observerGuard.prune(knownTaskIds);
+    } catch (err) {
+      logger.error({ err }, 'Error in Observer Guard monitor loop');
+    }
+    setTimeout(monitorLoop, GUARD_MONITOR_INTERVAL);
+  };
+  monitorLoop();
 }
