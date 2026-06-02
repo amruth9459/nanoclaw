@@ -5,6 +5,18 @@
 
 ---
 
+### 2026-06-02 14:32
+
+**Areas:** hooks
+**Files (20):** .cache/zellij/permissions.kdl, .claude/bin/fix-thinking.py, .claude/consolidation-2026-05-29/CONSOLIDATION_PLAN.md, .claude/consolidation-2026-05-29/add_history.py, .claude/consolidation-2026-05-29/batch.sh, .claude/consolidation-2026-05-29/build_maps.py, .claude/consolidation-2026-05-29/inventory.py, .claude/consolidation-2026-05-29/maps/INDEX.md, .claude/consolidation-2026-05-29/maps/SESSIONS-glowboard.md, .claude/consolidation-2026-05-29/maps/SESSIONS-home.md, .claude/consolidation-2026-05-29/maps/SESSIONS-jyotish.md, .claude/consolidation-2026-05-29/maps/SESSIONS-lexios.md, .claude/consolidation-2026-05-29/maps/SESSIONS-nanoclaw.md, .claude/consolidation-2026-05-29/relocate.py, .claude/consolidation-2026-05-29/relocate_fix_inplace.py, .claude/consolidation-2026-05-29/rewrite_session.py, .claude/hooks/brain-digest-inject.sh, .claude/hooks/image-safe-gate.sh, .claude/projects/-Users-amrut-Lexios/memory/MEMORY.md, .claude/projects/-Users-amrut-Lexios/memory/lexios_strategic_frame.md
+**Diff:** +31 -2 across 4 files
+
+### 2026-06-02 13:32
+
+**Areas:** hooks
+**Files (20):** .cache/zellij/permissions.kdl, .claude/bin/fix-thinking.py, .claude/consolidation-2026-05-29/CONSOLIDATION_PLAN.md, .claude/consolidation-2026-05-29/add_history.py, .claude/consolidation-2026-05-29/batch.sh, .claude/consolidation-2026-05-29/build_maps.py, .claude/consolidation-2026-05-29/inventory.py, .claude/consolidation-2026-05-29/maps/INDEX.md, .claude/consolidation-2026-05-29/maps/SESSIONS-glowboard.md, .claude/consolidation-2026-05-29/maps/SESSIONS-home.md, .claude/consolidation-2026-05-29/maps/SESSIONS-jyotish.md, .claude/consolidation-2026-05-29/maps/SESSIONS-lexios.md, .claude/consolidation-2026-05-29/maps/SESSIONS-nanoclaw.md, .claude/consolidation-2026-05-29/relocate.py, .claude/consolidation-2026-05-29/relocate_fix_inplace.py, .claude/consolidation-2026-05-29/rewrite_session.py, .claude/hooks/brain-digest-inject.sh, .claude/hooks/image-safe-gate.sh, .claude/projects/-Users-amrut-Lexios/memory/MEMORY.md, .claude/projects/-Users-amrut-Lexios/memory/lexios_strategic_frame.md
+**Diff:** +25 -2 across 3 files
+
 ### 2026-06-02 12:32
 
 **Areas:** hooks
