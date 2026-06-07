@@ -28,6 +28,8 @@ import { routeNotification } from './notification-router.js';
 import { getIndexStats } from './semantic-index.js';
 import { getCurrentThroughput, getHourlyThroughput } from './throughput-monitor.js';
 import { getActiveAlerts, acknowledgeAlert } from './throughput-alerts.js';
+import { getAgentGraphData, getBlastRadiusData } from './agent-graph/api.js';
+import type { BlastDirection } from './agent-graph/blast-radius.js';
 
 const PORT = parseInt(process.env.DASHCLAW_PORT || '8080', 10);
 const LOG_PATH = path.join(process.cwd(), 'logs', 'nanoclaw.log');
@@ -374,7 +376,7 @@ function tabBar() {
   var labels = Object.assign({ overview: 'Overview', kanban: 'Kanban', files: 'Files', router: 'Router' }, window._integrationTabLabels || {});
   return tabs.map(function(t) {
     return '<span class="tab' + (dashTab === t ? ' active' : '') + '" onclick="dashTab=\\'' + t + '\\';refresh()">' + labels[t] + '</span>';
-  }).join('');
+  }).join('') + '<a class="tab" href="/agent-graph" style="text-decoration:none">Agent Graph &#8599;</a>';
 }
 
 function fmtSize(bytes) {
@@ -893,6 +895,349 @@ setInterval(refresh, 10000);
 </body>
 </html>`;
 
+// ── Agent Call Graph page (standalone DashClaw UI component) ─────────────────────
+// Self-contained: vanilla canvas force-directed graph + blast-radius side panel.
+// Client JS deliberately avoids template literals / embedded newlines in string
+// literals so it survives being nested inside this TS template string.
+const AGENT_GRAPH_HTML = `<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Agent Call Graph · DashClaw</title>
+<style>
+  :root {
+    --bg:#0a0a0f; --surface:#13131a; --border:#26263a; --text:#e2e8f0;
+    --muted:#64748b; --accent:#7c3aed; --accent2:#06b6d4; --green:#22c55e;
+    --mono:'SF Mono',ui-monospace,Menlo,monospace;
+  }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--text); font-family:system-ui,sans-serif; height:100vh; display:flex; flex-direction:column; overflow:hidden; }
+  header { background:var(--surface); border-bottom:1px solid var(--border); padding:0.7rem 1.2rem; display:flex; align-items:center; gap:1rem; flex-wrap:wrap; }
+  header h1 { font-size:1.05rem; margin:0; font-weight:600; }
+  header h1 span { color:var(--accent); }
+  header a.back { color:var(--muted); text-decoration:none; font-size:0.8rem; }
+  .controls { display:flex; gap:0.5rem; align-items:center; margin-left:auto; flex-wrap:wrap; }
+  select, button { background:#07070d; color:var(--text); border:1px solid var(--border); border-radius:6px; padding:0.3rem 0.6rem; font-size:0.78rem; cursor:pointer; }
+  button:hover, select:hover { border-color:var(--accent); }
+  .stats { display:flex; gap:1.2rem; padding:0.5rem 1.2rem; background:var(--surface); border-bottom:1px solid var(--border); font-size:0.75rem; color:var(--muted); flex-wrap:wrap; }
+  .stats b { color:var(--text); }
+  main { flex:1; display:flex; min-height:0; }
+  #canvasWrap { flex:1; position:relative; }
+  canvas { display:block; width:100%; height:100%; }
+  #legend { position:absolute; left:12px; bottom:12px; background:rgba(19,19,26,0.85); border:1px solid var(--border); border-radius:8px; padding:0.5rem 0.7rem; font-size:0.7rem; }
+  #legend div { display:flex; align-items:center; gap:0.4rem; margin:0.15rem 0; }
+  .swatch { width:10px; height:10px; border-radius:50%; display:inline-block; }
+  aside { width:340px; border-left:1px solid var(--border); background:var(--surface); padding:1rem; overflow-y:auto; }
+  aside h2 { font-size:0.9rem; margin:0.8rem 0 0.4rem; }
+  aside h2:first-child { margin-top:0; }
+  .muted { color:var(--muted); font-size:0.78rem; }
+  .summary { background:#07070d; border:1px solid var(--border); border-radius:8px; padding:0.6rem 0.7rem; font-size:0.82rem; margin:0.6rem 0; }
+  .pill { display:inline-block; font-size:0.62rem; padding:0.1rem 0.4rem; border-radius:4px; background:var(--accent); color:#fff; margin-right:0.4rem; }
+  .chain { font-family:var(--mono); font-size:0.7rem; color:#94a3b8; padding:0.25rem 0; border-bottom:1px solid var(--border); word-break:break-word; }
+  .edge-row { font-size:0.74rem; padding:0.35rem 0; border-bottom:1px solid var(--border); }
+  .edge-row .intent { color:var(--muted); display:block; margin-top:0.15rem; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Dash<span>Claw</span> · Agent Call Graph</h1>
+  <a class="back" href="/">&#8592; dashboard</a>
+  <div class="controls">
+    <label class="muted">Window</label>
+    <select id="window">
+      <option value="24h">24h</option>
+      <option value="7d" selected>7d</option>
+      <option value="30d">30d</option>
+      <option value="all">All</option>
+    </select>
+    <label class="muted">Blast</label>
+    <select id="direction">
+      <option value="downstream">Downstream</option>
+      <option value="upstream">Upstream</option>
+      <option value="both">Both</option>
+    </select>
+    <select id="hops">
+      <option value="1">1 hop</option>
+      <option value="2">2 hops</option>
+      <option value="3">3 hops</option>
+      <option value="4" selected>4 hops</option>
+      <option value="6">6 hops</option>
+    </select>
+    <button id="reload">Refresh</button>
+  </div>
+</header>
+<div class="stats" id="stats"></div>
+<main>
+  <div id="canvasWrap">
+    <canvas id="cv"></canvas>
+    <div id="legend">
+      <div><span class="swatch" style="background:#f59e0b"></span> root</div>
+      <div><span class="swatch" style="background:#7c3aed"></span> agent</div>
+      <div><span class="swatch" style="background:#a78bfa"></span> team</div>
+      <div><span class="swatch" style="background:#06b6d4"></span> destination</div>
+    </div>
+  </div>
+  <aside id="panel">
+    <h2>Agent Call Graph</h2>
+    <p class="muted">Loading graph&#8230;</p>
+  </aside>
+</main>
+<script>
+(function(){
+  var COLORS = { root:'#f59e0b', agent:'#7c3aed', team:'#a78bfa', destination:'#06b6d4' };
+  var EDGE_COLORS = { message:'#3b3b55', delegation:'#f59e0b', team:'#a78bfa' };
+  var cv = document.getElementById('cv');
+  var ctx = cv.getContext('2d');
+  var state = { graph:null, stats:null, blast:null, selected:null };
+  var sim = { nodes:[], edges:[], byId:{}, alpha:1 };
+  var drag = null, hover = null;
+  var W=0, H=0, DPR = window.devicePixelRatio || 1;
+
+  function resize(){
+    var wrap = document.getElementById('canvasWrap');
+    W = wrap.clientWidth; H = wrap.clientHeight;
+    cv.width = W*DPR; cv.height = H*DPR;
+    ctx.setTransform(DPR,0,0,DPR,0,0);
+  }
+  window.addEventListener('resize', function(){ resize(); sim.alpha = 0.5; });
+
+  function api(path){
+    return fetch(path).then(function(r){
+      return r.json().then(function(j){
+        if(!r.ok) throw new Error(j.error || ('HTTP '+r.status));
+        return j;
+      });
+    });
+  }
+
+  function buildSim(graph){
+    var nodes = graph.nodes.map(function(n, i){
+      var ang = (i / Math.max(1, graph.nodes.length)) * Math.PI * 2;
+      var rad = Math.min(W,H)/3 || 200;
+      return {
+        id:n.id, label:n.label, kind:n.kind, data:n,
+        x: W/2 + Math.cos(ang)*rad, y: H/2 + Math.sin(ang)*rad,
+        vx:0, vy:0, r: 6 + Math.min(14, Math.sqrt((n.outCount+n.inCount)||1))
+      };
+    });
+    var byId = {}; nodes.forEach(function(n){ byId[n.id]=n; });
+    var edges = graph.edges.filter(function(e){ return byId[e.source] && byId[e.target]; });
+    sim = { nodes:nodes, edges:edges, byId:byId, alpha:1 };
+  }
+
+  function tick(){
+    var n = sim.nodes, i, j, a, b, dx, dy, d, f, ux, uy;
+    var rep = 1400;
+    for(i=0;i<n.length;i++){
+      a=n[i];
+      for(j=i+1;j<n.length;j++){
+        b=n[j];
+        dx=a.x-b.x; dy=a.y-b.y; d=Math.sqrt(dx*dx+dy*dy)||0.01;
+        if(d<280){ f=rep/(d*d); ux=dx/d; uy=dy/d; a.vx+=ux*f; a.vy+=uy*f; b.vx-=ux*f; b.vy-=uy*f; }
+      }
+      a.vx += (W/2 - a.x)*0.0016;
+      a.vy += (H/2 - a.y)*0.0016;
+    }
+    for(i=0;i<sim.edges.length;i++){
+      var e=sim.edges[i]; a=sim.byId[e.source]; b=sim.byId[e.target];
+      dx=b.x-a.x; dy=b.y-a.y; d=Math.sqrt(dx*dx+dy*dy)||0.01;
+      var rest = e.kind==='message'?130:95;
+      f=(d-rest)*0.012; ux=dx/d; uy=dy/d;
+      a.vx+=ux*f; a.vy+=uy*f; b.vx-=ux*f; b.vy-=uy*f;
+    }
+    for(i=0;i<n.length;i++){
+      a=n[i];
+      if(drag && drag.node===a) continue;
+      a.vx*=0.85; a.vy*=0.85;
+      a.x+=a.vx*sim.alpha; a.y+=a.vy*sim.alpha;
+      a.x=Math.max(20,Math.min(W-20,a.x)); a.y=Math.max(20,Math.min(H-20,a.y));
+    }
+    sim.alpha *= 0.992;
+    if(sim.alpha<0.02) sim.alpha=0.02;
+  }
+
+  function affectedSet(){ var s={}; if(state.blast){ state.blast.affectedNodes.forEach(function(id){ s[id]=true; }); } return s; }
+  function affectedEdgeSet(){ var s={}; if(state.blast){ state.blast.affectedEdges.forEach(function(e){ s[e.id]=true; }); } return s; }
+
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    var aff = affectedSet(), affE = affectedEdgeSet();
+    var hasBlast = !!state.blast;
+    sim.edges.forEach(function(e){
+      var a=sim.byId[e.source], b=sim.byId[e.target];
+      var on = !hasBlast || affE[e.id];
+      ctx.beginPath();
+      ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y);
+      ctx.strokeStyle = on ? (EDGE_COLORS[e.kind]||'#3b3b55') : '#1c1c2a';
+      ctx.globalAlpha = on ? 0.85 : 0.25;
+      ctx.lineWidth = Math.min(5, 0.6+Math.log(1+e.count));
+      ctx.stroke();
+      if(on && e.kind!=='message'){ drawArrow(a,b); }
+    });
+    ctx.globalAlpha=1;
+    sim.nodes.forEach(function(nd){
+      var isSel = state.selected===nd.id;
+      var on = !hasBlast || aff[nd.id] || isSel;
+      ctx.beginPath();
+      ctx.arc(nd.x,nd.y,nd.r,0,Math.PI*2);
+      ctx.fillStyle = on ? (COLORS[nd.kind]||'#7c3aed') : '#23233a';
+      ctx.globalAlpha = on?1:0.35;
+      ctx.fill();
+      if(isSel){ ctx.lineWidth=3; ctx.strokeStyle='#fff'; ctx.stroke(); }
+      else if(hasBlast && aff[nd.id]){ ctx.lineWidth=2; ctx.strokeStyle='#22c55e'; ctx.stroke(); }
+      ctx.globalAlpha=1;
+      if(nd.r>9 || isSel || hover===nd){
+        ctx.fillStyle = on ? '#e2e8f0' : '#475569';
+        ctx.font='10px system-ui';
+        var lbl = nd.label.length>22 ? nd.label.slice(0,22)+'\\u2026' : nd.label;
+        ctx.fillText(lbl, nd.x+nd.r+3, nd.y+3);
+      }
+    });
+  }
+
+  function drawArrow(a,b){
+    var dx=b.x-a.x, dy=b.y-a.y, d=Math.sqrt(dx*dx+dy*dy)||1;
+    var ux=dx/d, uy=dy/d;
+    var px=b.x-ux*(b.r+4), py=b.y-uy*(b.r+4);
+    var ang=Math.atan2(uy,ux);
+    ctx.beginPath();
+    ctx.moveTo(px,py);
+    ctx.lineTo(px-8*Math.cos(ang-0.4), py-8*Math.sin(ang-0.4));
+    ctx.lineTo(px-8*Math.cos(ang+0.4), py-8*Math.sin(ang+0.4));
+    ctx.closePath();
+    ctx.fillStyle='#f59e0b'; ctx.fill();
+  }
+
+  function loop(){ tick(); draw(); requestAnimationFrame(loop); }
+
+  function pick(mx,my){
+    for(var i=sim.nodes.length-1;i>=0;i--){
+      var nd=sim.nodes[i]; var dx=mx-nd.x, dy=my-nd.y;
+      if(dx*dx+dy*dy <= (nd.r+4)*(nd.r+4)) return nd;
+    }
+    return null;
+  }
+
+  cv.addEventListener('mousedown', function(ev){
+    var rect=cv.getBoundingClientRect();
+    var nd=pick(ev.clientX-rect.left, ev.clientY-rect.top);
+    if(nd){ drag={node:nd, moved:false}; }
+  });
+  cv.addEventListener('mousemove', function(ev){
+    var rect=cv.getBoundingClientRect();
+    var mx=ev.clientX-rect.left, my=ev.clientY-rect.top;
+    if(drag){ drag.node.x=mx; drag.node.y=my; drag.node.vx=0; drag.node.vy=0; drag.moved=true; sim.alpha=Math.max(sim.alpha,0.3); }
+    else { hover=pick(mx,my); cv.style.cursor=hover?'pointer':'default'; }
+  });
+  window.addEventListener('mouseup', function(){
+    if(drag){ if(!drag.moved){ selectNode(drag.node.id); } drag=null; }
+  });
+
+  function selectNode(id){
+    state.selected=id;
+    var dir=document.getElementById('direction').value;
+    var hops=document.getElementById('hops').value;
+    var win=document.getElementById('window').value;
+    api('/api/agent-graph/blast-radius?node='+encodeURIComponent(id)+'&window='+win+'&direction='+dir+'&hops='+hops)
+      .then(function(d){ state.blast=d.blastRadius; renderPanel(); sim.alpha=Math.max(sim.alpha,0.15); })
+      .catch(function(err){ panelError(err.message); });
+  }
+
+  function el(tag, cls, text){
+    var e=document.createElement(tag); if(cls) e.className=cls; if(text!=null) e.textContent=text; return e;
+  }
+
+  function renderStats(){
+    var s=state.stats, m=state.graph.meta;
+    var box=document.getElementById('stats'); box.textContent='';
+    function stat(label,val){ var sp=el('span'); sp.appendChild(el('b',null,String(val))); sp.appendChild(document.createTextNode(' '+label)); return sp; }
+    box.appendChild(stat('agents', s.agentCount));
+    box.appendChild(stat('destinations', s.destinationCount));
+    box.appendChild(stat('edges', s.edgeCount));
+    box.appendChild(stat('messages', s.totalMessages));
+    box.appendChild(stat('delegations', s.totalDelegations));
+    box.appendChild(el('span','muted','sources: evidence '+m.sources.evidence+' / identities '+m.sources.identities+' / team '+m.sources.teamEdges));
+  }
+
+  function renderPanel(){
+    var p=document.getElementById('panel'); p.textContent='';
+    if(!state.selected){
+      p.appendChild(el('h2',null,'Agent Call Graph'));
+      p.appendChild(el('p','muted','Click any node to trace its blast radius — who is affected if it fails. Drag nodes to rearrange.'));
+      p.appendChild(el('h2',null,'Busiest agents'));
+      state.stats.busiestAgents.forEach(function(a){
+        p.appendChild(el('div','edge-row', a.label+' — '+a.outCount+' out'));
+      });
+      p.appendChild(el('h2',null,'Top destinations'));
+      state.stats.topDestinations.forEach(function(a){
+        p.appendChild(el('div','edge-row', a.label+' — '+a.inCount+' in'));
+      });
+      return;
+    }
+    var nd=sim.byId[state.selected];
+    p.appendChild(el('h2',null, nd ? nd.label : state.selected));
+    if(nd){
+      var meta = nd.kind + (nd.data.agentType ? ' / '+nd.data.agentType : '') + (nd.data.instanceCount>1 ? ' / '+nd.data.instanceCount+' instances' : '');
+      p.appendChild(el('div','muted', meta));
+    }
+    if(state.blast){
+      var b=state.blast;
+      p.appendChild(el('div','summary', b.summary));
+      b.levels.forEach(function(lv){
+        var h=el('div');
+        h.appendChild(el('span','pill','hop '+lv.hop));
+        h.appendChild(document.createTextNode(lv.nodes.length+' node'+(lv.nodes.length===1?'':'s')));
+        p.appendChild(h);
+      });
+      if(b.chains.length){
+        p.appendChild(el('h2',null,'Chains'));
+        b.chains.forEach(function(ch){
+          var labels = ch.map(function(id){ var x=sim.byId[id]; return x?x.label:id; });
+          p.appendChild(el('div','chain', labels.join('  \\u2192  ')));
+        });
+      }
+    }
+    var outs = state.graph.edges.filter(function(e){ return e.source===state.selected; });
+    if(outs.length){
+      p.appendChild(el('h2',null,'Outgoing edges ('+outs.length+')'));
+      outs.slice(0,20).forEach(function(e){
+        var tgt=sim.byId[e.target]; var row=el('div','edge-row');
+        row.appendChild(document.createTextNode('\\u2192 '+(tgt?tgt.label:e.target)+'  ('+e.kind+', '+e.count+')'));
+        (e.sampleIntents||[]).forEach(function(si){ row.appendChild(el('span','intent','\\u2022 '+si)); });
+        p.appendChild(row);
+      });
+    }
+    var clr=el('button',null,'Clear selection'); clr.style.marginTop='0.7rem';
+    clr.onclick=function(){ state.selected=null; state.blast=null; renderPanel(); };
+    p.appendChild(clr);
+  }
+
+  function panelError(msg){
+    var p=document.getElementById('panel'); p.textContent='';
+    p.appendChild(el('h2',null,'Error')); p.appendChild(el('p','muted',msg));
+  }
+
+  function load(){
+    var win=document.getElementById('window').value;
+    state.selected=null; state.blast=null;
+    api('/api/agent-graph?window='+win).then(function(d){
+      state.graph=d.graph; state.stats=d.stats;
+      resize(); buildSim(d.graph); renderStats(); renderPanel();
+    }).catch(function(err){ panelError(err.message); });
+  }
+
+  document.getElementById('reload').onclick=load;
+  document.getElementById('window').onchange=load;
+  document.getElementById('direction').onchange=function(){ if(state.selected) selectNode(state.selected); };
+  document.getElementById('hops').onchange=function(){ if(state.selected) selectNode(state.selected); };
+
+  resize(); load(); loop();
+})();
+</script>
+</body>
+</html>`;
+
 // ── HTTP server ────────────────────────────────────────────────────────────────
 
 export function startDashboard(queue: GroupQueue, sendFn?: (jid: string, text: string) => Promise<void>, resourceOrchestrator?: ResourceOrchestrator, universalRouter?: UniversalRouter): void {
@@ -1007,6 +1352,34 @@ export function startDashboard(queue: GroupQueue, sendFn?: (jid: string, text: s
         res.writeHead(500);
         res.end(JSON.stringify({ error: String(err) }));
       }
+      return;
+    }
+
+    // ── Agent Call Graph API ─────────────────────────────────────────────────
+    if (url.pathname === '/api/agent-graph') {
+      const result = getAgentGraphData({ window: url.searchParams.get('window') || '7d' });
+      res.writeHead(result.ok ? 200 : 500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify(result.ok ? result.data : { error: result.error }));
+      return;
+    }
+
+    if (url.pathname === '/api/agent-graph/blast-radius') {
+      const node = url.searchParams.get('node') || '';
+      const hopsRaw = url.searchParams.get('hops');
+      const result = getBlastRadiusData({
+        window: url.searchParams.get('window') || '7d',
+        node,
+        hops: hopsRaw ? parseInt(hopsRaw, 10) : undefined,
+        direction: (url.searchParams.get('direction') as BlastDirection) || 'downstream',
+      });
+      res.writeHead(result.ok ? 200 : 400, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify(result.ok ? result.data : { error: result.error }));
+      return;
+    }
+
+    if (url.pathname === '/agent-graph') {
+      res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+      res.end(AGENT_GRAPH_HTML);
       return;
     }
 

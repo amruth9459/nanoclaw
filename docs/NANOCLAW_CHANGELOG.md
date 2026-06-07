@@ -2,6 +2,24 @@
 
 *Version control document — auto-updated by `lexios/update-docs.py` (twice daily via NanoClaw scheduled task)*
 
+## Unreleased — Agent Call Graph (DashClaw) (2026-06-07)
+
+### Added
+- **Agent call graph + blast-radius view** in DashClaw (`src/agent-graph/`). MVP prototype.
+  - `extractor.ts` — 3-stage (Extract → Merge → Analyze) multi-source extractor. Sources:
+    `evidence_chain` (message_sent/agent_spawned, `store/messages.db`), `agent_identities`
+    (issuer → agent delegation), `teams`/`team_members` (lead → specialist, `store/nanoclaw.db`,
+    opened read-only and skipped gracefully if absent). Time windows: 24h / 7d / 30d / all.
+    Edges carry message counts + first-3 sample intents; nodes carry in/out degree + instance count.
+  - `blast-radius.ts` — multi-hop BFS ("if agent X fails, who's affected?"). Downstream / upstream /
+    both directions, hop-levelled reachable sets, traversed edges, sample delegation/message chains.
+  - `api.ts` — server-agnostic `getAgentGraphData()` / `getBlastRadiusData()` with summary stats.
+  - DashClaw routes: `GET /api/agent-graph`, `GET /api/agent-graph/blast-radius`, and a self-contained
+    `GET /agent-graph` page (vanilla canvas force-directed graph + blast-radius side panel). Nav link
+    added to the dashboard tab bar.
+- Verified against live DB: 626 evidence rows, 30 identities, 67 team edges → 172 nodes / 108 edges (all-time).
+  Build passes; routes return correct status codes; served client JS passes `node --check`.
+
 ## v0.14.0 — Context System + Auto-Deploy (2026-03-01)
 
 ### Added
