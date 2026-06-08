@@ -42,6 +42,21 @@ export type { SentimentLabel, SentimentResult } from './SentimentAnalyzer.js';
 export { JsonExtractor } from './JsonExtractor.js';
 export type { FieldType, FieldSpec, ExtractionSchema } from './JsonExtractor.js';
 
+export {
+  BoundedMemory,
+  toOneLine,
+  toIntScore,
+  estimateTokensInt,
+  topN,
+  DEFAULT_MAX_SUMMARY_CHARS,
+  DEFAULT_MAX_ITEMS,
+} from './BoundedMemory.js';
+export type {
+  BoundedMemoryOptions,
+  MemoryItem,
+  MemoryInput,
+} from './BoundedMemory.js';
+
 import type { InferenceFn } from './base.js';
 import { ConversationSummarizer } from './ConversationSummarizer.js';
 import { IntentClassifier } from './IntentClassifier.js';

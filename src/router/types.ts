@@ -288,4 +288,13 @@ export interface RouterConfig {
   // Monitoring
   metricsEnabled: boolean;
   metricsRetentionDays: number;
+
+  // SLM-first routing (optional; additive — absent ⇒ legacy behavior).
+  // When set, the router prefers fine-tuned local SLMs for eligible tasks and
+  // escalates to a larger model only when confidence is below the threshold.
+  slmFirst?: boolean;
+  /** Confidence below which an SLM result is rejected in favor of the LLM fallback. */
+  slmConfidenceThreshold?: number;
+  /** task name → on-disk fine-tuned model id/path, resolved by the SLM backend. */
+  fineTunedModelPaths?: Record<string, string>;
 }

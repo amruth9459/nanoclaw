@@ -15,6 +15,10 @@ import { ModelRegistry, ModelSelector } from './model-selector.js';
 import { RoutingRulesEngine } from './routing-rules.js';
 import { FallbackHandler } from './fallback-handler.js';
 import { PerformanceTracker } from './performance-tracker.js';
+import type {
+  HeterogeneousRouter,
+  HeterogeneousRouterOptions,
+} from './heterogeneous-router.js';
 
 /**
  * Main Universal AI Router
@@ -26,6 +30,14 @@ export class UniversalRouter {
   private rules: RoutingRulesEngine;
   private fallbackHandler: FallbackHandler;
   private tracker: PerformanceTracker;
+  /**
+   * Optional SLM-first orchestrator. When attached, callers can route the
+   * classification/summarization/extraction fast-paths through fine-tuned
+   * specialist SLMs with ensemble voting and confidence-gated LLM fallback,
+   * while {@link route} continues to own model-tier selection for everything
+   * else. Kept optional so existing router consumers are unaffected.
+   */
+  private heterogeneous?: HeterogeneousRouter;
 
   constructor(private config: RouterConfig) {
     this.classifier = new TaskClassifier();
@@ -208,6 +220,30 @@ export class UniversalRouter {
     return this.rules.getRules();
   }
 
+  /**
+   * Attach an SLM-first orchestrator built from the experiment's learnings.
+   * Returns `this` for chaining. Idempotent — replaces any prior attachment.
+   */
+  attachHeterogeneous(router: HeterogeneousRouter): this {
+    this.heterogeneous = router;
+    return this;
+  }
+
+  /** The attached SLM-first orchestrator, if any. */
+  getHeterogeneous(): HeterogeneousRouter | undefined {
+    return this.heterogeneous;
+  }
+
+  /** Whether SLM-first routing is enabled (config flag + an attached orchestrator). */
+  isSlmFirstEnabled(): boolean {
+    return Boolean(this.config.slmFirst && this.heterogeneous);
+  }
+
+  /** Confidence below which an SLM result should be rejected for the LLM fallback. */
+  slmConfidenceThreshold(): number {
+    return this.config.slmConfidenceThreshold ?? 0.6;
+  }
+
   // Private helper methods
 
   private async classifyTask(context: RoutingContext): Promise<TaskFeatures> {
@@ -347,6 +383,17 @@ export class RouterFactory {
 
       metricsEnabled: true,
       metricsRetentionDays: 30,
+
+      // SLM-first routing (validated by the SLM Integration Experiment).
+      // Fine-tuned local SLMs handle eligible fast-paths; escalate below threshold.
+      slmFirst: true,
+      slmConfidenceThreshold: 0.6,
+      fineTunedModelPaths: {
+        intent: process.env.NANOCLAW_SLM_INTENT_MODEL || '',
+        sentiment: process.env.NANOCLAW_SLM_SENTIMENT_MODEL || '',
+        summarize: process.env.NANOCLAW_SLM_SUMMARIZE_MODEL || '',
+        extract: process.env.NANOCLAW_SLM_EXTRACT_MODEL || '',
+      },
     };
   }
 
@@ -383,4 +430,33 @@ export class RouterFactory {
       metricsEnabled: true,
     });
   }
+
+  /**
+   * Create a cost-optimized, SLM-first router with an attached heterogeneous
+   * orchestrator. This is the production wiring the SLM Integration Experiment
+   * validates: specialist fine-tuned SLMs handle the eligible fast-paths with
+   * confidence-gated escalation, while the router owns everything else.
+   *
+   * `makeOrchestrator` is a thunk so callers fully control how specialists are
+   * constructed (live Ollama/llama.cpp, mocks, etc.) without this module taking
+   * a hard dependency on any backend.
+   */
+  static createWithHeterogeneous(
+    makeOrchestrator: (opts: { confidenceThreshold: number }) => HeterogeneousRouter,
+    config?: Partial<RouterConfig>,
+  ): UniversalRouter {
+    const router = RouterFactory.create({
+      costOptimization: true,
+      defaultTier: 'local-slm',
+      slmFirst: true,
+      ...config,
+    });
+    router.attachHeterogeneous(
+      makeOrchestrator({ confidenceThreshold: router.slmConfidenceThreshold() }),
+    );
+    return router;
+  }
 }
+
+// Re-export the orchestrator types so consumers can build one without a separate import.
+export type { HeterogeneousRouter, HeterogeneousRouterOptions };

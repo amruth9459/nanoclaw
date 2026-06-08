@@ -28,6 +28,19 @@ export {
   RulePresets,
 } from './routing-rules.js';
 
+// Heterogeneous Orchestrator (SLM-first, ensemble voting, confidence-gated fallback)
+export {
+  HeterogeneousRouter,
+} from './heterogeneous-router.js';
+export type {
+  SlmTask,
+  Specialist,
+  HeterogeneousRouterOptions,
+  EnsembleVote,
+  EnsembleResult,
+  ScoreboardRow,
+} from './heterogeneous-router.js';
+
 // Fallback Handling
 export {
   FallbackHandler,
