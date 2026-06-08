@@ -41,6 +41,8 @@ import { processIdentityIpc, signOutgoingMessage, recordUnsignedMessage } from '
 import {
   getHostSlmExtensions,
   getSlmUsageTracker,
+  getSlmDashboard,
+  planModelDownload,
   estimateTokens,
 } from './router/slm-host-runtime.js';
 import type { ExtractionSchema } from './agents/slm-extensions/index.js';
@@ -739,6 +741,78 @@ export function startIpcWatcher(deps: IpcDeps): void {
                     logger.error({ type: data.type, sourceGroup, err: errMsg }, 'SLM tool failed');
                     if (responseFile)
                       writeIpcResponse(responseFile, { ok: false, error: `SLM backend unavailable: ${errMsg}` });
+                  }
+
+                  fs.unlinkSync(filePath);
+                  continue;
+                }
+
+                // slm_download_plan: HITL-gated download *planning* only. This
+                // never fetches bytes — it inspects whether a model's GGUF is
+                // present and returns an approval plan (size, license, blocking
+                // reasons). GPL models and models with no configured URL are
+                // surfaced as blocked. Actual downloads require explicit human
+                // approval and run outside this read-only handler.
+                if (data.type === 'slm_download_plan') {
+                  const responseFile = data.responseFile
+                    ? toHostIpcPath(data.responseFile as string, sourceGroup)
+                    : undefined;
+                  try {
+                    const modelId = String(data.modelId ?? '').trim();
+                    if (!modelId) {
+                      if (responseFile)
+                        writeIpcResponse(responseFile, { ok: false, error: 'modelId is required' });
+                    } else {
+                      const plan = planModelDownload(modelId);
+                      const blocked = Boolean(plan.blockedReason);
+                      writeIpcResponse(responseFile!, {
+                        ok: true,
+                        plan,
+                        present: !plan.required,
+                        blocked,
+                        // Approval is only meaningful when a download is needed and not blocked.
+                        approvalRequired: plan.required && !blocked,
+                        note: !plan.required
+                          ? 'Model already present — no download needed.'
+                          : blocked
+                            ? `Download blocked: ${plan.blockedReason}`
+                            : 'Download requires explicit human approval. No bytes were fetched.',
+                      });
+                    }
+                  } catch (err) {
+                    const errMsg = err instanceof Error ? err.message : String(err);
+                    logger.error({ sourceGroup, err: errMsg }, 'slm_download_plan failed');
+                    if (responseFile) writeIpcResponse(responseFile, { ok: false, error: errMsg });
+                  }
+
+                  fs.unlinkSync(filePath);
+                  continue;
+                }
+
+                // slm_dashboard: expose SLM usage metrics (cost savings, fallback
+                // rate, task/model distribution) — the SLM-first analogue of the
+                // router metrics dashboard. Read-only.
+                if (data.type === 'slm_dashboard') {
+                  const responseFile = data.responseFile
+                    ? toHostIpcPath(data.responseFile as string, sourceGroup)
+                    : undefined;
+                  try {
+                    const windowMs =
+                      typeof data.windowMs === 'number' && data.windowMs > 0
+                        ? data.windowMs
+                        : undefined;
+                    const windowLabel = typeof data.windowLabel === 'string' ? data.windowLabel : undefined;
+                    const dashboard = getSlmDashboard();
+                    if (responseFile)
+                      writeIpcResponse(responseFile, {
+                        ok: true,
+                        dashboard: dashboard.generate(windowMs, windowLabel),
+                        text: dashboard.textSummary(windowMs, windowLabel),
+                      });
+                  } catch (err) {
+                    const errMsg = err instanceof Error ? err.message : String(err);
+                    logger.error({ sourceGroup, err: errMsg }, 'slm_dashboard failed');
+                    if (responseFile) writeIpcResponse(responseFile, { ok: false, error: errMsg });
                   }
 
                   fs.unlinkSync(filePath);

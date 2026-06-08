@@ -62,6 +62,8 @@ import { calculateCost, getActiveProvider } from './economics.js';
 import { contextManager, codedContext, setSystemFact, setCapability } from './context/index.js';
 import { pruneOldChunks } from './semantic-index.js';
 import { RouterFactory, type UniversalRouter } from './router/index.js';
+import { buildProductionRouter } from './router/production-wiring.js';
+import { getSlmUsageTracker } from './router/slm-host-runtime.js';
 import type { RoutingContext, RoutingDecision } from './router/types.js';
 import { classifyGoalWithAI, classifyGoalHeuristic, extractGoalDetails } from './goal-classifier.js';
 import { ResponseTimeManager } from './response-time-manager.js';
@@ -1808,10 +1810,22 @@ Steps:
   }
 
   process.stderr.write('[BOOT] tasks checked, initializing router\n');
-  // Initialize enrichment/monitoring layers (non-blocking)
+  // Initialize enrichment/monitoring layers (non-blocking).
+  // buildProductionRouter attaches the heterogeneous SLM orchestrator when the
+  // fine-tuned specialist GGUFs (NANOCLAW_SLM_*_MODEL) are present on disk, and
+  // degrades gracefully to the standard production router otherwise — no model
+  // downloads or server spawns happen here (both are lazy / HITL-gated).
   try {
-    router = RouterFactory.createProduction();
-    logger.info('UniversalRouter initialized');
+    const wiring = buildProductionRouter({ tracker: getSlmUsageTracker() });
+    router = wiring.router;
+    if (wiring.heterogeneousEnabled) {
+      logger.info(
+        { wiredSpecialists: wiring.wiredSpecialists, missingModels: wiring.missingModels },
+        wiring.summary,
+      );
+    } else {
+      logger.warn({ reason: wiring.fallbackReason }, wiring.summary);
+    }
   } catch (err) {
     logger.warn({ err }, 'UniversalRouter init failed, creating fallback');
     router = RouterFactory.create();

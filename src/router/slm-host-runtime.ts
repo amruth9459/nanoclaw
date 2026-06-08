@@ -23,6 +23,15 @@ import {
   type SlmExtensionBundle,
 } from '../agents/slm-extensions/index.js';
 import { SlmUsageTracker } from './monitoring/router-metrics.js';
+import { SlmDashboard } from './monitoring/slm-dashboard.js';
+import { ModelRegistry } from './model-selector.js';
+import { LlamaCppBackend, type DownloadPlan } from './backends/llama-cpp.js';
+import {
+  specialistModelId,
+  makeSpecialistModelConfig,
+  SLM_TASK_ENV_VARS,
+} from './production-wiring.js';
+import type { SlmTask } from './heterogeneous-router.js';
 
 const OLLAMA_URL = process.env.OLLAMA_URL || 'http://127.0.0.1:11434';
 
@@ -59,11 +68,54 @@ export function ollamaInferenceFn(model: string, baseUrl = OLLAMA_URL): Inferenc
 
 let extensionsSingleton: SlmExtensionBundle | null = null;
 let trackerSingleton: SlmUsageTracker | null = null;
+let registrySingleton: ModelRegistry | null = null;
+let backendSingleton: LlamaCppBackend | null = null;
 
 /** Shared SLM cost-savings tracker. */
 export function getSlmUsageTracker(): SlmUsageTracker {
   if (!trackerSingleton) trackerSingleton = new SlmUsageTracker();
   return trackerSingleton;
+}
+
+/**
+ * Shared model registry for host-side SLM operations. Includes the default
+ * GGUF SLMs (qwen2.5-0.5b, tiny-aya-3.35b) plus any fine-tuned specialist
+ * models named via the NANOCLAW_SLM_*_MODEL env vars, so the download planner
+ * can resolve and presence-check both.
+ */
+export function getModelRegistry(): ModelRegistry {
+  if (registrySingleton) return registrySingleton;
+  const registry = new ModelRegistry();
+  for (const task of Object.keys(SLM_TASK_ENV_VARS) as SlmTask[]) {
+    const p = (process.env[SLM_TASK_ENV_VARS[task]] || '').trim();
+    if (p) registry.register(makeSpecialistModelConfig(specialistModelId(task), task, p));
+  }
+  registrySingleton = registry;
+  return registry;
+}
+
+/** Shared llama.cpp backend bound to the host model registry. */
+export function getLlamaCppBackend(): LlamaCppBackend {
+  if (!backendSingleton) {
+    const registry = getModelRegistry();
+    backendSingleton = new LlamaCppBackend((id) => registry.get(id));
+  }
+  return backendSingleton;
+}
+
+/**
+ * Plan (never execute) a model download. Pure inspection: reports whether the
+ * GGUF is already present, its approximate size and license, and any blocking
+ * reason (no URL, GPL license). Downloads remain HITL-gated — this only produces
+ * the approval message. See {@link LlamaCppBackend.planDownload}.
+ */
+export function planModelDownload(modelId: string): DownloadPlan {
+  return getLlamaCppBackend().planDownload(modelId);
+}
+
+/** Build an {@link SlmDashboard} over the shared usage tracker. */
+export function getSlmDashboard(): SlmDashboard {
+  return new SlmDashboard(getSlmUsageTracker());
 }
 
 /** Shared, lazily-built SLM extension bundle wired to local inference. */
@@ -86,4 +138,6 @@ export function estimateTokens(s: string): number {
 export function _resetSlmRuntime(): void {
   extensionsSingleton = null;
   trackerSingleton = null;
+  registrySingleton = null;
+  backendSingleton = null;
 }
