@@ -2,6 +2,34 @@
 
 *Version control document — auto-updated by `lexios/update-docs.py` (twice daily via NanoClaw scheduled task)*
 
+## Unreleased — Heterogeneous SLM Router → Production (2026-06-08)
+
+### Added
+- **Production wiring for the SLM-first router** (`src/router/production-wiring.ts`).
+  `buildProductionRouter()` reads the `NANOCLAW_SLM_{INTENT,SENTIMENT,SUMMARIZE,EXTRACT}_MODEL`
+  env vars, registers a synthetic `local-llamacpp` model per configured task, presence-checks
+  each GGUF on disk, and attaches a `HeterogeneousRouter` (ensemble voting + confidence-gated
+  LLM fallback) to the `UniversalRouter`. `src/index.ts` boot now calls this instead of
+  `RouterFactory.createProduction()`.
+- **Graceful degradation**: if no model paths are set, or the GGUF files aren't present
+  (downloads are HITL-gated), it falls back to the standard production router with a logged
+  reason — never downloads a model or spawns `llama-server` at boot.
+- **`slm_download_plan` MCP tool** (`container/agent-runner/src/tools/slm-download.ts`) + host
+  IPC handler. Planning-only: reports presence, size, license, and blocking reasons. Blocks GPL
+  models and models with no verified URL; surfaces an approval gate. Never fetches bytes.
+- **SLM usage dashboard** (`src/router/monitoring/slm-dashboard.ts`) + `slm_savings` tool + host
+  IPC handler. Cost savings, fallback rate, and task/model distribution over the shared
+  `SlmUsageTracker`; optionally folds in the specialist accuracy scoreboard.
+- **Host runtime helpers** (`src/router/slm-host-runtime.ts`): shared `ModelRegistry` /
+  `LlamaCppBackend` singletons, `planModelDownload()`, `getSlmDashboard()`.
+- **Integration tests** (`src/router/integration.test.ts`, 12 tests): heterogeneous attach,
+  partial wiring, graceful fallback (unset + missing-file), no-spawn-at-wiring, metrics tracking,
+  scoreboard folding, and the HITL download-planning path. Full router suite: 43/43 pass.
+
+### Notes
+- New env vars + model download workflow documented in `src/router/README.md`.
+- Container SLM tools (`slm-tools`, `slm-download`) gate behind `NANOCLAW_SLM_TOOLS=1`.
+
 ## Unreleased — Agent Call Graph (DashClaw) (2026-06-07)
 
 ### Added

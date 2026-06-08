@@ -109,4 +109,25 @@ fallback to a larger model. Output is validated and projected to exactly the sch
         schema: args.schema,
       }),
   );
+
+  server.tool(
+    'slm_savings',
+    `Report local SLM usage and the money saved by serving simple tasks ($0 local inference)
+instead of a paid API. Returns cost savings, fallback rate, and task/model distribution over
+a trailing window. Read-only — useful for checking how much the SLM-first router is saving.`,
+    {
+      windowMs: z
+        .number()
+        .int()
+        .positive()
+        .optional()
+        .describe('Trailing window in ms (default 7 days)'),
+      windowLabel: z.string().optional().describe('Label for the window, e.g. "Today"'),
+    },
+    async (args) =>
+      roundTrip('slm_dashboard', {
+        windowMs: args.windowMs,
+        windowLabel: args.windowLabel,
+      }),
+  );
 }

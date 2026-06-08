@@ -68,6 +68,29 @@ export type {
   SlmSavingsReport,
 } from './monitoring/router-metrics.js';
 
+// SLM Usage Dashboard (cost savings / fallback rate / task distribution)
+export {
+  SlmDashboard,
+  saveSlmDashboard,
+} from './monitoring/slm-dashboard.js';
+export type {
+  SlmDashboardData,
+  SlmModelShare,
+  SlmTaskShare,
+} from './monitoring/slm-dashboard.js';
+
+// Production wiring (heterogeneous SLM router attach + graceful fallback)
+export {
+  buildProductionRouter,
+  makeSpecialistModelConfig,
+  specialistModelId,
+  SLM_TASK_ENV_VARS,
+} from './production-wiring.js';
+export type {
+  ProductionRouterWiring,
+  BuildProductionRouterOptions,
+} from './production-wiring.js';
+
 // MLX Backend
 export {
   MLXBackend,

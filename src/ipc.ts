@@ -765,19 +765,20 @@ export function startIpcWatcher(deps: IpcDeps): void {
                     } else {
                       const plan = planModelDownload(modelId);
                       const blocked = Boolean(plan.blockedReason);
-                      writeIpcResponse(responseFile!, {
-                        ok: true,
-                        plan,
-                        present: !plan.required,
-                        blocked,
-                        // Approval is only meaningful when a download is needed and not blocked.
-                        approvalRequired: plan.required && !blocked,
-                        note: !plan.required
-                          ? 'Model already present — no download needed.'
-                          : blocked
-                            ? `Download blocked: ${plan.blockedReason}`
-                            : 'Download requires explicit human approval. No bytes were fetched.',
-                      });
+                      if (responseFile)
+                        writeIpcResponse(responseFile, {
+                          ok: true,
+                          plan,
+                          present: !plan.required,
+                          blocked,
+                          // Approval is only meaningful when a download is needed and not blocked.
+                          approvalRequired: plan.required && !blocked,
+                          note: !plan.required
+                            ? 'Model already present — no download needed.'
+                            : blocked
+                              ? `Download blocked: ${plan.blockedReason}`
+                              : 'Download requires explicit human approval. No bytes were fetched.',
+                        });
                     }
                   } catch (err) {
                     const errMsg = err instanceof Error ? err.message : String(err);

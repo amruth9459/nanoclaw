@@ -441,10 +441,12 @@ function buildContainerArgs(
     }
   }
 
-  // SLM tools (slm_summarize / slm_classify / slm_extract) — $0 local inference.
+  // SLM tools (slm_summarize / slm_classify / slm_extract / slm_savings) and the
+  // HITL-gated slm_download_plan — $0 local inference + download planning.
   // Opt-in via NANOCLAW_SLM_TOOLS=1 (host must have a local model backend running).
   if (process.env.NANOCLAW_SLM_TOOLS === '1') {
     toolModules.push('tools/slm-tools');
+    toolModules.push('tools/slm-download');
   }
 
   if (toolModules.length > 0) {
