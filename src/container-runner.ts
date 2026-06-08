@@ -441,6 +441,12 @@ function buildContainerArgs(
     }
   }
 
+  // SLM tools (slm_summarize / slm_classify / slm_extract) — $0 local inference.
+  // Opt-in via NANOCLAW_SLM_TOOLS=1 (host must have a local model backend running).
+  if (process.env.NANOCLAW_SLM_TOOLS === '1') {
+    toolModules.push('tools/slm-tools');
+  }
+
   if (toolModules.length > 0) {
     args.push('-e', `NANOCLAW_TOOL_MODULES=${toolModules.join(',')}`);
   }

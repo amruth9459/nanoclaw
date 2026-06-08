@@ -340,6 +340,145 @@ export class RouterMetrics {
 }
 
 /**
+ * Reference API cost we compare local SLM inference against, in USD per 1K tokens.
+ * Defaults to Claude Sonnet input pricing — the model an SLM call most often
+ * displaces. Override per-deployment via SlmUsageTracker options.
+ */
+export const DEFAULT_API_REFERENCE_COST_PER_1K = 0.003;
+
+/** One recorded SLM (or fallen-back) inference call. */
+export interface SlmCallRecord {
+  /** epoch ms */
+  timestamp: number;
+  modelId: string;
+  /** logical task, e.g. 'summarize' | 'classify' | 'extract' */
+  task: string;
+  inputTokens: number;
+  outputTokens: number;
+  /** true when the SLM output was rejected and an API/LLM fallback ran. */
+  usedFallback: boolean;
+}
+
+export interface SlmSavingsReport {
+  periodLabel: string;
+  /** SLM calls that succeeded locally (no fallback). */
+  slmCalls: number;
+  /** calls that fell back to a paid API/LLM. */
+  apiCalls: number;
+  totalCalls: number;
+  savedUsd: number;
+  /** what the same work would have cost if every call hit the API. */
+  wouldHaveCostUsd: number;
+  fallbackRate: number;
+  byTask: Record<string, number>;
+  byModel: Record<string, number>;
+  /** Human-readable one-liner, e.g. "This week: 847 SLM calls, saved $25.41 vs API". */
+  summary: string;
+}
+
+/**
+ * Tracks SLM-vs-API usage and computes the money saved by serving simple tasks
+ * locally. Distinct from {@link PerformanceTracker} (which tracks the router as a
+ * whole) — this is the cost-reduction scoreboard for the SLM primitive.
+ */
+export class SlmUsageTracker {
+  private records: SlmCallRecord[] = [];
+  private readonly referenceCostPer1k: number;
+  private readonly maxRecords = 50_000;
+  private readonly clock: () => number;
+
+  constructor(opts?: { referenceCostPer1kUsd?: number; clock?: () => number }) {
+    this.referenceCostPer1k = opts?.referenceCostPer1kUsd ?? DEFAULT_API_REFERENCE_COST_PER_1K;
+    this.clock = opts?.clock ?? (() => Date.now());
+  }
+
+  /** Record one call. `usedFallback` distinguishes a local win from an API fallback. */
+  record(rec: Omit<SlmCallRecord, 'timestamp'> & { timestamp?: number }): void {
+    this.records.push({
+      timestamp: rec.timestamp ?? this.clock(),
+      modelId: rec.modelId,
+      task: rec.task,
+      inputTokens: Math.max(0, rec.inputTokens || 0),
+      outputTokens: Math.max(0, rec.outputTokens || 0),
+      usedFallback: Boolean(rec.usedFallback),
+    });
+    if (this.records.length > this.maxRecords) {
+      this.records = this.records.slice(-this.maxRecords);
+    }
+  }
+
+  /** Cost (USD) the given tokens would have incurred at the reference API price. */
+  private apiCostFor(rec: SlmCallRecord): number {
+    return ((rec.inputTokens + rec.outputTokens) / 1000) * this.referenceCostPer1k;
+  }
+
+  /**
+   * Build a savings report over the trailing window (default 7 days).
+   */
+  report(windowMs: number = 7 * 24 * 60 * 60 * 1000, periodLabel = 'This week'): SlmSavingsReport {
+    const cutoff = this.clock() - windowMs;
+    const records = this.records.filter((r) => r.timestamp >= cutoff);
+
+    let slmCalls = 0;
+    let apiCalls = 0;
+    let savedUsd = 0;
+    let wouldHaveCostUsd = 0;
+    const byTask: Record<string, number> = {};
+    const byModel: Record<string, number> = {};
+
+    for (const r of records) {
+      const apiCost = this.apiCostFor(r);
+      wouldHaveCostUsd += apiCost;
+      if (r.usedFallback) {
+        apiCalls++;
+      } else {
+        slmCalls++;
+        savedUsd += apiCost; // local inference is $0, so the whole API cost is saved
+      }
+      byTask[r.task] = (byTask[r.task] || 0) + 1;
+      byModel[r.modelId] = (byModel[r.modelId] || 0) + 1;
+    }
+
+    const totalCalls = records.length;
+    const fallbackRate = totalCalls > 0 ? apiCalls / totalCalls : 0;
+    const summary = `${periodLabel}: ${slmCalls.toLocaleString()} SLM calls, saved $${savedUsd.toFixed(2)} vs API`;
+
+    return {
+      periodLabel,
+      slmCalls,
+      apiCalls,
+      totalCalls,
+      savedUsd,
+      wouldHaveCostUsd,
+      fallbackRate,
+      byTask,
+      byModel,
+      summary,
+    };
+  }
+
+  /** WhatsApp/console-friendly multi-line report. */
+  textReport(windowMs?: number, periodLabel?: string): string {
+    const r = this.report(windowMs, periodLabel);
+    const lines = [
+      `*SLM Cost Savings (${r.periodLabel})*`,
+      `• ${r.summary}`,
+      `• Local calls: ${r.slmCalls.toLocaleString()} | API fallbacks: ${r.apiCalls.toLocaleString()} (${(r.fallbackRate * 100).toFixed(1)}%)`,
+      `• If all-API: $${r.wouldHaveCostUsd.toFixed(2)} → actual extra: $${(r.wouldHaveCostUsd - r.savedUsd).toFixed(2)}`,
+    ];
+    const tasks = Object.entries(r.byTask).sort((a, b) => b[1] - a[1]);
+    if (tasks.length > 0) {
+      lines.push('• By task: ' + tasks.map(([t, n]) => `${t} ${n}`).join(', '));
+    }
+    return lines.join('\n');
+  }
+
+  exportRecords(): SlmCallRecord[] {
+    return [...this.records];
+  }
+}
+
+/**
  * Save dashboard to file
  */
 export async function saveDashboard(

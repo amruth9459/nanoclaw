@@ -38,6 +38,12 @@ import { logger } from './logger.js';
 import { indexDocument, semanticSearch } from './semantic-index.js';
 import { RegisteredGroup } from './types.js';
 import { processIdentityIpc, signOutgoingMessage, recordUnsignedMessage } from './identity/ipc-handlers.js';
+import {
+  getHostSlmExtensions,
+  getSlmUsageTracker,
+  estimateTokens,
+} from './router/slm-host-runtime.js';
+import type { ExtractionSchema } from './agents/slm-extensions/index.js';
 
 export interface IpcDeps {
   sendMessage: (jid: string, text: string) => Promise<void>;
@@ -626,6 +632,113 @@ export function startIpcWatcher(deps: IpcDeps): void {
                     const errMsg = err instanceof Error ? err.message : String(err);
                     logger.error({ model, sourceGroup, err: errMsg }, 'Ollama query failed');
                     if (responseFile) writeIpcResponse(responseFile, { error: `Ollama unavailable: ${errMsg}` });
+                  }
+
+                  fs.unlinkSync(filePath);
+                  continue;
+                }
+
+                // SLM tools (slm_summarize / slm_classify / slm_extract): run a
+                // small local model via the SLM agent extensions ($0 inference,
+                // automatic LLM fallback). Mirrors the ollama_query pattern.
+                if (
+                  data.type === 'slm_summarize' ||
+                  data.type === 'slm_classify' ||
+                  data.type === 'slm_extract'
+                ) {
+                  const responseFile = data.responseFile
+                    ? toHostIpcPath(data.responseFile as string, sourceGroup)
+                    : undefined;
+                  try {
+                    const ext = getHostSlmExtensions();
+                    const tracker = getSlmUsageTracker();
+                    let out: Record<string, unknown>;
+                    let task = 'classify';
+                    let inText = '';
+
+                    if (data.type === 'slm_summarize') {
+                      task = 'summarize';
+                      const messages = Array.isArray(data.messages)
+                        ? (data.messages as string[])
+                        : [];
+                      inText = messages.join('\n');
+                      const r = await ext.summarizer.summarize(messages, {
+                        paragraphs: typeof data.paragraphs === 'number' ? data.paragraphs : 3,
+                        focus: typeof data.focus === 'string' ? data.focus : undefined,
+                      });
+                      out = {
+                        ok: r.ok,
+                        summary: r.value?.summary ?? null,
+                        confidence: r.confidence,
+                        model: r.modelId,
+                        usedFallback: r.usedFallback,
+                        error: r.error,
+                      };
+                      if (r.ok) {
+                        tracker.record({
+                          modelId: r.modelId ?? 'slm',
+                          task,
+                          inputTokens: estimateTokens(inText),
+                          outputTokens: estimateTokens(r.value?.summary ?? ''),
+                          usedFallback: r.usedFallback,
+                        });
+                      }
+                    } else if (data.type === 'slm_classify') {
+                      inText = String(data.text ?? '');
+                      const kind = data.kind === 'sentiment' ? 'sentiment' : 'intent';
+                      task = `classify:${kind}`;
+                      const r =
+                        kind === 'sentiment'
+                          ? await ext.sentiment.analyze(inText)
+                          : await ext.intent.classify(inText);
+                      out = {
+                        ok: r.ok,
+                        result: r.value,
+                        confidence: r.confidence,
+                        model: r.modelId,
+                        usedFallback: r.usedFallback,
+                        error: r.error,
+                      };
+                      if (r.ok) {
+                        tracker.record({
+                          modelId: r.modelId ?? 'slm',
+                          task,
+                          inputTokens: estimateTokens(inText),
+                          outputTokens: 20,
+                          usedFallback: r.usedFallback,
+                        });
+                      }
+                    } else {
+                      // slm_extract
+                      task = 'extract';
+                      inText = String(data.text ?? '');
+                      const schema = (data.schema ?? {}) as ExtractionSchema;
+                      const r = await ext.json.extract(inText, schema);
+                      out = {
+                        ok: r.ok,
+                        result: r.value,
+                        confidence: r.confidence,
+                        model: r.modelId,
+                        usedFallback: r.usedFallback,
+                        error: r.error,
+                      };
+                      if (r.ok) {
+                        tracker.record({
+                          modelId: r.modelId ?? 'slm',
+                          task,
+                          inputTokens: estimateTokens(inText),
+                          outputTokens: estimateTokens(JSON.stringify(r.value ?? {})),
+                          usedFallback: r.usedFallback,
+                        });
+                      }
+                    }
+
+                    if (responseFile) writeIpcResponse(responseFile, out);
+                  } catch (err) {
+                    const errMsg = err instanceof Error ? err.message : String(err);
+                    logger.error({ type: data.type, sourceGroup, err: errMsg }, 'SLM tool failed');
+                    if (responseFile)
+                      writeIpcResponse(responseFile, { ok: false, error: `SLM backend unavailable: ${errMsg}` });
                   }
 
                   fs.unlinkSync(filePath);

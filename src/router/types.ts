@@ -72,7 +72,7 @@ export interface ModelConfig {
   id: string;
   name: string;
   tier: ModelTier;
-  provider: 'local-mlx' | 'anthropic' | 'openai' | 'google';
+  provider: 'local-mlx' | 'local-llamacpp' | 'anthropic' | 'openai' | 'google';
 
   // Capabilities
   supportsVision: boolean;
@@ -86,6 +86,15 @@ export interface ModelConfig {
   // Availability
   requiresGpu?: boolean;
   memoryGb?: number;
+
+  // GGUF / quantized-model metadata (local-llamacpp provider)
+  // Present for models served via llama.cpp from an on-disk GGUF file.
+  paramCountB?: number;       // Parameter count in billions (e.g. 3.35 for Tiny Aya 3.35B)
+  quantization?: string;      // GGUF quantization (e.g. 'Q4_K_M')
+  ggufFile?: string;          // GGUF filename, resolved against the models dir (e.g. 'tiny-aya-3.35b-q4_k_m.gguf')
+  downloadUrl?: string;       // Source URL for auto-download (HITL-gated). Operator-supplied/overridable via env.
+  requiredRamGb?: number;     // Approximate RAM needed to serve this model
+  license?: string;           // SPDX-ish license id (e.g. 'Apache-2.0') — used to enforce non-GPL constraint
 }
 
 /**
@@ -123,6 +132,12 @@ export interface TaskFeatures {
   requiresCode: boolean;
   requiresReasoning: boolean;
   requiresData: boolean;
+
+  // SLM-eligibility patterns (Small Language Model fast-path candidates).
+  // When set, the selector may route to the local-slm tier for $0 inference.
+  isSummarizable?: boolean;         // Conversation/long-text → compact summary
+  isSimpleClassification?: boolean; // Sentiment / intent / category labelling
+  requiresStructuredOutput?: boolean; // JSON / form / schema-constrained extraction
 
   // Content analysis
   estimatedTokens: number;

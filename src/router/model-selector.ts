@@ -52,6 +52,56 @@ export class ModelRegistry {
       memoryGb: 7,
     });
 
+    // GGUF SLMs served via llama.cpp (Q4_K_M, CPU-friendly, $0 inference).
+    // Per the "small-language-models-production" finding: <4B params reach
+    // production reliability for summarization / classification / structured
+    // output through engineering discipline (tolerant JSON parsing + fallback),
+    // not scale. Download URLs are HITL-gated and env-overridable — see
+    // LlamaCppBackend.planDownload(). Both models are Apache-2.0 (non-GPL).
+    this.register({
+      id: 'tiny-aya-3.35b',
+      name: 'Tiny Aya 3.35B (Q4_K_M)',
+      tier: 'local-slm',
+      provider: 'local-llamacpp',
+      supportsVision: false,
+      maxTokens: 4096,
+      contextWindow: 8192,
+      avgLatencyMs: 120,
+      costPer1kTokens: 0,
+      requiresGpu: false,
+      memoryGb: 4, // ~4GB RAM to serve
+      paramCountB: 3.35,
+      quantization: 'Q4_K_M',
+      ggufFile: 'tiny-aya-3.35b-q4_k_m.gguf',
+      // Operator-supplied: set TINY_AYA_GGUF_URL to the verified HF GGUF URL.
+      downloadUrl: process.env.TINY_AYA_GGUF_URL,
+      requiredRamGb: 4,
+      license: 'Apache-2.0',
+    });
+
+    this.register({
+      id: 'qwen2.5-0.5b',
+      name: 'Qwen 2.5 0.5B Instruct (Q4_K_M)',
+      tier: 'local-slm',
+      provider: 'local-llamacpp',
+      supportsVision: false,
+      maxTokens: 4096,
+      contextWindow: 32768,
+      avgLatencyMs: 40,
+      costPer1kTokens: 0,
+      requiresGpu: false,
+      memoryGb: 1, // ~1GB RAM to serve
+      paramCountB: 0.5,
+      quantization: 'Q4_K_M',
+      ggufFile: 'qwen2.5-0.5b-instruct-q4_k_m.gguf',
+      // Official Qwen GGUF (Apache-2.0). Env-overridable for mirrors/air-gapped hosts.
+      downloadUrl:
+        process.env.QWEN2_5_0_5B_GGUF_URL ||
+        'https://huggingface.co/Qwen/Qwen2.5-0.5B-Instruct-GGUF/resolve/main/qwen2.5-0.5b-instruct-q4_k_m.gguf',
+      requiredRamGb: 1,
+      license: 'Apache-2.0',
+    });
+
     // Local LLMs (Large Language Models)
     this.register({
       id: 'qwen2.5-vl-72b',
@@ -237,6 +287,20 @@ export class ModelSelector {
       return 'local-slm';
     }
 
+    // SLM fast-path: summarization / simple classification / structured output.
+    // These are the validated $0-inference candidates for small models. Quality
+    // "best" was already handled (and returned) above, so here we only need the
+    // accuracy gate. Structured output still routes to SLM but relies on the
+    // tolerant-JSON + LLM fallback in the agent extension layer.
+    if (features.accuracyRequired < 0.85) {
+      if (
+        (features.isSummarizable && features.complexity < 0.3) ||
+        features.isSimpleClassification
+      ) {
+        return 'local-slm';
+      }
+    }
+
     // Cost optimization path (default for most tasks)
     if (this.config.costOptimization) {
       // Try SLM first for simple tasks
@@ -285,7 +349,28 @@ export class ModelSelector {
 
     // Task-specific selection
     if (tier === 'local-slm') {
-      return features.requiresVision ? 'qwen2.5-vl-7b' : 'qwen2.5-7b';
+      if (features.requiresVision) return 'qwen2.5-vl-7b';
+
+      // Tiny classification with no structure → the lightest model (0.5B, ~40ms).
+      if (
+        features.isSimpleClassification &&
+        !features.requiresStructuredOutput &&
+        this.registry.get('qwen2.5-0.5b')
+      ) {
+        return 'qwen2.5-0.5b';
+      }
+
+      // Summarization / structured output / multilingual → Tiny Aya 3.35B (GGUF).
+      if (
+        (features.isSummarizable ||
+          features.requiresStructuredOutput ||
+          features.isSimpleClassification) &&
+        this.registry.get('tiny-aya-3.35b')
+      ) {
+        return 'tiny-aya-3.35b';
+      }
+
+      return 'qwen2.5-7b';
     }
 
     if (tier === 'local-llm') {

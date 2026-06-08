@@ -46,9 +46,13 @@ export {
 export {
   RouterMetrics,
   saveDashboard,
+  SlmUsageTracker,
+  DEFAULT_API_REFERENCE_COST_PER_1K,
 } from './monitoring/router-metrics.js';
 export type {
   MetricsDashboard,
+  SlmCallRecord,
+  SlmSavingsReport,
 } from './monitoring/router-metrics.js';
 
 // MLX Backend
@@ -63,6 +67,20 @@ export type {
   MLXInferenceResponse,
   MLXBackendConfig,
 } from './backends/mlx-backend.js';
+
+// llama.cpp Backend (GGUF / Q4_K_M, process-lifecycle-managed)
+export {
+  LlamaCppBackend,
+} from './backends/llama-cpp.js';
+export type {
+  LlamaCppBackendConfig,
+  LlamaCppInferenceRequest,
+  LlamaCppInferenceResponse,
+  DownloadPlan,
+  SpawnedProcess,
+  SpawnFn,
+  FetchFn,
+} from './backends/llama-cpp.js';
 
 // Types
 export type {

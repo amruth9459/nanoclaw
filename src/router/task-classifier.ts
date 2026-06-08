@@ -21,6 +21,14 @@ export class MetadataClassifier {
       requiresData: context.taskType === 'data',
     };
 
+    // SLM-eligibility (cheap, keyword-based — runs on the content sample if present)
+    if (context.contentSample) {
+      const slm = this.detectSlmFeatures(context.contentSample);
+      features.isSummarizable = slm.isSummarizable;
+      features.isSimpleClassification = slm.isSimpleClassification;
+      features.requiresStructuredOutput = slm.requiresStructuredOutput;
+    }
+
     // Estimate complexity from quality needs
     if (context.qualityNeeds === 'best') {
       features.complexity = 0.8;
@@ -106,6 +114,39 @@ export class MetadataClassifier {
   }
 
   /**
+   * Detect SLM fast-path eligibility from raw content.
+   *
+   * These are the three task shapes the "small-language-models-production"
+   * finding validated for local <4B models: summarization, simple
+   * classification, and schema-constrained structured output. Detection is
+   * intentionally keyword-based (no model call) so it stays on the instant path.
+   */
+  detectSlmFeatures(content: string): {
+    isSummarizable: boolean;
+    isSimpleClassification: boolean;
+    requiresStructuredOutput: boolean;
+  } {
+    const lower = content.toLowerCase();
+
+    const isSummarizable =
+      /\b(summari[sz]e|summary|tl;?dr|recap|condense|digest|brief(ly)?|key points|key takeaways)\b/.test(
+        lower,
+      );
+
+    const isSimpleClassification =
+      /\b(classif(y|ication)|categori[sz]e|category|sentiment|intent|label this|tag this|is this (positive|negative|spam|urgent)|detect (the )?(tone|mood|emotion))\b/.test(
+        lower,
+      );
+
+    const requiresStructuredOutput =
+      /\b(json|schema|structured (output|data)|extract (the )?(fields?|data|entities)|return .*\b(as|in)\b.*\bjson\b|key-?value|fill (in )?the form)\b/.test(
+        lower,
+      ) || /\{\s*"[^"]+"\s*:/.test(content); // looks like a JSON template/example
+
+    return { isSummarizable, isSimpleClassification, requiresStructuredOutput };
+  }
+
+  /**
    * Estimate complexity from content
    */
   estimateComplexity(content: string): number {
@@ -161,6 +202,7 @@ export class LLMClassifier {
     const metadata = new MetadataClassifier();
     const taskType = metadata.detectTaskType(content);
     const complexity = metadata.estimateComplexity(content);
+    const slm = metadata.detectSlmFeatures(content);
 
     const features: TaskFeatures = {
       complexity,
@@ -172,6 +214,10 @@ export class LLMClassifier {
       requiresCode: taskType === 'code',
       requiresReasoning: taskType === 'reasoning',
       requiresData: taskType === 'data',
+
+      isSummarizable: slm.isSummarizable,
+      isSimpleClassification: slm.isSimpleClassification,
+      requiresStructuredOutput: slm.requiresStructuredOutput,
 
       estimatedTokens: this.estimateTokens(content),
       language: this.detectLanguage(content),
@@ -318,6 +364,9 @@ export class TaskClassifier {
       requiresCode: partial.requiresCode || false,
       requiresReasoning: partial.requiresReasoning || false,
       requiresData: partial.requiresData || false,
+      isSummarizable: partial.isSummarizable || false,
+      isSimpleClassification: partial.isSimpleClassification || false,
+      requiresStructuredOutput: partial.requiresStructuredOutput || false,
       estimatedTokens: partial.estimatedTokens || 2000,
       language: partial.language,
       domain: partial.domain,
