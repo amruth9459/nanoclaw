@@ -5,6 +5,570 @@
 
 ---
 
+### 2026-06-13 04:18
+
+**Areas:** hooks
+**Files (20):** .cache/zellij/permissions.kdl, .claude/bin/fix-thinking.py, .claude/consolidation-2026-05-29/CONSOLIDATION_PLAN.md, .claude/consolidation-2026-05-29/add_history.py, .claude/consolidation-2026-05-29/batch.sh, .claude/consolidation-2026-05-29/build_maps.py, .claude/consolidation-2026-05-29/inventory.py, .claude/consolidation-2026-05-29/maps/INDEX.md, .claude/consolidation-2026-05-29/maps/SESSIONS-glowboard.md, .claude/consolidation-2026-05-29/maps/SESSIONS-home.md, .claude/consolidation-2026-05-29/maps/SESSIONS-jyotish.md, .claude/consolidation-2026-05-29/maps/SESSIONS-lexios.md, .claude/consolidation-2026-05-29/maps/SESSIONS-nanoclaw.md, .claude/consolidation-2026-05-29/relocate.py, .claude/consolidation-2026-05-29/relocate_fix_inplace.py, .claude/consolidation-2026-05-29/rewrite_session.py, .claude/hooks/brain-digest-inject.sh, .claude/hooks/image-safe-gate.sh, .claude/projects/-Users-amrut-Lexios/memory/MEMORY.md, .claude/projects/-Users-amrut-Lexios/memory/lexios-concurrent-repo-mutation.md
+**Diff:** +558 -1 across 2 files
+
+### 2026-06-13 04:18
+
+**Areas:** hooks
+**Files (20):** .cache/zellij/permissions.kdl, .claude/bin/fix-thinking.py, .claude/consolidation-2026-05-29/CONSOLIDATION_PLAN.md, .claude/consolidation-2026-05-29/add_history.py, .claude/consolidation-2026-05-29/batch.sh, .claude/consolidation-2026-05-29/build_maps.py, .claude/consolidation-2026-05-29/inventory.py, .claude/consolidation-2026-05-29/maps/INDEX.md, .claude/consolidation-2026-05-29/maps/SESSIONS-glowboard.md, .claude/consolidation-2026-05-29/maps/SESSIONS-home.md, .claude/consolidation-2026-05-29/maps/SESSIONS-jyotish.md, .claude/consolidation-2026-05-29/maps/SESSIONS-lexios.md, .claude/consolidation-2026-05-29/maps/SESSIONS-nanoclaw.md, .claude/consolidation-2026-05-29/relocate.py, .claude/consolidation-2026-05-29/relocate_fix_inplace.py, .claude/consolidation-2026-05-29/rewrite_session.py, .claude/hooks/brain-digest-inject.sh, .claude/hooks/image-safe-gate.sh, .claude/projects/-Users-amrut-Lexios/memory/MEMORY.md, .claude/projects/-Users-amrut-Lexios/memory/lexios-concurrent-repo-mutation.md
+**Diff:** +552 -1 across 2 files
+
+### 2026-06-13 04:17
+
+**Areas:** hooks
+**Files (20):** .cache/zellij/permissions.kdl, .claude/bin/fix-thinking.py, .claude/consolidation-2026-05-29/CONSOLIDATION_PLAN.md, .claude/consolidation-2026-05-29/add_history.py, .claude/consolidation-2026-05-29/batch.sh, .claude/consolidation-2026-05-29/build_maps.py, .claude/consolidation-2026-05-29/inventory.py, .claude/consolidation-2026-05-29/maps/INDEX.md, .claude/consolidation-2026-05-29/maps/SESSIONS-glowboard.md, .claude/consolidation-2026-05-29/maps/SESSIONS-home.md, .claude/consolidation-2026-05-29/maps/SESSIONS-jyotish.md, .claude/consolidation-2026-05-29/maps/SESSIONS-lexios.md, .claude/consolidation-2026-05-29/maps/SESSIONS-nanoclaw.md, .claude/consolidation-2026-05-29/relocate.py, .claude/consolidation-2026-05-29/relocate_fix_inplace.py, .claude/consolidation-2026-05-29/rewrite_session.py, .claude/hooks/brain-digest-inject.sh, .claude/hooks/image-safe-gate.sh, .claude/projects/-Users-amrut-Lexios/memory/MEMORY.md, .claude/projects/-Users-amrut-Lexios/memory/lexios-concurrent-repo-mutation.md
+**Diff:** +546 -1 across 2 files
+
+### 2026-06-13 04:17
+
+**Areas:** hooks
+**Files (20):** .cache/zellij/permissions.kdl, .claude/bin/fix-thinking.py, .claude/consolidation-2026-05-29/CONSOLIDATION_PLAN.md, .claude/consolidation-2026-05-29/add_history.py, .claude/consolidation-2026-05-29/batch.sh, .claude/consolidation-2026-05-29/build_maps.py, .claude/consolidation-2026-05-29/inventory.py, .claude/consolidation-2026-05-29/maps/INDEX.md, .claude/consolidation-2026-05-29/maps/SESSIONS-glowboard.md, .claude/consolidation-2026-05-29/maps/SESSIONS-home.md, .claude/consolidation-2026-05-29/maps/SESSIONS-jyotish.md, .claude/consolidation-2026-05-29/maps/SESSIONS-lexios.md, .claude/consolidation-2026-05-29/maps/SESSIONS-nanoclaw.md, .claude/consolidation-2026-05-29/relocate.py, .claude/consolidation-2026-05-29/relocate_fix_inplace.py, .claude/consolidation-2026-05-29/rewrite_session.py, .claude/hooks/brain-digest-inject.sh, .claude/hooks/image-safe-gate.sh, .claude/projects/-Users-amrut-Lexios/memory/MEMORY.md, .claude/projects/-Users-amrut-Lexios/memory/lexios-concurrent-repo-mutation.md
+**Diff:** +540 -1 across 2 files
+
+### 2026-06-13 04:16
+
+**Areas:** hooks
+**Files (20):** .cache/zellij/permissions.kdl, .claude/bin/fix-thinking.py, .claude/consolidation-2026-05-29/CONSOLIDATION_PLAN.md, .claude/consolidation-2026-05-29/add_history.py, .claude/consolidation-2026-05-29/batch.sh, .claude/consolidation-2026-05-29/build_maps.py, .claude/consolidation-2026-05-29/inventory.py, .claude/consolidation-2026-05-29/maps/INDEX.md, .claude/consolidation-2026-05-29/maps/SESSIONS-glowboard.md, .claude/consolidation-2026-05-29/maps/SESSIONS-home.md, .claude/consolidation-2026-05-29/maps/SESSIONS-jyotish.md, .claude/consolidation-2026-05-29/maps/SESSIONS-lexios.md, .claude/consolidation-2026-05-29/maps/SESSIONS-nanoclaw.md, .claude/consolidation-2026-05-29/relocate.py, .claude/consolidation-2026-05-29/relocate_fix_inplace.py, .claude/consolidation-2026-05-29/rewrite_session.py, .claude/hooks/brain-digest-inject.sh, .claude/hooks/image-safe-gate.sh, .claude/projects/-Users-amrut-Lexios/memory/MEMORY.md, .claude/projects/-Users-amrut-Lexios/memory/lexios-concurrent-repo-mutation.md
+**Diff:** +534 -1 across 2 files
+
+### 2026-06-13 04:16
+
+**Areas:** hooks
+**Files (20):** .cache/zellij/permissions.kdl, .claude/bin/fix-thinking.py, .claude/consolidation-2026-05-29/CONSOLIDATION_PLAN.md, .claude/consolidation-2026-05-29/add_history.py, .claude/consolidation-2026-05-29/batch.sh, .claude/consolidation-2026-05-29/build_maps.py, .claude/consolidation-2026-05-29/inventory.py, .claude/consolidation-2026-05-29/maps/INDEX.md, .claude/consolidation-2026-05-29/maps/SESSIONS-glowboard.md, .claude/consolidation-2026-05-29/maps/SESSIONS-home.md, .claude/consolidation-2026-05-29/maps/SESSIONS-jyotish.md, .claude/consolidation-2026-05-29/maps/SESSIONS-lexios.md, .claude/consolidation-2026-05-29/maps/SESSIONS-nanoclaw.md, .claude/consolidation-2026-05-29/relocate.py, .claude/consolidation-2026-05-29/relocate_fix_inplace.py, .claude/consolidation-2026-05-29/rewrite_session.py, .claude/hooks/brain-digest-inject.sh, .claude/hooks/image-safe-gate.sh, .claude/projects/-Users-amrut-Lexios/memory/MEMORY.md, .claude/projects/-Users-amrut-Lexios/memory/lexios-concurrent-repo-mutation.md
+**Diff:** +528 -1 across 2 files
+
+### 2026-06-13 04:16
+
+**Areas:** hooks
+**Files (20):** .cache/zellij/permissions.kdl, .claude/bin/fix-thinking.py, .claude/consolidation-2026-05-29/CONSOLIDATION_PLAN.md, .claude/consolidation-2026-05-29/add_history.py, .claude/consolidation-2026-05-29/batch.sh, .claude/consolidation-2026-05-29/build_maps.py, .claude/consolidation-2026-05-29/inventory.py, .claude/consolidation-2026-05-29/maps/INDEX.md, .claude/consolidation-2026-05-29/maps/SESSIONS-glowboard.md, .claude/consolidation-2026-05-29/maps/SESSIONS-home.md, .claude/consolidation-2026-05-29/maps/SESSIONS-jyotish.md, .claude/consolidation-2026-05-29/maps/SESSIONS-lexios.md, .claude/consolidation-2026-05-29/maps/SESSIONS-nanoclaw.md, .claude/consolidation-2026-05-29/relocate.py, .claude/consolidation-2026-05-29/relocate_fix_inplace.py, .claude/consolidation-2026-05-29/rewrite_session.py, .claude/hooks/brain-digest-inject.sh, .claude/hooks/image-safe-gate.sh, .claude/projects/-Users-amrut-Lexios/memory/MEMORY.md, .claude/projects/-Users-amrut-Lexios/memory/lexios-concurrent-repo-mutation.md
+**Diff:** +522 -1 across 2 files
+
+### 2026-06-13 04:14
+
+**Areas:** hooks
+**Files (20):** .cache/zellij/permissions.kdl, .claude/bin/fix-thinking.py, .claude/consolidation-2026-05-29/CONSOLIDATION_PLAN.md, .claude/consolidation-2026-05-29/add_history.py, .claude/consolidation-2026-05-29/batch.sh, .claude/consolidation-2026-05-29/build_maps.py, .claude/consolidation-2026-05-29/inventory.py, .claude/consolidation-2026-05-29/maps/INDEX.md, .claude/consolidation-2026-05-29/maps/SESSIONS-glowboard.md, .claude/consolidation-2026-05-29/maps/SESSIONS-home.md, .claude/consolidation-2026-05-29/maps/SESSIONS-jyotish.md, .claude/consolidation-2026-05-29/maps/SESSIONS-lexios.md, .claude/consolidation-2026-05-29/maps/SESSIONS-nanoclaw.md, .claude/consolidation-2026-05-29/relocate.py, .claude/consolidation-2026-05-29/relocate_fix_inplace.py, .claude/consolidation-2026-05-29/rewrite_session.py, .claude/hooks/brain-digest-inject.sh, .claude/hooks/image-safe-gate.sh, .claude/projects/-Users-amrut-Lexios/memory/MEMORY.md, .claude/projects/-Users-amrut-Lexios/memory/lexios-concurrent-repo-mutation.md
+**Diff:** +516 -1 across 2 files
+
+### 2026-06-13 04:14
+
+**Areas:** hooks
+**Files (20):** .cache/zellij/permissions.kdl, .claude/bin/fix-thinking.py, .claude/consolidation-2026-05-29/CONSOLIDATION_PLAN.md, .claude/consolidation-2026-05-29/add_history.py, .claude/consolidation-2026-05-29/batch.sh, .claude/consolidation-2026-05-29/build_maps.py, .claude/consolidation-2026-05-29/inventory.py, .claude/consolidation-2026-05-29/maps/INDEX.md, .claude/consolidation-2026-05-29/maps/SESSIONS-glowboard.md, .claude/consolidation-2026-05-29/maps/SESSIONS-home.md, .claude/consolidation-2026-05-29/maps/SESSIONS-jyotish.md, .claude/consolidation-2026-05-29/maps/SESSIONS-lexios.md, .claude/consolidation-2026-05-29/maps/SESSIONS-nanoclaw.md, .claude/consolidation-2026-05-29/relocate.py, .claude/consolidation-2026-05-29/relocate_fix_inplace.py, .claude/consolidation-2026-05-29/rewrite_session.py, .claude/hooks/brain-digest-inject.sh, .claude/hooks/image-safe-gate.sh, .claude/projects/-Users-amrut-Lexios/memory/MEMORY.md, .claude/projects/-Users-amrut-Lexios/memory/lexios-concurrent-repo-mutation.md
+**Diff:** +510 -1 across 2 files
+
+### 2026-06-13 04:13
+
+**Areas:** hooks
+**Files (20):** .cache/zellij/permissions.kdl, .claude/bin/fix-thinking.py, .claude/consolidation-2026-05-29/CONSOLIDATION_PLAN.md, .claude/consolidation-2026-05-29/add_history.py, .claude/consolidation-2026-05-29/batch.sh, .claude/consolidation-2026-05-29/build_maps.py, .claude/consolidation-2026-05-29/inventory.py, .claude/consolidation-2026-05-29/maps/INDEX.md, .claude/consolidation-2026-05-29/maps/SESSIONS-glowboard.md, .claude/consolidation-2026-05-29/maps/SESSIONS-home.md, .claude/consolidation-2026-05-29/maps/SESSIONS-jyotish.md, .claude/consolidation-2026-05-29/maps/SESSIONS-lexios.md, .claude/consolidation-2026-05-29/maps/SESSIONS-nanoclaw.md, .claude/consolidation-2026-05-29/relocate.py, .claude/consolidation-2026-05-29/relocate_fix_inplace.py, .claude/consolidation-2026-05-29/rewrite_session.py, .claude/hooks/brain-digest-inject.sh, .claude/hooks/image-safe-gate.sh, .claude/projects/-Users-amrut-Lexios/memory/MEMORY.md, .claude/projects/-Users-amrut-Lexios/memory/lexios-concurrent-repo-mutation.md
+**Diff:** +504 -1 across 2 files
+
+### 2026-06-13 04:12
+
+**Areas:** hooks
+**Files (20):** .cache/zellij/permissions.kdl, .claude/bin/fix-thinking.py, .claude/consolidation-2026-05-29/CONSOLIDATION_PLAN.md, .claude/consolidation-2026-05-29/add_history.py, .claude/consolidation-2026-05-29/batch.sh, .claude/consolidation-2026-05-29/build_maps.py, .claude/consolidation-2026-05-29/inventory.py, .claude/consolidation-2026-05-29/maps/INDEX.md, .claude/consolidation-2026-05-29/maps/SESSIONS-glowboard.md, .claude/consolidation-2026-05-29/maps/SESSIONS-home.md, .claude/consolidation-2026-05-29/maps/SESSIONS-jyotish.md, .claude/consolidation-2026-05-29/maps/SESSIONS-lexios.md, .claude/consolidation-2026-05-29/maps/SESSIONS-nanoclaw.md, .claude/consolidation-2026-05-29/relocate.py, .claude/consolidation-2026-05-29/relocate_fix_inplace.py, .claude/consolidation-2026-05-29/rewrite_session.py, .claude/hooks/brain-digest-inject.sh, .claude/hooks/image-safe-gate.sh, .claude/projects/-Users-amrut-Lexios/memory/MEMORY.md, .claude/projects/-Users-amrut-Lexios/memory/lexios-concurrent-repo-mutation.md
+**Diff:** +498 -1 across 2 files
+
+### 2026-06-13 04:12
+
+**Areas:** hooks
+**Files (20):** .cache/zellij/permissions.kdl, .claude/bin/fix-thinking.py, .claude/consolidation-2026-05-29/CONSOLIDATION_PLAN.md, .claude/consolidation-2026-05-29/add_history.py, .claude/consolidation-2026-05-29/batch.sh, .claude/consolidation-2026-05-29/build_maps.py, .claude/consolidation-2026-05-29/inventory.py, .claude/consolidation-2026-05-29/maps/INDEX.md, .claude/consolidation-2026-05-29/maps/SESSIONS-glowboard.md, .claude/consolidation-2026-05-29/maps/SESSIONS-home.md, .claude/consolidation-2026-05-29/maps/SESSIONS-jyotish.md, .claude/consolidation-2026-05-29/maps/SESSIONS-lexios.md, .claude/consolidation-2026-05-29/maps/SESSIONS-nanoclaw.md, .claude/consolidation-2026-05-29/relocate.py, .claude/consolidation-2026-05-29/relocate_fix_inplace.py, .claude/consolidation-2026-05-29/rewrite_session.py, .claude/hooks/brain-digest-inject.sh, .claude/hooks/image-safe-gate.sh, .claude/projects/-Users-amrut-Lexios/memory/MEMORY.md, .claude/projects/-Users-amrut-Lexios/memory/lexios-concurrent-repo-mutation.md
+**Diff:** +492 -1 across 2 files
+
+### 2026-06-13 04:11
+
+**Areas:** hooks
+**Files (20):** .cache/zellij/permissions.kdl, .claude/bin/fix-thinking.py, .claude/consolidation-2026-05-29/CONSOLIDATION_PLAN.md, .claude/consolidation-2026-05-29/add_history.py, .claude/consolidation-2026-05-29/batch.sh, .claude/consolidation-2026-05-29/build_maps.py, .claude/consolidation-2026-05-29/inventory.py, .claude/consolidation-2026-05-29/maps/INDEX.md, .claude/consolidation-2026-05-29/maps/SESSIONS-glowboard.md, .claude/consolidation-2026-05-29/maps/SESSIONS-home.md, .claude/consolidation-2026-05-29/maps/SESSIONS-jyotish.md, .claude/consolidation-2026-05-29/maps/SESSIONS-lexios.md, .claude/consolidation-2026-05-29/maps/SESSIONS-nanoclaw.md, .claude/consolidation-2026-05-29/relocate.py, .claude/consolidation-2026-05-29/relocate_fix_inplace.py, .claude/consolidation-2026-05-29/rewrite_session.py, .claude/hooks/brain-digest-inject.sh, .claude/hooks/image-safe-gate.sh, .claude/projects/-Users-amrut-Lexios/memory/MEMORY.md, .claude/projects/-Users-amrut-Lexios/memory/lexios-concurrent-repo-mutation.md
+**Diff:** +486 -1 across 2 files
+
+### 2026-06-13 04:10
+
+**Areas:** hooks
+**Files (20):** .cache/zellij/permissions.kdl, .claude/bin/fix-thinking.py, .claude/consolidation-2026-05-29/CONSOLIDATION_PLAN.md, .claude/consolidation-2026-05-29/add_history.py, .claude/consolidation-2026-05-29/batch.sh, .claude/consolidation-2026-05-29/build_maps.py, .claude/consolidation-2026-05-29/inventory.py, .claude/consolidation-2026-05-29/maps/INDEX.md, .claude/consolidation-2026-05-29/maps/SESSIONS-glowboard.md, .claude/consolidation-2026-05-29/maps/SESSIONS-home.md, .claude/consolidation-2026-05-29/maps/SESSIONS-jyotish.md, .claude/consolidation-2026-05-29/maps/SESSIONS-lexios.md, .claude/consolidation-2026-05-29/maps/SESSIONS-nanoclaw.md, .claude/consolidation-2026-05-29/relocate.py, .claude/consolidation-2026-05-29/relocate_fix_inplace.py, .claude/consolidation-2026-05-29/rewrite_session.py, .claude/hooks/brain-digest-inject.sh, .claude/hooks/image-safe-gate.sh, .claude/projects/-Users-amrut-Lexios/memory/MEMORY.md, .claude/projects/-Users-amrut-Lexios/memory/lexios-concurrent-repo-mutation.md
+**Diff:** +480 -1 across 2 files
+
+### 2026-06-13 04:09
+
+**Areas:** hooks
+**Files (20):** .cache/zellij/permissions.kdl, .claude/bin/fix-thinking.py, .claude/consolidation-2026-05-29/CONSOLIDATION_PLAN.md, .claude/consolidation-2026-05-29/add_history.py, .claude/consolidation-2026-05-29/batch.sh, .claude/consolidation-2026-05-29/build_maps.py, .claude/consolidation-2026-05-29/inventory.py, .claude/consolidation-2026-05-29/maps/INDEX.md, .claude/consolidation-2026-05-29/maps/SESSIONS-glowboard.md, .claude/consolidation-2026-05-29/maps/SESSIONS-home.md, .claude/consolidation-2026-05-29/maps/SESSIONS-jyotish.md, .claude/consolidation-2026-05-29/maps/SESSIONS-lexios.md, .claude/consolidation-2026-05-29/maps/SESSIONS-nanoclaw.md, .claude/consolidation-2026-05-29/relocate.py, .claude/consolidation-2026-05-29/relocate_fix_inplace.py, .claude/consolidation-2026-05-29/rewrite_session.py, .claude/hooks/brain-digest-inject.sh, .claude/hooks/image-safe-gate.sh, .claude/projects/-Users-amrut-Lexios/memory/MEMORY.md, .claude/projects/-Users-amrut-Lexios/memory/lexios-concurrent-repo-mutation.md
+**Diff:** +474 -1 across 2 files
+
+### 2026-06-13 04:09
+
+**Areas:** hooks
+**Files (20):** .cache/zellij/permissions.kdl, .claude/bin/fix-thinking.py, .claude/consolidation-2026-05-29/CONSOLIDATION_PLAN.md, .claude/consolidation-2026-05-29/add_history.py, .claude/consolidation-2026-05-29/batch.sh, .claude/consolidation-2026-05-29/build_maps.py, .claude/consolidation-2026-05-29/inventory.py, .claude/consolidation-2026-05-29/maps/INDEX.md, .claude/consolidation-2026-05-29/maps/SESSIONS-glowboard.md, .claude/consolidation-2026-05-29/maps/SESSIONS-home.md, .claude/consolidation-2026-05-29/maps/SESSIONS-jyotish.md, .claude/consolidation-2026-05-29/maps/SESSIONS-lexios.md, .claude/consolidation-2026-05-29/maps/SESSIONS-nanoclaw.md, .claude/consolidation-2026-05-29/relocate.py, .claude/consolidation-2026-05-29/relocate_fix_inplace.py, .claude/consolidation-2026-05-29/rewrite_session.py, .claude/hooks/brain-digest-inject.sh, .claude/hooks/image-safe-gate.sh, .claude/projects/-Users-amrut-Lexios/memory/MEMORY.md, .claude/projects/-Users-amrut-Lexios/memory/lexios-concurrent-repo-mutation.md
+**Diff:** +468 -1 across 2 files
+
+### 2026-06-13 04:08
+
+**Areas:** hooks
+**Files (20):** .cache/zellij/permissions.kdl, .claude/bin/fix-thinking.py, .claude/consolidation-2026-05-29/CONSOLIDATION_PLAN.md, .claude/consolidation-2026-05-29/add_history.py, .claude/consolidation-2026-05-29/batch.sh, .claude/consolidation-2026-05-29/build_maps.py, .claude/consolidation-2026-05-29/inventory.py, .claude/consolidation-2026-05-29/maps/INDEX.md, .claude/consolidation-2026-05-29/maps/SESSIONS-glowboard.md, .claude/consolidation-2026-05-29/maps/SESSIONS-home.md, .claude/consolidation-2026-05-29/maps/SESSIONS-jyotish.md, .claude/consolidation-2026-05-29/maps/SESSIONS-lexios.md, .claude/consolidation-2026-05-29/maps/SESSIONS-nanoclaw.md, .claude/consolidation-2026-05-29/relocate.py, .claude/consolidation-2026-05-29/relocate_fix_inplace.py, .claude/consolidation-2026-05-29/rewrite_session.py, .claude/hooks/brain-digest-inject.sh, .claude/hooks/image-safe-gate.sh, .claude/projects/-Users-amrut-Lexios/memory/MEMORY.md, .claude/projects/-Users-amrut-Lexios/memory/lexios-concurrent-repo-mutation.md
+**Diff:** +462 -1 across 2 files
+
+### 2026-06-13 04:07
+
+**Areas:** hooks
+**Files (20):** .cache/zellij/permissions.kdl, .claude/bin/fix-thinking.py, .claude/consolidation-2026-05-29/CONSOLIDATION_PLAN.md, .claude/consolidation-2026-05-29/add_history.py, .claude/consolidation-2026-05-29/batch.sh, .claude/consolidation-2026-05-29/build_maps.py, .claude/consolidation-2026-05-29/inventory.py, .claude/consolidation-2026-05-29/maps/INDEX.md, .claude/consolidation-2026-05-29/maps/SESSIONS-glowboard.md, .claude/consolidation-2026-05-29/maps/SESSIONS-home.md, .claude/consolidation-2026-05-29/maps/SESSIONS-jyotish.md, .claude/consolidation-2026-05-29/maps/SESSIONS-lexios.md, .claude/consolidation-2026-05-29/maps/SESSIONS-nanoclaw.md, .claude/consolidation-2026-05-29/relocate.py, .claude/consolidation-2026-05-29/relocate_fix_inplace.py, .claude/consolidation-2026-05-29/rewrite_session.py, .claude/hooks/brain-digest-inject.sh, .claude/hooks/image-safe-gate.sh, .claude/projects/-Users-amrut-Lexios/memory/MEMORY.md, .claude/projects/-Users-amrut-Lexios/memory/lexios-concurrent-repo-mutation.md
+**Diff:** +456 -1 across 2 files
+
+### 2026-06-13 04:06
+
+**Areas:** hooks
+**Files (20):** .cache/zellij/permissions.kdl, .claude/bin/fix-thinking.py, .claude/consolidation-2026-05-29/CONSOLIDATION_PLAN.md, .claude/consolidation-2026-05-29/add_history.py, .claude/consolidation-2026-05-29/batch.sh, .claude/consolidation-2026-05-29/build_maps.py, .claude/consolidation-2026-05-29/inventory.py, .claude/consolidation-2026-05-29/maps/INDEX.md, .claude/consolidation-2026-05-29/maps/SESSIONS-glowboard.md, .claude/consolidation-2026-05-29/maps/SESSIONS-home.md, .claude/consolidation-2026-05-29/maps/SESSIONS-jyotish.md, .claude/consolidation-2026-05-29/maps/SESSIONS-lexios.md, .claude/consolidation-2026-05-29/maps/SESSIONS-nanoclaw.md, .claude/consolidation-2026-05-29/relocate.py, .claude/consolidation-2026-05-29/relocate_fix_inplace.py, .claude/consolidation-2026-05-29/rewrite_session.py, .claude/hooks/brain-digest-inject.sh, .claude/hooks/image-safe-gate.sh, .claude/projects/-Users-amrut-Lexios/memory/MEMORY.md, .claude/projects/-Users-amrut-Lexios/memory/lexios-concurrent-repo-mutation.md
+**Diff:** +450 -1 across 2 files
+
+### 2026-06-13 04:06
+
+**Areas:** hooks
+**Files (20):** .cache/zellij/permissions.kdl, .claude/bin/fix-thinking.py, .claude/consolidation-2026-05-29/CONSOLIDATION_PLAN.md, .claude/consolidation-2026-05-29/add_history.py, .claude/consolidation-2026-05-29/batch.sh, .claude/consolidation-2026-05-29/build_maps.py, .claude/consolidation-2026-05-29/inventory.py, .claude/consolidation-2026-05-29/maps/INDEX.md, .claude/consolidation-2026-05-29/maps/SESSIONS-glowboard.md, .claude/consolidation-2026-05-29/maps/SESSIONS-home.md, .claude/consolidation-2026-05-29/maps/SESSIONS-jyotish.md, .claude/consolidation-2026-05-29/maps/SESSIONS-lexios.md, .claude/consolidation-2026-05-29/maps/SESSIONS-nanoclaw.md, .claude/consolidation-2026-05-29/relocate.py, .claude/consolidation-2026-05-29/relocate_fix_inplace.py, .claude/consolidation-2026-05-29/rewrite_session.py, .claude/hooks/brain-digest-inject.sh, .claude/hooks/image-safe-gate.sh, .claude/projects/-Users-amrut-Lexios/memory/MEMORY.md, .claude/projects/-Users-amrut-Lexios/memory/lexios-concurrent-repo-mutation.md
+**Diff:** +444 -1 across 2 files
+
+### 2026-06-13 03:49
+
+**Areas:** hooks
+**Files (20):** .cache/zellij/permissions.kdl, .claude/bin/fix-thinking.py, .claude/consolidation-2026-05-29/CONSOLIDATION_PLAN.md, .claude/consolidation-2026-05-29/add_history.py, .claude/consolidation-2026-05-29/batch.sh, .claude/consolidation-2026-05-29/build_maps.py, .claude/consolidation-2026-05-29/inventory.py, .claude/consolidation-2026-05-29/maps/INDEX.md, .claude/consolidation-2026-05-29/maps/SESSIONS-glowboard.md, .claude/consolidation-2026-05-29/maps/SESSIONS-home.md, .claude/consolidation-2026-05-29/maps/SESSIONS-jyotish.md, .claude/consolidation-2026-05-29/maps/SESSIONS-lexios.md, .claude/consolidation-2026-05-29/maps/SESSIONS-nanoclaw.md, .claude/consolidation-2026-05-29/relocate.py, .claude/consolidation-2026-05-29/relocate_fix_inplace.py, .claude/consolidation-2026-05-29/rewrite_session.py, .claude/hooks/brain-digest-inject.sh, .claude/hooks/image-safe-gate.sh, .claude/projects/-Users-amrut-Lexios/memory/MEMORY.md, .claude/projects/-Users-amrut-Lexios/memory/lexios-concurrent-repo-mutation.md
+**Diff:** +438 -1 across 2 files
+
+### 2026-06-13 03:47
+
+**Areas:** hooks
+**Files (20):** .cache/zellij/permissions.kdl, .claude/bin/fix-thinking.py, .claude/consolidation-2026-05-29/CONSOLIDATION_PLAN.md, .claude/consolidation-2026-05-29/add_history.py, .claude/consolidation-2026-05-29/batch.sh, .claude/consolidation-2026-05-29/build_maps.py, .claude/consolidation-2026-05-29/inventory.py, .claude/consolidation-2026-05-29/maps/INDEX.md, .claude/consolidation-2026-05-29/maps/SESSIONS-glowboard.md, .claude/consolidation-2026-05-29/maps/SESSIONS-home.md, .claude/consolidation-2026-05-29/maps/SESSIONS-jyotish.md, .claude/consolidation-2026-05-29/maps/SESSIONS-lexios.md, .claude/consolidation-2026-05-29/maps/SESSIONS-nanoclaw.md, .claude/consolidation-2026-05-29/relocate.py, .claude/consolidation-2026-05-29/relocate_fix_inplace.py, .claude/consolidation-2026-05-29/rewrite_session.py, .claude/hooks/brain-digest-inject.sh, .claude/hooks/image-safe-gate.sh, .claude/projects/-Users-amrut-Lexios/memory/MEMORY.md, .claude/projects/-Users-amrut-Lexios/memory/lexios-concurrent-repo-mutation.md
+**Diff:** +432 -1 across 2 files
+
+### 2026-06-13 03:38
+
+**Areas:** hooks
+**Files (20):** .cache/zellij/permissions.kdl, .claude/bin/fix-thinking.py, .claude/consolidation-2026-05-29/CONSOLIDATION_PLAN.md, .claude/consolidation-2026-05-29/add_history.py, .claude/consolidation-2026-05-29/batch.sh, .claude/consolidation-2026-05-29/build_maps.py, .claude/consolidation-2026-05-29/inventory.py, .claude/consolidation-2026-05-29/maps/INDEX.md, .claude/consolidation-2026-05-29/maps/SESSIONS-glowboard.md, .claude/consolidation-2026-05-29/maps/SESSIONS-home.md, .claude/consolidation-2026-05-29/maps/SESSIONS-jyotish.md, .claude/consolidation-2026-05-29/maps/SESSIONS-lexios.md, .claude/consolidation-2026-05-29/maps/SESSIONS-nanoclaw.md, .claude/consolidation-2026-05-29/relocate.py, .claude/consolidation-2026-05-29/relocate_fix_inplace.py, .claude/consolidation-2026-05-29/rewrite_session.py, .claude/hooks/brain-digest-inject.sh, .claude/hooks/image-safe-gate.sh, .claude/projects/-Users-amrut-Lexios/memory/MEMORY.md, .claude/projects/-Users-amrut-Lexios/memory/lexios-concurrent-repo-mutation.md
+**Diff:** +426 -1 across 2 files
+
+### 2026-06-13 03:38
+
+**Areas:** hooks
+**Files (20):** .cache/zellij/permissions.kdl, .claude/bin/fix-thinking.py, .claude/consolidation-2026-05-29/CONSOLIDATION_PLAN.md, .claude/consolidation-2026-05-29/add_history.py, .claude/consolidation-2026-05-29/batch.sh, .claude/consolidation-2026-05-29/build_maps.py, .claude/consolidation-2026-05-29/inventory.py, .claude/consolidation-2026-05-29/maps/INDEX.md, .claude/consolidation-2026-05-29/maps/SESSIONS-glowboard.md, .claude/consolidation-2026-05-29/maps/SESSIONS-home.md, .claude/consolidation-2026-05-29/maps/SESSIONS-jyotish.md, .claude/consolidation-2026-05-29/maps/SESSIONS-lexios.md, .claude/consolidation-2026-05-29/maps/SESSIONS-nanoclaw.md, .claude/consolidation-2026-05-29/relocate.py, .claude/consolidation-2026-05-29/relocate_fix_inplace.py, .claude/consolidation-2026-05-29/rewrite_session.py, .claude/hooks/brain-digest-inject.sh, .claude/hooks/image-safe-gate.sh, .claude/projects/-Users-amrut-Lexios/memory/MEMORY.md, .claude/projects/-Users-amrut-Lexios/memory/lexios-concurrent-repo-mutation.md
+**Diff:** +420 -1 across 2 files
+
+### 2026-06-13 03:37
+
+**Areas:** hooks
+**Files (20):** .cache/zellij/permissions.kdl, .claude/bin/fix-thinking.py, .claude/consolidation-2026-05-29/CONSOLIDATION_PLAN.md, .claude/consolidation-2026-05-29/add_history.py, .claude/consolidation-2026-05-29/batch.sh, .claude/consolidation-2026-05-29/build_maps.py, .claude/consolidation-2026-05-29/inventory.py, .claude/consolidation-2026-05-29/maps/INDEX.md, .claude/consolidation-2026-05-29/maps/SESSIONS-glowboard.md, .claude/consolidation-2026-05-29/maps/SESSIONS-home.md, .claude/consolidation-2026-05-29/maps/SESSIONS-jyotish.md, .claude/consolidation-2026-05-29/maps/SESSIONS-lexios.md, .claude/consolidation-2026-05-29/maps/SESSIONS-nanoclaw.md, .claude/consolidation-2026-05-29/relocate.py, .claude/consolidation-2026-05-29/relocate_fix_inplace.py, .claude/consolidation-2026-05-29/rewrite_session.py, .claude/hooks/brain-digest-inject.sh, .claude/hooks/image-safe-gate.sh, .claude/projects/-Users-amrut-Lexios/memory/MEMORY.md, .claude/projects/-Users-amrut-Lexios/memory/lexios-concurrent-repo-mutation.md
+**Diff:** +414 -1 across 2 files
+
+### 2026-06-13 03:36
+
+**Areas:** hooks
+**Files (20):** .cache/zellij/permissions.kdl, .claude/bin/fix-thinking.py, .claude/consolidation-2026-05-29/CONSOLIDATION_PLAN.md, .claude/consolidation-2026-05-29/add_history.py, .claude/consolidation-2026-05-29/batch.sh, .claude/consolidation-2026-05-29/build_maps.py, .claude/consolidation-2026-05-29/inventory.py, .claude/consolidation-2026-05-29/maps/INDEX.md, .claude/consolidation-2026-05-29/maps/SESSIONS-glowboard.md, .claude/consolidation-2026-05-29/maps/SESSIONS-home.md, .claude/consolidation-2026-05-29/maps/SESSIONS-jyotish.md, .claude/consolidation-2026-05-29/maps/SESSIONS-lexios.md, .claude/consolidation-2026-05-29/maps/SESSIONS-nanoclaw.md, .claude/consolidation-2026-05-29/relocate.py, .claude/consolidation-2026-05-29/relocate_fix_inplace.py, .claude/consolidation-2026-05-29/rewrite_session.py, .claude/hooks/brain-digest-inject.sh, .claude/hooks/image-safe-gate.sh, .claude/projects/-Users-amrut-Lexios/memory/MEMORY.md, .claude/projects/-Users-amrut-Lexios/memory/lexios-concurrent-repo-mutation.md
+**Diff:** +408 -1 across 2 files
+
+### 2026-06-13 03:35
+
+**Areas:** hooks
+**Files (20):** .cache/zellij/permissions.kdl, .claude/bin/fix-thinking.py, .claude/consolidation-2026-05-29/CONSOLIDATION_PLAN.md, .claude/consolidation-2026-05-29/add_history.py, .claude/consolidation-2026-05-29/batch.sh, .claude/consolidation-2026-05-29/build_maps.py, .claude/consolidation-2026-05-29/inventory.py, .claude/consolidation-2026-05-29/maps/INDEX.md, .claude/consolidation-2026-05-29/maps/SESSIONS-glowboard.md, .claude/consolidation-2026-05-29/maps/SESSIONS-home.md, .claude/consolidation-2026-05-29/maps/SESSIONS-jyotish.md, .claude/consolidation-2026-05-29/maps/SESSIONS-lexios.md, .claude/consolidation-2026-05-29/maps/SESSIONS-nanoclaw.md, .claude/consolidation-2026-05-29/relocate.py, .claude/consolidation-2026-05-29/relocate_fix_inplace.py, .claude/consolidation-2026-05-29/rewrite_session.py, .claude/hooks/brain-digest-inject.sh, .claude/hooks/image-safe-gate.sh, .claude/projects/-Users-amrut-Lexios/memory/MEMORY.md, .claude/projects/-Users-amrut-Lexios/memory/lexios-concurrent-repo-mutation.md
+**Diff:** +402 -1 across 2 files
+
+### 2026-06-13 03:34
+
+**Areas:** hooks
+**Files (20):** .cache/zellij/permissions.kdl, .claude/bin/fix-thinking.py, .claude/consolidation-2026-05-29/CONSOLIDATION_PLAN.md, .claude/consolidation-2026-05-29/add_history.py, .claude/consolidation-2026-05-29/batch.sh, .claude/consolidation-2026-05-29/build_maps.py, .claude/consolidation-2026-05-29/inventory.py, .claude/consolidation-2026-05-29/maps/INDEX.md, .claude/consolidation-2026-05-29/maps/SESSIONS-glowboard.md, .claude/consolidation-2026-05-29/maps/SESSIONS-home.md, .claude/consolidation-2026-05-29/maps/SESSIONS-jyotish.md, .claude/consolidation-2026-05-29/maps/SESSIONS-lexios.md, .claude/consolidation-2026-05-29/maps/SESSIONS-nanoclaw.md, .claude/consolidation-2026-05-29/relocate.py, .claude/consolidation-2026-05-29/relocate_fix_inplace.py, .claude/consolidation-2026-05-29/rewrite_session.py, .claude/hooks/brain-digest-inject.sh, .claude/hooks/image-safe-gate.sh, .claude/projects/-Users-amrut-Lexios/memory/MEMORY.md, .claude/projects/-Users-amrut-Lexios/memory/lexios-concurrent-repo-mutation.md
+**Diff:** +396 -1 across 2 files
+
+### 2026-06-13 03:33
+
+**Areas:** hooks
+**Files (20):** .cache/zellij/permissions.kdl, .claude/bin/fix-thinking.py, .claude/consolidation-2026-05-29/CONSOLIDATION_PLAN.md, .claude/consolidation-2026-05-29/add_history.py, .claude/consolidation-2026-05-29/batch.sh, .claude/consolidation-2026-05-29/build_maps.py, .claude/consolidation-2026-05-29/inventory.py, .claude/consolidation-2026-05-29/maps/INDEX.md, .claude/consolidation-2026-05-29/maps/SESSIONS-glowboard.md, .claude/consolidation-2026-05-29/maps/SESSIONS-home.md, .claude/consolidation-2026-05-29/maps/SESSIONS-jyotish.md, .claude/consolidation-2026-05-29/maps/SESSIONS-lexios.md, .claude/consolidation-2026-05-29/maps/SESSIONS-nanoclaw.md, .claude/consolidation-2026-05-29/relocate.py, .claude/consolidation-2026-05-29/relocate_fix_inplace.py, .claude/consolidation-2026-05-29/rewrite_session.py, .claude/hooks/brain-digest-inject.sh, .claude/hooks/image-safe-gate.sh, .claude/projects/-Users-amrut-Lexios/memory/MEMORY.md, .claude/projects/-Users-amrut-Lexios/memory/lexios-concurrent-repo-mutation.md
+**Diff:** +390 -1 across 2 files
+
+### 2026-06-13 03:33
+
+**Areas:** hooks
+**Files (20):** .cache/zellij/permissions.kdl, .claude/bin/fix-thinking.py, .claude/consolidation-2026-05-29/CONSOLIDATION_PLAN.md, .claude/consolidation-2026-05-29/add_history.py, .claude/consolidation-2026-05-29/batch.sh, .claude/consolidation-2026-05-29/build_maps.py, .claude/consolidation-2026-05-29/inventory.py, .claude/consolidation-2026-05-29/maps/INDEX.md, .claude/consolidation-2026-05-29/maps/SESSIONS-glowboard.md, .claude/consolidation-2026-05-29/maps/SESSIONS-home.md, .claude/consolidation-2026-05-29/maps/SESSIONS-jyotish.md, .claude/consolidation-2026-05-29/maps/SESSIONS-lexios.md, .claude/consolidation-2026-05-29/maps/SESSIONS-nanoclaw.md, .claude/consolidation-2026-05-29/relocate.py, .claude/consolidation-2026-05-29/relocate_fix_inplace.py, .claude/consolidation-2026-05-29/rewrite_session.py, .claude/hooks/brain-digest-inject.sh, .claude/hooks/image-safe-gate.sh, .claude/projects/-Users-amrut-Lexios/memory/MEMORY.md, .claude/projects/-Users-amrut-Lexios/memory/lexios-concurrent-repo-mutation.md
+**Diff:** +384 -1 across 2 files
+
+### 2026-06-13 03:32
+
+**Areas:** hooks
+**Files (20):** .cache/zellij/permissions.kdl, .claude/bin/fix-thinking.py, .claude/consolidation-2026-05-29/CONSOLIDATION_PLAN.md, .claude/consolidation-2026-05-29/add_history.py, .claude/consolidation-2026-05-29/batch.sh, .claude/consolidation-2026-05-29/build_maps.py, .claude/consolidation-2026-05-29/inventory.py, .claude/consolidation-2026-05-29/maps/INDEX.md, .claude/consolidation-2026-05-29/maps/SESSIONS-glowboard.md, .claude/consolidation-2026-05-29/maps/SESSIONS-home.md, .claude/consolidation-2026-05-29/maps/SESSIONS-jyotish.md, .claude/consolidation-2026-05-29/maps/SESSIONS-lexios.md, .claude/consolidation-2026-05-29/maps/SESSIONS-nanoclaw.md, .claude/consolidation-2026-05-29/relocate.py, .claude/consolidation-2026-05-29/relocate_fix_inplace.py, .claude/consolidation-2026-05-29/rewrite_session.py, .claude/hooks/brain-digest-inject.sh, .claude/hooks/image-safe-gate.sh, .claude/projects/-Users-amrut-Lexios/memory/MEMORY.md, .claude/projects/-Users-amrut-Lexios/memory/lexios-concurrent-repo-mutation.md
+**Diff:** +378 -1 across 2 files
+
+### 2026-06-13 03:32
+
+**Areas:** hooks
+**Files (20):** .cache/zellij/permissions.kdl, .claude/bin/fix-thinking.py, .claude/consolidation-2026-05-29/CONSOLIDATION_PLAN.md, .claude/consolidation-2026-05-29/add_history.py, .claude/consolidation-2026-05-29/batch.sh, .claude/consolidation-2026-05-29/build_maps.py, .claude/consolidation-2026-05-29/inventory.py, .claude/consolidation-2026-05-29/maps/INDEX.md, .claude/consolidation-2026-05-29/maps/SESSIONS-glowboard.md, .claude/consolidation-2026-05-29/maps/SESSIONS-home.md, .claude/consolidation-2026-05-29/maps/SESSIONS-jyotish.md, .claude/consolidation-2026-05-29/maps/SESSIONS-lexios.md, .claude/consolidation-2026-05-29/maps/SESSIONS-nanoclaw.md, .claude/consolidation-2026-05-29/relocate.py, .claude/consolidation-2026-05-29/relocate_fix_inplace.py, .claude/consolidation-2026-05-29/rewrite_session.py, .claude/hooks/brain-digest-inject.sh, .claude/hooks/image-safe-gate.sh, .claude/projects/-Users-amrut-Lexios/memory/MEMORY.md, .claude/projects/-Users-amrut-Lexios/memory/lexios-concurrent-repo-mutation.md
+**Diff:** +372 -1 across 2 files
+
+### 2026-06-13 03:31
+
+**Areas:** hooks
+**Files (20):** .cache/zellij/permissions.kdl, .claude/bin/fix-thinking.py, .claude/consolidation-2026-05-29/CONSOLIDATION_PLAN.md, .claude/consolidation-2026-05-29/add_history.py, .claude/consolidation-2026-05-29/batch.sh, .claude/consolidation-2026-05-29/build_maps.py, .claude/consolidation-2026-05-29/inventory.py, .claude/consolidation-2026-05-29/maps/INDEX.md, .claude/consolidation-2026-05-29/maps/SESSIONS-glowboard.md, .claude/consolidation-2026-05-29/maps/SESSIONS-home.md, .claude/consolidation-2026-05-29/maps/SESSIONS-jyotish.md, .claude/consolidation-2026-05-29/maps/SESSIONS-lexios.md, .claude/consolidation-2026-05-29/maps/SESSIONS-nanoclaw.md, .claude/consolidation-2026-05-29/relocate.py, .claude/consolidation-2026-05-29/relocate_fix_inplace.py, .claude/consolidation-2026-05-29/rewrite_session.py, .claude/hooks/brain-digest-inject.sh, .claude/hooks/image-safe-gate.sh, .claude/projects/-Users-amrut-Lexios/memory/MEMORY.md, .claude/projects/-Users-amrut-Lexios/memory/lexios-concurrent-repo-mutation.md
+**Diff:** +366 -1 across 2 files
+
+### 2026-06-13 03:30
+
+**Areas:** hooks
+**Files (20):** .cache/zellij/permissions.kdl, .claude/bin/fix-thinking.py, .claude/consolidation-2026-05-29/CONSOLIDATION_PLAN.md, .claude/consolidation-2026-05-29/add_history.py, .claude/consolidation-2026-05-29/batch.sh, .claude/consolidation-2026-05-29/build_maps.py, .claude/consolidation-2026-05-29/inventory.py, .claude/consolidation-2026-05-29/maps/INDEX.md, .claude/consolidation-2026-05-29/maps/SESSIONS-glowboard.md, .claude/consolidation-2026-05-29/maps/SESSIONS-home.md, .claude/consolidation-2026-05-29/maps/SESSIONS-jyotish.md, .claude/consolidation-2026-05-29/maps/SESSIONS-lexios.md, .claude/consolidation-2026-05-29/maps/SESSIONS-nanoclaw.md, .claude/consolidation-2026-05-29/relocate.py, .claude/consolidation-2026-05-29/relocate_fix_inplace.py, .claude/consolidation-2026-05-29/rewrite_session.py, .claude/hooks/brain-digest-inject.sh, .claude/hooks/image-safe-gate.sh, .claude/projects/-Users-amrut-Lexios/memory/MEMORY.md, .claude/projects/-Users-amrut-Lexios/memory/lexios-concurrent-repo-mutation.md
+**Diff:** +360 -1 across 2 files
+
+### 2026-06-13 03:29
+
+**Areas:** hooks
+**Files (20):** .cache/zellij/permissions.kdl, .claude/bin/fix-thinking.py, .claude/consolidation-2026-05-29/CONSOLIDATION_PLAN.md, .claude/consolidation-2026-05-29/add_history.py, .claude/consolidation-2026-05-29/batch.sh, .claude/consolidation-2026-05-29/build_maps.py, .claude/consolidation-2026-05-29/inventory.py, .claude/consolidation-2026-05-29/maps/INDEX.md, .claude/consolidation-2026-05-29/maps/SESSIONS-glowboard.md, .claude/consolidation-2026-05-29/maps/SESSIONS-home.md, .claude/consolidation-2026-05-29/maps/SESSIONS-jyotish.md, .claude/consolidation-2026-05-29/maps/SESSIONS-lexios.md, .claude/consolidation-2026-05-29/maps/SESSIONS-nanoclaw.md, .claude/consolidation-2026-05-29/relocate.py, .claude/consolidation-2026-05-29/relocate_fix_inplace.py, .claude/consolidation-2026-05-29/rewrite_session.py, .claude/hooks/brain-digest-inject.sh, .claude/hooks/image-safe-gate.sh, .claude/projects/-Users-amrut-Lexios/memory/MEMORY.md, .claude/projects/-Users-amrut-Lexios/memory/lexios-concurrent-repo-mutation.md
+**Diff:** +354 -1 across 2 files
+
+### 2026-06-13 03:28
+
+**Areas:** hooks
+**Files (20):** .cache/zellij/permissions.kdl, .claude/bin/fix-thinking.py, .claude/consolidation-2026-05-29/CONSOLIDATION_PLAN.md, .claude/consolidation-2026-05-29/add_history.py, .claude/consolidation-2026-05-29/batch.sh, .claude/consolidation-2026-05-29/build_maps.py, .claude/consolidation-2026-05-29/inventory.py, .claude/consolidation-2026-05-29/maps/INDEX.md, .claude/consolidation-2026-05-29/maps/SESSIONS-glowboard.md, .claude/consolidation-2026-05-29/maps/SESSIONS-home.md, .claude/consolidation-2026-05-29/maps/SESSIONS-jyotish.md, .claude/consolidation-2026-05-29/maps/SESSIONS-lexios.md, .claude/consolidation-2026-05-29/maps/SESSIONS-nanoclaw.md, .claude/consolidation-2026-05-29/relocate.py, .claude/consolidation-2026-05-29/relocate_fix_inplace.py, .claude/consolidation-2026-05-29/rewrite_session.py, .claude/hooks/brain-digest-inject.sh, .claude/hooks/image-safe-gate.sh, .claude/projects/-Users-amrut-Lexios/memory/MEMORY.md, .claude/projects/-Users-amrut-Lexios/memory/lexios-concurrent-repo-mutation.md
+**Diff:** +348 -1 across 2 files
+
+### 2026-06-13 03:28
+
+**Areas:** hooks
+**Files (20):** .cache/zellij/permissions.kdl, .claude/bin/fix-thinking.py, .claude/consolidation-2026-05-29/CONSOLIDATION_PLAN.md, .claude/consolidation-2026-05-29/add_history.py, .claude/consolidation-2026-05-29/batch.sh, .claude/consolidation-2026-05-29/build_maps.py, .claude/consolidation-2026-05-29/inventory.py, .claude/consolidation-2026-05-29/maps/INDEX.md, .claude/consolidation-2026-05-29/maps/SESSIONS-glowboard.md, .claude/consolidation-2026-05-29/maps/SESSIONS-home.md, .claude/consolidation-2026-05-29/maps/SESSIONS-jyotish.md, .claude/consolidation-2026-05-29/maps/SESSIONS-lexios.md, .claude/consolidation-2026-05-29/maps/SESSIONS-nanoclaw.md, .claude/consolidation-2026-05-29/relocate.py, .claude/consolidation-2026-05-29/relocate_fix_inplace.py, .claude/consolidation-2026-05-29/rewrite_session.py, .claude/hooks/brain-digest-inject.sh, .claude/hooks/image-safe-gate.sh, .claude/projects/-Users-amrut-Lexios/memory/MEMORY.md, .claude/projects/-Users-amrut-Lexios/memory/lexios-concurrent-repo-mutation.md
+**Diff:** +342 -1 across 2 files
+
+### 2026-06-13 03:27
+
+**Areas:** hooks
+**Files (20):** .cache/zellij/permissions.kdl, .claude/bin/fix-thinking.py, .claude/consolidation-2026-05-29/CONSOLIDATION_PLAN.md, .claude/consolidation-2026-05-29/add_history.py, .claude/consolidation-2026-05-29/batch.sh, .claude/consolidation-2026-05-29/build_maps.py, .claude/consolidation-2026-05-29/inventory.py, .claude/consolidation-2026-05-29/maps/INDEX.md, .claude/consolidation-2026-05-29/maps/SESSIONS-glowboard.md, .claude/consolidation-2026-05-29/maps/SESSIONS-home.md, .claude/consolidation-2026-05-29/maps/SESSIONS-jyotish.md, .claude/consolidation-2026-05-29/maps/SESSIONS-lexios.md, .claude/consolidation-2026-05-29/maps/SESSIONS-nanoclaw.md, .claude/consolidation-2026-05-29/relocate.py, .claude/consolidation-2026-05-29/relocate_fix_inplace.py, .claude/consolidation-2026-05-29/rewrite_session.py, .claude/hooks/brain-digest-inject.sh, .claude/hooks/image-safe-gate.sh, .claude/projects/-Users-amrut-Lexios/memory/MEMORY.md, .claude/projects/-Users-amrut-Lexios/memory/lexios-concurrent-repo-mutation.md
+**Diff:** +336 -1 across 2 files
+
+### 2026-06-13 03:20
+
+**Areas:** hooks
+**Files (20):** .cache/zellij/permissions.kdl, .claude/bin/fix-thinking.py, .claude/consolidation-2026-05-29/CONSOLIDATION_PLAN.md, .claude/consolidation-2026-05-29/add_history.py, .claude/consolidation-2026-05-29/batch.sh, .claude/consolidation-2026-05-29/build_maps.py, .claude/consolidation-2026-05-29/inventory.py, .claude/consolidation-2026-05-29/maps/INDEX.md, .claude/consolidation-2026-05-29/maps/SESSIONS-glowboard.md, .claude/consolidation-2026-05-29/maps/SESSIONS-home.md, .claude/consolidation-2026-05-29/maps/SESSIONS-jyotish.md, .claude/consolidation-2026-05-29/maps/SESSIONS-lexios.md, .claude/consolidation-2026-05-29/maps/SESSIONS-nanoclaw.md, .claude/consolidation-2026-05-29/relocate.py, .claude/consolidation-2026-05-29/relocate_fix_inplace.py, .claude/consolidation-2026-05-29/rewrite_session.py, .claude/hooks/brain-digest-inject.sh, .claude/hooks/image-safe-gate.sh, .claude/projects/-Users-amrut-Lexios/memory/MEMORY.md, .claude/projects/-Users-amrut-Lexios/memory/lexios-concurrent-repo-mutation.md
+**Diff:** +330 -1 across 2 files
+
+### 2026-06-13 03:19
+
+**Areas:** hooks
+**Files (20):** .cache/zellij/permissions.kdl, .claude/bin/fix-thinking.py, .claude/consolidation-2026-05-29/CONSOLIDATION_PLAN.md, .claude/consolidation-2026-05-29/add_history.py, .claude/consolidation-2026-05-29/batch.sh, .claude/consolidation-2026-05-29/build_maps.py, .claude/consolidation-2026-05-29/inventory.py, .claude/consolidation-2026-05-29/maps/INDEX.md, .claude/consolidation-2026-05-29/maps/SESSIONS-glowboard.md, .claude/consolidation-2026-05-29/maps/SESSIONS-home.md, .claude/consolidation-2026-05-29/maps/SESSIONS-jyotish.md, .claude/consolidation-2026-05-29/maps/SESSIONS-lexios.md, .claude/consolidation-2026-05-29/maps/SESSIONS-nanoclaw.md, .claude/consolidation-2026-05-29/relocate.py, .claude/consolidation-2026-05-29/relocate_fix_inplace.py, .claude/consolidation-2026-05-29/rewrite_session.py, .claude/hooks/brain-digest-inject.sh, .claude/hooks/image-safe-gate.sh, .claude/projects/-Users-amrut-Lexios/memory/MEMORY.md, .claude/projects/-Users-amrut-Lexios/memory/lexios-concurrent-repo-mutation.md
+**Diff:** +324 -1 across 2 files
+
+### 2026-06-13 03:18
+
+**Areas:** hooks
+**Files (20):** .cache/zellij/permissions.kdl, .claude/bin/fix-thinking.py, .claude/consolidation-2026-05-29/CONSOLIDATION_PLAN.md, .claude/consolidation-2026-05-29/add_history.py, .claude/consolidation-2026-05-29/batch.sh, .claude/consolidation-2026-05-29/build_maps.py, .claude/consolidation-2026-05-29/inventory.py, .claude/consolidation-2026-05-29/maps/INDEX.md, .claude/consolidation-2026-05-29/maps/SESSIONS-glowboard.md, .claude/consolidation-2026-05-29/maps/SESSIONS-home.md, .claude/consolidation-2026-05-29/maps/SESSIONS-jyotish.md, .claude/consolidation-2026-05-29/maps/SESSIONS-lexios.md, .claude/consolidation-2026-05-29/maps/SESSIONS-nanoclaw.md, .claude/consolidation-2026-05-29/relocate.py, .claude/consolidation-2026-05-29/relocate_fix_inplace.py, .claude/consolidation-2026-05-29/rewrite_session.py, .claude/hooks/brain-digest-inject.sh, .claude/hooks/image-safe-gate.sh, .claude/projects/-Users-amrut-Lexios/memory/MEMORY.md, .claude/projects/-Users-amrut-Lexios/memory/lexios-concurrent-repo-mutation.md
+**Diff:** +318 -1 across 2 files
+
+### 2026-06-13 03:17
+
+**Areas:** hooks
+**Files (20):** .cache/zellij/permissions.kdl, .claude/bin/fix-thinking.py, .claude/consolidation-2026-05-29/CONSOLIDATION_PLAN.md, .claude/consolidation-2026-05-29/add_history.py, .claude/consolidation-2026-05-29/batch.sh, .claude/consolidation-2026-05-29/build_maps.py, .claude/consolidation-2026-05-29/inventory.py, .claude/consolidation-2026-05-29/maps/INDEX.md, .claude/consolidation-2026-05-29/maps/SESSIONS-glowboard.md, .claude/consolidation-2026-05-29/maps/SESSIONS-home.md, .claude/consolidation-2026-05-29/maps/SESSIONS-jyotish.md, .claude/consolidation-2026-05-29/maps/SESSIONS-lexios.md, .claude/consolidation-2026-05-29/maps/SESSIONS-nanoclaw.md, .claude/consolidation-2026-05-29/relocate.py, .claude/consolidation-2026-05-29/relocate_fix_inplace.py, .claude/consolidation-2026-05-29/rewrite_session.py, .claude/hooks/brain-digest-inject.sh, .claude/hooks/image-safe-gate.sh, .claude/projects/-Users-amrut-Lexios/memory/MEMORY.md, .claude/projects/-Users-amrut-Lexios/memory/lexios-concurrent-repo-mutation.md
+**Diff:** +312 -1 across 2 files
+
+### 2026-06-13 03:17
+
+**Areas:** hooks
+**Files (20):** .cache/zellij/permissions.kdl, .claude/bin/fix-thinking.py, .claude/consolidation-2026-05-29/CONSOLIDATION_PLAN.md, .claude/consolidation-2026-05-29/add_history.py, .claude/consolidation-2026-05-29/batch.sh, .claude/consolidation-2026-05-29/build_maps.py, .claude/consolidation-2026-05-29/inventory.py, .claude/consolidation-2026-05-29/maps/INDEX.md, .claude/consolidation-2026-05-29/maps/SESSIONS-glowboard.md, .claude/consolidation-2026-05-29/maps/SESSIONS-home.md, .claude/consolidation-2026-05-29/maps/SESSIONS-jyotish.md, .claude/consolidation-2026-05-29/maps/SESSIONS-lexios.md, .claude/consolidation-2026-05-29/maps/SESSIONS-nanoclaw.md, .claude/consolidation-2026-05-29/relocate.py, .claude/consolidation-2026-05-29/relocate_fix_inplace.py, .claude/consolidation-2026-05-29/rewrite_session.py, .claude/hooks/brain-digest-inject.sh, .claude/hooks/image-safe-gate.sh, .claude/projects/-Users-amrut-Lexios/memory/MEMORY.md, .claude/projects/-Users-amrut-Lexios/memory/lexios-concurrent-repo-mutation.md
+**Diff:** +306 -1 across 2 files
+
+### 2026-06-13 03:17
+
+**Areas:** hooks
+**Files (20):** .cache/zellij/permissions.kdl, .claude/bin/fix-thinking.py, .claude/consolidation-2026-05-29/CONSOLIDATION_PLAN.md, .claude/consolidation-2026-05-29/add_history.py, .claude/consolidation-2026-05-29/batch.sh, .claude/consolidation-2026-05-29/build_maps.py, .claude/consolidation-2026-05-29/inventory.py, .claude/consolidation-2026-05-29/maps/INDEX.md, .claude/consolidation-2026-05-29/maps/SESSIONS-glowboard.md, .claude/consolidation-2026-05-29/maps/SESSIONS-home.md, .claude/consolidation-2026-05-29/maps/SESSIONS-jyotish.md, .claude/consolidation-2026-05-29/maps/SESSIONS-lexios.md, .claude/consolidation-2026-05-29/maps/SESSIONS-nanoclaw.md, .claude/consolidation-2026-05-29/relocate.py, .claude/consolidation-2026-05-29/relocate_fix_inplace.py, .claude/consolidation-2026-05-29/rewrite_session.py, .claude/hooks/brain-digest-inject.sh, .claude/hooks/image-safe-gate.sh, .claude/projects/-Users-amrut-Lexios/memory/MEMORY.md, .claude/projects/-Users-amrut-Lexios/memory/lexios-concurrent-repo-mutation.md
+**Diff:** +300 -1 across 2 files
+
+### 2026-06-13 03:15
+
+**Areas:** hooks
+**Files (20):** .cache/zellij/permissions.kdl, .claude/bin/fix-thinking.py, .claude/consolidation-2026-05-29/CONSOLIDATION_PLAN.md, .claude/consolidation-2026-05-29/add_history.py, .claude/consolidation-2026-05-29/batch.sh, .claude/consolidation-2026-05-29/build_maps.py, .claude/consolidation-2026-05-29/inventory.py, .claude/consolidation-2026-05-29/maps/INDEX.md, .claude/consolidation-2026-05-29/maps/SESSIONS-glowboard.md, .claude/consolidation-2026-05-29/maps/SESSIONS-home.md, .claude/consolidation-2026-05-29/maps/SESSIONS-jyotish.md, .claude/consolidation-2026-05-29/maps/SESSIONS-lexios.md, .claude/consolidation-2026-05-29/maps/SESSIONS-nanoclaw.md, .claude/consolidation-2026-05-29/relocate.py, .claude/consolidation-2026-05-29/relocate_fix_inplace.py, .claude/consolidation-2026-05-29/rewrite_session.py, .claude/hooks/brain-digest-inject.sh, .claude/hooks/image-safe-gate.sh, .claude/projects/-Users-amrut-Lexios/memory/MEMORY.md, .claude/projects/-Users-amrut-Lexios/memory/lexios-concurrent-repo-mutation.md
+**Diff:** +294 -1 across 2 files
+
+### 2026-06-13 03:15
+
+**Areas:** hooks
+**Files (20):** .cache/zellij/permissions.kdl, .claude/bin/fix-thinking.py, .claude/consolidation-2026-05-29/CONSOLIDATION_PLAN.md, .claude/consolidation-2026-05-29/add_history.py, .claude/consolidation-2026-05-29/batch.sh, .claude/consolidation-2026-05-29/build_maps.py, .claude/consolidation-2026-05-29/inventory.py, .claude/consolidation-2026-05-29/maps/INDEX.md, .claude/consolidation-2026-05-29/maps/SESSIONS-glowboard.md, .claude/consolidation-2026-05-29/maps/SESSIONS-home.md, .claude/consolidation-2026-05-29/maps/SESSIONS-jyotish.md, .claude/consolidation-2026-05-29/maps/SESSIONS-lexios.md, .claude/consolidation-2026-05-29/maps/SESSIONS-nanoclaw.md, .claude/consolidation-2026-05-29/relocate.py, .claude/consolidation-2026-05-29/relocate_fix_inplace.py, .claude/consolidation-2026-05-29/rewrite_session.py, .claude/hooks/brain-digest-inject.sh, .claude/hooks/image-safe-gate.sh, .claude/projects/-Users-amrut-Lexios/memory/MEMORY.md, .claude/projects/-Users-amrut-Lexios/memory/lexios-concurrent-repo-mutation.md
+**Diff:** +288 -1 across 2 files
+
+### 2026-06-13 03:14
+
+**Areas:** hooks
+**Files (20):** .cache/zellij/permissions.kdl, .claude/bin/fix-thinking.py, .claude/consolidation-2026-05-29/CONSOLIDATION_PLAN.md, .claude/consolidation-2026-05-29/add_history.py, .claude/consolidation-2026-05-29/batch.sh, .claude/consolidation-2026-05-29/build_maps.py, .claude/consolidation-2026-05-29/inventory.py, .claude/consolidation-2026-05-29/maps/INDEX.md, .claude/consolidation-2026-05-29/maps/SESSIONS-glowboard.md, .claude/consolidation-2026-05-29/maps/SESSIONS-home.md, .claude/consolidation-2026-05-29/maps/SESSIONS-jyotish.md, .claude/consolidation-2026-05-29/maps/SESSIONS-lexios.md, .claude/consolidation-2026-05-29/maps/SESSIONS-nanoclaw.md, .claude/consolidation-2026-05-29/relocate.py, .claude/consolidation-2026-05-29/relocate_fix_inplace.py, .claude/consolidation-2026-05-29/rewrite_session.py, .claude/hooks/brain-digest-inject.sh, .claude/hooks/image-safe-gate.sh, .claude/projects/-Users-amrut-Lexios/memory/MEMORY.md, .claude/projects/-Users-amrut-Lexios/memory/lexios-concurrent-repo-mutation.md
+**Diff:** +282 -1 across 2 files
+
+### 2026-06-13 03:13
+
+**Areas:** hooks
+**Files (20):** .cache/zellij/permissions.kdl, .claude/bin/fix-thinking.py, .claude/consolidation-2026-05-29/CONSOLIDATION_PLAN.md, .claude/consolidation-2026-05-29/add_history.py, .claude/consolidation-2026-05-29/batch.sh, .claude/consolidation-2026-05-29/build_maps.py, .claude/consolidation-2026-05-29/inventory.py, .claude/consolidation-2026-05-29/maps/INDEX.md, .claude/consolidation-2026-05-29/maps/SESSIONS-glowboard.md, .claude/consolidation-2026-05-29/maps/SESSIONS-home.md, .claude/consolidation-2026-05-29/maps/SESSIONS-jyotish.md, .claude/consolidation-2026-05-29/maps/SESSIONS-lexios.md, .claude/consolidation-2026-05-29/maps/SESSIONS-nanoclaw.md, .claude/consolidation-2026-05-29/relocate.py, .claude/consolidation-2026-05-29/relocate_fix_inplace.py, .claude/consolidation-2026-05-29/rewrite_session.py, .claude/hooks/brain-digest-inject.sh, .claude/hooks/image-safe-gate.sh, .claude/projects/-Users-amrut-Lexios/memory/MEMORY.md, .claude/projects/-Users-amrut-Lexios/memory/lexios-concurrent-repo-mutation.md
+**Diff:** +276 -1 across 2 files
+
+### 2026-06-13 03:13
+
+**Areas:** hooks
+**Files (20):** .cache/zellij/permissions.kdl, .claude/bin/fix-thinking.py, .claude/consolidation-2026-05-29/CONSOLIDATION_PLAN.md, .claude/consolidation-2026-05-29/add_history.py, .claude/consolidation-2026-05-29/batch.sh, .claude/consolidation-2026-05-29/build_maps.py, .claude/consolidation-2026-05-29/inventory.py, .claude/consolidation-2026-05-29/maps/INDEX.md, .claude/consolidation-2026-05-29/maps/SESSIONS-glowboard.md, .claude/consolidation-2026-05-29/maps/SESSIONS-home.md, .claude/consolidation-2026-05-29/maps/SESSIONS-jyotish.md, .claude/consolidation-2026-05-29/maps/SESSIONS-lexios.md, .claude/consolidation-2026-05-29/maps/SESSIONS-nanoclaw.md, .claude/consolidation-2026-05-29/relocate.py, .claude/consolidation-2026-05-29/relocate_fix_inplace.py, .claude/consolidation-2026-05-29/rewrite_session.py, .claude/hooks/brain-digest-inject.sh, .claude/hooks/image-safe-gate.sh, .claude/projects/-Users-amrut-Lexios/memory/MEMORY.md, .claude/projects/-Users-amrut-Lexios/memory/lexios-concurrent-repo-mutation.md
+**Diff:** +270 -1 across 2 files
+
+### 2026-06-13 03:13
+
+**Areas:** hooks
+**Files (20):** .cache/zellij/permissions.kdl, .claude/bin/fix-thinking.py, .claude/consolidation-2026-05-29/CONSOLIDATION_PLAN.md, .claude/consolidation-2026-05-29/add_history.py, .claude/consolidation-2026-05-29/batch.sh, .claude/consolidation-2026-05-29/build_maps.py, .claude/consolidation-2026-05-29/inventory.py, .claude/consolidation-2026-05-29/maps/INDEX.md, .claude/consolidation-2026-05-29/maps/SESSIONS-glowboard.md, .claude/consolidation-2026-05-29/maps/SESSIONS-home.md, .claude/consolidation-2026-05-29/maps/SESSIONS-jyotish.md, .claude/consolidation-2026-05-29/maps/SESSIONS-lexios.md, .claude/consolidation-2026-05-29/maps/SESSIONS-nanoclaw.md, .claude/consolidation-2026-05-29/relocate.py, .claude/consolidation-2026-05-29/relocate_fix_inplace.py, .claude/consolidation-2026-05-29/rewrite_session.py, .claude/hooks/brain-digest-inject.sh, .claude/hooks/image-safe-gate.sh, .claude/projects/-Users-amrut-Lexios/memory/MEMORY.md, .claude/projects/-Users-amrut-Lexios/memory/lexios-concurrent-repo-mutation.md
+**Diff:** +264 -1 across 2 files
+
+### 2026-06-13 03:12
+
+**Areas:** hooks
+**Files (20):** .cache/zellij/permissions.kdl, .claude/bin/fix-thinking.py, .claude/consolidation-2026-05-29/CONSOLIDATION_PLAN.md, .claude/consolidation-2026-05-29/add_history.py, .claude/consolidation-2026-05-29/batch.sh, .claude/consolidation-2026-05-29/build_maps.py, .claude/consolidation-2026-05-29/inventory.py, .claude/consolidation-2026-05-29/maps/INDEX.md, .claude/consolidation-2026-05-29/maps/SESSIONS-glowboard.md, .claude/consolidation-2026-05-29/maps/SESSIONS-home.md, .claude/consolidation-2026-05-29/maps/SESSIONS-jyotish.md, .claude/consolidation-2026-05-29/maps/SESSIONS-lexios.md, .claude/consolidation-2026-05-29/maps/SESSIONS-nanoclaw.md, .claude/consolidation-2026-05-29/relocate.py, .claude/consolidation-2026-05-29/relocate_fix_inplace.py, .claude/consolidation-2026-05-29/rewrite_session.py, .claude/hooks/brain-digest-inject.sh, .claude/hooks/image-safe-gate.sh, .claude/projects/-Users-amrut-Lexios/memory/MEMORY.md, .claude/projects/-Users-amrut-Lexios/memory/lexios-concurrent-repo-mutation.md
+**Diff:** +258 -1 across 2 files
+
+### 2026-06-13 03:12
+
+**Areas:** hooks
+**Files (20):** .cache/zellij/permissions.kdl, .claude/bin/fix-thinking.py, .claude/consolidation-2026-05-29/CONSOLIDATION_PLAN.md, .claude/consolidation-2026-05-29/add_history.py, .claude/consolidation-2026-05-29/batch.sh, .claude/consolidation-2026-05-29/build_maps.py, .claude/consolidation-2026-05-29/inventory.py, .claude/consolidation-2026-05-29/maps/INDEX.md, .claude/consolidation-2026-05-29/maps/SESSIONS-glowboard.md, .claude/consolidation-2026-05-29/maps/SESSIONS-home.md, .claude/consolidation-2026-05-29/maps/SESSIONS-jyotish.md, .claude/consolidation-2026-05-29/maps/SESSIONS-lexios.md, .claude/consolidation-2026-05-29/maps/SESSIONS-nanoclaw.md, .claude/consolidation-2026-05-29/relocate.py, .claude/consolidation-2026-05-29/relocate_fix_inplace.py, .claude/consolidation-2026-05-29/rewrite_session.py, .claude/hooks/brain-digest-inject.sh, .claude/hooks/image-safe-gate.sh, .claude/projects/-Users-amrut-Lexios/memory/MEMORY.md, .claude/projects/-Users-amrut-Lexios/memory/lexios-concurrent-repo-mutation.md
+**Diff:** +252 -1 across 2 files
+
+### 2026-06-13 03:12
+
+**Areas:** hooks
+**Files (20):** .cache/zellij/permissions.kdl, .claude/bin/fix-thinking.py, .claude/consolidation-2026-05-29/CONSOLIDATION_PLAN.md, .claude/consolidation-2026-05-29/add_history.py, .claude/consolidation-2026-05-29/batch.sh, .claude/consolidation-2026-05-29/build_maps.py, .claude/consolidation-2026-05-29/inventory.py, .claude/consolidation-2026-05-29/maps/INDEX.md, .claude/consolidation-2026-05-29/maps/SESSIONS-glowboard.md, .claude/consolidation-2026-05-29/maps/SESSIONS-home.md, .claude/consolidation-2026-05-29/maps/SESSIONS-jyotish.md, .claude/consolidation-2026-05-29/maps/SESSIONS-lexios.md, .claude/consolidation-2026-05-29/maps/SESSIONS-nanoclaw.md, .claude/consolidation-2026-05-29/relocate.py, .claude/consolidation-2026-05-29/relocate_fix_inplace.py, .claude/consolidation-2026-05-29/rewrite_session.py, .claude/hooks/brain-digest-inject.sh, .claude/hooks/image-safe-gate.sh, .claude/projects/-Users-amrut-Lexios/memory/MEMORY.md, .claude/projects/-Users-amrut-Lexios/memory/lexios-concurrent-repo-mutation.md
+**Diff:** +246 -1 across 2 files
+
+### 2026-06-13 03:12
+
+**Areas:** hooks
+**Files (20):** .cache/zellij/permissions.kdl, .claude/bin/fix-thinking.py, .claude/consolidation-2026-05-29/CONSOLIDATION_PLAN.md, .claude/consolidation-2026-05-29/add_history.py, .claude/consolidation-2026-05-29/batch.sh, .claude/consolidation-2026-05-29/build_maps.py, .claude/consolidation-2026-05-29/inventory.py, .claude/consolidation-2026-05-29/maps/INDEX.md, .claude/consolidation-2026-05-29/maps/SESSIONS-glowboard.md, .claude/consolidation-2026-05-29/maps/SESSIONS-home.md, .claude/consolidation-2026-05-29/maps/SESSIONS-jyotish.md, .claude/consolidation-2026-05-29/maps/SESSIONS-lexios.md, .claude/consolidation-2026-05-29/maps/SESSIONS-nanoclaw.md, .claude/consolidation-2026-05-29/relocate.py, .claude/consolidation-2026-05-29/relocate_fix_inplace.py, .claude/consolidation-2026-05-29/rewrite_session.py, .claude/hooks/brain-digest-inject.sh, .claude/hooks/image-safe-gate.sh, .claude/projects/-Users-amrut-Lexios/memory/MEMORY.md, .claude/projects/-Users-amrut-Lexios/memory/lexios-concurrent-repo-mutation.md
+**Diff:** +240 -1 across 2 files
+
+### 2026-06-13 03:11
+
+**Areas:** hooks
+**Files (20):** .cache/zellij/permissions.kdl, .claude/bin/fix-thinking.py, .claude/consolidation-2026-05-29/CONSOLIDATION_PLAN.md, .claude/consolidation-2026-05-29/add_history.py, .claude/consolidation-2026-05-29/batch.sh, .claude/consolidation-2026-05-29/build_maps.py, .claude/consolidation-2026-05-29/inventory.py, .claude/consolidation-2026-05-29/maps/INDEX.md, .claude/consolidation-2026-05-29/maps/SESSIONS-glowboard.md, .claude/consolidation-2026-05-29/maps/SESSIONS-home.md, .claude/consolidation-2026-05-29/maps/SESSIONS-jyotish.md, .claude/consolidation-2026-05-29/maps/SESSIONS-lexios.md, .claude/consolidation-2026-05-29/maps/SESSIONS-nanoclaw.md, .claude/consolidation-2026-05-29/relocate.py, .claude/consolidation-2026-05-29/relocate_fix_inplace.py, .claude/consolidation-2026-05-29/rewrite_session.py, .claude/hooks/brain-digest-inject.sh, .claude/hooks/image-safe-gate.sh, .claude/projects/-Users-amrut-Lexios/memory/MEMORY.md, .claude/projects/-Users-amrut-Lexios/memory/lexios-concurrent-repo-mutation.md
+**Diff:** +234 -1 across 2 files
+
+### 2026-06-13 03:11
+
+**Areas:** hooks
+**Files (20):** .cache/zellij/permissions.kdl, .claude/bin/fix-thinking.py, .claude/consolidation-2026-05-29/CONSOLIDATION_PLAN.md, .claude/consolidation-2026-05-29/add_history.py, .claude/consolidation-2026-05-29/batch.sh, .claude/consolidation-2026-05-29/build_maps.py, .claude/consolidation-2026-05-29/inventory.py, .claude/consolidation-2026-05-29/maps/INDEX.md, .claude/consolidation-2026-05-29/maps/SESSIONS-glowboard.md, .claude/consolidation-2026-05-29/maps/SESSIONS-home.md, .claude/consolidation-2026-05-29/maps/SESSIONS-jyotish.md, .claude/consolidation-2026-05-29/maps/SESSIONS-lexios.md, .claude/consolidation-2026-05-29/maps/SESSIONS-nanoclaw.md, .claude/consolidation-2026-05-29/relocate.py, .claude/consolidation-2026-05-29/relocate_fix_inplace.py, .claude/consolidation-2026-05-29/rewrite_session.py, .claude/hooks/brain-digest-inject.sh, .claude/hooks/image-safe-gate.sh, .claude/projects/-Users-amrut-Lexios/memory/MEMORY.md, .claude/projects/-Users-amrut-Lexios/memory/lexios-concurrent-repo-mutation.md
+**Diff:** +228 -1 across 2 files
+
+### 2026-06-13 03:11
+
+**Areas:** hooks
+**Files (20):** .cache/zellij/permissions.kdl, .claude/bin/fix-thinking.py, .claude/consolidation-2026-05-29/CONSOLIDATION_PLAN.md, .claude/consolidation-2026-05-29/add_history.py, .claude/consolidation-2026-05-29/batch.sh, .claude/consolidation-2026-05-29/build_maps.py, .claude/consolidation-2026-05-29/inventory.py, .claude/consolidation-2026-05-29/maps/INDEX.md, .claude/consolidation-2026-05-29/maps/SESSIONS-glowboard.md, .claude/consolidation-2026-05-29/maps/SESSIONS-home.md, .claude/consolidation-2026-05-29/maps/SESSIONS-jyotish.md, .claude/consolidation-2026-05-29/maps/SESSIONS-lexios.md, .claude/consolidation-2026-05-29/maps/SESSIONS-nanoclaw.md, .claude/consolidation-2026-05-29/relocate.py, .claude/consolidation-2026-05-29/relocate_fix_inplace.py, .claude/consolidation-2026-05-29/rewrite_session.py, .claude/hooks/brain-digest-inject.sh, .claude/hooks/image-safe-gate.sh, .claude/projects/-Users-amrut-Lexios/memory/MEMORY.md, .claude/projects/-Users-amrut-Lexios/memory/lexios-concurrent-repo-mutation.md
+**Diff:** +222 -1 across 2 files
+
+### 2026-06-13 03:11
+
+**Areas:** hooks
+**Files (20):** .cache/zellij/permissions.kdl, .claude/bin/fix-thinking.py, .claude/consolidation-2026-05-29/CONSOLIDATION_PLAN.md, .claude/consolidation-2026-05-29/add_history.py, .claude/consolidation-2026-05-29/batch.sh, .claude/consolidation-2026-05-29/build_maps.py, .claude/consolidation-2026-05-29/inventory.py, .claude/consolidation-2026-05-29/maps/INDEX.md, .claude/consolidation-2026-05-29/maps/SESSIONS-glowboard.md, .claude/consolidation-2026-05-29/maps/SESSIONS-home.md, .claude/consolidation-2026-05-29/maps/SESSIONS-jyotish.md, .claude/consolidation-2026-05-29/maps/SESSIONS-lexios.md, .claude/consolidation-2026-05-29/maps/SESSIONS-nanoclaw.md, .claude/consolidation-2026-05-29/relocate.py, .claude/consolidation-2026-05-29/relocate_fix_inplace.py, .claude/consolidation-2026-05-29/rewrite_session.py, .claude/hooks/brain-digest-inject.sh, .claude/hooks/image-safe-gate.sh, .claude/projects/-Users-amrut-Lexios/memory/MEMORY.md, .claude/projects/-Users-amrut-Lexios/memory/lexios-concurrent-repo-mutation.md
+**Diff:** +216 -1 across 2 files
+
+### 2026-06-13 03:10
+
+**Areas:** hooks
+**Files (20):** .cache/zellij/permissions.kdl, .claude/bin/fix-thinking.py, .claude/consolidation-2026-05-29/CONSOLIDATION_PLAN.md, .claude/consolidation-2026-05-29/add_history.py, .claude/consolidation-2026-05-29/batch.sh, .claude/consolidation-2026-05-29/build_maps.py, .claude/consolidation-2026-05-29/inventory.py, .claude/consolidation-2026-05-29/maps/INDEX.md, .claude/consolidation-2026-05-29/maps/SESSIONS-glowboard.md, .claude/consolidation-2026-05-29/maps/SESSIONS-home.md, .claude/consolidation-2026-05-29/maps/SESSIONS-jyotish.md, .claude/consolidation-2026-05-29/maps/SESSIONS-lexios.md, .claude/consolidation-2026-05-29/maps/SESSIONS-nanoclaw.md, .claude/consolidation-2026-05-29/relocate.py, .claude/consolidation-2026-05-29/relocate_fix_inplace.py, .claude/consolidation-2026-05-29/rewrite_session.py, .claude/hooks/brain-digest-inject.sh, .claude/hooks/image-safe-gate.sh, .claude/projects/-Users-amrut-Lexios/memory/MEMORY.md, .claude/projects/-Users-amrut-Lexios/memory/lexios-concurrent-repo-mutation.md
+**Diff:** +210 -1 across 2 files
+
+### 2026-06-13 03:10
+
+**Areas:** hooks
+**Files (20):** .cache/zellij/permissions.kdl, .claude/bin/fix-thinking.py, .claude/consolidation-2026-05-29/CONSOLIDATION_PLAN.md, .claude/consolidation-2026-05-29/add_history.py, .claude/consolidation-2026-05-29/batch.sh, .claude/consolidation-2026-05-29/build_maps.py, .claude/consolidation-2026-05-29/inventory.py, .claude/consolidation-2026-05-29/maps/INDEX.md, .claude/consolidation-2026-05-29/maps/SESSIONS-glowboard.md, .claude/consolidation-2026-05-29/maps/SESSIONS-home.md, .claude/consolidation-2026-05-29/maps/SESSIONS-jyotish.md, .claude/consolidation-2026-05-29/maps/SESSIONS-lexios.md, .claude/consolidation-2026-05-29/maps/SESSIONS-nanoclaw.md, .claude/consolidation-2026-05-29/relocate.py, .claude/consolidation-2026-05-29/relocate_fix_inplace.py, .claude/consolidation-2026-05-29/rewrite_session.py, .claude/hooks/brain-digest-inject.sh, .claude/hooks/image-safe-gate.sh, .claude/projects/-Users-amrut-Lexios/memory/MEMORY.md, .claude/projects/-Users-amrut-Lexios/memory/lexios-concurrent-repo-mutation.md
+**Diff:** +204 -1 across 2 files
+
+### 2026-06-13 03:09
+
+**Areas:** hooks
+**Files (20):** .cache/zellij/permissions.kdl, .claude/bin/fix-thinking.py, .claude/consolidation-2026-05-29/CONSOLIDATION_PLAN.md, .claude/consolidation-2026-05-29/add_history.py, .claude/consolidation-2026-05-29/batch.sh, .claude/consolidation-2026-05-29/build_maps.py, .claude/consolidation-2026-05-29/inventory.py, .claude/consolidation-2026-05-29/maps/INDEX.md, .claude/consolidation-2026-05-29/maps/SESSIONS-glowboard.md, .claude/consolidation-2026-05-29/maps/SESSIONS-home.md, .claude/consolidation-2026-05-29/maps/SESSIONS-jyotish.md, .claude/consolidation-2026-05-29/maps/SESSIONS-lexios.md, .claude/consolidation-2026-05-29/maps/SESSIONS-nanoclaw.md, .claude/consolidation-2026-05-29/relocate.py, .claude/consolidation-2026-05-29/relocate_fix_inplace.py, .claude/consolidation-2026-05-29/rewrite_session.py, .claude/hooks/brain-digest-inject.sh, .claude/hooks/image-safe-gate.sh, .claude/projects/-Users-amrut-Lexios/memory/MEMORY.md, .claude/projects/-Users-amrut-Lexios/memory/lexios-concurrent-repo-mutation.md
+**Diff:** +198 -1 across 2 files
+
+### 2026-06-13 03:09
+
+**Areas:** hooks
+**Files (20):** .cache/zellij/permissions.kdl, .claude/bin/fix-thinking.py, .claude/consolidation-2026-05-29/CONSOLIDATION_PLAN.md, .claude/consolidation-2026-05-29/add_history.py, .claude/consolidation-2026-05-29/batch.sh, .claude/consolidation-2026-05-29/build_maps.py, .claude/consolidation-2026-05-29/inventory.py, .claude/consolidation-2026-05-29/maps/INDEX.md, .claude/consolidation-2026-05-29/maps/SESSIONS-glowboard.md, .claude/consolidation-2026-05-29/maps/SESSIONS-home.md, .claude/consolidation-2026-05-29/maps/SESSIONS-jyotish.md, .claude/consolidation-2026-05-29/maps/SESSIONS-lexios.md, .claude/consolidation-2026-05-29/maps/SESSIONS-nanoclaw.md, .claude/consolidation-2026-05-29/relocate.py, .claude/consolidation-2026-05-29/relocate_fix_inplace.py, .claude/consolidation-2026-05-29/rewrite_session.py, .claude/hooks/brain-digest-inject.sh, .claude/hooks/image-safe-gate.sh, .claude/projects/-Users-amrut-Lexios/memory/MEMORY.md, .claude/projects/-Users-amrut-Lexios/memory/lexios-concurrent-repo-mutation.md
+**Diff:** +192 -1 across 2 files
+
+### 2026-06-13 03:08
+
+**Areas:** hooks
+**Files (20):** .cache/zellij/permissions.kdl, .claude/bin/fix-thinking.py, .claude/consolidation-2026-05-29/CONSOLIDATION_PLAN.md, .claude/consolidation-2026-05-29/add_history.py, .claude/consolidation-2026-05-29/batch.sh, .claude/consolidation-2026-05-29/build_maps.py, .claude/consolidation-2026-05-29/inventory.py, .claude/consolidation-2026-05-29/maps/INDEX.md, .claude/consolidation-2026-05-29/maps/SESSIONS-glowboard.md, .claude/consolidation-2026-05-29/maps/SESSIONS-home.md, .claude/consolidation-2026-05-29/maps/SESSIONS-jyotish.md, .claude/consolidation-2026-05-29/maps/SESSIONS-lexios.md, .claude/consolidation-2026-05-29/maps/SESSIONS-nanoclaw.md, .claude/consolidation-2026-05-29/relocate.py, .claude/consolidation-2026-05-29/relocate_fix_inplace.py, .claude/consolidation-2026-05-29/rewrite_session.py, .claude/hooks/brain-digest-inject.sh, .claude/hooks/image-safe-gate.sh, .claude/projects/-Users-amrut-Lexios/memory/MEMORY.md, .claude/projects/-Users-amrut-Lexios/memory/lexios-concurrent-repo-mutation.md
+**Diff:** +186 -1 across 2 files
+
+### 2026-06-13 03:07
+
+**Areas:** hooks
+**Files (20):** .cache/zellij/permissions.kdl, .claude/bin/fix-thinking.py, .claude/consolidation-2026-05-29/CONSOLIDATION_PLAN.md, .claude/consolidation-2026-05-29/add_history.py, .claude/consolidation-2026-05-29/batch.sh, .claude/consolidation-2026-05-29/build_maps.py, .claude/consolidation-2026-05-29/inventory.py, .claude/consolidation-2026-05-29/maps/INDEX.md, .claude/consolidation-2026-05-29/maps/SESSIONS-glowboard.md, .claude/consolidation-2026-05-29/maps/SESSIONS-home.md, .claude/consolidation-2026-05-29/maps/SESSIONS-jyotish.md, .claude/consolidation-2026-05-29/maps/SESSIONS-lexios.md, .claude/consolidation-2026-05-29/maps/SESSIONS-nanoclaw.md, .claude/consolidation-2026-05-29/relocate.py, .claude/consolidation-2026-05-29/relocate_fix_inplace.py, .claude/consolidation-2026-05-29/rewrite_session.py, .claude/hooks/brain-digest-inject.sh, .claude/hooks/image-safe-gate.sh, .claude/projects/-Users-amrut-Lexios/memory/MEMORY.md, .claude/projects/-Users-amrut-Lexios/memory/lexios-concurrent-repo-mutation.md
+**Diff:** +180 -1 across 2 files
+
+### 2026-06-13 03:07
+
+**Areas:** hooks
+**Files (20):** .cache/zellij/permissions.kdl, .claude/bin/fix-thinking.py, .claude/consolidation-2026-05-29/CONSOLIDATION_PLAN.md, .claude/consolidation-2026-05-29/add_history.py, .claude/consolidation-2026-05-29/batch.sh, .claude/consolidation-2026-05-29/build_maps.py, .claude/consolidation-2026-05-29/inventory.py, .claude/consolidation-2026-05-29/maps/INDEX.md, .claude/consolidation-2026-05-29/maps/SESSIONS-glowboard.md, .claude/consolidation-2026-05-29/maps/SESSIONS-home.md, .claude/consolidation-2026-05-29/maps/SESSIONS-jyotish.md, .claude/consolidation-2026-05-29/maps/SESSIONS-lexios.md, .claude/consolidation-2026-05-29/maps/SESSIONS-nanoclaw.md, .claude/consolidation-2026-05-29/relocate.py, .claude/consolidation-2026-05-29/relocate_fix_inplace.py, .claude/consolidation-2026-05-29/rewrite_session.py, .claude/hooks/brain-digest-inject.sh, .claude/hooks/image-safe-gate.sh, .claude/projects/-Users-amrut-Lexios/memory/MEMORY.md, .claude/projects/-Users-amrut-Lexios/memory/lexios-concurrent-repo-mutation.md
+**Diff:** +174 -1 across 2 files
+
+### 2026-06-13 03:06
+
+**Areas:** hooks
+**Files (20):** .cache/zellij/permissions.kdl, .claude/bin/fix-thinking.py, .claude/consolidation-2026-05-29/CONSOLIDATION_PLAN.md, .claude/consolidation-2026-05-29/add_history.py, .claude/consolidation-2026-05-29/batch.sh, .claude/consolidation-2026-05-29/build_maps.py, .claude/consolidation-2026-05-29/inventory.py, .claude/consolidation-2026-05-29/maps/INDEX.md, .claude/consolidation-2026-05-29/maps/SESSIONS-glowboard.md, .claude/consolidation-2026-05-29/maps/SESSIONS-home.md, .claude/consolidation-2026-05-29/maps/SESSIONS-jyotish.md, .claude/consolidation-2026-05-29/maps/SESSIONS-lexios.md, .claude/consolidation-2026-05-29/maps/SESSIONS-nanoclaw.md, .claude/consolidation-2026-05-29/relocate.py, .claude/consolidation-2026-05-29/relocate_fix_inplace.py, .claude/consolidation-2026-05-29/rewrite_session.py, .claude/hooks/brain-digest-inject.sh, .claude/hooks/image-safe-gate.sh, .claude/projects/-Users-amrut-Lexios/memory/MEMORY.md, .claude/projects/-Users-amrut-Lexios/memory/lexios-concurrent-repo-mutation.md
+**Diff:** +168 -1 across 2 files
+
+### 2026-06-13 03:06
+
+**Areas:** hooks
+**Files (20):** .cache/zellij/permissions.kdl, .claude/bin/fix-thinking.py, .claude/consolidation-2026-05-29/CONSOLIDATION_PLAN.md, .claude/consolidation-2026-05-29/add_history.py, .claude/consolidation-2026-05-29/batch.sh, .claude/consolidation-2026-05-29/build_maps.py, .claude/consolidation-2026-05-29/inventory.py, .claude/consolidation-2026-05-29/maps/INDEX.md, .claude/consolidation-2026-05-29/maps/SESSIONS-glowboard.md, .claude/consolidation-2026-05-29/maps/SESSIONS-home.md, .claude/consolidation-2026-05-29/maps/SESSIONS-jyotish.md, .claude/consolidation-2026-05-29/maps/SESSIONS-lexios.md, .claude/consolidation-2026-05-29/maps/SESSIONS-nanoclaw.md, .claude/consolidation-2026-05-29/relocate.py, .claude/consolidation-2026-05-29/relocate_fix_inplace.py, .claude/consolidation-2026-05-29/rewrite_session.py, .claude/hooks/brain-digest-inject.sh, .claude/hooks/image-safe-gate.sh, .claude/projects/-Users-amrut-Lexios/memory/MEMORY.md, .claude/projects/-Users-amrut-Lexios/memory/lexios-concurrent-repo-mutation.md
+**Diff:** +162 -1 across 2 files
+
+### 2026-06-13 03:06
+
+**Areas:** hooks
+**Files (20):** .cache/zellij/permissions.kdl, .claude/bin/fix-thinking.py, .claude/consolidation-2026-05-29/CONSOLIDATION_PLAN.md, .claude/consolidation-2026-05-29/add_history.py, .claude/consolidation-2026-05-29/batch.sh, .claude/consolidation-2026-05-29/build_maps.py, .claude/consolidation-2026-05-29/inventory.py, .claude/consolidation-2026-05-29/maps/INDEX.md, .claude/consolidation-2026-05-29/maps/SESSIONS-glowboard.md, .claude/consolidation-2026-05-29/maps/SESSIONS-home.md, .claude/consolidation-2026-05-29/maps/SESSIONS-jyotish.md, .claude/consolidation-2026-05-29/maps/SESSIONS-lexios.md, .claude/consolidation-2026-05-29/maps/SESSIONS-nanoclaw.md, .claude/consolidation-2026-05-29/relocate.py, .claude/consolidation-2026-05-29/relocate_fix_inplace.py, .claude/consolidation-2026-05-29/rewrite_session.py, .claude/hooks/brain-digest-inject.sh, .claude/hooks/image-safe-gate.sh, .claude/projects/-Users-amrut-Lexios/memory/MEMORY.md, .claude/projects/-Users-amrut-Lexios/memory/lexios-concurrent-repo-mutation.md
+**Diff:** +156 -1 across 2 files
+
+### 2026-06-13 03:05
+
+**Areas:** hooks
+**Files (20):** .cache/zellij/permissions.kdl, .claude/bin/fix-thinking.py, .claude/consolidation-2026-05-29/CONSOLIDATION_PLAN.md, .claude/consolidation-2026-05-29/add_history.py, .claude/consolidation-2026-05-29/batch.sh, .claude/consolidation-2026-05-29/build_maps.py, .claude/consolidation-2026-05-29/inventory.py, .claude/consolidation-2026-05-29/maps/INDEX.md, .claude/consolidation-2026-05-29/maps/SESSIONS-glowboard.md, .claude/consolidation-2026-05-29/maps/SESSIONS-home.md, .claude/consolidation-2026-05-29/maps/SESSIONS-jyotish.md, .claude/consolidation-2026-05-29/maps/SESSIONS-lexios.md, .claude/consolidation-2026-05-29/maps/SESSIONS-nanoclaw.md, .claude/consolidation-2026-05-29/relocate.py, .claude/consolidation-2026-05-29/relocate_fix_inplace.py, .claude/consolidation-2026-05-29/rewrite_session.py, .claude/hooks/brain-digest-inject.sh, .claude/hooks/image-safe-gate.sh, .claude/projects/-Users-amrut-Lexios/memory/MEMORY.md, .claude/projects/-Users-amrut-Lexios/memory/lexios-concurrent-repo-mutation.md
+**Diff:** +150 -1 across 2 files
+
+### 2026-06-13 03:05
+
+**Areas:** hooks
+**Files (20):** .cache/zellij/permissions.kdl, .claude/bin/fix-thinking.py, .claude/consolidation-2026-05-29/CONSOLIDATION_PLAN.md, .claude/consolidation-2026-05-29/add_history.py, .claude/consolidation-2026-05-29/batch.sh, .claude/consolidation-2026-05-29/build_maps.py, .claude/consolidation-2026-05-29/inventory.py, .claude/consolidation-2026-05-29/maps/INDEX.md, .claude/consolidation-2026-05-29/maps/SESSIONS-glowboard.md, .claude/consolidation-2026-05-29/maps/SESSIONS-home.md, .claude/consolidation-2026-05-29/maps/SESSIONS-jyotish.md, .claude/consolidation-2026-05-29/maps/SESSIONS-lexios.md, .claude/consolidation-2026-05-29/maps/SESSIONS-nanoclaw.md, .claude/consolidation-2026-05-29/relocate.py, .claude/consolidation-2026-05-29/relocate_fix_inplace.py, .claude/consolidation-2026-05-29/rewrite_session.py, .claude/hooks/brain-digest-inject.sh, .claude/hooks/image-safe-gate.sh, .claude/projects/-Users-amrut-Lexios/memory/MEMORY.md, .claude/projects/-Users-amrut-Lexios/memory/lexios-concurrent-repo-mutation.md
+**Diff:** +144 -1 across 2 files
+
+### 2026-06-13 03:05
+
+**Areas:** hooks
+**Files (20):** .cache/zellij/permissions.kdl, .claude/bin/fix-thinking.py, .claude/consolidation-2026-05-29/CONSOLIDATION_PLAN.md, .claude/consolidation-2026-05-29/add_history.py, .claude/consolidation-2026-05-29/batch.sh, .claude/consolidation-2026-05-29/build_maps.py, .claude/consolidation-2026-05-29/inventory.py, .claude/consolidation-2026-05-29/maps/INDEX.md, .claude/consolidation-2026-05-29/maps/SESSIONS-glowboard.md, .claude/consolidation-2026-05-29/maps/SESSIONS-home.md, .claude/consolidation-2026-05-29/maps/SESSIONS-jyotish.md, .claude/consolidation-2026-05-29/maps/SESSIONS-lexios.md, .claude/consolidation-2026-05-29/maps/SESSIONS-nanoclaw.md, .claude/consolidation-2026-05-29/relocate.py, .claude/consolidation-2026-05-29/relocate_fix_inplace.py, .claude/consolidation-2026-05-29/rewrite_session.py, .claude/hooks/brain-digest-inject.sh, .claude/hooks/image-safe-gate.sh, .claude/projects/-Users-amrut-Lexios/memory/MEMORY.md, .claude/projects/-Users-amrut-Lexios/memory/lexios-concurrent-repo-mutation.md
+**Diff:** +138 -1 across 2 files
+
+### 2026-06-13 03:04
+
+**Areas:** hooks
+**Files (20):** .cache/zellij/permissions.kdl, .claude/bin/fix-thinking.py, .claude/consolidation-2026-05-29/CONSOLIDATION_PLAN.md, .claude/consolidation-2026-05-29/add_history.py, .claude/consolidation-2026-05-29/batch.sh, .claude/consolidation-2026-05-29/build_maps.py, .claude/consolidation-2026-05-29/inventory.py, .claude/consolidation-2026-05-29/maps/INDEX.md, .claude/consolidation-2026-05-29/maps/SESSIONS-glowboard.md, .claude/consolidation-2026-05-29/maps/SESSIONS-home.md, .claude/consolidation-2026-05-29/maps/SESSIONS-jyotish.md, .claude/consolidation-2026-05-29/maps/SESSIONS-lexios.md, .claude/consolidation-2026-05-29/maps/SESSIONS-nanoclaw.md, .claude/consolidation-2026-05-29/relocate.py, .claude/consolidation-2026-05-29/relocate_fix_inplace.py, .claude/consolidation-2026-05-29/rewrite_session.py, .claude/hooks/brain-digest-inject.sh, .claude/hooks/image-safe-gate.sh, .claude/projects/-Users-amrut-Lexios/memory/MEMORY.md, .claude/projects/-Users-amrut-Lexios/memory/lexios-concurrent-repo-mutation.md
+**Diff:** +132 -1 across 2 files
+
+### 2026-06-13 03:04
+
+**Areas:** hooks
+**Files (20):** .cache/zellij/permissions.kdl, .claude/bin/fix-thinking.py, .claude/consolidation-2026-05-29/CONSOLIDATION_PLAN.md, .claude/consolidation-2026-05-29/add_history.py, .claude/consolidation-2026-05-29/batch.sh, .claude/consolidation-2026-05-29/build_maps.py, .claude/consolidation-2026-05-29/inventory.py, .claude/consolidation-2026-05-29/maps/INDEX.md, .claude/consolidation-2026-05-29/maps/SESSIONS-glowboard.md, .claude/consolidation-2026-05-29/maps/SESSIONS-home.md, .claude/consolidation-2026-05-29/maps/SESSIONS-jyotish.md, .claude/consolidation-2026-05-29/maps/SESSIONS-lexios.md, .claude/consolidation-2026-05-29/maps/SESSIONS-nanoclaw.md, .claude/consolidation-2026-05-29/relocate.py, .claude/consolidation-2026-05-29/relocate_fix_inplace.py, .claude/consolidation-2026-05-29/rewrite_session.py, .claude/hooks/brain-digest-inject.sh, .claude/hooks/image-safe-gate.sh, .claude/projects/-Users-amrut-Lexios/memory/MEMORY.md, .claude/projects/-Users-amrut-Lexios/memory/lexios-concurrent-repo-mutation.md
+**Diff:** +126 -1 across 2 files
+
+### 2026-06-13 03:03
+
+**Areas:** hooks
+**Files (20):** .cache/zellij/permissions.kdl, .claude/bin/fix-thinking.py, .claude/consolidation-2026-05-29/CONSOLIDATION_PLAN.md, .claude/consolidation-2026-05-29/add_history.py, .claude/consolidation-2026-05-29/batch.sh, .claude/consolidation-2026-05-29/build_maps.py, .claude/consolidation-2026-05-29/inventory.py, .claude/consolidation-2026-05-29/maps/INDEX.md, .claude/consolidation-2026-05-29/maps/SESSIONS-glowboard.md, .claude/consolidation-2026-05-29/maps/SESSIONS-home.md, .claude/consolidation-2026-05-29/maps/SESSIONS-jyotish.md, .claude/consolidation-2026-05-29/maps/SESSIONS-lexios.md, .claude/consolidation-2026-05-29/maps/SESSIONS-nanoclaw.md, .claude/consolidation-2026-05-29/relocate.py, .claude/consolidation-2026-05-29/relocate_fix_inplace.py, .claude/consolidation-2026-05-29/rewrite_session.py, .claude/hooks/brain-digest-inject.sh, .claude/hooks/image-safe-gate.sh, .claude/projects/-Users-amrut-Lexios/memory/MEMORY.md, .claude/projects/-Users-amrut-Lexios/memory/lexios-concurrent-repo-mutation.md
+**Diff:** +120 -1 across 2 files
+
+### 2026-06-13 03:03
+
+**Areas:** hooks
+**Files (20):** .cache/zellij/permissions.kdl, .claude/bin/fix-thinking.py, .claude/consolidation-2026-05-29/CONSOLIDATION_PLAN.md, .claude/consolidation-2026-05-29/add_history.py, .claude/consolidation-2026-05-29/batch.sh, .claude/consolidation-2026-05-29/build_maps.py, .claude/consolidation-2026-05-29/inventory.py, .claude/consolidation-2026-05-29/maps/INDEX.md, .claude/consolidation-2026-05-29/maps/SESSIONS-glowboard.md, .claude/consolidation-2026-05-29/maps/SESSIONS-home.md, .claude/consolidation-2026-05-29/maps/SESSIONS-jyotish.md, .claude/consolidation-2026-05-29/maps/SESSIONS-lexios.md, .claude/consolidation-2026-05-29/maps/SESSIONS-nanoclaw.md, .claude/consolidation-2026-05-29/relocate.py, .claude/consolidation-2026-05-29/relocate_fix_inplace.py, .claude/consolidation-2026-05-29/rewrite_session.py, .claude/hooks/brain-digest-inject.sh, .claude/hooks/image-safe-gate.sh, .claude/projects/-Users-amrut-Lexios/memory/MEMORY.md, .claude/projects/-Users-amrut-Lexios/memory/lexios-concurrent-repo-mutation.md
+**Diff:** +114 -1 across 2 files
+
+### 2026-06-13 03:02
+
+**Areas:** hooks
+**Files (20):** .cache/zellij/permissions.kdl, .claude/bin/fix-thinking.py, .claude/consolidation-2026-05-29/CONSOLIDATION_PLAN.md, .claude/consolidation-2026-05-29/add_history.py, .claude/consolidation-2026-05-29/batch.sh, .claude/consolidation-2026-05-29/build_maps.py, .claude/consolidation-2026-05-29/inventory.py, .claude/consolidation-2026-05-29/maps/INDEX.md, .claude/consolidation-2026-05-29/maps/SESSIONS-glowboard.md, .claude/consolidation-2026-05-29/maps/SESSIONS-home.md, .claude/consolidation-2026-05-29/maps/SESSIONS-jyotish.md, .claude/consolidation-2026-05-29/maps/SESSIONS-lexios.md, .claude/consolidation-2026-05-29/maps/SESSIONS-nanoclaw.md, .claude/consolidation-2026-05-29/relocate.py, .claude/consolidation-2026-05-29/relocate_fix_inplace.py, .claude/consolidation-2026-05-29/rewrite_session.py, .claude/hooks/brain-digest-inject.sh, .claude/hooks/image-safe-gate.sh, .claude/projects/-Users-amrut-Lexios/memory/MEMORY.md, .claude/projects/-Users-amrut-Lexios/memory/lexios-concurrent-repo-mutation.md
+**Diff:** +108 -1 across 2 files
+
+### 2026-06-13 03:02
+
+**Areas:** hooks
+**Files (20):** .cache/zellij/permissions.kdl, .claude/bin/fix-thinking.py, .claude/consolidation-2026-05-29/CONSOLIDATION_PLAN.md, .claude/consolidation-2026-05-29/add_history.py, .claude/consolidation-2026-05-29/batch.sh, .claude/consolidation-2026-05-29/build_maps.py, .claude/consolidation-2026-05-29/inventory.py, .claude/consolidation-2026-05-29/maps/INDEX.md, .claude/consolidation-2026-05-29/maps/SESSIONS-glowboard.md, .claude/consolidation-2026-05-29/maps/SESSIONS-home.md, .claude/consolidation-2026-05-29/maps/SESSIONS-jyotish.md, .claude/consolidation-2026-05-29/maps/SESSIONS-lexios.md, .claude/consolidation-2026-05-29/maps/SESSIONS-nanoclaw.md, .claude/consolidation-2026-05-29/relocate.py, .claude/consolidation-2026-05-29/relocate_fix_inplace.py, .claude/consolidation-2026-05-29/rewrite_session.py, .claude/hooks/brain-digest-inject.sh, .claude/hooks/image-safe-gate.sh, .claude/projects/-Users-amrut-Lexios/memory/MEMORY.md, .claude/projects/-Users-amrut-Lexios/memory/lexios-concurrent-repo-mutation.md
+**Diff:** +102 -1 across 2 files
+
+### 2026-06-13 03:02
+
+**Areas:** hooks
+**Files (20):** .cache/zellij/permissions.kdl, .claude/bin/fix-thinking.py, .claude/consolidation-2026-05-29/CONSOLIDATION_PLAN.md, .claude/consolidation-2026-05-29/add_history.py, .claude/consolidation-2026-05-29/batch.sh, .claude/consolidation-2026-05-29/build_maps.py, .claude/consolidation-2026-05-29/inventory.py, .claude/consolidation-2026-05-29/maps/INDEX.md, .claude/consolidation-2026-05-29/maps/SESSIONS-glowboard.md, .claude/consolidation-2026-05-29/maps/SESSIONS-home.md, .claude/consolidation-2026-05-29/maps/SESSIONS-jyotish.md, .claude/consolidation-2026-05-29/maps/SESSIONS-lexios.md, .claude/consolidation-2026-05-29/maps/SESSIONS-nanoclaw.md, .claude/consolidation-2026-05-29/relocate.py, .claude/consolidation-2026-05-29/relocate_fix_inplace.py, .claude/consolidation-2026-05-29/rewrite_session.py, .claude/hooks/brain-digest-inject.sh, .claude/hooks/image-safe-gate.sh, .claude/projects/-Users-amrut-Lexios/memory/MEMORY.md, .claude/projects/-Users-amrut-Lexios/memory/lexios-concurrent-repo-mutation.md
+**Diff:** +96 -1 across 2 files
+
+### 2026-06-13 03:01
+
+**Areas:** hooks
+**Files (20):** .cache/zellij/permissions.kdl, .claude/bin/fix-thinking.py, .claude/consolidation-2026-05-29/CONSOLIDATION_PLAN.md, .claude/consolidation-2026-05-29/add_history.py, .claude/consolidation-2026-05-29/batch.sh, .claude/consolidation-2026-05-29/build_maps.py, .claude/consolidation-2026-05-29/inventory.py, .claude/consolidation-2026-05-29/maps/INDEX.md, .claude/consolidation-2026-05-29/maps/SESSIONS-glowboard.md, .claude/consolidation-2026-05-29/maps/SESSIONS-home.md, .claude/consolidation-2026-05-29/maps/SESSIONS-jyotish.md, .claude/consolidation-2026-05-29/maps/SESSIONS-lexios.md, .claude/consolidation-2026-05-29/maps/SESSIONS-nanoclaw.md, .claude/consolidation-2026-05-29/relocate.py, .claude/consolidation-2026-05-29/relocate_fix_inplace.py, .claude/consolidation-2026-05-29/rewrite_session.py, .claude/hooks/brain-digest-inject.sh, .claude/hooks/image-safe-gate.sh, .claude/projects/-Users-amrut-Lexios/memory/MEMORY.md, .claude/projects/-Users-amrut-Lexios/memory/lexios-concurrent-repo-mutation.md
+**Diff:** +90 -1 across 2 files
+
+### 2026-06-13 03:01
+
+**Areas:** hooks
+**Files (20):** .cache/zellij/permissions.kdl, .claude/bin/fix-thinking.py, .claude/consolidation-2026-05-29/CONSOLIDATION_PLAN.md, .claude/consolidation-2026-05-29/add_history.py, .claude/consolidation-2026-05-29/batch.sh, .claude/consolidation-2026-05-29/build_maps.py, .claude/consolidation-2026-05-29/inventory.py, .claude/consolidation-2026-05-29/maps/INDEX.md, .claude/consolidation-2026-05-29/maps/SESSIONS-glowboard.md, .claude/consolidation-2026-05-29/maps/SESSIONS-home.md, .claude/consolidation-2026-05-29/maps/SESSIONS-jyotish.md, .claude/consolidation-2026-05-29/maps/SESSIONS-lexios.md, .claude/consolidation-2026-05-29/maps/SESSIONS-nanoclaw.md, .claude/consolidation-2026-05-29/relocate.py, .claude/consolidation-2026-05-29/relocate_fix_inplace.py, .claude/consolidation-2026-05-29/rewrite_session.py, .claude/hooks/brain-digest-inject.sh, .claude/hooks/image-safe-gate.sh, .claude/projects/-Users-amrut-Lexios/memory/MEMORY.md, .claude/projects/-Users-amrut-Lexios/memory/lexios-concurrent-repo-mutation.md
+**Diff:** +84 -1 across 2 files
+
+### 2026-06-13 03:01
+
+**Areas:** hooks
+**Files (20):** .cache/zellij/permissions.kdl, .claude/bin/fix-thinking.py, .claude/consolidation-2026-05-29/CONSOLIDATION_PLAN.md, .claude/consolidation-2026-05-29/add_history.py, .claude/consolidation-2026-05-29/batch.sh, .claude/consolidation-2026-05-29/build_maps.py, .claude/consolidation-2026-05-29/inventory.py, .claude/consolidation-2026-05-29/maps/INDEX.md, .claude/consolidation-2026-05-29/maps/SESSIONS-glowboard.md, .claude/consolidation-2026-05-29/maps/SESSIONS-home.md, .claude/consolidation-2026-05-29/maps/SESSIONS-jyotish.md, .claude/consolidation-2026-05-29/maps/SESSIONS-lexios.md, .claude/consolidation-2026-05-29/maps/SESSIONS-nanoclaw.md, .claude/consolidation-2026-05-29/relocate.py, .claude/consolidation-2026-05-29/relocate_fix_inplace.py, .claude/consolidation-2026-05-29/rewrite_session.py, .claude/hooks/brain-digest-inject.sh, .claude/hooks/image-safe-gate.sh, .claude/projects/-Users-amrut-Lexios/memory/MEMORY.md, .claude/projects/-Users-amrut-Lexios/memory/lexios-concurrent-repo-mutation.md
+**Diff:** +78 -1 across 2 files
+
+### 2026-06-13 03:00
+
+**Areas:** hooks
+**Files (20):** .cache/zellij/permissions.kdl, .claude/bin/fix-thinking.py, .claude/consolidation-2026-05-29/CONSOLIDATION_PLAN.md, .claude/consolidation-2026-05-29/add_history.py, .claude/consolidation-2026-05-29/batch.sh, .claude/consolidation-2026-05-29/build_maps.py, .claude/consolidation-2026-05-29/inventory.py, .claude/consolidation-2026-05-29/maps/INDEX.md, .claude/consolidation-2026-05-29/maps/SESSIONS-glowboard.md, .claude/consolidation-2026-05-29/maps/SESSIONS-home.md, .claude/consolidation-2026-05-29/maps/SESSIONS-jyotish.md, .claude/consolidation-2026-05-29/maps/SESSIONS-lexios.md, .claude/consolidation-2026-05-29/maps/SESSIONS-nanoclaw.md, .claude/consolidation-2026-05-29/relocate.py, .claude/consolidation-2026-05-29/relocate_fix_inplace.py, .claude/consolidation-2026-05-29/rewrite_session.py, .claude/hooks/brain-digest-inject.sh, .claude/hooks/image-safe-gate.sh, .claude/projects/-Users-amrut-Lexios/memory/MEMORY.md, .claude/projects/-Users-amrut-Lexios/memory/lexios-concurrent-repo-mutation.md
+**Diff:** +72 -1 across 2 files
+
+### 2026-06-13 03:00
+
+**Areas:** hooks
+**Files (20):** .cache/zellij/permissions.kdl, .claude/bin/fix-thinking.py, .claude/consolidation-2026-05-29/CONSOLIDATION_PLAN.md, .claude/consolidation-2026-05-29/add_history.py, .claude/consolidation-2026-05-29/batch.sh, .claude/consolidation-2026-05-29/build_maps.py, .claude/consolidation-2026-05-29/inventory.py, .claude/consolidation-2026-05-29/maps/INDEX.md, .claude/consolidation-2026-05-29/maps/SESSIONS-glowboard.md, .claude/consolidation-2026-05-29/maps/SESSIONS-home.md, .claude/consolidation-2026-05-29/maps/SESSIONS-jyotish.md, .claude/consolidation-2026-05-29/maps/SESSIONS-lexios.md, .claude/consolidation-2026-05-29/maps/SESSIONS-nanoclaw.md, .claude/consolidation-2026-05-29/relocate.py, .claude/consolidation-2026-05-29/relocate_fix_inplace.py, .claude/consolidation-2026-05-29/rewrite_session.py, .claude/hooks/brain-digest-inject.sh, .claude/hooks/image-safe-gate.sh, .claude/projects/-Users-amrut-Lexios/memory/MEMORY.md, .claude/projects/-Users-amrut-Lexios/memory/lexios-concurrent-repo-mutation.md
+**Diff:** +66 -1 across 2 files
+
+### 2026-06-13 03:00
+
+**Areas:** hooks
+**Files (20):** .cache/zellij/permissions.kdl, .claude/bin/fix-thinking.py, .claude/consolidation-2026-05-29/CONSOLIDATION_PLAN.md, .claude/consolidation-2026-05-29/add_history.py, .claude/consolidation-2026-05-29/batch.sh, .claude/consolidation-2026-05-29/build_maps.py, .claude/consolidation-2026-05-29/inventory.py, .claude/consolidation-2026-05-29/maps/INDEX.md, .claude/consolidation-2026-05-29/maps/SESSIONS-glowboard.md, .claude/consolidation-2026-05-29/maps/SESSIONS-home.md, .claude/consolidation-2026-05-29/maps/SESSIONS-jyotish.md, .claude/consolidation-2026-05-29/maps/SESSIONS-lexios.md, .claude/consolidation-2026-05-29/maps/SESSIONS-nanoclaw.md, .claude/consolidation-2026-05-29/relocate.py, .claude/consolidation-2026-05-29/relocate_fix_inplace.py, .claude/consolidation-2026-05-29/rewrite_session.py, .claude/hooks/brain-digest-inject.sh, .claude/hooks/image-safe-gate.sh, .claude/projects/-Users-amrut-Lexios/memory/MEMORY.md, .claude/projects/-Users-amrut-Lexios/memory/lexios-concurrent-repo-mutation.md
+**Diff:** +60 -1 across 2 files
+
+### 2026-06-13 02:59
+
+**Areas:** hooks
+**Files (20):** .cache/zellij/permissions.kdl, .claude/bin/fix-thinking.py, .claude/consolidation-2026-05-29/CONSOLIDATION_PLAN.md, .claude/consolidation-2026-05-29/add_history.py, .claude/consolidation-2026-05-29/batch.sh, .claude/consolidation-2026-05-29/build_maps.py, .claude/consolidation-2026-05-29/inventory.py, .claude/consolidation-2026-05-29/maps/INDEX.md, .claude/consolidation-2026-05-29/maps/SESSIONS-glowboard.md, .claude/consolidation-2026-05-29/maps/SESSIONS-home.md, .claude/consolidation-2026-05-29/maps/SESSIONS-jyotish.md, .claude/consolidation-2026-05-29/maps/SESSIONS-lexios.md, .claude/consolidation-2026-05-29/maps/SESSIONS-nanoclaw.md, .claude/consolidation-2026-05-29/relocate.py, .claude/consolidation-2026-05-29/relocate_fix_inplace.py, .claude/consolidation-2026-05-29/rewrite_session.py, .claude/hooks/brain-digest-inject.sh, .claude/hooks/image-safe-gate.sh, .claude/projects/-Users-amrut-Lexios/memory/MEMORY.md, .claude/projects/-Users-amrut-Lexios/memory/lexios-concurrent-repo-mutation.md
+**Diff:** +54 -1 across 2 files
+
+### 2026-06-13 02:58
+
+**Areas:** hooks
+**Files (20):** .cache/zellij/permissions.kdl, .claude/bin/fix-thinking.py, .claude/consolidation-2026-05-29/CONSOLIDATION_PLAN.md, .claude/consolidation-2026-05-29/add_history.py, .claude/consolidation-2026-05-29/batch.sh, .claude/consolidation-2026-05-29/build_maps.py, .claude/consolidation-2026-05-29/inventory.py, .claude/consolidation-2026-05-29/maps/INDEX.md, .claude/consolidation-2026-05-29/maps/SESSIONS-glowboard.md, .claude/consolidation-2026-05-29/maps/SESSIONS-home.md, .claude/consolidation-2026-05-29/maps/SESSIONS-jyotish.md, .claude/consolidation-2026-05-29/maps/SESSIONS-lexios.md, .claude/consolidation-2026-05-29/maps/SESSIONS-nanoclaw.md, .claude/consolidation-2026-05-29/relocate.py, .claude/consolidation-2026-05-29/relocate_fix_inplace.py, .claude/consolidation-2026-05-29/rewrite_session.py, .claude/hooks/brain-digest-inject.sh, .claude/hooks/image-safe-gate.sh, .claude/projects/-Users-amrut-Lexios/memory/MEMORY.md, .claude/projects/-Users-amrut-Lexios/memory/lexios-concurrent-repo-mutation.md
+**Diff:** +48 -1 across 2 files
+
+### 2026-06-13 02:58
+
+**Areas:** hooks
+**Files (20):** .cache/zellij/permissions.kdl, .claude/bin/fix-thinking.py, .claude/consolidation-2026-05-29/CONSOLIDATION_PLAN.md, .claude/consolidation-2026-05-29/add_history.py, .claude/consolidation-2026-05-29/batch.sh, .claude/consolidation-2026-05-29/build_maps.py, .claude/consolidation-2026-05-29/inventory.py, .claude/consolidation-2026-05-29/maps/INDEX.md, .claude/consolidation-2026-05-29/maps/SESSIONS-glowboard.md, .claude/consolidation-2026-05-29/maps/SESSIONS-home.md, .claude/consolidation-2026-05-29/maps/SESSIONS-jyotish.md, .claude/consolidation-2026-05-29/maps/SESSIONS-lexios.md, .claude/consolidation-2026-05-29/maps/SESSIONS-nanoclaw.md, .claude/consolidation-2026-05-29/relocate.py, .claude/consolidation-2026-05-29/relocate_fix_inplace.py, .claude/consolidation-2026-05-29/rewrite_session.py, .claude/hooks/brain-digest-inject.sh, .claude/hooks/image-safe-gate.sh, .claude/projects/-Users-amrut-Lexios/memory/MEMORY.md, .claude/projects/-Users-amrut-Lexios/memory/lexios-concurrent-repo-mutation.md
+**Diff:** +42 -1 across 2 files
+
+### 2026-06-13 02:57
+
+**Areas:** hooks
+**Files (20):** .cache/zellij/permissions.kdl, .claude/bin/fix-thinking.py, .claude/consolidation-2026-05-29/CONSOLIDATION_PLAN.md, .claude/consolidation-2026-05-29/add_history.py, .claude/consolidation-2026-05-29/batch.sh, .claude/consolidation-2026-05-29/build_maps.py, .claude/consolidation-2026-05-29/inventory.py, .claude/consolidation-2026-05-29/maps/INDEX.md, .claude/consolidation-2026-05-29/maps/SESSIONS-glowboard.md, .claude/consolidation-2026-05-29/maps/SESSIONS-home.md, .claude/consolidation-2026-05-29/maps/SESSIONS-jyotish.md, .claude/consolidation-2026-05-29/maps/SESSIONS-lexios.md, .claude/consolidation-2026-05-29/maps/SESSIONS-nanoclaw.md, .claude/consolidation-2026-05-29/relocate.py, .claude/consolidation-2026-05-29/relocate_fix_inplace.py, .claude/consolidation-2026-05-29/rewrite_session.py, .claude/hooks/brain-digest-inject.sh, .claude/hooks/image-safe-gate.sh, .claude/projects/-Users-amrut-Lexios/memory/MEMORY.md, .claude/projects/-Users-amrut-Lexios/memory/lexios-concurrent-repo-mutation.md
+**Diff:** +36 -1 across 2 files
+
+### 2026-06-13 02:56
+
+**Areas:** hooks
+**Files (20):** .cache/zellij/permissions.kdl, .claude/bin/fix-thinking.py, .claude/consolidation-2026-05-29/CONSOLIDATION_PLAN.md, .claude/consolidation-2026-05-29/add_history.py, .claude/consolidation-2026-05-29/batch.sh, .claude/consolidation-2026-05-29/build_maps.py, .claude/consolidation-2026-05-29/inventory.py, .claude/consolidation-2026-05-29/maps/INDEX.md, .claude/consolidation-2026-05-29/maps/SESSIONS-glowboard.md, .claude/consolidation-2026-05-29/maps/SESSIONS-home.md, .claude/consolidation-2026-05-29/maps/SESSIONS-jyotish.md, .claude/consolidation-2026-05-29/maps/SESSIONS-lexios.md, .claude/consolidation-2026-05-29/maps/SESSIONS-nanoclaw.md, .claude/consolidation-2026-05-29/relocate.py, .claude/consolidation-2026-05-29/relocate_fix_inplace.py, .claude/consolidation-2026-05-29/rewrite_session.py, .claude/hooks/brain-digest-inject.sh, .claude/hooks/image-safe-gate.sh, .claude/projects/-Users-amrut-Lexios/memory/MEMORY.md, .claude/projects/-Users-amrut-Lexios/memory/lexios-concurrent-repo-mutation.md
+**Diff:** +30 -1 across 2 files
+
+### 2026-06-13 02:55
+
+**Areas:** hooks
+**Files (20):** .cache/zellij/permissions.kdl, .claude/bin/fix-thinking.py, .claude/consolidation-2026-05-29/CONSOLIDATION_PLAN.md, .claude/consolidation-2026-05-29/add_history.py, .claude/consolidation-2026-05-29/batch.sh, .claude/consolidation-2026-05-29/build_maps.py, .claude/consolidation-2026-05-29/inventory.py, .claude/consolidation-2026-05-29/maps/INDEX.md, .claude/consolidation-2026-05-29/maps/SESSIONS-glowboard.md, .claude/consolidation-2026-05-29/maps/SESSIONS-home.md, .claude/consolidation-2026-05-29/maps/SESSIONS-jyotish.md, .claude/consolidation-2026-05-29/maps/SESSIONS-lexios.md, .claude/consolidation-2026-05-29/maps/SESSIONS-nanoclaw.md, .claude/consolidation-2026-05-29/relocate.py, .claude/consolidation-2026-05-29/relocate_fix_inplace.py, .claude/consolidation-2026-05-29/rewrite_session.py, .claude/hooks/brain-digest-inject.sh, .claude/hooks/image-safe-gate.sh, .claude/projects/-Users-amrut-Lexios/memory/MEMORY.md, .claude/projects/-Users-amrut-Lexios/memory/lexios-concurrent-repo-mutation.md
+**Diff:** +24 -1 across 2 files
+
+### 2026-06-13 02:55
+
+**Areas:** hooks
+**Files (20):** .cache/zellij/permissions.kdl, .claude/bin/fix-thinking.py, .claude/consolidation-2026-05-29/CONSOLIDATION_PLAN.md, .claude/consolidation-2026-05-29/add_history.py, .claude/consolidation-2026-05-29/batch.sh, .claude/consolidation-2026-05-29/build_maps.py, .claude/consolidation-2026-05-29/inventory.py, .claude/consolidation-2026-05-29/maps/INDEX.md, .claude/consolidation-2026-05-29/maps/SESSIONS-glowboard.md, .claude/consolidation-2026-05-29/maps/SESSIONS-home.md, .claude/consolidation-2026-05-29/maps/SESSIONS-jyotish.md, .claude/consolidation-2026-05-29/maps/SESSIONS-lexios.md, .claude/consolidation-2026-05-29/maps/SESSIONS-nanoclaw.md, .claude/consolidation-2026-05-29/relocate.py, .claude/consolidation-2026-05-29/relocate_fix_inplace.py, .claude/consolidation-2026-05-29/rewrite_session.py, .claude/hooks/brain-digest-inject.sh, .claude/hooks/image-safe-gate.sh, .claude/projects/-Users-amrut-Lexios/memory/MEMORY.md, .claude/projects/-Users-amrut-Lexios/memory/lexios-concurrent-repo-mutation.md
+**Diff:** +18 -1 across 2 files
+
+### 2026-06-13 02:54
+
+**Areas:** hooks
+**Files (20):** .cache/zellij/permissions.kdl, .claude/bin/fix-thinking.py, .claude/consolidation-2026-05-29/CONSOLIDATION_PLAN.md, .claude/consolidation-2026-05-29/add_history.py, .claude/consolidation-2026-05-29/batch.sh, .claude/consolidation-2026-05-29/build_maps.py, .claude/consolidation-2026-05-29/inventory.py, .claude/consolidation-2026-05-29/maps/INDEX.md, .claude/consolidation-2026-05-29/maps/SESSIONS-glowboard.md, .claude/consolidation-2026-05-29/maps/SESSIONS-home.md, .claude/consolidation-2026-05-29/maps/SESSIONS-jyotish.md, .claude/consolidation-2026-05-29/maps/SESSIONS-lexios.md, .claude/consolidation-2026-05-29/maps/SESSIONS-nanoclaw.md, .claude/consolidation-2026-05-29/relocate.py, .claude/consolidation-2026-05-29/relocate_fix_inplace.py, .claude/consolidation-2026-05-29/rewrite_session.py, .claude/hooks/brain-digest-inject.sh, .claude/hooks/image-safe-gate.sh, .claude/projects/-Users-amrut-Lexios/memory/MEMORY.md, .claude/projects/-Users-amrut-Lexios/memory/lexios-concurrent-repo-mutation.md
+**Diff:** +12 -1 across 2 files
+
+### 2026-06-13 02:53
+
+**Areas:** hooks
+**Files (20):** .cache/zellij/permissions.kdl, .claude/bin/fix-thinking.py, .claude/consolidation-2026-05-29/CONSOLIDATION_PLAN.md, .claude/consolidation-2026-05-29/add_history.py, .claude/consolidation-2026-05-29/batch.sh, .claude/consolidation-2026-05-29/build_maps.py, .claude/consolidation-2026-05-29/inventory.py, .claude/consolidation-2026-05-29/maps/INDEX.md, .claude/consolidation-2026-05-29/maps/SESSIONS-glowboard.md, .claude/consolidation-2026-05-29/maps/SESSIONS-home.md, .claude/consolidation-2026-05-29/maps/SESSIONS-jyotish.md, .claude/consolidation-2026-05-29/maps/SESSIONS-lexios.md, .claude/consolidation-2026-05-29/maps/SESSIONS-nanoclaw.md, .claude/consolidation-2026-05-29/relocate.py, .claude/consolidation-2026-05-29/relocate_fix_inplace.py, .claude/consolidation-2026-05-29/rewrite_session.py, .claude/hooks/brain-digest-inject.sh, .claude/hooks/image-safe-gate.sh, .claude/projects/-Users-amrut-Lexios/memory/MEMORY.md, .claude/projects/-Users-amrut-Lexios/memory/lexios-concurrent-repo-mutation.md
+**Diff:** +6 -1 across 2 files
+
+### 2026-06-13 02:53
+
+**Areas:** hooks
+**Files (20):** .cache/zellij/permissions.kdl, .claude/bin/fix-thinking.py, .claude/consolidation-2026-05-29/CONSOLIDATION_PLAN.md, .claude/consolidation-2026-05-29/add_history.py, .claude/consolidation-2026-05-29/batch.sh, .claude/consolidation-2026-05-29/build_maps.py, .claude/consolidation-2026-05-29/inventory.py, .claude/consolidation-2026-05-29/maps/INDEX.md, .claude/consolidation-2026-05-29/maps/SESSIONS-glowboard.md, .claude/consolidation-2026-05-29/maps/SESSIONS-home.md, .claude/consolidation-2026-05-29/maps/SESSIONS-jyotish.md, .claude/consolidation-2026-05-29/maps/SESSIONS-lexios.md, .claude/consolidation-2026-05-29/maps/SESSIONS-nanoclaw.md, .claude/consolidation-2026-05-29/relocate.py, .claude/consolidation-2026-05-29/relocate_fix_inplace.py, .claude/consolidation-2026-05-29/rewrite_session.py, .claude/hooks/brain-digest-inject.sh, .claude/hooks/image-safe-gate.sh, .claude/projects/-Users-amrut-Lexios/memory/MEMORY.md, .claude/projects/-Users-amrut-Lexios/memory/lexios-concurrent-repo-mutation.md
+**Diff:** +0 -1 across 1 files
+
 ### 2026-06-13 02:52
 
 **Areas:** hooks
