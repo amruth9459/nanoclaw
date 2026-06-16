@@ -149,3 +149,11 @@ Use restore.sh with the full-access token (stored in password manager).
 
 **Write-only token**: Rotate annually (set calendar reminder)
 **Full-access token**: Rotate after each use for maintenance operations
+
+## Related
+
+- [[nc-sec-09-r2-token-security|Security Review: R2 Backup Token Least Privilege]]
+- [[R2_WRITEONLY_TOKEN_GUIDE|R2 Write-Only Token Implementation Guide]]
+- [[nanoclaw-sandbox-workflow|NanoClaw Sandbox Workflow]]
+- [[HARDENING_CHECKLIST|NanoClaw Security Hardening Checklist]]
+- [[DEPLOYMENT-INSTRUCTIONS|Lexios Nginx SSL Infrastructure Deployment]]

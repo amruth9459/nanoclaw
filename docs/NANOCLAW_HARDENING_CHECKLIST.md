@@ -963,3 +963,12 @@ ls -la ~/nanoclaw/.env | awk '{print $6, $7, $8}'
 **Audited by:** Blockchain Security Auditor (specialized)
 **Dispatched by:** NanoClaw Auto-Dispatch
 **Next review:** 2026-04-18 (30 days)
+
+## Related
+
+- [[NANOCLAW_HARDENING_CHECKLIST|NanoClaw Security Hardening Checklist]]
+- [[IMPLEMENTATION_GUIDE|R2 Write-Only Token Implementation Guide]]
+- [[2026-02-23-conversation-2021|Conversation]]
+- [[2026-02-24-conversation-2341|Conversation]]
+- [[SKILL|Check if nanoclaw launchd service is running]]
+- [[APPLE-CONTAINER-NETWORKING|Apple Container Networking Setup (macOS 26)]]

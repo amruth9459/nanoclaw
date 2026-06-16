@@ -641,3 +641,12 @@ function createSdkMcpServer(options: {
 - `sdk-tools.d.ts` — Tool input schemas
 - `sdk.mjs` — SDK runtime (minified, 376KB)
 - `cli.js` — CLI executable (minified, runs as subprocess)
+
+## Related
+
+- [[nanoclaw-whatsapp-integration|NanoClaw WhatsApp Integration]]
+- [[2026-04-07-conversation-2232|Conversation]]
+- [[AG-UI_Protocol_Research_Report|AG-UI Protocol Research Report]]
+- [[AG-UI_Implementation_Evaluation|AG-UI Protocol Implementation Evaluation]]
+- [[nanoclaw-ipc-system|NanoClaw IPC System]]
+- [[SECURITY|NanoClaw Security Model]]

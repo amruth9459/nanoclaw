@@ -1061,3 +1061,12 @@ project/
 17. **Deterministic serialization.** Sorted keys, consistent formatting. No noisy diffs.
 18. **Rebase when needed.** Flatten layers for a clean starting point.
 19. **Progressive core slimming.** Breaking changes move functionality from core to migration skills. Existing users keep what they have automatically. New users start minimal and add what they need.
+
+## Related
+
+- [[nanorepo-architecture|NanoClaw Skills Architecture]]
+- [[nanoclaw-sandbox-workflow|NanoClaw Sandbox Workflow]]
+- [[AG-UI_Protocol_Research_Report|AG-UI Protocol Research Report]]
+- [[2026-04-07-conversation-2232|Conversation]]
+- [[QUICK_REFERENCE|Lexios WhatsApp Beta - Quick Reference]]
+- [[PLATFORM|NanoClaw Platform Overview]]

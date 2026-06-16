@@ -166,3 +166,12 @@ Each skill includes integration tests. Tests run **always** — after apply, aft
 17. **Deterministic serialization.** No noisy diffs.
 18. **Rebase when needed.**
 19. **Progressive core slimming** via migration skills.
+
+## Related
+
+- [[nanoclaw-architecture-final|NanoClaw Skills Architecture]]
+- [[nanoclaw-ipc-system|NanoClaw IPC System]]
+- [[QUICK_REFERENCE|Lexios WhatsApp Beta - Quick Reference]]
+- [[PLATFORM|NanoClaw Platform Overview]]
+- [[A2UI_Research_Report|A2UI Protocol Research Report: Evaluation Against NanoClaw O]]
+- [[skills-alignment-assessment|NanoClaw Skills Alignment Assessment]]
