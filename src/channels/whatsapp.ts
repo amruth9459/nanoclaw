@@ -448,15 +448,14 @@ export class WhatsAppChannel implements Channel {
 
           const fromMe = msg.key.fromMe || false;
           // Detect bot messages: with own number, fromMe is reliable.
-          // With a shared number, the prefix check normally pairs with fromMe.
-          // BUT Baileys can echo our IPC-sent messages back with the sender's JID
-          // and fromMe=false — so also treat a prefixed message as ours when the
-          // sender is our own number. The sender guard prevents false positives
-          // from quoted replies by other users ("> Claw: ...").
+          // With a shared number, only the bot adds the "${ASSISTANT_NAME}:" prefix
+          // (see sendMessage below), so any prefixed message is ours. Baileys echoes
+          // our IPC-sent messages back with the sender's JID and fromMe=false, and the
+          // sender no longer matches ownPhoneJid() — relying on the prefix alone breaks
+          // that echo loop without a fragile sender-JID guard.
           const isBotMessage = ASSISTANT_HAS_OWN_NUMBER
             ? fromMe
-            : (fromMe && content.startsWith(`${ASSISTANT_NAME}:`)) ||
-              (!fromMe && content.startsWith(`${ASSISTANT_NAME}:`) && sender === this.ownPhoneJid());
+            : content.startsWith(`${ASSISTANT_NAME}:`);
 
           // Append audio transcription to message content
           let messageContent = fullContent || (effectiveMedia ? `[${effectiveMedia.type}]` : '');
