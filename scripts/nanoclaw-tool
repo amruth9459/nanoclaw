@@ -1,0 +1,1087 @@
+#!/usr/bin/env python3
+"""
+nanoclaw-tool — IPC bridge for host-mode Claude Code sessions.
+
+Provides all MCP tools that container agents have, but as shell commands.
+Writes JSON to the IPC directory; the host's IPC watcher picks them up.
+
+Safety:
+  - Rate limiting on send_message (max 5/min/JID, 20/min total)
+  - Content length limits (8KB messages, 200KB learn)
+  - File size caps (25MB)
+  - Input sanitization
+  - Blocked operations for non-main groups
+
+Usage:
+  nanoclaw-tool send "Hello world"
+  nanoclaw-tool send --jid 1234@s.whatsapp.net "Hello"
+  nanoclaw-tool react 👍 --message-id BAE5...
+  nanoclaw-tool learn "Topic" "Knowledge content..."
+  nanoclaw-tool task create "Do something" --priority 50
+  nanoclaw-tool task list
+  nanoclaw-tool search "how does routing work"
+  nanoclaw-tool schedule "Check status" --cron "0 9 * * *"
+  nanoclaw-tool file send report.pdf
+  nanoclaw-tool groups
+  nanoclaw-tool items list
+  nanoclaw-tool items triage ITEM_ID "notes"
+
+Env vars (set by host-runner.ts):
+  NANOCLAW_IPC_DIR      - IPC directory path
+  NANOCLAW_CHAT_JID     - Current chat JID
+  NANOCLAW_GROUP_FOLDER - Group folder name
+  NANOCLAW_IS_MAIN      - "1" if main group
+  NANOCLAW_STORE_DIR    - Store directory path
+"""
+
+import argparse
+import json
+import os
+import sys
+import time
+import hashlib
+import mimetypes
+import tempfile
+from pathlib import Path
+from datetime import datetime
+
+# ── Config ──────────────────────────────────────────────────────────────
+
+IPC_DIR = os.environ.get("NANOCLAW_IPC_DIR", "")
+CHAT_JID = os.environ.get("NANOCLAW_CHAT_JID", "")
+GROUP_FOLDER = os.environ.get("NANOCLAW_GROUP_FOLDER", "")
+IS_MAIN = os.environ.get("NANOCLAW_IS_MAIN", "0") == "1"
+STORE_DIR = os.environ.get("NANOCLAW_STORE_DIR", "")
+
+# Safety limits
+MAX_MESSAGE_LENGTH = 8192        # 8KB
+MAX_LEARN_LENGTH = 204800        # 200KB
+MAX_FILE_SIZE = 25 * 1024 * 1024 # 25MB
+RATE_LIMIT_WINDOW = 60           # seconds
+MAX_SENDS_PER_JID = 5            # per window
+MAX_SENDS_TOTAL = 20             # per window
+RESPONSE_TIMEOUT = 30            # seconds
+
+# Rate limit state file
+RATE_FILE = Path(tempfile.gettempdir()) / f"nanoclaw-ratelimit-{os.getpid() // 100}.json"
+
+
+def die(msg: str):
+    print(f"ERROR: {msg}", file=sys.stderr)
+    sys.exit(1)
+
+
+def check_env():
+    if not IPC_DIR:
+        die("NANOCLAW_IPC_DIR not set. Are you running inside a host-mode Claude Code session?")
+    if not os.path.isdir(IPC_DIR):
+        die(f"IPC directory does not exist: {IPC_DIR}")
+
+
+def check_jid_auth(target_jid: str):
+    """Non-main groups can only send to their own JID."""
+    if not IS_MAIN and target_jid != CHAT_JID:
+        die(f"Permission denied: non-main group can only send to own JID ({CHAT_JID}), not {target_jid}")
+
+
+# ── Rate Limiting ───────────────────────────────────────────────────────
+
+def _load_rates() -> dict:
+    try:
+        if RATE_FILE.exists():
+            data = json.loads(RATE_FILE.read_text())
+            # Prune old entries
+            now = time.time()
+            data["sends"] = [s for s in data.get("sends", []) if now - s["t"] < RATE_LIMIT_WINDOW]
+            return data
+    except Exception:
+        pass
+    return {"sends": []}
+
+
+def _save_rates(data: dict):
+    try:
+        RATE_FILE.write_text(json.dumps(data))
+    except Exception:
+        pass
+
+
+def check_rate_limit(jid: str):
+    data = _load_rates()
+    now = time.time()
+    sends = data["sends"]
+
+    # Per-JID limit
+    jid_count = sum(1 for s in sends if s["jid"] == jid)
+    if jid_count >= MAX_SENDS_PER_JID:
+        die(f"Rate limit: already sent {jid_count} messages to {jid} in the last {RATE_LIMIT_WINDOW}s (max {MAX_SENDS_PER_JID})")
+
+    # Total limit
+    if len(sends) >= MAX_SENDS_TOTAL:
+        die(f"Rate limit: already sent {len(sends)} messages total in the last {RATE_LIMIT_WINDOW}s (max {MAX_SENDS_TOTAL})")
+
+    # Record this send
+    sends.append({"jid": jid, "t": now})
+    data["sends"] = sends
+    _save_rates(data)
+
+
+# ── IPC Helpers ─────────────────────────────────────────────────────────
+
+def write_ipc_message(msg: dict) -> str:
+    """Write a JSON message to the IPC messages directory. Returns the file path."""
+    messages_dir = os.path.join(IPC_DIR, "messages")
+    os.makedirs(messages_dir, exist_ok=True)
+
+    ts = int(time.time() * 1000)
+    rand = hashlib.md5(f"{ts}{os.getpid()}".encode()).hexdigest()[:8]
+    filename = f"{ts}-{rand}.json"
+    filepath = os.path.join(messages_dir, filename)
+
+    # Atomic write via temp file
+    tmp = filepath + ".tmp"
+    with open(tmp, "w") as f:
+        json.dump(msg, f)
+    os.rename(tmp, filepath)
+    return filepath
+
+
+def write_ipc_task(msg: dict) -> str:
+    """Write a JSON message to the IPC tasks directory."""
+    tasks_dir = os.path.join(IPC_DIR, "tasks")
+    os.makedirs(tasks_dir, exist_ok=True)
+
+    ts = int(time.time() * 1000)
+    rand = hashlib.md5(f"{ts}{os.getpid()}".encode()).hexdigest()[:8]
+    filename = f"{ts}-{rand}.json"
+    filepath = os.path.join(tasks_dir, filename)
+
+    tmp = filepath + ".tmp"
+    with open(tmp, "w") as f:
+        json.dump(msg, f)
+    os.rename(tmp, filepath)
+    return filepath
+
+
+def write_ipc_special(msg: dict, suffix: str) -> str:
+    """Write a JSON file to the IPC root directory with a special suffix."""
+    os.makedirs(IPC_DIR, exist_ok=True)
+
+    ts = int(time.time() * 1000)
+    rand = hashlib.md5(f"{ts}{os.getpid()}".encode()).hexdigest()[:8]
+    filename = f"{ts}-{rand}.{suffix}"
+    filepath = os.path.join(IPC_DIR, filename)
+
+    tmp = filepath + ".tmp"
+    with open(tmp, "w") as f:
+        json.dump(msg, f)
+    os.rename(tmp, filepath)
+    return filepath
+
+
+def wait_for_response(response_file: str) -> dict:
+    """Poll for a response file, return parsed JSON."""
+    # The host writes the response to a path relative to the IPC dir
+    # For host runner, the response file is an absolute path
+    start = time.time()
+    while time.time() - start < RESPONSE_TIMEOUT:
+        if os.path.exists(response_file):
+            try:
+                with open(response_file) as f:
+                    result = json.load(f)
+                os.unlink(response_file)
+                return result
+            except (json.JSONDecodeError, OSError):
+                pass
+        time.sleep(0.5)
+    die(f"Timeout waiting for response after {RESPONSE_TIMEOUT}s")
+    return {}  # unreachable
+
+
+def make_response_path() -> str:
+    """Create a response file path in the IPC messages directory."""
+    messages_dir = os.path.join(IPC_DIR, "messages")
+    os.makedirs(messages_dir, exist_ok=True)
+    ts = int(time.time() * 1000)
+    rand = hashlib.md5(f"{ts}{os.getpid()}{time.time()}".encode()).hexdigest()[:8]
+    return os.path.join(messages_dir, f"{ts}-{rand}.response.json")
+
+
+# ── Commands ────────────────────────────────────────────────────────────
+
+def cmd_send(args):
+    """Send a WhatsApp message."""
+    check_env()
+    text = " ".join(args.text)
+    if not text:
+        die("Message text is required")
+    if len(text) > MAX_MESSAGE_LENGTH:
+        die(f"Message too long: {len(text)} chars (max {MAX_MESSAGE_LENGTH})")
+
+    jid = args.jid or CHAT_JID
+    if not jid:
+        die("No target JID. Use --jid or ensure NANOCLAW_CHAT_JID is set")
+    check_jid_auth(jid)
+    check_rate_limit(jid)
+
+    msg = {
+        "type": "message",
+        "chatJid": jid,
+        "text": text,
+        "groupFolder": GROUP_FOLDER,
+        "timestamp": datetime.utcnow().isoformat() + "Z",
+    }
+    if args.sender:
+        msg["sender"] = args.sender
+
+    fp = write_ipc_message(msg)
+    print(f"Message queued → {jid} ({len(text)} chars)")
+
+
+def cmd_react(args):
+    """React to a message with an emoji."""
+    check_env()
+    if not args.emoji:
+        die("Emoji is required")
+    if not args.message_id:
+        die("--message-id is required")
+
+    jid = args.jid or CHAT_JID
+    check_jid_auth(jid)
+
+    msg = {
+        "type": "react",
+        "chatJid": jid,
+        "messageId": args.message_id,
+        "emoji": args.emoji,
+        "groupFolder": GROUP_FOLDER,
+        "timestamp": datetime.utcnow().isoformat() + "Z",
+    }
+    if args.sender_jid:
+        msg["senderJid"] = args.sender_jid
+
+    write_ipc_message(msg)
+    print(f"Reaction queued: {args.emoji} → message {args.message_id}")
+
+
+def cmd_learn(args):
+    """Record a learned fact to shared memory."""
+    check_env()
+    topic = args.topic
+    knowledge = " ".join(args.knowledge)
+
+    if not topic:
+        die("Topic is required")
+    if not knowledge:
+        die("Knowledge content is required")
+    if len(knowledge) < 50:
+        die(f"Knowledge too short: {len(knowledge)} chars (min 50). Be specific and detailed.")
+    if len(knowledge) > MAX_LEARN_LENGTH:
+        die(f"Knowledge too long: {len(knowledge)} chars (max {MAX_LEARN_LENGTH})")
+
+    response_file = make_response_path()
+    ts = int(time.time() * 1000)
+    rand = hashlib.md5(f"{ts}".encode()).hexdigest()[:8]
+
+    msg = {
+        "type": "learn",
+        "topic": topic,
+        "knowledge": knowledge,
+        "domain": args.domain or "nanoclaw",
+        "requestId": f"learn-{ts}-{rand}",
+        "responseFile": response_file,
+        "groupFolder": GROUP_FOLDER,
+        "timestamp": datetime.utcnow().isoformat() + "Z",
+    }
+    write_ipc_message(msg)
+    print(f"Learning: {topic} ({len(knowledge)} chars)...")
+
+    result = wait_for_response(response_file)
+    if result.get("success"):
+        print(f"Learned: {topic} ({result.get('knowledge_length', '?')} chars saved)")
+    else:
+        print(f"Learn failed: {result.get('error', 'unknown')}", file=sys.stderr)
+
+
+def cmd_task(args):
+    """Manage tasks via the task tool."""
+    check_env()
+    action = args.action
+
+    response_file = make_response_path()
+    ts = int(time.time() * 1000)
+    rand = hashlib.md5(f"{ts}".encode()).hexdigest()[:8]
+
+    msg = {
+        "type": "task_tool",
+        "action": action,
+        "requestId": f"task-{ts}-{rand}",
+        "responseFile": response_file,
+        "groupFolder": GROUP_FOLDER,
+        "timestamp": datetime.utcnow().isoformat() + "Z",
+    }
+
+    if action == "create":
+        desc = " ".join(args.description) if args.description else ""
+        if not desc:
+            die("Task description required for create")
+        msg["description"] = desc
+        if args.priority:
+            msg["priority"] = args.priority
+        if args.complexity:
+            msg["complexity"] = args.complexity
+        if args.agent:
+            msg["assignedAgent"] = args.agent
+    elif action == "update":
+        if not args.task_id:
+            die("--task-id required for update")
+        msg["taskId"] = args.task_id
+        if args.status:
+            msg["status"] = args.status
+        if args.priority:
+            msg["newPriority"] = args.priority
+        if args.agent:
+            msg["newAgent"] = args.agent
+    elif action == "get":
+        if not args.task_id:
+            die("--task-id required for get")
+        msg["taskId"] = args.task_id
+    elif action == "delete":
+        if not args.task_id:
+            die("--task-id required for delete")
+        msg["taskId"] = args.task_id
+    elif action == "list":
+        if args.status:
+            msg["filterStatus"] = args.status
+        if args.agent:
+            msg["filterAgent"] = args.agent
+    elif action == "available":
+        pass
+    else:
+        die(f"Unknown task action: {action}. Use: create, update, list, get, delete, available")
+
+    write_ipc_message(msg)
+
+    result = wait_for_response(response_file)
+    output = result.get("result", result.get("error", json.dumps(result)))
+    print(output)
+
+
+def cmd_search(args):
+    """Semantic search across indexed knowledge."""
+    check_env()
+    query = " ".join(args.query)
+    if not query:
+        die("Search query is required")
+
+    response_file = make_response_path()
+    ts = int(time.time() * 1000)
+    rand = hashlib.md5(f"{ts}".encode()).hexdigest()[:8]
+
+    msg = {
+        "type": "semantic_search",
+        "requestId": f"search-{ts}-{rand}",
+        "query": query,
+        "topK": args.top_k,
+        "groupFolder": GROUP_FOLDER if args.group_only else None,
+        "responseFile": response_file,
+    }
+
+    # Semantic search uses special suffix files, not messages dir
+    write_ipc_special(msg, "search.json")
+    print(f"Searching: {query}...")
+
+    result = wait_for_response(response_file)
+    results = result.get("results", [])
+    if not results:
+        print("No results found.")
+        return
+
+    for i, r in enumerate(results, 1):
+        source = r.get("source", "?")
+        content = r.get("content", "")[:200]
+        dist = r.get("distance", 0)
+        print(f"\n--- Result {i} (distance: {dist:.3f}) ---")
+        print(f"Source: {source}")
+        print(content)
+        if len(r.get("content", "")) > 200:
+            print("...")
+
+
+def cmd_schedule(args):
+    """Schedule a recurring or one-time task."""
+    check_env()
+    prompt = " ".join(args.prompt)
+    if not prompt:
+        die("Task prompt is required")
+
+    if args.cron:
+        schedule_type = "cron"
+        schedule_value = args.cron
+    elif args.interval:
+        schedule_type = "interval"
+        if args.interval < 300000:
+            die("Minimum interval is 300000ms (5 minutes)")
+        schedule_value = str(args.interval)
+    elif args.once:
+        schedule_type = "once"
+        schedule_value = args.once
+    else:
+        die("Must specify --cron, --interval, or --once")
+
+    jid = args.jid or CHAT_JID
+    check_jid_auth(jid)
+
+    msg = {
+        "type": "schedule_task",
+        "prompt": prompt,
+        "schedule_type": schedule_type,
+        "schedule_value": schedule_value,
+        "context_mode": args.context or "group",
+        "targetJid": jid,
+        "createdBy": GROUP_FOLDER,
+        "timestamp": datetime.utcnow().isoformat() + "Z",
+    }
+
+    write_ipc_task(msg)
+    print(f"Task scheduled: {schedule_type}={schedule_value}")
+    print(f"  Prompt: {prompt[:100]}{'...' if len(prompt) > 100 else ''}")
+
+
+def cmd_file(args):
+    """Send a file via WhatsApp."""
+    check_env()
+    filepath = os.path.abspath(args.filepath)
+
+    if not os.path.isfile(filepath):
+        die(f"File not found: {filepath}")
+
+    size = os.path.getsize(filepath)
+    if size > MAX_FILE_SIZE:
+        die(f"File too large: {size / (1024*1024):.1f}MB (max {MAX_FILE_SIZE / (1024*1024):.0f}MB)")
+    if size == 0:
+        die("File is empty")
+
+    jid = args.jid or CHAT_JID
+    check_jid_auth(jid)
+    check_rate_limit(jid)
+
+    # Detect mimetype
+    mime = args.mimetype or mimetypes.guess_type(filepath)[0] or "application/octet-stream"
+    filename = args.filename or os.path.basename(filepath)
+
+    msg = {
+        "type": "send_file",
+        "chatJid": jid,
+        "groupFolder": GROUP_FOLDER,
+        "filePath": filepath,
+        "filename": filename,
+        "mimetype": mime,
+        "timestamp": datetime.utcnow().isoformat() + "Z",
+    }
+    if args.caption:
+        msg["caption"] = args.caption
+
+    write_ipc_message(msg)
+    print(f"File queued: {filename} ({size / 1024:.1f}KB, {mime}) → {jid}")
+
+
+def cmd_groups(args):
+    """List available WhatsApp groups."""
+    check_env()
+    groups_file = os.path.join(IPC_DIR, "available_groups.json")
+    if not os.path.exists(groups_file):
+        die("No groups file found. The host may not have synced group metadata yet.")
+
+    with open(groups_file) as f:
+        data = json.load(f)
+
+    groups = data.get("groups", [])
+    if not groups:
+        print("No groups found.")
+        return
+
+    for g in groups:
+        name = g.get("name", "?")
+        jid = g.get("jid", "?")
+        reg = "registered" if g.get("isRegistered") else "unregistered"
+        print(f"  {name:30s}  {jid:40s}  [{reg}]")
+    print(f"\n{len(groups)} groups total")
+
+
+def cmd_items(args):
+    """Manage shared items (links, ideas, docs shared in chat)."""
+    check_env()
+    action = args.action
+
+    response_file = make_response_path()
+    ts = int(time.time() * 1000)
+    rand = hashlib.md5(f"{ts}".encode()).hexdigest()[:8]
+
+    msg = {
+        "type": "shared_items",
+        "action": action,
+        "requestId": f"items-{ts}-{rand}",
+        "responseFile": response_file,
+        "groupFolder": GROUP_FOLDER,
+        "timestamp": datetime.utcnow().isoformat() + "Z",
+    }
+
+    if action == "list":
+        if args.status:
+            msg["status"] = args.status
+        msg["limit"] = args.limit or 20
+    elif action in ("get", "archive"):
+        if not args.item_id:
+            die(f"--item-id required for {action}")
+        msg["id"] = args.item_id
+    elif action == "triage":
+        if not args.item_id:
+            die("--item-id required for triage")
+        msg["id"] = args.item_id
+        if args.notes:
+            msg["notes"] = " ".join(args.notes)
+    elif action == "act":
+        if not args.item_id:
+            die("--item-id required for act")
+        msg["id"] = args.item_id
+    else:
+        die(f"Unknown items action: {action}. Use: list, get, triage, act, archive")
+
+    write_ipc_message(msg)
+
+    result = wait_for_response(response_file)
+    output = result.get("result", result.get("error", json.dumps(result)))
+    print(output)
+
+
+def cmd_index(args):
+    """Index a document for semantic search."""
+    check_env()
+    content = args.content
+    if args.file:
+        fpath = os.path.abspath(args.file)
+        if not os.path.isfile(fpath):
+            die(f"File not found: {fpath}")
+        with open(fpath) as f:
+            content = f.read()
+    if not content:
+        die("Content required (positional arg or --file)")
+    if len(content) > MAX_LEARN_LENGTH:
+        die(f"Content too long: {len(content)} chars (max {MAX_LEARN_LENGTH})")
+
+    source = args.source or os.path.basename(args.file) if args.file else "manual"
+    ts = int(time.time() * 1000)
+    rand = hashlib.md5(f"{ts}".encode()).hexdigest()[:8]
+
+    msg = {
+        "type": "index_document",
+        "requestId": f"index-{ts}-{rand}",
+        "source": source,
+        "groupFolder": GROUP_FOLDER,
+        "content": content,
+    }
+    write_ipc_special(msg, "index.json")
+    print(f"Indexed: {source} ({len(content)} chars)")
+
+
+def cmd_spawn_team(args):
+    """Spawn a multi-agent team for a complex goal."""
+    check_env()
+    goal = " ".join(args.goal)
+    if not goal:
+        die("Goal is required")
+
+    msg = {
+        "type": "spawn_team",
+        "chatJid": CHAT_JID,
+        "groupFolder": GROUP_FOLDER,
+        "goal": goal,
+        "priority": args.priority or "high",
+        "timestamp": datetime.utcnow().isoformat() + "Z",
+    }
+    if args.target_value:
+        msg["targetValue"] = args.target_value
+    if args.deadline:
+        msg["deadline"] = args.deadline
+
+    write_ipc_task(msg)
+    print(f"Team spawn requested: {goal[:100]}")
+
+
+def cmd_register(args):
+    """Register a new WhatsApp group."""
+    check_env()
+    if not IS_MAIN:
+        die("Only the main group can register new groups")
+    if not args.jid:
+        die("--jid is required")
+    if not args.name:
+        die("--name is required")
+
+    folder = args.folder or args.name.lower().replace(" ", "-").replace("_", "-")
+
+    msg = {
+        "type": "register_group",
+        "jid": args.jid,
+        "name": args.name,
+        "folder": folder,
+        "trigger": args.trigger or "@claw",
+        "timestamp": datetime.utcnow().isoformat() + "Z",
+    }
+    write_ipc_task(msg)
+    print(f"Group registration requested: {args.name} ({args.jid}) → groups/{folder}/")
+
+
+def cmd_gsd(args):
+    """GSD productivity tool — track specs and progress."""
+    check_env()
+    action = args.action
+
+    response_file = make_response_path()
+    ts = int(time.time() * 1000)
+    rand = hashlib.md5(f"{ts}".encode()).hexdigest()[:8]
+
+    msg = {
+        "type": "gsd_tool",
+        "action": action,
+        "requestId": f"gsd-{ts}-{rand}",
+        "responseFile": response_file,
+        "groupFolder": GROUP_FOLDER,
+        "timestamp": datetime.utcnow().isoformat() + "Z",
+    }
+
+    if action == "init":
+        if not args.goal:
+            die("--goal required for init")
+        msg["goal"] = args.goal
+        if args.project_path:
+            msg["project_path"] = args.project_path
+    elif action in ("status", "checkpoint", "validate", "complete_item", "complete_spec"):
+        if args.spec_id:
+            msg["spec_id"] = args.spec_id
+        if args.summary:
+            msg["summary"] = args.summary
+    elif action == "list":
+        pass
+
+    write_ipc_message(msg)
+    result = wait_for_response(response_file)
+    print(result.get("result", json.dumps(result)))
+
+
+def cmd_propose(args):
+    """Propose a deliverable or implementation for HITL approval."""
+    check_env()
+    kind = args.kind
+
+    response_file = make_response_path()
+    ts = int(time.time() * 1000)
+    rand = hashlib.md5(f"{ts}".encode()).hexdigest()[:8]
+
+    if kind == "deliverable":
+        if not args.gig_id or not args.title or not args.summary:
+            die("--gig-id, --title, and --summary required for deliverable")
+        msg = {
+            "type": "propose_deliverable",
+            "gig_id": args.gig_id,
+            "gig_title": args.title,
+            "work_summary": args.summary,
+            "requestId": f"propose-{ts}-{rand}",
+            "responseFile": response_file,
+            "groupFolder": GROUP_FOLDER,
+            "timestamp": datetime.utcnow().isoformat() + "Z",
+        }
+        if args.client:
+            msg["client_info"] = args.client
+    elif kind == "implementation":
+        if not args.task_id or not args.branch or not args.summary:
+            die("--task-id, --branch, and --summary required for implementation")
+        msg = {
+            "type": "propose_implementation",
+            "task_id": args.task_id,
+            "branch": args.branch,
+            "summary": args.summary,
+            "requestId": f"propose-{ts}-{rand}",
+            "responseFile": response_file,
+            "groupFolder": GROUP_FOLDER,
+            "timestamp": datetime.utcnow().isoformat() + "Z",
+        }
+    else:
+        die(f"Unknown propose kind: {kind}. Use: deliverable, implementation")
+
+    write_ipc_message(msg)
+    print(f"Proposal submitted ({kind}), waiting for approval...")
+    result = wait_for_response(response_file)
+    token = result.get("token", "")
+    if token:
+        print(f"Approval token: {token}")
+        print("User must reply with the token to approve.")
+    else:
+        print(json.dumps(result))
+
+
+def cmd_identity(args):
+    """Identity and trust verification tools."""
+    check_env()
+    action = args.action
+
+    response_file = make_response_path()
+    ts = int(time.time() * 1000)
+    rand = hashlib.md5(f"{ts}".encode()).hexdigest()[:8]
+
+    msg = {
+        "type": f"identity_{action}",
+        "requestId": f"identity-{ts}-{rand}",
+        "responseFile": response_file,
+        "groupFolder": GROUP_FOLDER,
+        "timestamp": datetime.utcnow().isoformat() + "Z",
+    }
+
+    if action == "create":
+        if not args.agent_name or not args.agent_type:
+            die("--agent-name and --agent-type required for create")
+        msg["agent_name"] = args.agent_name
+        msg["agent_type"] = args.agent_type
+    elif action in ("verify_agent", "audit_evidence"):
+        if not args.agent_id:
+            die("--agent-id required")
+        msg["agent_id"] = args.agent_id
+    elif action == "trust_report":
+        if not IS_MAIN:
+            die("trust_report requires main group")
+    elif action == "record_evidence":
+        if not args.action_type or not args.intent:
+            die("--action-type and --intent required")
+        msg["agent_id"] = args.agent_id or os.environ.get("NANOCLAW_AGENT_ID", "")
+        msg["action_type"] = args.action_type
+        msg["intent"] = args.intent
+        if args.outcome_success is not None:
+            msg["outcome"] = {"success": args.outcome_success == "true"}
+
+    write_ipc_message(msg)
+    result = wait_for_response(response_file)
+    print(json.dumps(result, indent=2))
+
+
+def cmd_autoresearch(args):
+    """Manage autoresearch experiments."""
+    check_env()
+    action = args.action
+
+    response_file = make_response_path()
+    ts = int(time.time() * 1000)
+    rand = hashlib.md5(f"{ts}".encode()).hexdigest()[:8]
+
+    msg = {
+        "type": "autoresearch",
+        "action": action,
+        "agent_id": args.agent_id or GROUP_FOLDER,
+        "requestId": f"autoresearch-{ts}-{rand}",
+        "responseFile": response_file,
+        "groupFolder": GROUP_FOLDER,
+        "timestamp": datetime.utcnow().isoformat() + "Z",
+    }
+
+    if action == "create":
+        if not args.name:
+            die("--name required for create")
+        msg["name"] = args.name
+        if args.description:
+            msg["description"] = args.description
+    elif action == "run":
+        if not args.experiment_id:
+            die("--experiment-id required for run")
+        msg["experiment_id"] = args.experiment_id
+    elif action in ("pause", "resume", "complete", "analyze"):
+        if not args.experiment_id:
+            die(f"--experiment-id required for {action}")
+        msg["experiment_id"] = args.experiment_id
+    elif action == "list":
+        if args.status:
+            msg["status"] = args.status
+    elif action == "leaderboard":
+        msg["limit"] = args.limit or 10
+    elif action == "baseline":
+        if not args.experiment_id or args.score is None:
+            die("--experiment-id and --score required for baseline")
+        msg["experiment_id"] = args.experiment_id
+        msg["score"] = args.score
+
+    write_ipc_message(msg)
+    result = wait_for_response(response_file)
+    print(result.get("result", json.dumps(result, indent=2)))
+
+
+def cmd_stream(args):
+    """Send a streaming/partial message (for progress updates)."""
+    check_env()
+    text = " ".join(args.text)
+    if not text:
+        die("Message text is required")
+
+    jid = args.jid or CHAT_JID
+    check_jid_auth(jid)
+
+    msg = {
+        "type": "streaming_message",
+        "chatJid": jid,
+        "text": text,
+        "groupFolder": GROUP_FOLDER,
+        "timestamp": datetime.utcnow().isoformat() + "Z",
+    }
+    write_ipc_message(msg)
+    print(f"Streaming message sent ({len(text)} chars)")
+
+
+def cmd_gmail(args):
+    """Gmail operations (search, send, categorize, cleanup)."""
+    check_env()
+    action = args.action
+
+    # gmail_search, gmail_send, gmail_categorize shell out to Python helper
+    # gmail_cleanup uses IPC (HITL-gated)
+    gws_helper = os.path.join(
+        os.environ.get("NANOCLAW_PROJECT_ROOT", os.path.dirname(os.path.dirname(os.path.abspath(__file__)))),
+        "container", "gws", "gws_helper.py",
+    )
+
+    if action == "search":
+        query = " ".join(args.query) if args.query else ""
+        if not query:
+            die("Search query required")
+        import subprocess
+        result = subprocess.run(
+            ["python3", gws_helper, "search", query, str(args.max_results or 10)],
+            capture_output=True, text=True, timeout=30,
+        )
+        print(result.stdout or result.stderr)
+
+    elif action == "send":
+        if not args.to or not args.subject or not args.body:
+            die("--to, --subject, and --body required")
+        import subprocess
+        cmd_args = ["python3", gws_helper, "send", args.to, args.subject, args.body]
+        if args.cc:
+            cmd_args.extend(["--cc", args.cc])
+        result = subprocess.run(cmd_args, capture_output=True, text=True, timeout=30)
+        print(result.stdout or result.stderr)
+
+    elif action == "categorize":
+        query = " ".join(args.query) if args.query else "category:promotions"
+        import subprocess
+        result = subprocess.run(
+            ["python3", gws_helper, "categorize", query, str(args.max_results or 50)],
+            capture_output=True, text=True, timeout=60,
+        )
+        print(result.stdout or result.stderr)
+
+    elif action == "cleanup":
+        if not args.message_ids or not args.summary:
+            die("--message-ids and --summary required")
+        response_file = make_response_path()
+        ts = int(time.time() * 1000)
+        rand = hashlib.md5(f"{ts}".encode()).hexdigest()[:8]
+        msg = {
+            "type": "gmail_cleanup",
+            "action": args.cleanup_action or "trash",
+            "message_ids": args.message_ids.split(","),
+            "summary": args.summary,
+            "breakdown": args.breakdown or args.summary,
+            "chatJid": CHAT_JID,
+            "responseFile": response_file,
+        }
+        write_ipc_message(msg)
+        print("Gmail cleanup submitted for approval...")
+        result = wait_for_response(response_file)
+        token = result.get("token", "")
+        if token:
+            print(f"Approval token: {token}")
+            print("User must reply 'approve-cleanup {token}' to approve.")
+        else:
+            print(json.dumps(result))
+    else:
+        die(f"Unknown gmail action: {action}. Use: search, send, categorize, cleanup")
+
+
+# ── CLI Parser ──────────────────────────────────────────────────────────
+
+def main():
+    parser = argparse.ArgumentParser(
+        prog="nanoclaw-tool",
+        description="IPC bridge for host-mode Claude Code sessions",
+    )
+    sub = parser.add_subparsers(dest="command", required=True)
+
+    # send
+    p = sub.add_parser("send", help="Send a WhatsApp message")
+    p.add_argument("text", nargs="+", help="Message text")
+    p.add_argument("--jid", help="Target JID (default: current chat)")
+    p.add_argument("--sender", help="Sender name override")
+
+    # react
+    p = sub.add_parser("react", help="React to a message")
+    p.add_argument("emoji", help="Emoji to react with")
+    p.add_argument("--message-id", required=True, help="Message ID to react to")
+    p.add_argument("--jid", help="Chat JID")
+    p.add_argument("--sender-jid", help="Original message sender JID")
+
+    # learn
+    p = sub.add_parser("learn", help="Record a learned fact")
+    p.add_argument("topic", help="Topic/subject area")
+    p.add_argument("knowledge", nargs="+", help="Knowledge content (min 50 chars)")
+    p.add_argument("--domain", default="nanoclaw", help="Domain (default: nanoclaw)")
+
+    # task
+    p = sub.add_parser("task", help="Manage tasks")
+    p.add_argument("action", choices=["create", "update", "list", "get", "delete", "available"])
+    p.add_argument("description", nargs="*", help="Task description (for create)")
+    p.add_argument("--task-id", help="Task ID (for update/get/delete)")
+    p.add_argument("--status", help="Task status")
+    p.add_argument("--priority", type=int, help="Priority (1-100)")
+    p.add_argument("--complexity", choices=["trivial", "simple", "moderate", "complex", "expert"])
+    p.add_argument("--agent", help="Assigned agent name")
+
+    # search
+    p = sub.add_parser("search", help="Semantic search")
+    p.add_argument("query", nargs="+", help="Search query")
+    p.add_argument("--top-k", type=int, default=5, help="Max results (default: 5)")
+    p.add_argument("--group-only", action="store_true", help="Limit to current group")
+
+    # schedule
+    p = sub.add_parser("schedule", help="Schedule a task")
+    p.add_argument("prompt", nargs="+", help="Task instructions")
+    p.add_argument("--cron", help="Cron expression (e.g., '0 9 * * *')")
+    p.add_argument("--interval", type=int, help="Interval in milliseconds (min 300000)")
+    p.add_argument("--once", help="One-time ISO datetime (e.g., '2026-04-13T15:30:00')")
+    p.add_argument("--jid", help="Target group JID")
+    p.add_argument("--context", choices=["group", "isolated"], default="group")
+
+    # file
+    p = sub.add_parser("file", help="Send a file")
+    p.add_argument("filepath", help="Path to file")
+    p.add_argument("--jid", help="Target JID")
+    p.add_argument("--filename", help="Display name override")
+    p.add_argument("--mimetype", help="MIME type override")
+    p.add_argument("--caption", help="File caption")
+
+    # groups
+    sub.add_parser("groups", help="List available WhatsApp groups")
+
+    # items
+    p = sub.add_parser("items", help="Manage shared items")
+    p.add_argument("action", choices=["list", "get", "triage", "act", "archive"])
+    p.add_argument("--item-id", help="Item ID")
+    p.add_argument("--status", help="Filter by status (for list)")
+    p.add_argument("--limit", type=int, help="Max items (for list)")
+    p.add_argument("notes", nargs="*", help="Notes (for triage)")
+
+    # index
+    p = sub.add_parser("index", help="Index a document for semantic search")
+    p.add_argument("content", nargs="?", default="", help="Text content to index")
+    p.add_argument("--file", help="File to read and index")
+    p.add_argument("--source", help="Source identifier (default: filename)")
+
+    # spawn-team
+    p = sub.add_parser("spawn-team", help="Spawn a multi-agent team")
+    p.add_argument("goal", nargs="+", help="Team goal")
+    p.add_argument("--priority", choices=["critical", "high", "medium", "low"], default="high")
+    p.add_argument("--target-value", type=float, help="Numeric target value")
+    p.add_argument("--deadline", help="ISO deadline (e.g., 2026-06-30T00:00:00Z)")
+
+    # register
+    p = sub.add_parser("register", help="Register a new WhatsApp group")
+    p.add_argument("--jid", required=True, help="WhatsApp JID")
+    p.add_argument("--name", required=True, help="Display name")
+    p.add_argument("--folder", help="Folder name (default: derived from name)")
+    p.add_argument("--trigger", default="@claw", help="Trigger word")
+
+    # gsd
+    p = sub.add_parser("gsd", help="GSD productivity tool")
+    p.add_argument("action", choices=["init", "status", "checkpoint", "validate",
+                                       "complete_item", "complete_spec", "list"])
+    p.add_argument("--spec-id", help="Spec ID")
+    p.add_argument("--goal", help="Goal (for init)")
+    p.add_argument("--project-path", help="Project path (for init)")
+    p.add_argument("--summary", help="Summary (for checkpoint)")
+
+    # propose
+    p = sub.add_parser("propose", help="Propose deliverable/implementation for approval")
+    p.add_argument("kind", choices=["deliverable", "implementation"])
+    p.add_argument("--gig-id", help="Gig ID (for deliverable)")
+    p.add_argument("--title", help="Gig title (for deliverable)")
+    p.add_argument("--summary", help="Work summary")
+    p.add_argument("--client", help="Client info (for deliverable)")
+    p.add_argument("--task-id", help="Task ID (for implementation)")
+    p.add_argument("--branch", help="Git branch (for implementation)")
+
+    # identity
+    p = sub.add_parser("identity", help="Identity and trust tools")
+    p.add_argument("action", choices=["create", "verify_agent", "audit_evidence",
+                                       "trust_report", "record_evidence"])
+    p.add_argument("--agent-id", help="Agent ID")
+    p.add_argument("--agent-name", help="Agent name (for create)")
+    p.add_argument("--agent-type", help="Agent type (for create)")
+    p.add_argument("--action-type", help="Action type (for record_evidence)")
+    p.add_argument("--intent", help="Intent description (for record_evidence)")
+    p.add_argument("--outcome-success", choices=["true", "false"], help="Outcome (for record_evidence)")
+
+    # autoresearch
+    p = sub.add_parser("autoresearch", help="Manage autoresearch experiments")
+    p.add_argument("action", choices=["create", "run", "list", "pause", "resume",
+                                       "complete", "baseline", "leaderboard", "analyze", "metrics"])
+    p.add_argument("--agent-id", help="Agent ID")
+    p.add_argument("--experiment-id", help="Experiment ID")
+    p.add_argument("--name", help="Experiment name (for create)")
+    p.add_argument("--description", help="Description (for create)")
+    p.add_argument("--status", help="Filter status (for list)")
+    p.add_argument("--score", type=float, help="Baseline score")
+    p.add_argument("--limit", type=int, help="Limit (for leaderboard)")
+
+    # stream
+    p = sub.add_parser("stream", help="Send a streaming/progress message")
+    p.add_argument("text", nargs="+", help="Message text")
+    p.add_argument("--jid", help="Target JID")
+
+    # gmail
+    p = sub.add_parser("gmail", help="Gmail operations")
+    p.add_argument("action", choices=["search", "send", "categorize", "cleanup"])
+    p.add_argument("query", nargs="*", help="Search query (for search/categorize)")
+    p.add_argument("--max-results", type=int, help="Max results")
+    p.add_argument("--to", help="Recipient (for send)")
+    p.add_argument("--subject", help="Subject (for send)")
+    p.add_argument("--body", help="Body (for send)")
+    p.add_argument("--cc", help="CC (for send)")
+    p.add_argument("--message-ids", help="Comma-separated message IDs (for cleanup)")
+    p.add_argument("--summary", help="Summary (for cleanup)")
+    p.add_argument("--breakdown", help="Breakdown (for cleanup)")
+    p.add_argument("--cleanup-action", choices=["trash", "archive"], default="trash")
+
+    args = parser.parse_args()
+
+    commands = {
+        "send": cmd_send,
+        "react": cmd_react,
+        "learn": cmd_learn,
+        "task": cmd_task,
+        "search": cmd_search,
+        "schedule": cmd_schedule,
+        "file": cmd_file,
+        "groups": cmd_groups,
+        "items": cmd_items,
+        "index": cmd_index,
+        "spawn-team": cmd_spawn_team,
+        "register": cmd_register,
+        "gsd": cmd_gsd,
+        "propose": cmd_propose,
+        "identity": cmd_identity,
+        "autoresearch": cmd_autoresearch,
+        "stream": cmd_stream,
+        "gmail": cmd_gmail,
+    }
+
+    commands[args.command](args)
+
+
+if __name__ == "__main__":
+    main()

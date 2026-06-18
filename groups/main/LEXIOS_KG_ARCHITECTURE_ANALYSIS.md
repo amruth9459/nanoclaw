@@ -766,3 +766,12 @@ When a building fails inspection because the AI said "probably compliant," who i
 ---
 
 *The graph is the moat. The LLM is the interface. Build the graph first.*
+
+## Related
+
+- [[gitnexus-inspired-features|GitNexus-Inspired Features for Lexios]]
+- [[LEXIOS_WHATSAPP_BETA|Lexios WhatsApp Agent — Beta Deployment Architecture]]
+- [[2026-03-17|Journal: 2026-03-17]]
+- [[lexios-agent-accessibility-plan|Lexios Agent Accessibility - Future-Proofing Plan]]
+- [[LEXIOS_IMPLEMENTATION_ROADMAP|Lexios WhatsApp Beta — Implementation Roadmap]]
+- [[2026-02-28|Journal: 2026-02-28]]

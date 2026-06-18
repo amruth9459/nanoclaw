@@ -1,0 +1,42 @@
+[
+  {
+    "doc_id": "Duplex_A_20110907",
+    "gt_file": "Duplex_A_20110907.ground-truth.json",
+    "images": ["Duplex-Level_1.png", "Duplex-Level_2.png"]
+  },
+  {
+    "doc_id": "NBU_MedicalClinic_Arch",
+    "gt_file": "NBU_MedicalClinic_Arch.ground-truth.json",
+    "images": ["MedArch-First_Floor.png", "MedArch-Second_Floor.png", "MedArch-TOF_Footing.png"]
+  },
+  {
+    "doc_id": "Office_A",
+    "gt_file": "Office_A.ground-truth.json",
+    "images": ["OfficeA-Level_1.png", "OfficeA-Level_2.png"]
+  },
+  {
+    "doc_id": "AC20_FZK_Haus",
+    "gt_file": "AC20_FZK_Haus.ground-truth.json",
+    "images": ["FZK-Erdgeschoss.png", "FZK-Dachgeschoss.png"]
+  },
+  {
+    "doc_id": "Ifc4_SampleHouse",
+    "gt_file": "Ifc4_SampleHouse.ground-truth.json",
+    "images": ["Ifc4-Ground_Floor.png"]
+  },
+  {
+    "doc_id": "AC20_Institute",
+    "gt_file": "AC20_Institute.ground-truth.json",
+    "images": ["Institute-Erdgeschoss.png", "Institute-1__Obergeschoss.png", "Institute-2__Obergeschoss.png", "Institute-Dachgeschoss.png"]
+  },
+  {
+    "doc_id": "Smiley_West",
+    "gt_file": "Smiley_West.ground-truth.json",
+    "images": ["Smiley-1_OG.png", "Smiley-2_OG.png", "Smiley-Dach.png"]
+  },
+  {
+    "doc_id": "NBU_MedicalClinic_Eng-HVAC",
+    "gt_file": "NBU_MedicalClinic_Eng-HVAC.ground-truth.json",
+    "images": ["MedHVAC-First_Floor.png", "MedHVAC-Second_Floor.png", "MedHVAC-Roof_-_Mech.png"]
+  }
+]

@@ -1,0 +1,375 @@
+{
+  "experiment": "exp31-highrise-industrial-hospitality",
+  "description": "Three generalization improvements in one experiment: (1) High-rise level aliases: extend STRUCT_LEVEL_ALIASES and DOOR_LEVEL_ALIASES with Level 11-20, German 7.OG-15.OG, and special high-rise floor names (Sky Lobby, Transfer Floor, Podium, Plant Floor, Observation Deck, Roof Terrace, Mechanical Floor, Service Floor, Trading Floor). Current code only goes to Level 10 and 6.OG \u2014 high-rise towers (>10 stories) need these aliases for stairs/slabs/railings/doors. (2) Industrial/warehouse building seeds: WAREHOUSE, LOADING, DOCK, PRODUCTION, ASSEMBLY, MANUFACTURING, FABRICATION, MACHINE, SHIPPING, PACKING, DISPATCH, COLD STORAGE, PRESS, PLANT, WORKSHOP, BOILER, COMPRESSOR, GENERATOR. (3) Hospitality/hotel building seeds: GUEST, SUITE, BALLROOM, BANQUET, CONCIERGE, SPA, BAR, RESTAURANT, LOBBY (partial overlap with LOBBY already present as substring), POOL DECK, VALET. Retail seeds: SALES, SHOWROOM, MERCHANDISE, STOCKROOM. Expected: F1=1.0 maintained on all 8 current docs. System now generalizes to high-rise towers, warehouses, factories, hotels, and retail buildings.",
+  "results": [
+    {
+      "doc_id": "Duplex_A_20110907",
+      "f1": 1.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "categories": {
+        "beams": {
+          "f1": 1.0,
+          "correct": 8,
+          "missed": 0
+        },
+        "doors": {
+          "f1": 1.0,
+          "correct": 14,
+          "missed": 0
+        },
+        "railings_guards": {
+          "f1": 1.0,
+          "correct": 4,
+          "missed": 0
+        },
+        "rooms": {
+          "f1": 1.0,
+          "correct": 21,
+          "missed": 0
+        },
+        "slabs": {
+          "f1": 1.0,
+          "correct": 21,
+          "missed": 0
+        },
+        "stairs_elevators": {
+          "f1": 1.0,
+          "correct": 2,
+          "missed": 0
+        },
+        "wall_types": {
+          "f1": 1.0,
+          "correct": 8,
+          "missed": 0
+        },
+        "windows": {
+          "f1": 1.0,
+          "correct": 24,
+          "missed": 0
+        }
+      },
+      "cost_usd": 0.0
+    },
+    {
+      "doc_id": "NBU_MedicalClinic_Arch",
+      "f1": 1.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "categories": {
+        "doors": {
+          "f1": 1.0,
+          "correct": 254,
+          "missed": 0
+        },
+        "equipment": {
+          "f1": 1.0,
+          "correct": 2,
+          "missed": 0
+        },
+        "plumbing_fixtures": {
+          "f1": 1.0,
+          "correct": 3,
+          "missed": 0
+        },
+        "railings_guards": {
+          "f1": 1.0,
+          "correct": 9,
+          "missed": 0
+        },
+        "rooms": {
+          "f1": 1.0,
+          "correct": 269,
+          "missed": 0
+        },
+        "slabs": {
+          "f1": 1.0,
+          "correct": 3,
+          "missed": 0
+        },
+        "sprinklers": {
+          "f1": 1.0,
+          "correct": 10,
+          "missed": 0
+        },
+        "stairs_elevators": {
+          "f1": 1.0,
+          "correct": 3,
+          "missed": 0
+        },
+        "wall_types": {
+          "f1": 1.0,
+          "correct": 7,
+          "missed": 0
+        },
+        "windows": {
+          "f1": 1.0,
+          "correct": 58,
+          "missed": 0
+        }
+      },
+      "cost_usd": 0.0
+    },
+    {
+      "doc_id": "Office_A",
+      "f1": 1.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "categories": {
+        "rooms": {
+          "f1": 1.0,
+          "correct": 99,
+          "missed": 0
+        },
+        "doors": {
+          "f1": 1.0,
+          "correct": 102,
+          "missed": 0
+        },
+        "windows": {
+          "f1": 1.0,
+          "correct": 69,
+          "missed": 0
+        },
+        "wall_types": {
+          "f1": 1.0,
+          "correct": 487,
+          "missed": 0
+        },
+        "stairs_elevators": {
+          "f1": 1.0,
+          "correct": 4,
+          "missed": 0
+        },
+        "slabs": {
+          "f1": 1.0,
+          "correct": 2,
+          "missed": 0
+        },
+        "railings_guards": {
+          "f1": 1.0,
+          "correct": 10,
+          "missed": 0
+        }
+      },
+      "cost_usd": 0.0
+    },
+    {
+      "doc_id": "AC20_FZK_Haus",
+      "f1": 1.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "categories": {
+        "rooms": {
+          "f1": 1.0,
+          "correct": 7,
+          "missed": 0
+        },
+        "doors": {
+          "f1": 1.0,
+          "correct": 5,
+          "missed": 0
+        },
+        "windows": {
+          "f1": 1.0,
+          "correct": 11,
+          "missed": 0
+        },
+        "beams": {
+          "f1": 1.0,
+          "correct": 4,
+          "missed": 0
+        },
+        "wall_types": {
+          "f1": 1.0,
+          "correct": 2,
+          "missed": 0
+        },
+        "stairs_elevators": {
+          "f1": 1.0,
+          "correct": 1,
+          "missed": 0
+        },
+        "slabs": {
+          "f1": 1.0,
+          "correct": 4,
+          "missed": 0
+        },
+        "railings_guards": {
+          "f1": 1.0,
+          "correct": 2,
+          "missed": 0
+        }
+      },
+      "cost_usd": 0.0
+    },
+    {
+      "doc_id": "Ifc4_SampleHouse",
+      "f1": 1.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "categories": {
+        "rooms": {
+          "f1": 1.0,
+          "correct": 4,
+          "missed": 0
+        },
+        "doors": {
+          "f1": 1.0,
+          "correct": 3,
+          "missed": 0
+        },
+        "windows": {
+          "f1": 1.0,
+          "correct": 4,
+          "missed": 0
+        },
+        "wall_types": {
+          "f1": 1.0,
+          "correct": 2,
+          "missed": 0
+        },
+        "slabs": {
+          "f1": 1.0,
+          "correct": 2,
+          "missed": 0
+        }
+      },
+      "cost_usd": 0.0
+    },
+    {
+      "doc_id": "AC20_Institute",
+      "f1": 0.9983,
+      "precision": 1.0,
+      "recall": 0.9966,
+      "categories": {
+        "rooms": {
+          "f1": 0.988,
+          "correct": 80,
+          "missed": 2
+        },
+        "doors": {
+          "f1": 1.0,
+          "correct": 77,
+          "missed": 0
+        },
+        "windows": {
+          "f1": 1.0,
+          "correct": 206,
+          "missed": 0
+        },
+        "wall_types": {
+          "f1": 1.0,
+          "correct": 3,
+          "missed": 0
+        },
+        "stairs_elevators": {
+          "f1": 1.0,
+          "correct": 4,
+          "missed": 0
+        },
+        "slabs": {
+          "f1": 1.0,
+          "correct": 26,
+          "missed": 0
+        },
+        "railings_guards": {
+          "f1": 1.0,
+          "correct": 12,
+          "missed": 0
+        }
+      },
+      "cost_usd": 0.0
+    },
+    {
+      "doc_id": "Smiley_West",
+      "f1": 1.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "categories": {
+        "rooms": {
+          "f1": 1.0,
+          "correct": 140,
+          "missed": 0
+        },
+        "doors": {
+          "f1": 1.0,
+          "correct": 170,
+          "missed": 0
+        },
+        "windows": {
+          "f1": 1.0,
+          "correct": 80,
+          "missed": 0
+        },
+        "beams": {
+          "f1": 1.0,
+          "correct": 10,
+          "missed": 0
+        },
+        "wall_types": {
+          "f1": 1.0,
+          "correct": 6,
+          "missed": 0
+        },
+        "stairs_elevators": {
+          "f1": 1.0,
+          "correct": 30,
+          "missed": 0
+        },
+        "slabs": {
+          "f1": 1.0,
+          "correct": 120,
+          "missed": 0
+        },
+        "railings_guards": {
+          "f1": 1.0,
+          "correct": 120,
+          "missed": 0
+        }
+      },
+      "cost_usd": 0.0
+    },
+    {
+      "doc_id": "NBU_MedicalClinic_Eng-HVAC",
+      "f1": 1.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "categories": {
+        "ductwork": {
+          "f1": 1.0,
+          "correct": 1509,
+          "missed": 0
+        },
+        "foundations": {
+          "f1": 1.0,
+          "correct": 1,
+          "missed": 0
+        },
+        "hvac_equipment": {
+          "f1": 1.0,
+          "correct": 421,
+          "missed": 0
+        },
+        "plumbing_piping": {
+          "f1": 1.0,
+          "correct": 39,
+          "missed": 0
+        },
+        "rooms": {
+          "f1": 1.0,
+          "correct": 263,
+          "missed": 0
+        },
+        "title_block": {
+          "f1": 1.0,
+          "correct": 4,
+          "missed": 0
+        }
+      },
+      "cost_usd": 0.0
+    }
+  ],
+  "overall_f1": 0.9998,
+  "total_cost_usd": 0.0
+}
