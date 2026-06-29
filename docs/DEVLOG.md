@@ -5,6 +5,168 @@
 
 ---
 
+### 2026-06-29 16:46
+
+**Areas:** config
+**Files (20):** .cache/zellij/permissions.kdl, .claude-ledger/bin/claude-spend, .claude-ledger/claude-ledger.py, .claude-ledger/routing_gate.sh, .claude-ledger/weekly_usage.py, .claude/CLAUDE.md, .claude/bin/fix-thinking.py, .claude/codex-build-routing-snippet.md, .claude/commands/checkpoint.md, .claude/commands/codex-build.md, .claude/commands/recall.md, .claude/consolidation-2026-05-29/CONSOLIDATION_PLAN.md, .claude/consolidation-2026-05-29/add_history.py, .claude/consolidation-2026-05-29/batch.sh, .claude/consolidation-2026-05-29/build_maps.py, .claude/consolidation-2026-05-29/inventory.py, .claude/consolidation-2026-05-29/maps/INDEX.md, .claude/consolidation-2026-05-29/maps/SESSIONS-glowboard.md, .claude/consolidation-2026-05-29/maps/SESSIONS-home.md, .claude/consolidation-2026-05-29/maps/SESSIONS-jyotish.md
+**Diff:** +156 -1 across 2 files
+
+### 2026-06-29 16:44
+
+**Areas:** config
+**Files (20):** .cache/zellij/permissions.kdl, .claude-ledger/bin/claude-spend, .claude-ledger/claude-ledger.py, .claude-ledger/routing_gate.sh, .claude-ledger/weekly_usage.py, .claude/CLAUDE.md, .claude/bin/fix-thinking.py, .claude/codex-build-routing-snippet.md, .claude/commands/checkpoint.md, .claude/commands/codex-build.md, .claude/commands/recall.md, .claude/consolidation-2026-05-29/CONSOLIDATION_PLAN.md, .claude/consolidation-2026-05-29/add_history.py, .claude/consolidation-2026-05-29/batch.sh, .claude/consolidation-2026-05-29/build_maps.py, .claude/consolidation-2026-05-29/inventory.py, .claude/consolidation-2026-05-29/maps/INDEX.md, .claude/consolidation-2026-05-29/maps/SESSIONS-glowboard.md, .claude/consolidation-2026-05-29/maps/SESSIONS-home.md, .claude/consolidation-2026-05-29/maps/SESSIONS-jyotish.md
+**Diff:** +150 -1 across 2 files
+
+### 2026-06-29 16:44
+
+**Areas:** config
+**Files (20):** .cache/zellij/permissions.kdl, .claude-ledger/bin/claude-spend, .claude-ledger/claude-ledger.py, .claude-ledger/routing_gate.sh, .claude-ledger/weekly_usage.py, .claude/CLAUDE.md, .claude/bin/fix-thinking.py, .claude/codex-build-routing-snippet.md, .claude/commands/checkpoint.md, .claude/commands/codex-build.md, .claude/commands/recall.md, .claude/consolidation-2026-05-29/CONSOLIDATION_PLAN.md, .claude/consolidation-2026-05-29/add_history.py, .claude/consolidation-2026-05-29/batch.sh, .claude/consolidation-2026-05-29/build_maps.py, .claude/consolidation-2026-05-29/inventory.py, .claude/consolidation-2026-05-29/maps/INDEX.md, .claude/consolidation-2026-05-29/maps/SESSIONS-glowboard.md, .claude/consolidation-2026-05-29/maps/SESSIONS-home.md, .claude/consolidation-2026-05-29/maps/SESSIONS-jyotish.md
+**Diff:** +144 -1 across 2 files
+
+### 2026-06-29 16:38
+
+**Areas:** config
+**Files (20):** .cache/zellij/permissions.kdl, .claude-ledger/bin/claude-spend, .claude-ledger/claude-ledger.py, .claude-ledger/routing_gate.sh, .claude-ledger/weekly_usage.py, .claude/CLAUDE.md, .claude/bin/fix-thinking.py, .claude/codex-build-routing-snippet.md, .claude/commands/checkpoint.md, .claude/commands/codex-build.md, .claude/commands/recall.md, .claude/consolidation-2026-05-29/CONSOLIDATION_PLAN.md, .claude/consolidation-2026-05-29/add_history.py, .claude/consolidation-2026-05-29/batch.sh, .claude/consolidation-2026-05-29/build_maps.py, .claude/consolidation-2026-05-29/inventory.py, .claude/consolidation-2026-05-29/maps/INDEX.md, .claude/consolidation-2026-05-29/maps/SESSIONS-glowboard.md, .claude/consolidation-2026-05-29/maps/SESSIONS-home.md, .claude/consolidation-2026-05-29/maps/SESSIONS-jyotish.md
+**Diff:** +138 -1 across 2 files
+
+### 2026-06-29 16:36
+
+**Areas:** config
+**Files (20):** .cache/zellij/permissions.kdl, .claude-ledger/bin/claude-spend, .claude-ledger/claude-ledger.py, .claude-ledger/routing_gate.sh, .claude-ledger/weekly_usage.py, .claude/CLAUDE.md, .claude/bin/fix-thinking.py, .claude/codex-build-routing-snippet.md, .claude/commands/checkpoint.md, .claude/commands/codex-build.md, .claude/commands/recall.md, .claude/consolidation-2026-05-29/CONSOLIDATION_PLAN.md, .claude/consolidation-2026-05-29/add_history.py, .claude/consolidation-2026-05-29/batch.sh, .claude/consolidation-2026-05-29/build_maps.py, .claude/consolidation-2026-05-29/inventory.py, .claude/consolidation-2026-05-29/maps/INDEX.md, .claude/consolidation-2026-05-29/maps/SESSIONS-glowboard.md, .claude/consolidation-2026-05-29/maps/SESSIONS-home.md, .claude/consolidation-2026-05-29/maps/SESSIONS-jyotish.md
+**Diff:** +132 -1 across 2 files
+
+### 2026-06-29 16:35
+
+**Areas:** config
+**Files (20):** .cache/zellij/permissions.kdl, .claude-ledger/bin/claude-spend, .claude-ledger/claude-ledger.py, .claude-ledger/routing_gate.sh, .claude-ledger/weekly_usage.py, .claude/CLAUDE.md, .claude/bin/fix-thinking.py, .claude/codex-build-routing-snippet.md, .claude/commands/checkpoint.md, .claude/commands/codex-build.md, .claude/commands/recall.md, .claude/consolidation-2026-05-29/CONSOLIDATION_PLAN.md, .claude/consolidation-2026-05-29/add_history.py, .claude/consolidation-2026-05-29/batch.sh, .claude/consolidation-2026-05-29/build_maps.py, .claude/consolidation-2026-05-29/inventory.py, .claude/consolidation-2026-05-29/maps/INDEX.md, .claude/consolidation-2026-05-29/maps/SESSIONS-glowboard.md, .claude/consolidation-2026-05-29/maps/SESSIONS-home.md, .claude/consolidation-2026-05-29/maps/SESSIONS-jyotish.md
+**Diff:** +126 -1 across 2 files
+
+### 2026-06-29 16:10
+
+**Areas:** config
+**Files (20):** .cache/zellij/permissions.kdl, .claude-ledger/bin/claude-spend, .claude-ledger/claude-ledger.py, .claude-ledger/routing_gate.sh, .claude-ledger/weekly_usage.py, .claude/CLAUDE.md, .claude/bin/fix-thinking.py, .claude/codex-build-routing-snippet.md, .claude/commands/checkpoint.md, .claude/commands/codex-build.md, .claude/commands/recall.md, .claude/consolidation-2026-05-29/CONSOLIDATION_PLAN.md, .claude/consolidation-2026-05-29/add_history.py, .claude/consolidation-2026-05-29/batch.sh, .claude/consolidation-2026-05-29/build_maps.py, .claude/consolidation-2026-05-29/inventory.py, .claude/consolidation-2026-05-29/maps/INDEX.md, .claude/consolidation-2026-05-29/maps/SESSIONS-glowboard.md, .claude/consolidation-2026-05-29/maps/SESSIONS-home.md, .claude/consolidation-2026-05-29/maps/SESSIONS-jyotish.md
+**Diff:** +120 -1 across 2 files
+
+### 2026-06-29 16:10
+
+**Areas:** config
+**Files (20):** .cache/zellij/permissions.kdl, .claude-ledger/bin/claude-spend, .claude-ledger/claude-ledger.py, .claude-ledger/routing_gate.sh, .claude-ledger/weekly_usage.py, .claude/CLAUDE.md, .claude/bin/fix-thinking.py, .claude/codex-build-routing-snippet.md, .claude/commands/checkpoint.md, .claude/commands/codex-build.md, .claude/commands/recall.md, .claude/consolidation-2026-05-29/CONSOLIDATION_PLAN.md, .claude/consolidation-2026-05-29/add_history.py, .claude/consolidation-2026-05-29/batch.sh, .claude/consolidation-2026-05-29/build_maps.py, .claude/consolidation-2026-05-29/inventory.py, .claude/consolidation-2026-05-29/maps/INDEX.md, .claude/consolidation-2026-05-29/maps/SESSIONS-glowboard.md, .claude/consolidation-2026-05-29/maps/SESSIONS-home.md, .claude/consolidation-2026-05-29/maps/SESSIONS-jyotish.md
+**Diff:** +114 -1 across 2 files
+
+### 2026-06-29 16:09
+
+**Areas:** config
+**Files (20):** .cache/zellij/permissions.kdl, .claude-ledger/bin/claude-spend, .claude-ledger/claude-ledger.py, .claude-ledger/routing_gate.sh, .claude-ledger/weekly_usage.py, .claude/CLAUDE.md, .claude/bin/fix-thinking.py, .claude/codex-build-routing-snippet.md, .claude/commands/checkpoint.md, .claude/commands/codex-build.md, .claude/commands/recall.md, .claude/consolidation-2026-05-29/CONSOLIDATION_PLAN.md, .claude/consolidation-2026-05-29/add_history.py, .claude/consolidation-2026-05-29/batch.sh, .claude/consolidation-2026-05-29/build_maps.py, .claude/consolidation-2026-05-29/inventory.py, .claude/consolidation-2026-05-29/maps/INDEX.md, .claude/consolidation-2026-05-29/maps/SESSIONS-glowboard.md, .claude/consolidation-2026-05-29/maps/SESSIONS-home.md, .claude/consolidation-2026-05-29/maps/SESSIONS-jyotish.md
+**Diff:** +108 -1 across 2 files
+
+### 2026-06-29 15:59
+
+**Areas:** config
+**Files (20):** .cache/zellij/permissions.kdl, .claude-ledger/bin/claude-spend, .claude-ledger/claude-ledger.py, .claude-ledger/routing_gate.sh, .claude-ledger/weekly_usage.py, .claude/CLAUDE.md, .claude/bin/fix-thinking.py, .claude/codex-build-routing-snippet.md, .claude/commands/checkpoint.md, .claude/commands/codex-build.md, .claude/commands/recall.md, .claude/consolidation-2026-05-29/CONSOLIDATION_PLAN.md, .claude/consolidation-2026-05-29/add_history.py, .claude/consolidation-2026-05-29/batch.sh, .claude/consolidation-2026-05-29/build_maps.py, .claude/consolidation-2026-05-29/inventory.py, .claude/consolidation-2026-05-29/maps/INDEX.md, .claude/consolidation-2026-05-29/maps/SESSIONS-glowboard.md, .claude/consolidation-2026-05-29/maps/SESSIONS-home.md, .claude/consolidation-2026-05-29/maps/SESSIONS-jyotish.md
+**Diff:** +102 -1 across 2 files
+
+### 2026-06-29 15:51
+
+**Areas:** config
+**Files (20):** .cache/zellij/permissions.kdl, .claude-ledger/bin/claude-spend, .claude-ledger/claude-ledger.py, .claude-ledger/routing_gate.sh, .claude-ledger/weekly_usage.py, .claude/CLAUDE.md, .claude/bin/fix-thinking.py, .claude/codex-build-routing-snippet.md, .claude/commands/checkpoint.md, .claude/commands/codex-build.md, .claude/commands/recall.md, .claude/consolidation-2026-05-29/CONSOLIDATION_PLAN.md, .claude/consolidation-2026-05-29/add_history.py, .claude/consolidation-2026-05-29/batch.sh, .claude/consolidation-2026-05-29/build_maps.py, .claude/consolidation-2026-05-29/inventory.py, .claude/consolidation-2026-05-29/maps/INDEX.md, .claude/consolidation-2026-05-29/maps/SESSIONS-glowboard.md, .claude/consolidation-2026-05-29/maps/SESSIONS-home.md, .claude/consolidation-2026-05-29/maps/SESSIONS-jyotish.md
+**Diff:** +96 -1 across 2 files
+
+### 2026-06-29 15:50
+
+**Areas:** config
+**Files (20):** .cache/zellij/permissions.kdl, .claude-ledger/bin/claude-spend, .claude-ledger/claude-ledger.py, .claude-ledger/routing_gate.sh, .claude-ledger/weekly_usage.py, .claude/CLAUDE.md, .claude/bin/fix-thinking.py, .claude/codex-build-routing-snippet.md, .claude/commands/checkpoint.md, .claude/commands/codex-build.md, .claude/commands/recall.md, .claude/consolidation-2026-05-29/CONSOLIDATION_PLAN.md, .claude/consolidation-2026-05-29/add_history.py, .claude/consolidation-2026-05-29/batch.sh, .claude/consolidation-2026-05-29/build_maps.py, .claude/consolidation-2026-05-29/inventory.py, .claude/consolidation-2026-05-29/maps/INDEX.md, .claude/consolidation-2026-05-29/maps/SESSIONS-glowboard.md, .claude/consolidation-2026-05-29/maps/SESSIONS-home.md, .claude/consolidation-2026-05-29/maps/SESSIONS-jyotish.md
+**Diff:** +90 -1 across 2 files
+
+### 2026-06-29 15:50
+
+**Areas:** config
+**Files (20):** .cache/zellij/permissions.kdl, .claude-ledger/bin/claude-spend, .claude-ledger/claude-ledger.py, .claude-ledger/routing_gate.sh, .claude-ledger/weekly_usage.py, .claude/CLAUDE.md, .claude/bin/fix-thinking.py, .claude/codex-build-routing-snippet.md, .claude/commands/checkpoint.md, .claude/commands/codex-build.md, .claude/commands/recall.md, .claude/consolidation-2026-05-29/CONSOLIDATION_PLAN.md, .claude/consolidation-2026-05-29/add_history.py, .claude/consolidation-2026-05-29/batch.sh, .claude/consolidation-2026-05-29/build_maps.py, .claude/consolidation-2026-05-29/inventory.py, .claude/consolidation-2026-05-29/maps/INDEX.md, .claude/consolidation-2026-05-29/maps/SESSIONS-glowboard.md, .claude/consolidation-2026-05-29/maps/SESSIONS-home.md, .claude/consolidation-2026-05-29/maps/SESSIONS-jyotish.md
+**Diff:** +84 -1 across 2 files
+
+### 2026-06-29 15:46
+
+**Areas:** config
+**Files (20):** .cache/zellij/permissions.kdl, .claude-ledger/bin/claude-spend, .claude-ledger/claude-ledger.py, .claude-ledger/routing_gate.sh, .claude-ledger/weekly_usage.py, .claude/CLAUDE.md, .claude/bin/fix-thinking.py, .claude/codex-build-routing-snippet.md, .claude/commands/checkpoint.md, .claude/commands/codex-build.md, .claude/commands/recall.md, .claude/consolidation-2026-05-29/CONSOLIDATION_PLAN.md, .claude/consolidation-2026-05-29/add_history.py, .claude/consolidation-2026-05-29/batch.sh, .claude/consolidation-2026-05-29/build_maps.py, .claude/consolidation-2026-05-29/inventory.py, .claude/consolidation-2026-05-29/maps/INDEX.md, .claude/consolidation-2026-05-29/maps/SESSIONS-glowboard.md, .claude/consolidation-2026-05-29/maps/SESSIONS-home.md, .claude/consolidation-2026-05-29/maps/SESSIONS-jyotish.md
+**Diff:** +78 -1 across 2 files
+
+### 2026-06-29 15:43
+
+**Areas:** config
+**Files (20):** .cache/zellij/permissions.kdl, .claude-ledger/bin/claude-spend, .claude-ledger/claude-ledger.py, .claude-ledger/routing_gate.sh, .claude-ledger/weekly_usage.py, .claude/CLAUDE.md, .claude/bin/fix-thinking.py, .claude/codex-build-routing-snippet.md, .claude/commands/checkpoint.md, .claude/commands/codex-build.md, .claude/commands/recall.md, .claude/consolidation-2026-05-29/CONSOLIDATION_PLAN.md, .claude/consolidation-2026-05-29/add_history.py, .claude/consolidation-2026-05-29/batch.sh, .claude/consolidation-2026-05-29/build_maps.py, .claude/consolidation-2026-05-29/inventory.py, .claude/consolidation-2026-05-29/maps/INDEX.md, .claude/consolidation-2026-05-29/maps/SESSIONS-glowboard.md, .claude/consolidation-2026-05-29/maps/SESSIONS-home.md, .claude/consolidation-2026-05-29/maps/SESSIONS-jyotish.md
+**Diff:** +72 -1 across 2 files
+
+### 2026-06-29 15:39
+
+**Areas:** config
+**Files (20):** .cache/zellij/permissions.kdl, .claude-ledger/bin/claude-spend, .claude-ledger/claude-ledger.py, .claude-ledger/routing_gate.sh, .claude-ledger/weekly_usage.py, .claude/CLAUDE.md, .claude/bin/fix-thinking.py, .claude/codex-build-routing-snippet.md, .claude/commands/checkpoint.md, .claude/commands/codex-build.md, .claude/commands/recall.md, .claude/consolidation-2026-05-29/CONSOLIDATION_PLAN.md, .claude/consolidation-2026-05-29/add_history.py, .claude/consolidation-2026-05-29/batch.sh, .claude/consolidation-2026-05-29/build_maps.py, .claude/consolidation-2026-05-29/inventory.py, .claude/consolidation-2026-05-29/maps/INDEX.md, .claude/consolidation-2026-05-29/maps/SESSIONS-glowboard.md, .claude/consolidation-2026-05-29/maps/SESSIONS-home.md, .claude/consolidation-2026-05-29/maps/SESSIONS-jyotish.md
+**Diff:** +66 -1 across 2 files
+
+### 2026-06-29 15:36
+
+**Areas:** config
+**Files (20):** .cache/zellij/permissions.kdl, .claude-ledger/bin/claude-spend, .claude-ledger/claude-ledger.py, .claude-ledger/routing_gate.sh, .claude-ledger/weekly_usage.py, .claude/CLAUDE.md, .claude/bin/fix-thinking.py, .claude/codex-build-routing-snippet.md, .claude/commands/checkpoint.md, .claude/commands/codex-build.md, .claude/commands/recall.md, .claude/consolidation-2026-05-29/CONSOLIDATION_PLAN.md, .claude/consolidation-2026-05-29/add_history.py, .claude/consolidation-2026-05-29/batch.sh, .claude/consolidation-2026-05-29/build_maps.py, .claude/consolidation-2026-05-29/inventory.py, .claude/consolidation-2026-05-29/maps/INDEX.md, .claude/consolidation-2026-05-29/maps/SESSIONS-glowboard.md, .claude/consolidation-2026-05-29/maps/SESSIONS-home.md, .claude/consolidation-2026-05-29/maps/SESSIONS-jyotish.md
+**Diff:** +60 -1 across 2 files
+
+### 2026-06-29 15:33
+
+**Areas:** config
+**Files (20):** .cache/zellij/permissions.kdl, .claude-ledger/bin/claude-spend, .claude-ledger/claude-ledger.py, .claude-ledger/routing_gate.sh, .claude-ledger/weekly_usage.py, .claude/CLAUDE.md, .claude/bin/fix-thinking.py, .claude/codex-build-routing-snippet.md, .claude/commands/checkpoint.md, .claude/commands/codex-build.md, .claude/commands/recall.md, .claude/consolidation-2026-05-29/CONSOLIDATION_PLAN.md, .claude/consolidation-2026-05-29/add_history.py, .claude/consolidation-2026-05-29/batch.sh, .claude/consolidation-2026-05-29/build_maps.py, .claude/consolidation-2026-05-29/inventory.py, .claude/consolidation-2026-05-29/maps/INDEX.md, .claude/consolidation-2026-05-29/maps/SESSIONS-glowboard.md, .claude/consolidation-2026-05-29/maps/SESSIONS-home.md, .claude/consolidation-2026-05-29/maps/SESSIONS-jyotish.md
+**Diff:** +54 -1 across 2 files
+
+### 2026-06-29 15:31
+
+**Areas:** config
+**Files (20):** .cache/zellij/permissions.kdl, .claude-ledger/bin/claude-spend, .claude-ledger/claude-ledger.py, .claude-ledger/routing_gate.sh, .claude-ledger/weekly_usage.py, .claude/CLAUDE.md, .claude/bin/fix-thinking.py, .claude/codex-build-routing-snippet.md, .claude/commands/checkpoint.md, .claude/commands/codex-build.md, .claude/commands/recall.md, .claude/consolidation-2026-05-29/CONSOLIDATION_PLAN.md, .claude/consolidation-2026-05-29/add_history.py, .claude/consolidation-2026-05-29/batch.sh, .claude/consolidation-2026-05-29/build_maps.py, .claude/consolidation-2026-05-29/inventory.py, .claude/consolidation-2026-05-29/maps/INDEX.md, .claude/consolidation-2026-05-29/maps/SESSIONS-glowboard.md, .claude/consolidation-2026-05-29/maps/SESSIONS-home.md, .claude/consolidation-2026-05-29/maps/SESSIONS-jyotish.md
+**Diff:** +48 -1 across 2 files
+
+### 2026-06-29 15:11
+
+**Areas:** config
+**Files (20):** .cache/zellij/permissions.kdl, .claude-ledger/bin/claude-spend, .claude-ledger/claude-ledger.py, .claude-ledger/routing_gate.sh, .claude-ledger/weekly_usage.py, .claude/CLAUDE.md, .claude/bin/fix-thinking.py, .claude/codex-build-routing-snippet.md, .claude/commands/checkpoint.md, .claude/commands/codex-build.md, .claude/commands/recall.md, .claude/consolidation-2026-05-29/CONSOLIDATION_PLAN.md, .claude/consolidation-2026-05-29/add_history.py, .claude/consolidation-2026-05-29/batch.sh, .claude/consolidation-2026-05-29/build_maps.py, .claude/consolidation-2026-05-29/inventory.py, .claude/consolidation-2026-05-29/maps/INDEX.md, .claude/consolidation-2026-05-29/maps/SESSIONS-glowboard.md, .claude/consolidation-2026-05-29/maps/SESSIONS-home.md, .claude/consolidation-2026-05-29/maps/SESSIONS-jyotish.md
+**Diff:** +42 -1 across 2 files
+
+### 2026-06-29 15:09
+
+**Areas:** config
+**Files (20):** .cache/zellij/permissions.kdl, .claude-ledger/bin/claude-spend, .claude-ledger/claude-ledger.py, .claude-ledger/routing_gate.sh, .claude-ledger/weekly_usage.py, .claude/CLAUDE.md, .claude/bin/fix-thinking.py, .claude/codex-build-routing-snippet.md, .claude/commands/checkpoint.md, .claude/commands/codex-build.md, .claude/commands/recall.md, .claude/consolidation-2026-05-29/CONSOLIDATION_PLAN.md, .claude/consolidation-2026-05-29/add_history.py, .claude/consolidation-2026-05-29/batch.sh, .claude/consolidation-2026-05-29/build_maps.py, .claude/consolidation-2026-05-29/inventory.py, .claude/consolidation-2026-05-29/maps/INDEX.md, .claude/consolidation-2026-05-29/maps/SESSIONS-glowboard.md, .claude/consolidation-2026-05-29/maps/SESSIONS-home.md, .claude/consolidation-2026-05-29/maps/SESSIONS-jyotish.md
+**Diff:** +36 -1 across 2 files
+
+### 2026-06-29 15:09
+
+**Areas:** config
+**Files (20):** .cache/zellij/permissions.kdl, .claude-ledger/bin/claude-spend, .claude-ledger/claude-ledger.py, .claude-ledger/routing_gate.sh, .claude-ledger/weekly_usage.py, .claude/CLAUDE.md, .claude/bin/fix-thinking.py, .claude/codex-build-routing-snippet.md, .claude/commands/checkpoint.md, .claude/commands/codex-build.md, .claude/commands/recall.md, .claude/consolidation-2026-05-29/CONSOLIDATION_PLAN.md, .claude/consolidation-2026-05-29/add_history.py, .claude/consolidation-2026-05-29/batch.sh, .claude/consolidation-2026-05-29/build_maps.py, .claude/consolidation-2026-05-29/inventory.py, .claude/consolidation-2026-05-29/maps/INDEX.md, .claude/consolidation-2026-05-29/maps/SESSIONS-glowboard.md, .claude/consolidation-2026-05-29/maps/SESSIONS-home.md, .claude/consolidation-2026-05-29/maps/SESSIONS-jyotish.md
+**Diff:** +30 -1 across 2 files
+
+### 2026-06-29 15:01
+
+**Areas:** config
+**Files (20):** .cache/zellij/permissions.kdl, .claude-ledger/bin/claude-spend, .claude-ledger/claude-ledger.py, .claude-ledger/routing_gate.sh, .claude-ledger/weekly_usage.py, .claude/CLAUDE.md, .claude/bin/fix-thinking.py, .claude/codex-build-routing-snippet.md, .claude/commands/checkpoint.md, .claude/commands/codex-build.md, .claude/commands/recall.md, .claude/consolidation-2026-05-29/CONSOLIDATION_PLAN.md, .claude/consolidation-2026-05-29/add_history.py, .claude/consolidation-2026-05-29/batch.sh, .claude/consolidation-2026-05-29/build_maps.py, .claude/consolidation-2026-05-29/inventory.py, .claude/consolidation-2026-05-29/maps/INDEX.md, .claude/consolidation-2026-05-29/maps/SESSIONS-glowboard.md, .claude/consolidation-2026-05-29/maps/SESSIONS-home.md, .claude/consolidation-2026-05-29/maps/SESSIONS-jyotish.md
+**Diff:** +24 -1 across 2 files
+
+### 2026-06-29 15:01
+
+**Areas:** config
+**Files (20):** .cache/zellij/permissions.kdl, .claude-ledger/bin/claude-spend, .claude-ledger/claude-ledger.py, .claude-ledger/routing_gate.sh, .claude-ledger/weekly_usage.py, .claude/CLAUDE.md, .claude/bin/fix-thinking.py, .claude/codex-build-routing-snippet.md, .claude/commands/checkpoint.md, .claude/commands/codex-build.md, .claude/commands/recall.md, .claude/consolidation-2026-05-29/CONSOLIDATION_PLAN.md, .claude/consolidation-2026-05-29/add_history.py, .claude/consolidation-2026-05-29/batch.sh, .claude/consolidation-2026-05-29/build_maps.py, .claude/consolidation-2026-05-29/inventory.py, .claude/consolidation-2026-05-29/maps/INDEX.md, .claude/consolidation-2026-05-29/maps/SESSIONS-glowboard.md, .claude/consolidation-2026-05-29/maps/SESSIONS-home.md, .claude/consolidation-2026-05-29/maps/SESSIONS-jyotish.md
+**Diff:** +18 -1 across 2 files
+
+### 2026-06-29 14:55
+
+**Areas:** config
+**Files (20):** .cache/zellij/permissions.kdl, .claude-ledger/bin/claude-spend, .claude-ledger/claude-ledger.py, .claude-ledger/routing_gate.sh, .claude-ledger/weekly_usage.py, .claude/CLAUDE.md, .claude/bin/fix-thinking.py, .claude/codex-build-routing-snippet.md, .claude/commands/checkpoint.md, .claude/commands/codex-build.md, .claude/commands/recall.md, .claude/consolidation-2026-05-29/CONSOLIDATION_PLAN.md, .claude/consolidation-2026-05-29/add_history.py, .claude/consolidation-2026-05-29/batch.sh, .claude/consolidation-2026-05-29/build_maps.py, .claude/consolidation-2026-05-29/inventory.py, .claude/consolidation-2026-05-29/maps/INDEX.md, .claude/consolidation-2026-05-29/maps/SESSIONS-glowboard.md, .claude/consolidation-2026-05-29/maps/SESSIONS-home.md, .claude/consolidation-2026-05-29/maps/SESSIONS-jyotish.md
+**Diff:** +12 -1 across 2 files
+
+### 2026-06-29 14:48
+
+**Areas:** config
+**Files (20):** .cache/zellij/permissions.kdl, .claude-ledger/bin/claude-spend, .claude-ledger/claude-ledger.py, .claude-ledger/routing_gate.sh, .claude-ledger/weekly_usage.py, .claude/CLAUDE.md, .claude/bin/fix-thinking.py, .claude/codex-build-routing-snippet.md, .claude/commands/checkpoint.md, .claude/commands/codex-build.md, .claude/commands/recall.md, .claude/consolidation-2026-05-29/CONSOLIDATION_PLAN.md, .claude/consolidation-2026-05-29/add_history.py, .claude/consolidation-2026-05-29/batch.sh, .claude/consolidation-2026-05-29/build_maps.py, .claude/consolidation-2026-05-29/inventory.py, .claude/consolidation-2026-05-29/maps/INDEX.md, .claude/consolidation-2026-05-29/maps/SESSIONS-glowboard.md, .claude/consolidation-2026-05-29/maps/SESSIONS-home.md, .claude/consolidation-2026-05-29/maps/SESSIONS-jyotish.md
+**Diff:** +6 -1 across 2 files
+
+### 2026-06-29 14:31
+
+**Areas:** config
+**Files (20):** .cache/zellij/permissions.kdl, .claude-ledger/bin/claude-spend, .claude-ledger/claude-ledger.py, .claude-ledger/routing_gate.sh, .claude-ledger/weekly_usage.py, .claude/CLAUDE.md, .claude/bin/fix-thinking.py, .claude/codex-build-routing-snippet.md, .claude/commands/checkpoint.md, .claude/commands/codex-build.md, .claude/commands/recall.md, .claude/consolidation-2026-05-29/CONSOLIDATION_PLAN.md, .claude/consolidation-2026-05-29/add_history.py, .claude/consolidation-2026-05-29/batch.sh, .claude/consolidation-2026-05-29/build_maps.py, .claude/consolidation-2026-05-29/inventory.py, .claude/consolidation-2026-05-29/maps/INDEX.md, .claude/consolidation-2026-05-29/maps/SESSIONS-glowboard.md, .claude/consolidation-2026-05-29/maps/SESSIONS-home.md, .claude/consolidation-2026-05-29/maps/SESSIONS-jyotish.md
+**Diff:** +0 -1 across 1 files
+
 ### 2026-06-29 13:31
 
 **Areas:** config
