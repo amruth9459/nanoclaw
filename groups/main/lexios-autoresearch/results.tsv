@@ -293,3 +293,8 @@ exp83-fix-exp72-80-regressions-76-docs	2026-04-24	1.0000	76	0.00	Apply all missi
 2026-07-02T05:05:00Z	exp113-pdf-plans-residential-seeds-habitat-consolidation	Corpus expansion: add duplex_a_20110907 (PDF) + habitat-floor-plans (PDF, 18 new categories). 2 new docs needed 18 category injections (door_schedule/window_schedule/joists/rafters/shear_walls/lateral_bracing/area_calculations/sheet_index/exterior_materials/foundations/roof_plan/ROOM_SEEDS). 86 docs total, F1=0.9904.	1.0	0.9904	0.0	expansion
 2026-07-02T10:33:59Z	exp114-gap-close-dimensions-stairs-family-title-roof	Fix remaining F1 gaps from exp113 (0.9904): FAMILY room seed, a+o dim seeds, a note/egress seeds, u/i equip seeds, step stair seed, floor title_block seed, slope=6 roof_plan seed. 83 docs at F1=1.0, 3 remain below (maricopa/grandview/permit-sonoma have images).	0.9904	0.9929	0.0	kept
 2026-07-02T10:34:26Z	exp-20260702-050914	Fix remaining F1 gaps from exp113 (overall_f1=0.9904). Root 	1	0.9929	0.0	discarded
+2026-07-03T07:01:01Z	exp-20260703-025359	Fix remaining F1 gaps from exp113 (overall_f1=0.9904). Root 	1	1.0	0.0	discarded
+2026-07-03T07:15:15Z	exp-20260703-030101	Fix the 3 docs still below F1=1.0 after exp114 (maricopa-sam	1	1.0	0.0	discarded
+2026-07-03T07:30:24Z	exp-20260703-031515	Fix the last 3 sub-1.0 docs after exp114 (overall_f1=0.9929)	1	0.8571	0.0	discarded
+2026-07-03T07:37:02Z	exp-20260703-033024	Fix the 3 remaining sub-1.0 docs after exp114 (overall_f1=0.	1	1.0	0.0	discarded
+2026-07-03T07:55:48Z	exp-20260703-033702	exp114 (F1=0.9929) claimed 83/86 docs at F1=1.0 with only 3 	1	1.0	0.0	discarded
