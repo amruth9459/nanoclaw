@@ -298,3 +298,11 @@ exp83-fix-exp72-80-regressions-76-docs	2026-04-24	1.0000	76	0.00	Apply all missi
 2026-07-03T07:30:24Z	exp-20260703-031515	Fix the last 3 sub-1.0 docs after exp114 (overall_f1=0.9929)	1	0.8571	0.0	discarded
 2026-07-03T07:37:02Z	exp-20260703-033024	Fix the 3 remaining sub-1.0 docs after exp114 (overall_f1=0.	1	1.0	0.0	discarded
 2026-07-03T07:55:48Z	exp-20260703-033702	exp114 (F1=0.9929) claimed 83/86 docs at F1=1.0 with only 3 	1	1.0	0.0	discarded
+2026-07-04T06:06:44Z	exp-20260704-020004	exp114 (F1=0.9929) claimed 83/86 docs at F1=1.0 with only 3 	1	1.0	0.0	discarded
+2026-07-04T06:22:22Z	exp-20260704-020644	Fix remaining F1 gaps from exp113 (overall_f1=0.9904). Root 	1	0.771	0.0	discarded
+2026-07-04T06:27:33Z	exp-20260704-022222	Fix the 3 docs still below F1=1.0 after exp114 (maricopa-sam	1	1.0	0.0	discarded
+2026-07-04T07:58:37Z	exp115-deterministic-gap-diagnostic-fix	Deterministic diagnostic (postprocess+score_elements, no vision) found exact GT misses in 4 docs: builders door tag=Garage Door, grandview/maricopa rooms PATIO/CLOSET/PANTRY + doors sliding/garage, maricopa equipment (type-field fallback unfed), grandview/maricopa title_block. Also found manifest.json is untracked by git and drifts across sessions — explains the wild F1 swings (0.77-1.0) on the same fix across 10 prior discarded attempts; current corpus is 80 docs not 86.	0.9929	1.0	0.0	kept
+2026-07-04T07:59:25Z	exp-20260704-022733	The prior 'kept' baseline (exp114, overall_f1=0.9929) claime	1	1.0	0.0	discarded
+2026-07-04T08:10:17Z	exp-20260704-035925	no-result	1	0	0	error
+2026-07-04T08:36:14Z	exp-20260704-041017	no-result	1	0	0	error
+2026-07-04T08:42:30Z	exp-20260704-043614	Fix remaining F1 gaps from exp113 (overall_f1=0.9904). Root 	1	1.0	0.0	discarded
