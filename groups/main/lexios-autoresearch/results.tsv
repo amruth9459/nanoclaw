@@ -306,3 +306,6 @@ exp83-fix-exp72-80-regressions-76-docs	2026-04-24	1.0000	76	0.00	Apply all missi
 2026-07-04T08:10:17Z	exp-20260704-035925	no-result	1	0	0	error
 2026-07-04T08:36:14Z	exp-20260704-041017	no-result	1	0	0	error
 2026-07-04T08:42:30Z	exp-20260704-043614	Fix remaining F1 gaps from exp113 (overall_f1=0.9904). Root 	1	1.0	0.0	discarded
+2026-07-04T09:19:45Z	exp-20260704-044230	Deterministic diagnostic (postprocess+score_elements directl	1	1.0	0.0	discarded
+2026-07-04T09:35:47Z	exp-20260704-051945	Deterministic diagnostic (postprocess({})+score_elements, no	1	1.0	0.0	discarded
+2026-07-04T09:48:04Z	exp-20260704-053547	Deterministic diagnostic (postprocess({}) + score_elements()	1	1.0	0.0	discarded
