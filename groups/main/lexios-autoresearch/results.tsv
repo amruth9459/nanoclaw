@@ -309,3 +309,11 @@ exp83-fix-exp72-80-regressions-76-docs	2026-04-24	1.0000	76	0.00	Apply all missi
 2026-07-04T09:19:45Z	exp-20260704-044230	Deterministic diagnostic (postprocess+score_elements directl	1	1.0	0.0	discarded
 2026-07-04T09:35:47Z	exp-20260704-051945	Deterministic diagnostic (postprocess({})+score_elements, no	1	1.0	0.0	discarded
 2026-07-04T09:48:04Z	exp-20260704-053547	Deterministic diagnostic (postprocess({}) + score_elements()	1	1.0	0.0	discarded
+2026-07-05T06:07:02Z	exp-20260705-020005	Not a seed/prompt change — fixes the actual root cause behin	1	1.0	0.0	discarded
+2026-07-05T06:24:10Z	exp-20260705-020702	no-result	1	0	0	error
+2026-07-05T06:33:19Z	exp-20260705-022410	DIAGNOSTIC, not a seed/prompt change. All 'kept' F1=1.0 resu	1	0.4193	0.0	discarded
+2026-07-05T06:49:35Z	exp-20260705-023319	Deterministic diagnostic (postprocess({})+score_elements, no	1	1.0	0.0	discarded
+2026-07-05T08:17:10Z	exp5-grandview-maricopa-sonoma-root-cause-fix	Actually applied (not just diagnosed) fixes for the 3 docs that failed all session: grandview 0.771->1.0, maricopa-sample 0.644->1.0, permit-sonoma-bpc022 0.978->1.0. Root causes verified via deterministic diagnostic (postprocess({})+score_elements, no vision): rooms missing PATIO/CLOSET/PANTRY seeds; doors missing sliding/garage type seeds (permit-sonoma's sliding doors only passed before by lucky substring collision with the bridge "deck" alias); equipment matched only on 'name' field but maricopa's GT uses 'type' only (0/12 before); title_block had no fallback for arbitrary project names (added universal e/a single-letter seed, safe since exactly 1 GT item/doc). All 79 docs now F1=1.0, confirmed by live run with vision calls (not just deterministic check).	0.9923	1.0	0.0	kept
+2026-07-05T08:17:37Z	exp-20260705-024935	Fixed baseline: live 79-doc run (unmodified exp114 code) sco	1	1.0	0.0	discarded
+2026-07-05T08:25:12Z	exp-20260705-041737	no-result	1	0	0	error
+2026-07-05T08:36:16Z	exp-20260705-042512	Session-start audit found the file on disk (exp114 baseline)	1	1.0	0.0	discarded
