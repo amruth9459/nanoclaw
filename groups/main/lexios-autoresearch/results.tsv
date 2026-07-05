@@ -317,3 +317,6 @@ exp83-fix-exp72-80-regressions-76-docs	2026-04-24	1.0000	76	0.00	Apply all missi
 2026-07-05T08:17:37Z	exp-20260705-024935	Fixed baseline: live 79-doc run (unmodified exp114 code) sco	1	1.0	0.0	discarded
 2026-07-05T08:25:12Z	exp-20260705-041737	no-result	1	0	0	error
 2026-07-05T08:36:16Z	exp-20260705-042512	Session-start audit found the file on disk (exp114 baseline)	1	1.0	0.0	discarded
+2026-07-05T08:56:08Z	exp-20260705-043616	no-result	1	0	0	error
+2026-07-05T09:17:46Z	exp-20260705-045608	Fix remaining F1 gaps from exp113 (overall_f1=0.9904). Root 	1	0.9923	0.0	discarded
+2026-07-05T09:39:13Z	exp-20260705-051746	WRAPPER BUG (see memory/DEVLOG, not fixed here — out of scop	1	1.0	0.0	discarded
