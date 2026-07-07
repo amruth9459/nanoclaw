@@ -330,3 +330,10 @@ exp83-fix-exp72-80-regressions-76-docs	2026-04-24	1.0000	76	0.00	Apply all missi
 2026-07-06T07:41:34Z	exp-20260706-033501	Fix remaining F1 gaps from exp113 (overall_f1=0.9904). Root 	1	1.0	0.0	discarded
 2026-07-06T07:54:17Z	exp-20260706-034134	Fix remaining F1 gaps from exp113 (overall_f1=0.9904). Root 	1	1.0	0.0	discarded
 2026-07-06T08:02:48Z	exp-20260706-035417	no-result	1	0	0	error
+2026-07-07T06:14:50Z	exp-20260707-020005	DIAGNOSTIC (not a seed/injection change): measure the TRUE v	1	0.4193	0.0	discarded
+2026-07-07T06:34:00Z	exp-20260707-021450	no-result	1	0	0	error
+2026-07-07T06:47:01Z	exp-20260707-023400	DIAGNOSTIC + REAL PROMPT CHANGE (not another injection-seed 	1	1.0	0.0	discarded
+2026-07-07T06:56:51Z	exp-20260707-024701	WRAPPER BUG (see memory/DEVLOG, not fixed here — out of scop	1	1.0	0.0	discarded
+2026-07-07T07:02:18Z	exp-20260707-025651	no-result	1	0	0	error
+2026-07-07T07:12:50Z	exp-20260707-030218	SYSTEMIC BLOCKER (not fixed here — out of scope, requires hu	1	1.0	0.0	discarded
+2026-07-07T07:26:32Z	exp-20260707-072632	RESTORE (not a new hypothesis): traced why exp116's fix keeps vanishing (com.nanoclaw.backup cron re-commits the reverted file within ~2hrs of every run_nightly.sh discard, burying it under a new HEAD even after git commit). Restored exp116 byte-for-byte from commit c3f4b3a over a working tree that was already back at exp114 (zero-risk: working tree was identical to HEAD before restore). Validated with a single foreground --doc grandview run: F1=1.000 (3/4 pages real vision calls, not injection-only). This is a single-doc spot-check, NOT a full 91-doc corpus score — do not read new_f1 as an overall number. Wrapper bug confirmed unpatched; committed this restore anyway since the .git object survives even though the working tree will likely be reverted again by run_nightly.sh after this session ends.	1	1.0	0.0	discarded-expected(gate-broken)
