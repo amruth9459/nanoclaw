@@ -341,3 +341,14 @@ exp83-fix-exp72-80-regressions-76-docs	2026-04-24	1.0000	76	0.00	Apply all missi
 2026-07-07T07:42:20Z	exp-20260707-032836	no-result	1	0	0	error
 2026-07-07T08:23:10Z	exp-20260707-034220	DIAGNOSTIC (postprocess() no-op via LEXIOS_NO_INJECTION=1), 	1	0.2073	0.0	discarded
 2026-07-07T08:40:25Z	exp-20260707-042310	Fix remaining F1 gaps from exp113 (overall_f1=0.9904). Root 	1	0.2811	0.0	discarded
+2026-07-08T06:04:18Z	exp-20260708-020001	NOT a seed/injection change (91-doc manifest audit found onl	1	0.9935	0.0	discarded
+2026-07-08T06:11:06Z	exp-20260708-020418	no-result	1	0	0	error
+2026-07-08T06:15:48Z	exp-20260708-021106	no-result	1	0	0	error
+2026-07-08T06:20:22Z	exp-20260708-021548	no-result	1	0	0	error
+2026-07-08T06:33:35Z	exp-20260708-experiment5	SYSTEMIC BLOCKER re-confirmed (gate mathematically dead: BEST_F1=max(kept)=1.0, cant be exceeded). Real work instead: preprocess() now downscales oversized images to <=1568px before vision (fixes NBU_MedicalClinic_Arch Second_Floor JSON-parse failure). Real-vision F1 (LEXIOS_NO_INJECTION=1, --doc scoped): Clinic 0.0->0.2511 (target 0.50, First_Floor still 120s-timeout blocked). Duplex stable 0.4146 (target 0.70, no regression). Changes uncommitted in working tree.	1	0.2511	0.0	blocked-partial-fix-uncommitted
+2026-07-08T06:33:49Z	exp-20260708-022022	SYSTEMIC BLOCKER CONFIRMED (not another injection-seed round	1	0.4146	0.0	discarded
+2026-07-08T06:43:55Z	exp-20260708-023349	no-result	1	0	0	error
+2026-07-08T06:48:19Z	exp-20260708-024356	no-result	1	0	0	error
+2026-07-08T06:59:38Z	exp-20260708-024819	SYSTEMIC BLOCKER re-confirmed AGAIN this session (BEST_F1 ga	1	0.4146	0.0	discarded
+2026-07-08T07:09:24Z	exp-20260708-025938	NOT a seed/injection change. Re-derives and hardens a fix a 	1	0.3312	0.0	discarded
+2026-07-08T07:20:13Z	exp-20260708-030924	NOT a seed/injection change. Re-derives and hardens a fix a 	1	0.382	0.0	discarded
