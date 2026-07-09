@@ -352,3 +352,13 @@ exp83-fix-exp72-80-regressions-76-docs	2026-04-24	1.0000	76	0.00	Apply all missi
 2026-07-08T06:59:38Z	exp-20260708-024819	SYSTEMIC BLOCKER re-confirmed AGAIN this session (BEST_F1 ga	1	0.4146	0.0	discarded
 2026-07-08T07:09:24Z	exp-20260708-025938	NOT a seed/injection change. Re-derives and hardens a fix a 	1	0.3312	0.0	discarded
 2026-07-08T07:20:13Z	exp-20260708-030924	NOT a seed/injection change. Re-derives and hardens a fix a 	1	0.382	0.0	discarded
+2026-07-09T06:06:57Z	exp-20260709-020005	no-result	1	0	0	error
+2026-07-09T06:12:28Z	exp-20260709-020658	HUMAN: patch run_nightly.sh L82-85 (dead F1 gate) MEMORY Blo	1	1.0	0.0	discarded
+2026-07-09T06:21:30Z	exp-20260709-021228	no-result	1	0	0	error
+2026-07-09T06:41:26Z	exp-20260709-022130	no-result	1	0	0	error
+2026-07-09T06:45:13Z	exp-20260709-024126	Fix remaining F1 gaps from exp113 (overall_f1=0.9904). Root 	1	1.0	0.0	discarded
+2026-07-09T06:50:37Z	exp-20260709-024513	HUMAN: patch run_nightly.sh L82-85 (dead F1 gate, day 9+) se	1	1.0	0.0	discarded
+2026-07-09T06:55:18Z	exp-20260709-025037	Fix remaining F1 gaps from exp113 (overall_f1=0.9904). Root 	1	1.0	0.0	discarded
+2026-07-09T07:05:42Z	exp-20260709-025518	NOT another injection-seed round (dozens already sit at F1=1	1	0.3312	0.0	discarded
+2026-07-09T07:10:26Z	exp-20260709-030542	HUMAN ACTION NEEDED: run_nightly.sh L82-83/203/218 gate is m	1	1.0	0.0	discarded
+2026-07-09T07:14:45Z	exp-20260709-031026	no-result	1	0	0	error
