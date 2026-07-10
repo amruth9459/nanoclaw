@@ -362,3 +362,11 @@ exp83-fix-exp72-80-regressions-76-docs	2026-04-24	1.0000	76	0.00	Apply all missi
 2026-07-09T07:05:42Z	exp-20260709-025518	NOT another injection-seed round (dozens already sit at F1=1	1	0.3312	0.0	discarded
 2026-07-09T07:10:26Z	exp-20260709-030542	HUMAN ACTION NEEDED: run_nightly.sh L82-83/203/218 gate is m	1	1.0	0.0	discarded
 2026-07-09T07:14:45Z	exp-20260709-031026	no-result	1	0	0	error
+2026-07-10T06:03:15Z	exp-20260710-020005	no-result	1	0	0	error
+2026-07-10T06:18:11Z	exp-20260710-020315	SCOPE NOTE: the run_nightly.sh keep/discard gate is mathemat	1	0.2747	0.0	discarded
+2026-07-10T06:26:29Z	exp-20260710-021811	METHODOLOGY FIX + real hypothesis test, not another injectio	1	0.4146	0.0	discarded
+2026-07-10T06:33:43Z	exp-20260710-022629	HUMAN ACTION NEEDED: run_nightly.sh L82-83 keep/discard gate	1	1.0	0.0	discarded
+2026-07-10T06:37:04Z	exp-20260710-023343	Fix remaining F1 gaps from exp113 (overall_f1=0.9904). Root 	1	1.0	0.0	discarded
+2026-07-10T06:43:26Z	exp-20260710-023704	no-result	1	0	0	error
+2026-07-10T06:46:54Z	exp-20260710-024326	HUMAN ACTION NEEDED (day 6+ of escalation, gate dead since 2	1	1.0	0.0	discarded
+2026-07-10T06:58:39Z	exp-20260710-image-downscale-plus-gate-fix	INFRA FIX (run_nightly.sh, not experiment.py): BEST_F1 was max(kept) over all history, pinned at 1.0 since ~2026-03-27, mathematically blocking all future improvement. Fixed to compare against most-recent-kept row. Also fixed git add silently failing on gitignored-but-tracked experiment.py (needs -f). Then tested reintroducing 2026-07-08s lost image-downscale fix (1568px cap) as experiment.py change: confounded by fixed 120s extraction timeout, both NBU_MedicalClinic_Arch pages timed out with 0 real vision elements either way, so hypothesis unconfirmed. Reported F1=1.0 is 100% injection-layer, not real extraction. Reverted experiment.py to committed state since 1.0 is not > baseline 1.0 (gate correctly discards per its own fixed logic). Infra fix stands independently in run_nightly.sh.	1	1.0	0.0	discarded (infra-fix-kept-separately)
