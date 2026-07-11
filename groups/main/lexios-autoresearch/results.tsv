@@ -373,3 +373,11 @@ exp83-fix-exp72-80-regressions-76-docs	2026-04-24	1.0000	76	0.00	Apply all missi
 2026-07-10T07:12:19Z	exp-20260710-024654	SCOPE NOTE: the run_nightly.sh keep/discard gate is mathemat	1	1.0	0.0	discarded
 2026-07-10T07:16:26Z	exp-20260710-031219	HUMAN ACTION NEEDED: run_nightly.sh L82-83/203/218 keep/disc	1	1.0	0.0	discarded
 2026-07-10T07:21:27Z	exp-20260710-031626	Fix remaining F1 gaps from exp113 (overall_f1=0.9904). Root 	1	1.0	0.0	discarded
+2026-07-11T06:07:12Z	exp-20260711-020005	HUMAN ACTION NEEDED (day 11+, unpatched): run_nightly.sh L83	1	1.0	0.0	discarded
+2026-07-11T06:12:38Z	exp-20260711-020713	HUMAN ACTION NEEDED (day 12+, unpatched): run_nightly.sh L83	1	1.0	0.0	discarded
+2026-07-11T06:17:41Z	exp-20260711-021238	HUMAN ACTION NEEDED (day 12+, still unpatched): run_nightly.	1	1.0	0.0	discarded
+2026-07-11T06:26:41Z	exp-20260711-021741	Fix remaining F1 gaps from exp113 (overall_f1=0.9904). Root 	1	0.2747	0.0	discarded
+2026-07-11T06:33:53Z	exp-20260711-022641	no-result	1	0	0	error
+2026-07-11T06:41:14Z	exp-20260711-023353	HUMAN ACTION NEEDED (day 12+, unpatched): run_nightly.sh L83	1	1.0	0.0	discarded
+2026-07-11T07:03:38Z	exp-20260711-024114	NOT an injection/seed change (those are saturated — harness 	1	1.0	0.0	discarded
+2026-07-11T07:16:06Z	exp-20260711-030338	NOT a seed/injection change (injection logic is byte-identic	1	1.0	0.0	discarded
