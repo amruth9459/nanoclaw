@@ -264,13 +264,17 @@ export function startDailyDigest(
   const check = async () => {
     const now = new Date();
     const hour = now.getHours();
-    const dateKey = now.toISOString().slice(0, 10); // YYYY-MM-DD
+    // LOCAL date key (matches the local `hour`). Using the UTC date here caused
+    // the state row to be labeled a day off in western timezones.
+    const dateKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
 
     const mainJid = getMainJid();
     if (!mainJid) return;
 
-    // 9 AM morning brief
-    if (hour === 9 && getLastSentDate('morning') !== dateKey) {
+    // Morning brief — target 9 AM, but catch up any time before the evening
+    // window if it hasn't gone out yet (process down / WhatsApp disconnected
+    // during the 9 o'clock hour must not skip the whole day). dateKey dedups.
+    if (hour >= 9 && hour < 21 && getLastSentDate('morning') !== dateKey) {
       try {
         const brief = generateMorningBrief(getPendingApprovals?.());
         await sendMessage(mainJid, brief);
@@ -281,8 +285,8 @@ export function startDailyDigest(
       }
     }
 
-    // 9 PM evening report
-    if (hour === 21 && getLastSentDate('evening') !== dateKey) {
+    // Evening report — target 9 PM, catch up until midnight.
+    if (hour >= 21 && getLastSentDate('evening') !== dateKey) {
       try {
         const report = generateEveningReport();
         await sendMessage(mainJid, report);

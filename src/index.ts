@@ -1,5 +1,6 @@
 import fs from 'fs';
 import path from 'path';
+import { execFileSync } from 'child_process';
 
 import {
   ASSISTANT_NAME,
@@ -16,7 +17,9 @@ import {
   WARMUP_ON_START,
   DESKTOP_NOTIFY_JID,
   FREELANCE_AGENT_JID,
+  TIMEZONE,
 } from './config.js';
+import { CronExpressionParser } from 'cron-parser';
 import { WhatsAppChannel } from './channels/whatsapp.js';
 import {
   ContainerOutput,
@@ -889,8 +892,14 @@ async function processGroupMessages(chatJid: string): Promise<boolean> {
           ? validatedText.slice(0, maxLen) + '\n\n[Truncated — full output saved to file]'
           : validatedText;
         logger.info({ group: group.name, totalChars: validatedText.length }, 'Streaming complete');
-        await channel.sendMessage(chatJid, truncated);
-        outputSentToUser = true;
+        // Guard the send: a failure here (WhatsApp disconnected mid-stream) must
+        // not reject the streaming callback and wedge the container's promise.
+        try {
+          await channel.sendMessage(chatJid, truncated);
+          outputSentToUser = true;
+        } catch (err) {
+          logger.warn({ group: group.name, chatJid, err }, 'Failed to send streamed output to chat');
+        }
       }
       streamingBuffer = '';
       resetIdleTimer();
@@ -992,10 +1001,15 @@ async function runAgent(
     new Set(Object.keys(registeredGroups)),
   );
 
-  // Wrap onOutput to track session ID from streamed results
+  // Wrap onOutput to track session ID from streamed results.
+  // CRITICAL: never persist the session from a maxTurns run. The container starts
+  // a FRESH session whenever maxTurns is set (it doesn't resume), so its
+  // newSessionId is an empty throwaway. Warmup (maxTurns:1) runs on every restart;
+  // persisting its session would replace the group's real conversation with an
+  // empty "warming up" session — the dominant cause of context loss across restarts.
   const wrappedOnOutput = onOutput
     ? async (output: ContainerOutput) => {
-        if (output.newSessionId) {
+        if (output.newSessionId && !maxTurns) {
           sessions[group.folder] = output.newSessionId;
           setSession(group.folder, output.newSessionId);
         }
@@ -1649,14 +1663,26 @@ async function main(): Promise<void> {
   {
     try {
       const existingPid = fs.readFileSync(pidFile, 'utf-8').trim();
-      if (existingPid) {
+      if (existingPid && Number(existingPid) !== process.pid) {
+        // Verify the PID actually belongs to a live NanoClaw process. A bare
+        // process.kill(pid, 0) only proves *some* process has that id — after a
+        // reboot the id is often recycled to an unrelated process, which would
+        // make NanoClaw exit on every launchd start (permanent silent outage).
+        let isLiveNanoclaw = false;
         try {
-          process.kill(Number(existingPid), 0); // Check if process exists
+          const cmd = execFileSync('ps', ['-p', existingPid, '-o', 'command='], {
+            encoding: 'utf-8',
+            stdio: ['ignore', 'pipe', 'ignore'],
+          }).trim();
+          isLiveNanoclaw = cmd.includes('nanoclaw/dist') || cmd.includes('nanoclaw/src');
+        } catch {
+          isLiveNanoclaw = false; // no such process → stale pid file
+        }
+        if (isLiveNanoclaw) {
           logger.error({ existingPid }, 'Another NanoClaw instance is already running — exiting');
           process.exit(0); // Exit cleanly so launchd doesn't restart immediately
-        } catch {
-          // Process doesn't exist — stale pid file, continue
         }
+        logger.warn({ existingPid }, 'Stale/foreign PID file — taking over');
       }
     } catch {
       // No pid file — first run
@@ -1770,6 +1796,22 @@ async function main(): Promise<void> {
   logger.info('ResourceOrchestrator initialized');
   loadState();
 
+  // Repair pass: any active recurring task stranded with next_run=null can never
+  // fire (getDueTasks filters next_run IS NOT NULL). Recompute it from the cron.
+  {
+    for (const t of getAllTasks()) {
+      if (t.status === 'active' && t.schedule_type === 'cron' && !t.next_run) {
+        try {
+          const nextRun = CronExpressionParser.parse(t.schedule_value, { tz: TIMEZONE }).next().toISOString();
+          updateTask(t.id, { next_run: nextRun });
+          logger.info({ taskId: t.id, nextRun }, 'Repaired scheduled task with null next_run');
+        } catch (err) {
+          logger.warn({ taskId: t.id, err }, 'Could not repair task next_run (bad cron?)');
+        }
+      }
+    }
+  }
+
   // Auto-create shared-items-triage scheduled task if it doesn't exist
   {
     const existingTasks = getAllTasks();
@@ -1800,7 +1842,10 @@ Steps:
           schedule_type: 'cron',
           schedule_value: '0 9 * * *',
           context_mode: 'group',
-          next_run: null,
+          // Compute the first run time up front. getDueTasks() filters on
+          // next_run IS NOT NULL, and next_run is otherwise only ever set AFTER
+          // a run — so a null here means the task can never fire.
+          next_run: CronExpressionParser.parse('0 9 * * *', { tz: TIMEZONE }).next().toISOString(),
           status: 'active',
           created_at: new Date().toISOString(),
         });
@@ -1996,7 +2041,7 @@ Steps:
     getSessions: () => sessions,
     queue,
     orchestrator,
-    onProcess: (groupJid, proc, containerName, groupFolder) => queue.registerProcess(groupJid, proc, containerName, groupFolder),
+    onProcess: (groupJid, proc, containerName, groupFolder) => queue.registerProcess(groupJid, proc, containerName, groupFolder, true),
     sendMessage: async (jid, rawText) => {
       const text = formatOutbound(rawText);
       if (text) await clawSend(jid, text).catch((err) =>
@@ -2011,6 +2056,19 @@ Steps:
   // they trigger notifications — sending from the same number as the user gets
   // silenced by WhatsApp as "your own message". Falls back to WA1 if WA2 not in group.
   const clawSend = async (jid: string, text: string): Promise<void> => {
+    // Universal outbound sanitizer. clawSend is the shared exit for the scheduler,
+    // the MCP send_message tool (ipc.ts), and system notifications. The scheduler
+    // already runs formatOutbound (idempotent here); the MCP path does NOT, so this
+    // is where <internal> tags, invisible chars, safety-ack tails, and infra/API
+    // errors ("You've hit your limit", "API Error 401") get dropped before reaching
+    // a user's WhatsApp group regardless of which path produced them.
+    const clean = formatOutbound(text);
+    if (!clean) {
+      logger.info({ jid, preview: text.slice(0, 60) }, 'clawSend: suppressed empty/infra-error/boilerplate message');
+      return;
+    }
+    text = clean;
+
     // First, use ownsJid-based routing — respects registered group context
     // and prevents cross-channel contamination when a JID appears on multiple channels.
     const owned = findChannel(channels, jid);
@@ -2119,7 +2177,7 @@ Steps:
             group,
             input,
             (proc, containerName) => {
-              queue.registerProcess(groupJid, proc, containerName, group.folder);
+              queue.registerProcess(groupJid, proc, containerName, group.folder, true);
               queue.setDesignation(groupJid, 'dispatch', true);
               queue.setSpawnReason(groupJid, `Persona: ${input.personaId}`, true);
               // Mark dispatch as running now that container actually started

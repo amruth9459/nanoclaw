@@ -338,12 +338,19 @@ function buildVolumeMounts(
  * Read allowed secrets from .env for passing to the container via stdin.
  * Secrets are never written to disk or mounted as files.
  */
-function readSecrets(): Record<string, string> {
+function readSecrets(includeThirdPartyKeys: boolean): Record<string, string> {
   // NOTE: ANTHROPIC_API_KEY intentionally NOT passed to containers — use OAuth only
   // so container sessions are covered by the Pro subscription (no API billing).
   // API key is still used host-side by judge-system.ts and semantic-index.ts.
-  const fromEnvFile = readEnvFile(['CLAUDE_CODE_OAUTH_TOKEN',
-    'OPENAI_API_KEY', 'GOOGLE_API_KEY']);
+  //
+  // SECURITY: the OAuth token is required by every container to run Claude, but
+  // OPENAI_API_KEY / GOOGLE_API_KEY are only handed to trusted groups. Ephemeral
+  // guest groups (driven entirely by untrusted WhatsApp senders) don't get them,
+  // so a prompt-injected guest agent can't exfiltrate keys it never needed.
+  const keys = includeThirdPartyKeys
+    ? ['CLAUDE_CODE_OAUTH_TOKEN', 'OPENAI_API_KEY', 'GOOGLE_API_KEY']
+    : ['CLAUDE_CODE_OAUTH_TOKEN'];
+  const fromEnvFile = readEnvFile(keys);
 
   // Keychain-first: on macOS, always try reading the freshest token from Keychain
   // (maintained by Claude Code desktop). Falls back to .env if Keychain is unavailable.
@@ -547,7 +554,9 @@ export async function runContainerAgent(
 
   // Pre-flight: validate OAuth token before spawning container
   // Prevents 401 storms that trigger rate limits on the token endpoint
-  const secrets = readSecrets();
+  // Untrusted guest groups don't receive third-party API keys (see readSecrets).
+  const isGuestGroup = group.folder.startsWith('guest-');
+  const secrets = readSecrets(!isGuestGroup);
   const oauthToken = secrets['CLAUDE_CODE_OAUTH_TOKEN'];
   if (!oauthToken) {
     logger.error({ group: group.name }, 'No CLAUDE_CODE_OAUTH_TOKEN in .env — cannot spawn container');
@@ -650,7 +659,13 @@ export async function runContainerAgent(
             resetTimeout();
             // Call onOutput for all markers (including null results)
             // so idle timers start even for "silent" query completions.
-            outputChain = outputChain.then(() => onOutput(parsed));
+            // Swallow per-chunk errors: if onOutput rejects (e.g. a failed
+            // WhatsApp send), the chain must stay fulfilled so the close/timeout
+            // handlers below still resolve — otherwise this container's promise
+            // never settles and its queue slot leaks permanently.
+            outputChain = outputChain
+              .then(() => onOutput(parsed))
+              .catch((err) => logger.warn({ group: group.name, err }, 'onOutput callback failed (continuing)'));
 
             // Resource tracking: accumulate spend and check limits
             if (parsed.usage) {
@@ -764,7 +779,7 @@ export async function runContainerAgent(
             { group: group.name, containerName, duration, code },
             'Container timed out after output (idle cleanup)',
           );
-          outputChain.then(() => {
+          outputChain.finally(() => {
             resolve({
               status: 'success',
               result: null,
@@ -865,9 +880,10 @@ export async function runContainerAgent(
         return;
       }
 
-      // Streaming mode: wait for output chain to settle, return completion marker
+      // Streaming mode: wait for output chain to settle, return completion marker.
+      // .finally so a rejected chain still resolves (never leak the slot).
       if (onOutput) {
-        outputChain.then(() => {
+        outputChain.finally(() => {
           logger.info(
             { group: group.name, duration, newSessionId },
             'Container completed (streaming mode)',

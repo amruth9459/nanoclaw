@@ -22,9 +22,16 @@ interface GroupState {
   isWarmupContainer: boolean;
   pendingMessages: boolean;
   pendingTasks: QueuedTask[];
+  // Message/warmup slot (state.active). Kept separate from the task slot so a
+  // task container and a conversation container for the same group never share
+  // one process handle — otherwise each one's cleanup kills the other's VM.
   process: ChildProcess | null;
   containerName: string | null;
   groupFolder: string | null;
+  // Task slot (state.activeTask) — independent process handle.
+  taskProcess: ChildProcess | null;
+  taskContainerName: string | null;
+  taskGroupFolder: string | null;
   retryCount: number;
   spawnReason: string | null;   // why the current container was spawned (message preview or task description)
   taskSpawnReason: string | null; // why the current task container was spawned
@@ -56,6 +63,9 @@ export class GroupQueue {
         process: null,
         containerName: null,
         groupFolder: null,
+        taskProcess: null,
+        taskContainerName: null,
+        taskGroupFolder: null,
         retryCount: 0,
         spawnReason: null,
         taskSpawnReason: null,
@@ -77,9 +87,9 @@ export class GroupQueue {
    * Kill a container's OS process and stop its runtime container.
    * Safe to call even if the process is already dead.
    */
-  private killContainer(state: GroupState): void {
-    const proc = state.process;
-    const name = state.containerName;
+  private killContainer(state: GroupState, slot: 'message' | 'task'): void {
+    const proc = slot === 'task' ? state.taskProcess : state.process;
+    const name = slot === 'task' ? state.taskContainerName : state.containerName;
 
     // Kill the Node child process if still alive
     if (proc && !proc.killed) {
@@ -128,6 +138,7 @@ export class GroupQueue {
       const tracked = new Set<string>();
       for (const [, state] of this.groups) {
         if (state.containerName) tracked.add(state.containerName);
+        if (state.taskContainerName) tracked.add(state.taskContainerName);
       }
 
       const zombies = running.filter((name) => !tracked.has(name));
@@ -210,7 +221,7 @@ export class GroupQueue {
     fn()
       .catch((err) => logger.error({ groupJid, err }, 'Warmup failed'))
       .finally(() => {
-        this.killContainer(state);
+        this.killContainer(state, 'message');
         state.active = false;
         state.isWarmupContainer = false;
         state.process = null;
@@ -230,9 +241,14 @@ export class GroupQueue {
 
     const state = this.getGroup(groupJid);
 
-    // Prevent double-queuing of the same task
+    // Prevent double-queuing of the same task. But don't dead-end: if the task
+    // is queued yet a slot is now free and no task is running, nudge a drain so
+    // a task can't get permanently stranded (the "scheduler runs but doesn't
+    // trigger" bug — the scheduler re-enqueues the same id every 60s).
     if (state.pendingTasks.some((t) => t.id === taskId)) {
-      logger.debug({ groupJid, taskId }, 'Task already queued, skipping');
+      logger.debug({ groupJid, taskId }, 'Task already queued, nudging drain');
+      this.drainTasks(groupJid);
+      this.drainWaiting();
       return;
     }
 
@@ -261,11 +277,17 @@ export class GroupQueue {
     );
   }
 
-  registerProcess(groupJid: string, proc: ChildProcess, containerName: string, groupFolder?: string): void {
+  registerProcess(groupJid: string, proc: ChildProcess, containerName: string, groupFolder?: string, isTask = false): void {
     const state = this.getGroup(groupJid);
-    state.process = proc;
-    state.containerName = containerName;
-    if (groupFolder) state.groupFolder = groupFolder;
+    if (isTask) {
+      state.taskProcess = proc;
+      state.taskContainerName = containerName;
+      if (groupFolder) state.taskGroupFolder = groupFolder;
+    } else {
+      state.process = proc;
+      state.containerName = containerName;
+      if (groupFolder) state.groupFolder = groupFolder;
+    }
   }
 
   /** Set a human-readable reason for why the current container was spawned. */
@@ -387,7 +409,7 @@ export class GroupQueue {
       logger.error({ groupJid, err }, 'Error processing messages for group');
       this.scheduleRetry(groupJid, state);
     } finally {
-      this.killContainer(state);
+      this.killContainer(state, 'message');
       state.active = false;
       state.process = null;
       state.containerName = null;
@@ -397,6 +419,7 @@ export class GroupQueue {
       state.designation = null;
       this.activeCount--;
       this.drainMessages(groupJid);
+      this.drainTasks(groupJid);
       this.drainWaiting();
     }
   }
@@ -417,9 +440,12 @@ export class GroupQueue {
     } catch (err) {
       logger.error({ groupJid, taskId: task.id, err }, 'Error running task');
     } finally {
-      // Tasks share the same state.process — kill if still alive
-      this.killContainer(state);
+      // Task slot only — never touch the message container's handle.
+      this.killContainer(state, 'task');
       state.activeTask = false;
+      state.taskProcess = null;
+      state.taskContainerName = null;
+      state.taskGroupFolder = null;
       state.taskSpawnReason = null;
       state.taskStartedAt = null;
       state.taskDesignation = null;
@@ -487,6 +513,12 @@ export class GroupQueue {
         this.runForGroup(nextJid, 'drain').catch((err) =>
           logger.error({ groupJid: nextJid, err }, 'Unhandled error in runForGroup (waiting)'),
         );
+        // Message and task use independent slots — if this group also has a
+        // queued task, re-add it so the task gets its own slot too (otherwise
+        // the task is stranded until the next enqueue).
+        if (state.pendingTasks.length > 0 && !this.waitingGroups.includes(nextJid)) {
+          this.waitingGroups.push(nextJid);
+        }
       } else if (state.pendingTasks.length > 0 && !state.activeTask) {
         const task = state.pendingTasks.shift()!;
         this.runTask(nextJid, task).catch((err) =>
@@ -549,9 +581,15 @@ export class GroupQueue {
     for (const [, state] of this.groups) {
       if (state.containerName) {
         killed.push(state.containerName);
-        this.killContainer(state);
+        this.killContainer(state, 'message');
         state.process = null;
         state.containerName = null;
+      }
+      if (state.taskContainerName) {
+        killed.push(state.taskContainerName);
+        this.killContainer(state, 'task');
+        state.taskProcess = null;
+        state.taskContainerName = null;
       }
     }
 

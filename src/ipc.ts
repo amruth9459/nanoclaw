@@ -524,6 +524,30 @@ export function startIpcWatcher(deps: IpcDeps): void {
                   continue;
                 }
 
+                // ── cmux session bridge (view/drive Claude Code sessions) ──
+                if (data.type === 'cmux') {
+                  const responseFile = filePath.replace('.json', '.response.json');
+                  if (!isMain) {
+                    logger.warn({ sourceGroup }, 'Unauthorized cmux attempt blocked');
+                    fs.writeFileSync(responseFile, JSON.stringify({ success: false, error: 'Unauthorized: cmux control is only available in the main group' }));
+                    fs.unlinkSync(filePath);
+                    continue;
+                  }
+
+                  const { runCmuxAction } = await import('./cmux-bridge.js');
+                  const result = await runCmuxAction({
+                    action: data.action as import('./cmux-bridge.js').CmuxAction,
+                    workspace: data.workspace as string | undefined,
+                    text: data.text as string | undefined,
+                    lines: data.lines as number | undefined,
+                    submit: data.submit as boolean | undefined,
+                    title: data.title as string | undefined,
+                  });
+                  fs.writeFileSync(responseFile, JSON.stringify(result));
+                  fs.unlinkSync(filePath);
+                  continue;
+                }
+
                 if (data.type === 'send_file' && data.chatJid && data.filePath) {
                   // Authorization: non-main groups can only send files to their own JID
                   const fileTargetGroup = registeredGroups[data.chatJid as string];
@@ -979,16 +1003,35 @@ export function startIpcWatcher(deps: IpcDeps): void {
 }
 
 /**
+ * Ensure a resolved path stays within an allowed base directory.
+ * SECURITY: container-supplied paths (responseFile, filePath) are untrusted —
+ * a prompt-injected agent can emit "/workspace/ipc/../../../etc" or an absolute
+ * host path. Reject anything that escapes the group's own directory. Throwing is
+ * safe: both IPC loops catch and quarantine the offending file to errors/.
+ */
+function assertWithinBase(candidate: string, base: string, label: string): string {
+  const resolved = path.resolve(candidate);
+  const resolvedBase = path.resolve(base);
+  if (resolved !== resolvedBase && !resolved.startsWith(resolvedBase + path.sep)) {
+    throw new Error(`IPC path escapes ${label}: ${candidate}`);
+  }
+  return resolved;
+}
+
+/**
  * Translate a container-relative IPC path to the host filesystem path.
  * Container sees: /workspace/ipc/messages/foo.json
  * Host maps to:   data/ipc/{groupFolder}/messages/foo.json
  */
 export function toHostIpcPath(containerPath: string, groupFolder: string): string {
+  const base = path.join(DATA_DIR, 'ipc', groupFolder);
   const containerPrefix = '/workspace/ipc/';
   if (containerPath.startsWith(containerPrefix)) {
-    return path.join(DATA_DIR, 'ipc', groupFolder, containerPath.slice(containerPrefix.length));
+    return assertWithinBase(path.join(base, containerPath.slice(containerPrefix.length)), base, 'ipc dir');
   }
-  return containerPath; // already a host-side path
+  // Otherwise it must already be a host-side path we generated — it still has to
+  // live inside this group's ipc dir. Reject absolute-path / traversal abuse.
+  return assertWithinBase(containerPath, base, 'ipc dir');
 }
 
 /**
@@ -1001,18 +1044,22 @@ export function toHostIpcPath(containerPath: string, groupFolder: string): strin
  */
 function toHostWorkspacePath(containerPath: string, groupFolder: string): string {
   if (containerPath.startsWith('/workspace/group/')) {
-    return path.join(GROUPS_DIR, groupFolder, containerPath.slice('/workspace/group/'.length));
+    const base = path.join(GROUPS_DIR, groupFolder);
+    return assertWithinBase(path.join(base, containerPath.slice('/workspace/group/'.length)), base, 'group dir');
   }
   if (containerPath.startsWith('/workspace/global/')) {
-    return path.join(GROUPS_DIR, 'global', containerPath.slice('/workspace/global/'.length));
+    const base = path.join(GROUPS_DIR, 'global');
+    return assertWithinBase(path.join(base, containerPath.slice('/workspace/global/'.length)), base, 'global dir');
   }
   if (containerPath.startsWith('/workspace/ipc/')) {
     return toHostIpcPath(containerPath, groupFolder);
   }
   if (containerPath.startsWith('/workspace/media/')) {
-    return path.join(STORE_DIR, 'media', containerPath.slice('/workspace/media/'.length));
+    const base = path.join(STORE_DIR, 'media');
+    return assertWithinBase(path.join(base, containerPath.slice('/workspace/media/'.length)), base, 'media dir');
   }
-  return containerPath;
+  // Unknown prefix — not a legitimate workspace mount. Reject.
+  throw new Error(`IPC path is not a recognized workspace path: ${containerPath}`);
 }
 
 export function writeIpcResponse(responseFile: string, data: object): void {

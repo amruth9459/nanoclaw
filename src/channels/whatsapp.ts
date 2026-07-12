@@ -1,4 +1,4 @@
-import { exec, execSync } from 'child_process';
+import { exec, execSync, execFileSync } from 'child_process';
 import fs from 'fs';
 import path from 'path';
 
@@ -810,11 +810,23 @@ export class WhatsAppChannel implements Channel {
       // Ensure media directory exists
       fs.mkdirSync(MEDIA_DIR, { recursive: true });
 
-      // Save to disk with message ID as filename
+      // Save to disk with message ID as filename.
+      // SECURITY: `extension` derives from attacker-controlled protobuf fields
+      // (mimetype / document fileName). Whitelist it to alphanumerics so it can
+      // neither traverse the path (../) nor inject shell metacharacters into the
+      // sips/ffmpeg commands below. Any sender in any registered group can set
+      // these fields, so this runs before every media message touches the disk.
+      const safeExt = (extension || 'bin').toLowerCase().replace(/[^a-z0-9]/g, '').slice(0, 5) || 'bin';
       const messageId = msg.key.id || `${Date.now()}`;
       const sanitizedId = messageId.replace(/[^a-zA-Z0-9-_]/g, '_');
-      const filename = `${sanitizedId}.${extension}`;
+      const filename = `${sanitizedId}.${safeExt}`;
       const filePath = path.join(MEDIA_DIR, filename);
+
+      // Defense in depth: never write outside MEDIA_DIR.
+      if (!path.resolve(filePath).startsWith(path.resolve(MEDIA_DIR) + path.sep)) {
+        logger.warn({ messageId, filePath }, 'Refusing media write outside MEDIA_DIR');
+        return null;
+      }
 
       fs.writeFileSync(filePath, buffer);
 
@@ -822,8 +834,9 @@ export class WhatsAppChannel implements Channel {
       // 1568px gives headroom and is Claude's recommended long-edge for best quality/token ratio).
       if (mediaType === 'image' && process.platform === 'darwin') {
         try {
-          execSync(
-            `sips --resampleHeightWidthMax 1568 "${filePath}"`,
+          execFileSync(
+            'sips',
+            ['--resampleHeightWidthMax', '1568', filePath],
             { stdio: 'pipe', timeout: 30000 },
           );
           const newSize = fs.statSync(filePath).size;
@@ -840,8 +853,9 @@ export class WhatsAppChannel implements Channel {
           // Extract up to 4 evenly-spaced keyframes so the agent can see the video
           const duration = (() => {
             try {
-              const out = execSync(
-                `ffprobe -v error -show_entries format=duration -of csv=p=0 "${filePath}"`,
+              const out = execFileSync(
+                'ffprobe',
+                ['-v', 'error', '-show_entries', 'format=duration', '-of', 'csv=p=0', filePath],
                 { stdio: 'pipe', timeout: 10000 },
               ).toString().trim();
               return parseFloat(out) || 10;
@@ -851,12 +865,13 @@ export class WhatsAppChannel implements Channel {
           for (let i = 0; i < frameCount; i++) {
             const timestamp = Math.min(duration * (i + 1) / (frameCount + 1), duration - 0.5);
             const framePath = `${filePath}.frame${i}.jpg`;
-            execSync(
-              `ffmpeg -i "${filePath}" -ss ${timestamp.toFixed(2)} -vframes 1 -q:v 2 "${framePath}" -y`,
+            execFileSync(
+              'ffmpeg',
+              ['-i', filePath, '-ss', timestamp.toFixed(2), '-vframes', '1', '-q:v', '2', framePath, '-y'],
               { stdio: 'pipe', timeout: 15000 },
             );
             if (process.platform === 'darwin' && fs.existsSync(framePath)) {
-              try { execSync(`sips --resampleHeightWidthMax 1568 "${framePath}"`, { stdio: 'pipe', timeout: 10000 }); } catch {}
+              try { execFileSync('sips', ['--resampleHeightWidthMax', '1568', framePath], { stdio: 'pipe', timeout: 10000 }); } catch {}
             }
           }
           // Keep backward-compatible thumbnail
@@ -867,7 +882,7 @@ export class WhatsAppChannel implements Channel {
           // Extract audio track for transcription
           const audioTrack = `${filePath}.audio.ogg`;
           try {
-            execSync(`ffmpeg -i "${filePath}" -vn -acodec libopus -y "${audioTrack}"`, { stdio: 'pipe', timeout: 30000 });
+            execFileSync('ffmpeg', ['-i', filePath, '-vn', '-acodec', 'libopus', '-y', audioTrack], { stdio: 'pipe', timeout: 30000 });
           } catch { /* no audio track or ffmpeg issue */ }
           logger.info({ messageId, frameCount, duration: duration.toFixed(1) }, 'Video frames extracted');
         } catch {
@@ -900,7 +915,7 @@ export class WhatsAppChannel implements Channel {
           const venvPython = path.join(process.cwd(), '.venv', 'bin', 'python3');
           const transcribeScript = path.join(process.cwd(), 'scripts', 'transcribe.py');
           if (fs.existsSync(venvPython) && fs.existsSync(transcribeScript)) {
-            const result = execSync(`"${venvPython}" "${transcribeScript}" "${target}"`, {
+            const result = execFileSync(venvPython, [transcribeScript, target], {
               stdio: 'pipe',
               timeout: 120000, // 2 min for large files
               env: { ...process.env, TOKENIZERS_PARALLELISM: 'false' },

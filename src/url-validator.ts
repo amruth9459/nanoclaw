@@ -3,9 +3,49 @@
  * Strips dead links, homepages, and expired listings.
  */
 
+import dns from 'dns';
+import net from 'net';
+
 import { logger } from './logger.js';
 
 const URL_REGEX = /https?:\/\/[^\s"')>\]]+/g;
+
+/**
+ * SSRF guard. These URLs come from agent output driven by untrusted WhatsApp
+ * input; the host must never be tricked into fetching internal endpoints
+ * (cloud metadata 169.254.169.254, localhost services, RFC1918, Tailscale CGNAT).
+ */
+function isPrivateIp(ip: string): boolean {
+  if (net.isIPv4(ip)) {
+    const p = ip.split('.').map(Number);
+    if (p[0] === 127 || p[0] === 10 || p[0] === 0) return true;
+    if (p[0] === 169 && p[1] === 254) return true;            // link-local + metadata
+    if (p[0] === 172 && p[1] >= 16 && p[1] <= 31) return true;
+    if (p[0] === 192 && p[1] === 168) return true;
+    if (p[0] === 100 && p[1] >= 64 && p[1] <= 127) return true; // CGNAT / Tailscale
+    return false;
+  }
+  const v6 = ip.toLowerCase();
+  if (v6 === '::1' || v6 === '::') return true;
+  if (v6.startsWith('fe80') || v6.startsWith('fc') || v6.startsWith('fd')) return true;
+  const mapped = v6.match(/::ffff:(\d+\.\d+\.\d+\.\d+)$/);
+  if (mapped) return isPrivateIp(mapped[1]);
+  return false;
+}
+
+async function isBlockedTarget(hostname: string): Promise<boolean> {
+  const h = hostname.toLowerCase().replace(/^\[|\]$/g, '');
+  if (h === 'localhost' || h.endsWith('.localhost') || h.endsWith('.internal') || h.endsWith('.local')) {
+    return true;
+  }
+  if (net.isIP(h)) return isPrivateIp(h);
+  try {
+    const records = await dns.promises.lookup(h, { all: true });
+    return records.some((r) => isPrivateIp(r.address));
+  } catch {
+    return false; // DNS failure is handled downstream as an unreachable URL
+  }
+}
 
 // URLs that are informational (government sites, reference docs) — skip validation
 const SKIP_DOMAINS = new Set([
@@ -37,24 +77,33 @@ interface ValidationResult {
 async function validateUrl(url: string, timeoutMs = 8000): Promise<ValidationResult> {
   try {
     // Skip informational/reference URLs
-    const domain = new URL(url).hostname.replace(/^www\./, '');
+    const parsed = new URL(url);
+    const domain = parsed.hostname.replace(/^www\./, '');
     if (SKIP_DOMAINS.has(domain)) {
       return { url, status: 200, valid: true, reason: 'reference-domain-skipped' };
+    }
+
+    // SSRF guard: refuse to fetch internal/private targets.
+    if (await isBlockedTarget(parsed.hostname)) {
+      logger.warn({ url, hostname: parsed.hostname }, 'URL validation: blocked internal/private target (SSRF guard)');
+      return { url, status: 0, valid: false, reason: 'blocked-internal-target' };
     }
 
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), timeoutMs);
 
+    // redirect: 'manual' — don't auto-follow to an internal target that a public
+    // URL 302-redirects to (SSRF bypass). A 3xx just means the link is live.
     const resp = await fetch(url, {
       method: 'HEAD',
-      redirect: 'follow',
+      redirect: 'manual',
       signal: controller.signal,
       headers: { 'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36' },
     }).catch(async () => {
       // HEAD might be blocked, try GET
       return fetch(url, {
         method: 'GET',
-        redirect: 'follow',
+        redirect: 'manual',
         signal: controller.signal,
         headers: { 'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36' },
       });

@@ -45,7 +45,11 @@ export interface ObserverGuardConfig {
 export const DEFAULT_CONFIG: ObserverGuardConfig = {
   maxConcurrentTasks: 8, // 64GB RAM / ~8GB avg per task container
   maxConcurrentPerGroup: 2,
-  taskTimeoutMs: 10 * 60 * 1000, // 10 minutes
+  // Must be >= the container's own timeout (CONTAINER_TIMEOUT, default 30 min),
+  // plus container spawn overhead — otherwise the guard winds down long
+  // scheduled tasks (daily reports, freelance hunts) mid-work before they can
+  // finish. Override with NANOCLAW_GUARD_TIMEOUT_MS.
+  taskTimeoutMs: parseInt(process.env.NANOCLAW_GUARD_TIMEOUT_MS || '', 10) || 31 * 60 * 1000,
   failureThreshold: 3,
   throttleBackoffMs: 15 * 60 * 1000, // 15 minutes
   lazyStartDelayMs: 5 * 1000, // 5 seconds

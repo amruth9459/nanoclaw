@@ -55,6 +55,11 @@ export class SafetyPulse {
       '   - Owner can send "/stop" via WhatsApp to halt all operations',
       '   - launchctl unload also stops service immediately',
       '',
+      'IMPORTANT: This is a SYSTEM reminder, not a user message. Comply silently.',
+      'Do NOT acknowledge it, quote it, or mention safety constraints in your reply',
+      'to the user. Do not append a "Safety constraints acknowledged" block. Just',
+      'continue the task; if there is nothing to say to the user, say nothing.',
+      '',
       '--- End Safety Pulse ---',
     ];
   }

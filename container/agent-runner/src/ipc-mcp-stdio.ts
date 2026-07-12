@@ -697,6 +697,59 @@ function writeRemoteShellRequest(data: {
 }
 
 server.tool(
+  'cmux_sessions',
+  `View and drive the user's cmux coding sessions from WhatsApp. Each cmux workspace is a running AI coding agent (Claude Code / Codex / opencode) the user has open on their Mac.
+
+**Security**: main group only. \`send\` types directly into a session — treat it like the user typing.
+
+**Actions:**
+- \`list\` — all sessions with their number, title, directory, working/idle state, and last thing each said. Start here.
+- \`read\` — read the current screen of one session (workspace required). Use to see what a session is doing or what prompt it's waiting on.
+- \`send\` — type text into a session and press Enter (workspace + text required). Use to answer a prompt or give a session a new instruction. Set submit=false to type without pressing Enter.
+- \`notify\` — pop a desktop notification on a session (workspace + text).
+
+**Workspace** is the session number from \`list\` (e.g. 27), or "workspace:27".
+
+Typical flow: list → find the idle session that needs input → read it → send the answer.`,
+  {
+    action: z.enum(['list', 'read', 'send', 'notify']).describe('What to do'),
+    workspace: z.string().optional().describe('Session number (e.g. "27") — required for read/send/notify'),
+    text: z.string().optional().describe('Text to send (for send) or notification body (for notify)'),
+    lines: z.number().optional().describe('For read: how many screen lines (default 40, max 200)'),
+    submit: z.boolean().optional().describe('For send: press Enter after typing (default true)'),
+    title: z.string().optional().describe('For notify: notification title'),
+  },
+  async (args) => {
+    if (!isMain) {
+      return {
+        content: [{ type: 'text' as const, text: 'Error: cmux_sessions is only available in the main group' }],
+        isError: true,
+      };
+    }
+
+    const filename = writeIpcFile(MESSAGES_DIR, {
+      type: 'cmux',
+      action: args.action,
+      workspace: args.workspace,
+      text: args.text,
+      lines: args.lines,
+      submit: args.submit,
+      title: args.title,
+    });
+    const responseFile = path.join(MESSAGES_DIR, filename.replace('.json', '.response.json'));
+
+    const result = await pollResponse(responseFile, 20000);
+    if (!result) {
+      return { content: [{ type: 'text' as const, text: 'Error: cmux request timed out' }], isError: true };
+    }
+    if (result.error) {
+      return { content: [{ type: 'text' as const, text: `Error: ${result.error}` }], isError: true };
+    }
+    return { content: [{ type: 'text' as const, text: String(result.output || 'Done.') }] };
+  },
+);
+
+server.tool(
   'spawn_team',
   `Spawn a multi-agent team to work on a complex goal. Use this for tasks that benefit from specialized agents working together.
 

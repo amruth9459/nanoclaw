@@ -17,6 +17,7 @@ import {
   getTaskById,
   logTaskRun,
   logUsage,
+  updateTask,
   updateTaskAfterRun,
 } from './db.js';
 import { calculateCost, getActiveProvider } from './economics.js';
@@ -286,16 +287,34 @@ async function runTask(
   });
 
   let nextRun: string | null = null;
-  if (task.schedule_type === 'cron') {
-    const interval = CronExpressionParser.parse(task.schedule_value, {
-      tz: TIMEZONE,
+  try {
+    if (task.schedule_type === 'cron') {
+      const interval = CronExpressionParser.parse(task.schedule_value, {
+        tz: TIMEZONE,
+      });
+      nextRun = interval.next().toISOString();
+    } else if (task.schedule_type === 'interval') {
+      const ms = parseInt(task.schedule_value, 10);
+      if (!Number.isFinite(ms) || ms <= 0) throw new Error(`invalid interval: ${task.schedule_value}`);
+      nextRun = new Date(Date.now() + ms).toISOString();
+    }
+    // 'once' tasks have no next run
+  } catch (schedErr) {
+    // A bad schedule must not leave next_run in the past — that reruns the task
+    // every poll forever. Pause it and surface the error.
+    const msg = schedErr instanceof Error ? schedErr.message : String(schedErr);
+    logger.error({ taskId: task.id, schedule: task.schedule_value, err: msg }, 'Invalid task schedule — pausing task');
+    updateTask(task.id, { status: 'paused', next_run: null });
+    logTaskRun({
+      task_id: task.id,
+      run_at: new Date().toISOString(),
+      duration_ms: 0,
+      status: 'error',
+      result: null,
+      error: `Paused: invalid schedule "${task.schedule_value}" (${msg})`,
     });
-    nextRun = interval.next().toISOString();
-  } else if (task.schedule_type === 'interval') {
-    const ms = parseInt(task.schedule_value, 10);
-    nextRun = new Date(Date.now() + ms).toISOString();
+    return;
   }
-  // 'once' tasks have no next run
 
   const resultSummary = error
     ? `Error: ${error}`
@@ -321,6 +340,12 @@ export function startSchedulerLoop(deps: SchedulerDependencies): void {
   // Track when we last ran cleanup (once per day)
   let lastCleanupDay = new Date().getDate();
 
+  // Task IDs currently queued or running. next_run is only advanced AFTER a run
+  // completes, so a task taking >1 poll interval stays "due" and would be
+  // re-enqueued every tick (running the daily report twice, tripling cost).
+  // Guard here so each due task is enqueued at most once per firing.
+  const inFlight = new Set<string>();
+
   const loop = async () => {
     try {
       // Run daily media cleanup at midnight
@@ -342,10 +367,22 @@ export function startSchedulerLoop(deps: SchedulerDependencies): void {
           continue;
         }
 
+        // Skip if this task is already queued or running from a prior tick.
+        if (inFlight.has(currentTask.id)) {
+          continue;
+        }
+        inFlight.add(currentTask.id);
+
         deps.queue.enqueueTask(
           currentTask.chat_jid,
           currentTask.id,
-          () => runTask(currentTask, deps),
+          async () => {
+            try {
+              await runTask(currentTask, deps);
+            } finally {
+              inFlight.delete(currentTask.id);
+            }
+          },
         );
       }
     } catch (err) {
