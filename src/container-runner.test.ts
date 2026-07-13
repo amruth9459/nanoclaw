@@ -67,6 +67,7 @@ vi.mock('./container-runtime.js', () => ({
   CONTAINER_RUNTIME_BIN: 'docker',
   readonlyMountArgs: vi.fn((hostPath: string, containerPath: string) => ['-v', `${hostPath}:${containerPath}:ro`]),
   stopContainer: vi.fn((name: string) => `docker stop ${name}`),
+  removeContainer: vi.fn((_name: string) => {}),
 }));
 
 // Create a controllable fake ChildProcess
