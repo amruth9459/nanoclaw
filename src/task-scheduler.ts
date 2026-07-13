@@ -235,7 +235,10 @@ async function runTask(
             logUsage(task.group_folder, task.chat_jid, streamedOutput.usage, durationMs, true, costUsd, purpose, getActiveProvider());
             logger.info({ taskId: task.id, costUsd, usage: streamedOutput.usage }, 'Task cost tracked');
           }
-          deps.queue.notifyIdle(task.chat_jid);
+          // NOTE: do NOT call notifyIdle here — it mutates the *message* slot
+          // (idleWaiting + _close to the live conversation container). A task
+          // finishing must not tear down a parallel message container. The task
+          // winds down via scheduleClose() → closeTaskStdin() below.
           // Tasks that signal success without populating `result` (e.g. agent sent
           // the WhatsApp reply via MCP tool, then returned silent success) won't
           // hit the result-branch above. Schedule close here too — otherwise

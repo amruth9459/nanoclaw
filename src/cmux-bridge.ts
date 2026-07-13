@@ -17,11 +17,36 @@
  */
 import { execFile } from 'child_process';
 import { promisify } from 'util';
+import fs from 'fs';
+import path from 'path';
 
 const execFileAsync = promisify(execFile);
 
 const CMUX_BIN =
   process.env.CMUX_BIN || '/Applications/cmux.app/Contents/Resources/bin/cmux';
+
+/**
+ * Read cmux's configured socket password from ~/.config/cmux/cmux.json so the
+ * daemon can authenticate to cmux without duplicating the secret in the plist.
+ * The file is JSONC (comments); strip them before parsing. Returns '' if unset.
+ */
+function readCmuxSocketPassword(): string {
+  if (process.env.CMUX_SOCKET_PASSWORD) return process.env.CMUX_SOCKET_PASSWORD;
+  try {
+    const home = process.env.HOME || '/Users/amrut';
+    const raw = fs.readFileSync(path.join(home, '.config', 'cmux', 'cmux.json'), 'utf-8');
+    const stripped = raw
+      .replace(/\/\*[\s\S]*?\*\//g, '')
+      .split('\n')
+      .map((l) => l.replace(/(^|[^:])\/\/.*$/, '$1'))
+      .join('\n');
+    const cfg = JSON.parse(stripped);
+    const pw = cfg?.automation?.socketPassword;
+    return typeof pw === 'string' ? pw : '';
+  } catch {
+    return '';
+  }
+}
 
 export type CmuxAction = 'list' | 'read' | 'send' | 'notify';
 
@@ -71,7 +96,8 @@ async function runCmux(args: string[], timeoutMs = 15000): Promise<string> {
     CMUX_QUIET: '1',
   };
   if (process.env.CMUX_SOCKET_PATH) env.CMUX_SOCKET_PATH = process.env.CMUX_SOCKET_PATH;
-  if (process.env.CMUX_SOCKET_PASSWORD) env.CMUX_SOCKET_PASSWORD = process.env.CMUX_SOCKET_PASSWORD;
+  const pw = readCmuxSocketPassword();
+  if (pw) env.CMUX_SOCKET_PASSWORD = pw;
   const { stdout } = await execFileAsync(CMUX_BIN, args, {
     env,
     timeout: timeoutMs,
