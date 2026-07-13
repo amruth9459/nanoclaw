@@ -52,19 +52,28 @@ function normalizeWorkspace(raw: string): string {
   );
 }
 
-/** Minimal environment the cmux CLI needs, matching the launchd daemon env. */
-function cmuxEnv(): NodeJS.ProcessEnv {
-  return {
+/**
+ * Invoke the cmux CLI.
+ *
+ * cmux's control socket defaults to `socketControlMode: "cmuxOnly"` — only
+ * cmux's own descendant processes may drive it. So this works out of the box
+ * only when NanoClaw itself runs inside a cmux tab (e.g. `npm run dev` launched
+ * from cmux). When NanoClaw runs as the background launchd daemon it is NOT a
+ * cmux descendant, so cmux drops the connection (EPIPE / "Broken pipe"). To
+ * enable it there, set a socket password in cmux
+ * (automation.socketControlMode = "password" + socketPassword) and export
+ * CMUX_SOCKET_PASSWORD to the daemon — forwarded here. See docs/CMUX_BRIDGE.md.
+ */
+async function runCmux(args: string[], timeoutMs = 15000): Promise<string> {
+  const env: NodeJS.ProcessEnv = {
     HOME: process.env.HOME || '/Users/amrut',
     PATH: process.env.PATH || '/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin',
     CMUX_QUIET: '1',
-    ...(process.env.CMUX_SOCKET_PATH ? { CMUX_SOCKET_PATH: process.env.CMUX_SOCKET_PATH } : {}),
   };
-}
-
-async function runCmux(args: string[], timeoutMs = 15000): Promise<string> {
+  if (process.env.CMUX_SOCKET_PATH) env.CMUX_SOCKET_PATH = process.env.CMUX_SOCKET_PATH;
+  if (process.env.CMUX_SOCKET_PASSWORD) env.CMUX_SOCKET_PASSWORD = process.env.CMUX_SOCKET_PASSWORD;
   const { stdout } = await execFileAsync(CMUX_BIN, args, {
-    env: cmuxEnv(),
+    env,
     timeout: timeoutMs,
     maxBuffer: 4 * 1024 * 1024,
   });
