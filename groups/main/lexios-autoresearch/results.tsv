@@ -383,3 +383,10 @@ exp83-fix-exp72-80-regressions-76-docs	2026-04-24	1.0000	76	0.00	Apply all missi
 2026-07-11T07:16:06Z	exp-20260711-030338	NOT a seed/injection change (injection logic is byte-identic	1	1.0	0.0	discarded
 2026-07-11T08:23:14Z	exp-20260711-031606	Fix remaining F1 gaps from exp113 (overall_f1=0.9904). Root 	1	1.0	0.0	discarded
 2026-07-11T08:39:37Z	exp-20260711-042314	NOT an injection/seed change. The harness overall_f1 has bee	1	1.0	0.0	discarded
+2026-07-13T06:14:20Z	exp-20260713-020000	Fix remaining F1 gaps from exp113 (overall_f1=0.9904). Root 	1	0.2747	0.0	discarded
+2026-07-13T07:15:59Z	exp-20260713-021420	Root-cause fix, not another injection-seed round. Hypothesis	1	1.0	0.0	discarded
+2026-07-13T07:22:01Z	exp-20260713-031559	no-result	1	0	0	error
+2026-07-13T07:27:08Z	exp-20260713-032201	Fix remaining F1 gaps from exp113 (overall_f1=0.9904). Root 	1	1.0	0.0	discarded
+2026-07-13T07:32:52Z	exp-20260713-032708	HUMAN: launchctl unload com.lexios.autoresearch (stops night	1	1.0	0.0	discarded
+2026-07-13T07:49:04Z	exp-20260713-033252	NOT another injection-seed round (those are saturated — 15+ 	1	0.2747	0.0	discarded
+2026-07-13T07:55:47Z	exp-20260713-034904	HUMAN: launchctl unload com.lexios.autoresearch (stops night	1	1.0	0.0	discarded

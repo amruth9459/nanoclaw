@@ -655,6 +655,10 @@ def preprocess(image_path: str) -> str:
     2. stdin stall: claude --print hangs indefinitely when stdin is not closed
        (inherited pipe from parent). Inject stdin=DEVNULL when not already set.
        This matches the CLAUDE.md documented pattern for desktop_claude invocations.
+    3. Image downscale: renders above ~1568px on the long edge (Claude vision's
+       efficient-tokenization ceiling) were causing JSON-parse failures on
+       NBU_MedicalClinic_Arch (2516x3539 / 2893x3539px, 0 raw elements extracted —
+       diagnosed 2026-07-08). Re-applied here after being dropped from commit 2b22f9d.
     """
     import subprocess as _sp
     if not hasattr(_sp, "_claude_arg_fix_applied"):
@@ -674,6 +678,25 @@ def preprocess(image_path: str) -> str:
 
         _sp.run = _fixed_run
         _sp._claude_arg_fix_applied = True
+
+    # Fix 3: downscale oversized images
+    if image_path and os.path.exists(image_path):
+        try:
+            from PIL import Image
+            img = Image.open(image_path)
+            long_edge = max(img.size)
+            if long_edge > 1568:
+                scale = 1568 / long_edge
+                new_size = (max(1, round(img.size[0] * scale)), max(1, round(img.size[1] * scale)))
+                resized = img.convert("RGB").resize(new_size, Image.LANCZOS)
+                cache_dir = Path("/tmp/lexios-autoresearch-downscale")
+                cache_dir.mkdir(parents=True, exist_ok=True)
+                out_path = cache_dir / Path(image_path).name
+                resized.save(out_path)
+                print(f"[preprocess] downscaled {Path(image_path).name}: {img.size} -> {new_size}")
+                return str(out_path)
+        except Exception as e:
+            print(f"[preprocess] WARN: downscale failed for {image_path}: {e}")
     return image_path
 
 
