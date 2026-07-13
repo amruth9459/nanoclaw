@@ -35,14 +35,15 @@ function readCmuxSocketPassword(): string {
   try {
     const home = process.env.HOME || '/Users/amrut';
     const raw = fs.readFileSync(path.join(home, '.config', 'cmux', 'cmux.json'), 'utf-8');
-    const stripped = raw
-      .replace(/\/\*[\s\S]*?\*\//g, '')
+    // JSONC with trailing commas — don't JSON.parse. Drop whole-line comments so
+    // cmux's commented example socketPassword can't shadow the real one, then
+    // regex the active value out.
+    const active = raw
       .split('\n')
-      .map((l) => l.replace(/(^|[^:])\/\/.*$/, '$1'))
+      .filter((l) => !/^\s*\/\//.test(l))
       .join('\n');
-    const cfg = JSON.parse(stripped);
-    const pw = cfg?.automation?.socketPassword;
-    return typeof pw === 'string' ? pw : '';
+    const m = active.match(/"socketPassword"\s*:\s*"([^"]*)"/);
+    return m ? m[1] : '';
   } catch {
     return '';
   }
