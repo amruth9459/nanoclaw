@@ -393,3 +393,6 @@ exp83-fix-exp72-80-regressions-76-docs	2026-04-24	1.0000	76	0.00	Apply all missi
 2026-07-13T08:11:04Z	exp-20260713-035547	NOT another injection-seed round (those are saturated — the 	1	0.0	0.0	discarded
 2026-07-13T08:18:09Z	exp-20260713-041104	HUMAN: run_nightly.sh L83 BEST_F1=max(all kept)=1.0 forever,	1	1.0	0.0	discarded
 2026-07-13T08:31:27Z	exp-20260713-041809	Fix remaining F1 gaps from exp113 (overall_f1=0.9904). Root 	1	0.2747	0.0	discarded
+2026-07-14T06:05:33Z	exp-20260714-020005	HUMAN DECISION NEEDED (15+ days unpatched): fix run_nightly.	1	1.0	0.0	discarded
+2026-07-14T06:13:14Z	exp-20260714-020533	no-result	1	0	0	error
+2026-07-14T06:31:50Z	exp-20260714-021314	Real-vision experiment, NOT another injection-seed round. Th	1	1.0	0.0	discarded
