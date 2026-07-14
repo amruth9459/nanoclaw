@@ -402,3 +402,4 @@ exp83-fix-exp72-80-regressions-76-docs	2026-04-24	1.0000	76	0.00	Apply all missi
 2026-07-14T09:02:52Z	exp-20260714-043553	Fix remaining F1 gaps from exp113 (overall_f1=0.9904). Root 	1	0.0	0.0	discarded
 2026-07-14T09:31:05Z	exp-20260714-050252	REAL-VISION hypothesis (program.md direction #2, zone-based 	1	0.2536	0.0	discarded
 2026-07-14T09:38:26Z	exp-20260714-053105	no-result	1	0	0	error
+2026-07-14T10:06:50Z	exp-20260714-053826	Untried lever (verified via git log -p: no prior commit ever	1	0.4193	0.0	discarded
