@@ -135,7 +135,16 @@ def recent_claw_text(hours: int = 36) -> tuple[str, list[str]]:
     sources: list[str] = []
     if not CLAW_MIRROR.exists():
         return "", []
-    files = sorted(CLAW_MIRROR.glob("*.md"))
+    # Desktop Claude Code work, mirrored nightly by claude-brain-sync.py —
+    # without this the digest's "today" only sees Claw/WhatsApp activity and
+    # is blind to the actual hands-on projects (the 2026-07-14 divergence).
+    # Ordered FIRST: the combined text is capped at MAX_CLAW_CHARS and the
+    # Claw mirror files are large enough to truncate anything after them.
+    files: list[Path] = []
+    cc_dir = BRAIN / "ClaudeCode"
+    if cc_dir.exists():
+        files += sorted(cc_dir.glob("*.md"))
+    files += sorted(CLAW_MIRROR.glob("*.md"))
     recent = [p for p in files if datetime.fromtimestamp(p.stat().st_mtime) >= cutoff]
     target = recent if recent else files[:2]
     for p in target:
