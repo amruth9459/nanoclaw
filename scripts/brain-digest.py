@@ -51,6 +51,40 @@ def canonicalize(names: set[str]) -> set[str]:
     m = _load_alias_map()
     return {m.get(n, n) for n in names}
 META_DIR = Path("/Users/amrut/nanoclaw/data/brain-wiki/.wiki_meta")
+DECIDED_MD = BRAIN / "decided.md"
+
+
+def load_decided() -> list[dict]:
+    """Parse Brain/decided.md verdict ledger: `- status | key | reason | date`.
+
+    Decided items are suppressed from the digest and excluded from the surprise
+    prompt so settled verdicts (rejected/parked/shipped/superseded) stop
+    re-surfacing every day. Delete a line from decided.md to un-suppress.
+    """
+    if not DECIDED_MD.exists():
+        return []
+    out: list[dict] = []
+    for line in DECIDED_MD.read_text().splitlines():
+        line = line.strip()
+        if not line.startswith("- ") or "|" not in line:
+            continue
+        parts = [p.strip() for p in line[2:].split("|")]
+        # Keys under 4 chars are rejected: a hyper-generic substring key (like a
+        # stray "key" from a format example) would suppress nearly everything.
+        if len(parts) < 2 or len(parts[1]) < 4:
+            continue
+        out.append({"status": parts[0].lower(), "key": parts[1].lower(),
+                    "reason": parts[2] if len(parts) > 2 else ""})
+    return out
+
+
+def decided_match(text: str, decided: list[dict]) -> str | None:
+    """Return the matching decided key if `text` hits any verdict, else None."""
+    low = (text or "").lower()
+    for d in decided:
+        if d["key"] in low:
+            return d["key"]
+    return None
 LATEST = Path("/Users/amrut/nanoclaw/data/brain-digest.json")
 LOG = Path("/Users/amrut/nanoclaw/data/brain-digest.log")
 DAILY = BRAIN / "Daily"
@@ -220,10 +254,12 @@ def build_surprise_prompt(today_entities: list[str], candidates: list[dict],
                           neighbours: dict[str, list[tuple[str, str]]],
                           fresh: list[dict] | None = None,
                           deeplinks: list[dict] | None = None,
-                          research: list[dict] | None = None) -> str:
+                          research: list[dict] | None = None,
+                          decided: list[dict] | None = None) -> str:
     fresh = fresh or []
     deeplinks = deeplinks or []
     research = research or []
+    decided = decided or []
     cand_lines = []
     for c in candidates[:SURPRISE_CANDIDATES]:
         cand_lines.append(f"- {c['slug']} [{c['category']}] shares: {', '.join(c['shared_entities'][:5])}")
@@ -268,6 +304,11 @@ Researched pages (LLM-summarised actual URL content):
 
 Graph neighbours of today's entities (1-hop):
 {chr(10).join(neigh_lines) or '(none)'}
+
+DECIDED VERDICTS (settled — do NOT propose connections about these; the user
+already ruled on them and re-surfacing them is the failure mode this section
+exists to prevent):
+{chr(10).join(f"- [{d['status']}] {d['key']}: {d['reason'][:120]}" for d in decided) or '(none)'}
 
 Find 3-6 SURPRISING / NON-OBVIOUS connections, weighted against the USER
 LONG-TERM CONTEXT above. Favour insights that:
@@ -474,8 +515,23 @@ def main() -> int:
     today_ents = canonicalize(raw_ents)
     log(f"today's entities: {len(today_ents)} (canonicalized from {len(raw_ents)}) — {sorted(today_ents)[:10]}")
 
+    decided = load_decided()
+    suppressed: dict[str, int] = defaultdict(int)
+
+    def _gate(items: list[dict], textfn) -> list[dict]:
+        kept = []
+        for it in items:
+            k = decided_match(textfn(it), decided)
+            if k:
+                suppressed[k] += 1
+            else:
+                kept.append(it)
+        return kept
+
     meta = load_meta_index()
     relevant = find_relevant_notes(today_ents, meta)
+    # Note slugs carry the loop (e.g. dashclaw-as-phone-first-*) — gate on slug.
+    relevant = _gate(relevant, lambda r: r["slug"])
     log(f"relevant notes by entity overlap: {len(relevant)}")
 
     graph = load_graph()
@@ -483,20 +539,27 @@ def main() -> int:
     log(f"graph neighbours: {sum(len(v) for v in neighbours.values())} edges")
 
     fresh = fresh_shared_items(today_ents)
+    # Fresh/research items gate on title+URL only, so an item merely MENTIONING
+    # a decided entity in its notes still surfaces; only decided-CENTRIC items drop.
+    fresh = _gate(fresh, lambda f: f"{f['title']} {f.get('url') or ''}")
     fresh_with_overlap = [f for f in fresh if f["overlap"] > 0]
     log(f"fresh shared items (last {SHARED_DAYS}d): {len(fresh)} total, "
         f"{len(fresh_with_overlap)} with overlap")
 
     deeplinks_data = _load_optional_json(DEEPLINKS_JSON)
     deeplinks = deeplinks_data.get("deeplinks", [])
+    deeplinks = _gate(deeplinks, lambda d: f"{d.get('title','')} {d.get('url') or ''}")
     log(f"deeplinks: {len(deeplinks)}")
 
     research_data = _load_optional_json(RESEARCH_JSON)
     research = research_data.get("summaries", [])
+    research = _gate(research, lambda r: f"{r.get('title','')} {r.get('url') or ''}")
     log(f"research summaries: {len(research)}")
 
     themes_data = _load_optional_json(THEMES_JSON)
     themes = themes_data.get("themes", [])
+    # Themes ARE the re-derivation loop — gate on their full text.
+    themes = _gate(themes, lambda t: json.dumps(t))
     log(f"themes: {len(themes)}")
 
     # Forward-looking agenda: collect all open_questions across research +
@@ -522,21 +585,35 @@ def main() -> int:
     if api_key and (relevant or neighbours or fresh_with_overlap or deeplinks or research):
         prompt = build_surprise_prompt(
             sorted(today_ents), relevant, neighbours, fresh, deeplinks, research,
+            decided,
         )
         try:
             resp = call_haiku(api_key, prompt)
             surprise = resp.get("surprising_connections", []) or []
+            # Belt-and-braces: the prompt forbids decided topics, but also
+            # post-filter whatever the model returned.
+            surprise = _gate(surprise, lambda s: json.dumps(s))
             log(f"surprising connections: {len(surprise)}")
         except Exception as e:
             log(f"Haiku call failed (continuing without surprises): {e}")
     elif not api_key:
         log("no ANTHROPIC_API_KEY — skipping surprise pass")
 
+    if suppressed:
+        log("decided.md gate suppressed: "
+            + ", ".join(f"{k}×{n}" for k, n in sorted(suppressed.items())))
+
     date = datetime.now().strftime("%Y-%m-%d")
     body = render_digest(
         date, sorted(today_ents), relevant, surprise, sources,
         fresh, deeplinks, research, themes, forward_agenda,
     )
+    if suppressed:
+        body += (
+            "_decided.md gate suppressed: "
+            + ", ".join(f"`{k}`×{n}" for k, n in sorted(suppressed.items()))
+            + " — edit Brain/decided.md to change._\n"
+        )
     daily = write_daily(date, body)
     log(f"daily written: {daily}")
 
