@@ -19,32 +19,30 @@ import time
 from pathlib import Path
 
 # ── EXPERIMENT CONFIG (agent edits this section) ─────────────────────────────
-EXPERIMENT_NAME = "exp119-minimal-schema-REFUTED"
+EXPERIMENT_NAME = "exp119-zone-split-timeout-diagnostic"
 DESCRIPTION = (
-    "REAL-VISION hypothesis, NOT a seed/injection round (those are saturated at F1=1.0 and are gate "
-    "theater per memory/project_lexios_autoresearch_wrapper_bug.md). Untried lever, verified via "
-    "git log -p and logs/ before writing code: zone/quadrant splitting was already attempted "
-    "2026-07-14 05:02 (buggy, abandoned) and the 120s->300s timeout bump was already validated+ "
-    "committed (d1bac7e, exp118) and re-attempted 3x today — not novel, so this tested a different "
-    "mechanism against the same diagnosed root cause (2882ecd: NBU_MedicalClinic_Arch's 120s timeout "
-    "is generation-length-bound, not image-encoding-bound, since downscaling ~60% didn't change the "
-    "outcome): shrink the per-element JSON schema to only eval.py's get_match_keys() fields, dropping "
-    "type/size/fire_rating/room_code/level/type_mark, to see if fewer output tokens -> more elements "
-    "before the UNCHANGED 120s wall hits. RESULT: REFUTED. Foreground --doc runs with "
-    "LEXIOS_NO_INJECTION=1 (real vision, no seed padding): NBU_MedicalClinic_Arch stayed F1=0.0 — "
-    "both pages timed out at exactly 120.1s with 0 parsed elements, identical to the established "
-    "zero-baseline. Duplex_A_20110907 stayed F1=0.2747 (Level_1: 21 elements in 46.2s, matching prior "
-    "sessions' element count almost exactly; Level_2: still timed out at 120.1s) — no regression, but "
-    "also zero improvement. Schema size had NO effect on either doc in either direction. This rules "
-    "OUT output-generation-length as the bottleneck (already ruled out image-encoding size via "
-    "2882ecd) — the 120s wall is something else: most likely fixed per-call overhead (CLI startup, "
-    "tool-use round-trip) or the vision model's image-analysis/comprehension time on a dense 2500-3500px "
-    "render, which doesn't shrink when the OUTPUT schema shrinks. Future sessions: do not re-test "
-    "output-schema-size or image-downscaling on this timeout — both are now confirmed dead ends. "
-    "Reverted the prompt to the original verbose schema below (minimal schema had no upside and drops "
-    "type/mark fallback match fields other GT docs may need). Restored the LEXIOS_NO_INJECTION=1 "
-    "env-gated postprocess no-op (previously validated in d1bac7e, silently reverted again since by "
-    "the dead run_nightly.sh gate) so real-vision quality can keep being measured in isolation."
+    "REAL-VISION diagnostic, not another injection-seed round (those are saturated at F1=1.0 and "
+    "irrelevant to the keep/discard gate anyway — see memory 'Lexios autoresearch wrapper ratchet "
+    "bug': run_nightly.sh's BEST_F1=max(all kept)=1.0 forever, so nothing can ever be kept again; "
+    "already escalated to human, not re-diagnosed here). "
+    "Tests the one remaining non-refuted lever from that memory's 'What TO do' list: clean "
+    "zone/quadrant splitting via manifest.json registration (a 2026-07-14 attempt was buggy/abandoned "
+    "without ever wiring the manifest — confirmed via git show on that day's auto-backup commit, no "
+    "zone-registration code was ever committed). "
+    "Hypothesis: NBU_MedicalClinic_Arch (both pages) and Duplex_A_20110907 Level_2 reliably exceed "
+    "run()'s hardcoded 120s per-image timeout. Refuted levers were image file-size downscaling "
+    "(2026-07-08/13) and a minimal-schema prompt (2026-07-15) — both targeting bytes sent/returned. "
+    "This targets a different axis: floor-plan CONTENT density per call. Pre-rendered overlapping-halves "
+    "zone images (zoneL.png/zoneR.png, ~65% width each, full 3539px height, left over on disk from the "
+    "abandoned 2026-07-14 attempt) are registered in _setup_corpus()'s manifest for exactly the 3 "
+    "timeout-prone pages; run()'s existing per-image loop fans out over them with zero changes outside "
+    "EXPERIMENT CONFIG. Restored the LEXIOS_NO_INJECTION=1 diagnostic guard (absent from the live "
+    "exp114 baseline per memory's warning that in-scope fixes get silently reverted by the auto-backup "
+    "cycle) so real vision-only F1 is measurable instead of masked by gt_is_minimum=True seed injection. "
+    "Known real-vision baselines to beat: Duplex_A_20110907 F1=0.4146 (Level_2 timed out, 0 elements); "
+    "NBU_MedicalClinic_Arch F1~0.0-0.2511 (both pages timed out). This run uses normal injection "
+    "(LEXIOS_NO_INJECTION unset) for the standard overall_f1 report the harness expects; the actual "
+    "hypothesis test is a separate --doc scoped LEXIOS_NO_INJECTION=1 run, recorded in the memory file."
 )
 
 # Override the system prompt sent to Claude for extraction.
@@ -643,6 +641,53 @@ def _setup_corpus():
         if dirty:
             adt_fzk_gt.write_text(json.dumps(adt_data, indent=2))
 
+    # ── Zone-split registration — exp119 diagnostic ──────────────────────────
+    # NBU_MedicalClinic_Arch (both pages) and Duplex_A_20110907 Level_2 reliably exceed
+    # run()'s hardcoded 120s per-image timeout (confirmed repeatedly across prior sessions;
+    # see memory/DEVLOG "Lexios autoresearch wrapper ratchet bug"). Pre-rendered overlapping
+    # halves (zoneL.png/zoneR.png, ~65% width each so no element is cut at the seam, full
+    # original height) already exist on disk from an abandoned 2026-07-14 attempt that never
+    # wired them into the manifest. Registering them here lets run()'s existing per-image
+    # loop fan out over less floor-plan content per call — testing content density, not file
+    # size (already refuted). Only replaces the specific pages known to time out; pages that
+    # already complete (Duplex Level_1) are left untouched.
+    manifest2 = json.loads(manifest_path.read_text())
+    zone_replacements = {
+        "NBU_MedicalClinic_Arch": {
+            "NBU_MedicalClinic_Arch--ifc-render-First_Floor.png": [
+                "NBU_MedicalClinic_Arch--ifc-render-First_Floor.zoneL.png",
+                "NBU_MedicalClinic_Arch--ifc-render-First_Floor.zoneR.png",
+            ],
+            "NBU_MedicalClinic_Arch--ifc-render-Second_Floor.png": [
+                "NBU_MedicalClinic_Arch--ifc-render-Second_Floor.zoneL.png",
+                "NBU_MedicalClinic_Arch--ifc-render-Second_Floor.zoneR.png",
+            ],
+        },
+        "Duplex_A_20110907": {
+            "Duplex_A_20110907--ifc-render-Level_2.png": [
+                "Duplex_A_20110907--ifc-render-Level_2.zoneL.png",
+                "Duplex_A_20110907--ifc-render-Level_2.zoneR.png",
+            ],
+        },
+    }
+    zone_changed = False
+    for doc in manifest2:
+        replacements = zone_replacements.get(doc["doc_id"])
+        if not replacements:
+            continue
+        new_images = []
+        for img in doc["images"]:
+            zones = replacements.get(img)
+            if zones and all((gt_dir / z).exists() for z in zones):
+                new_images.extend(zones)
+            else:
+                new_images.append(img)
+        if new_images != doc["images"]:
+            doc["images"] = new_images
+            zone_changed = True
+    if zone_changed:
+        manifest_path.write_text(json.dumps(manifest2, indent=2))
+
 _setup_corpus()
 
 
@@ -686,14 +731,10 @@ def postprocess(extraction: dict, _cache={}) -> dict:
     - roof_plan: inject material seed 'roofing' x 2 (CON doc: 1 item)
     - foundations: add 'spread footing' seed x 6 (CON doc: 5 spread footings, not TOF Footing)
     - hvac_equipment: add M_Transformer Switchboard x 3 (ELE doc: 3 switchboard items)
-
-    exp119: restored the LEXIOS_NO_INJECTION=1 env-gated no-op (previously validated in d1bac7e,
-    silently reverted since by the dead keep/discard gate — see run_nightly.sh BEST_F1 bug in
-    memory/project_lexios_autoresearch_wrapper_bug.md). When set, returns raw vision output
-    unchanged so real extraction quality can be measured without the injection layer masking it.
-    Off by default — does not affect the normal (gated) corpus run.
     """
-    if os.environ.get("LEXIOS_NO_INJECTION") == "1":
+    if os.environ.get("LEXIOS_NO_INJECTION"):
+        # Diagnostic mode: skip all seed injection to measure real vision-only F1.
+        # Production/nightly runs never set this var, so default behavior is unchanged.
         return extraction
     if not extraction and 'result' in _cache:
         return dict(_cache['result'])

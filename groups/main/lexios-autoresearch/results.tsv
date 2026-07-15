@@ -403,3 +403,12 @@ exp83-fix-exp72-80-regressions-76-docs	2026-04-24	1.0000	76	0.00	Apply all missi
 2026-07-14T09:31:05Z	exp-20260714-050252	REAL-VISION hypothesis (program.md direction #2, zone-based 	1	0.2536	0.0	discarded
 2026-07-14T09:38:26Z	exp-20260714-053105	no-result	1	0	0	error
 2026-07-14T10:06:50Z	exp-20260714-053826	Untried lever (verified via git log -p: no prior commit ever	1	0.4193	0.0	discarded
+2026-07-15T06:06:59Z	exp-20260715-020005	no-result	1	0	0	error
+2026-07-15T06:24:29Z	exp-20260715-020659	NOT a new injection-seed round (those are saturated at F1=1.	1	0.4146	0.0	discarded
+2026-07-15T06:29:45Z	exp-20260715-022429	no-result	1	0	0	error
+2026-07-15T06:38:03Z	exp-20260715-022945	Re-applying the exp118 real-vision fix (originally committed	1	1.0	0.0	discarded
+2026-07-15T06:46:27Z	exp-20260715-023803	HUMAN ACTION NEEDED: run_nightly.sh L83/203 keep gate requir	1	1.0	0.0	discarded
+2026-07-15T06:50:25Z	exp-20260715-024627	no-result	1	0	0	error
+2026-07-15T06:54:05Z	exp-20260715-025025	no-result	1	0	0	error
+2026-07-15T07:13:22Z	exp-20260715-025405	REAL-VISION hypothesis, NOT a seed/injection round (those ar	1	0.2747	0.0	discarded
+2026-07-15T07:31:29Z	exp-20260715-031322	no-result	1	0	0	error
