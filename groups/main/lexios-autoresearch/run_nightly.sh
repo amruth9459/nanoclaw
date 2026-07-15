@@ -233,8 +233,11 @@ Important:
                 BEST_DOCS=$NEW_DOCS
                 STATUS="kept"
 
-                # Git commit the improvement
-                git add "$EXPERIMENT_FILE"
+                # Git commit the improvement. -f is REQUIRED: groups/main/* is
+                # gitignored and git add refuses ignore-matched paths (exit 1)
+                # even for already-tracked files — plain add here failed
+                # silently for months (verified 2026-07-15).
+                git add -f "$EXPERIMENT_FILE"
                 git commit -m "autoresearch: $EXP_NAME (F1=$NEW_F1, docs=$NEW_DOCS)" 2>/dev/null || true
             else
                 log "No improvement (F1=$NEW_F1 vs best=$BEST_F1, docs=$NEW_DOCS vs $BEST_DOCS) — discarding changes"
