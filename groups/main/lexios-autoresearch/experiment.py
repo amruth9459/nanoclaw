@@ -3570,9 +3570,18 @@ def postprocess(extraction: dict, _cache={}) -> dict:
 # ── END EXPERIMENT CONFIG ────────────────────────────────────────────────────
 
 
-def run(ground_truth_dir: str | None = None, doc_filter: str | None = None) -> dict:
+def run(ground_truth_dir: str | None = None, doc_filter: str | None = None,
+        eval_docs: list[str] | None = None) -> dict:
     """
     Run extraction on test images, score against ground truth.
+
+    eval_docs (orchestrator-only, 2026-07-16): real-vision evaluation mode on a
+    fixed doc set. Scores RAW vision output and POSTPROCESSED output separately,
+    and probes postprocess() for fabrication (elements produced from empty or
+    decoy input = GT-derived injection, the gaming vector that saturated the old
+    corpus metric at F1=1.0). Per-doc effective F1 = postprocessed score when
+    the probes are clean, else the raw score — so honest normalization counts
+    and injections don't.
 
     Returns:
         {
@@ -3599,6 +3608,16 @@ def run(ground_truth_dir: str | None = None, doc_filter: str | None = None) -> d
         if not manifest:
             print(f"[experiment] No document matching '{doc_filter}'")
             sys.exit(1)
+    if eval_docs:
+        missing = [d for d in eval_docs if not any(m["doc_id"] == d for m in manifest)]
+        if missing:
+            print(f"[experiment] Eval docs missing from manifest: {missing}")
+            sys.exit(1)
+        manifest = [m for m in manifest if m["doc_id"] in eval_docs]
+        no_img = [m["doc_id"] for m in manifest if not m.get("images")]
+        if no_img:
+            print(f"[experiment] Eval docs without images (cannot vision-score): {no_img}")
+            sys.exit(1)
 
     # Import the production eval functions
     sys.path.insert(0, str(Path.home() / "Lexios"))
@@ -3620,6 +3639,29 @@ def run(ground_truth_dir: str | None = None, doc_filter: str | None = None) -> d
     claude_bin = os.environ.get("CLAUDE_BIN", "/opt/homebrew/bin/claude")
     results = []
     total_cost = 0.0
+
+    # ── Eval mode: fabrication probes (computed once — postprocess is global).
+    # A postprocess() that emits elements from EMPTY input, or grows a 1-element
+    # decoy, is manufacturing elements from GT knowledge rather than transforming
+    # vision output. A probe that THROWS also fails closed (scored as raw).
+    phantom = None
+    if eval_docs:
+        try:
+            preprocess("")  # apply any subprocess patches once (corpus-mode parity)
+        except Exception:
+            pass
+        try:
+            empty_out = postprocess({}) or {}
+            n_empty = sum(len(v) for v in empty_out.values() if isinstance(v, list))
+            decoy_out = postprocess(json.loads('{"rooms": [{"name": "__PHANTOM_PROBE__"}]}')) or {}
+            n_decoy = sum(len(v) for v in decoy_out.values() if isinstance(v, list))
+            fabricated = max(n_empty, max(0, n_decoy - 1))
+            phantom = {"empty_injection": n_empty, "decoy_growth": max(0, n_decoy - 1),
+                       "fabricated": fabricated, "clean": fabricated <= 2}
+        except Exception as e:
+            phantom = {"empty_injection": -1, "decoy_growth": -1, "fabricated": -1,
+                       "clean": False, "probe_error": str(e)[:120]}
+        print(f"[experiment] Phantom probes: {phantom}")
 
     for entry in manifest:
         doc_id = entry["doc_id"]
@@ -3682,7 +3724,11 @@ def run(ground_truth_dir: str | None = None, doc_filter: str | None = None) -> d
                 print(f"[experiment]   WARN: Failed to parse JSON from {img_name}")
                 extraction = {}
 
-            extraction = postprocess(extraction)
+            # Corpus mode: postprocess per image (historical behavior).
+            # Eval mode: accumulate RAW output; postprocess applied once on the
+            # merged dict below so raw and post can be scored separately.
+            if not eval_docs:
+                extraction = postprocess(extraction)
 
             # Merge elements
             for cat, items in extraction.items():
@@ -3708,33 +3754,55 @@ def run(ground_truth_dir: str | None = None, doc_filter: str | None = None) -> d
         gt_is_min = gt_data.get("gt_is_minimum", True)
         if gt_is_min is None:
             gt_is_min = True  # treat None as True: injection system requires this semantics
-        category_scores = {}
-        all_f1 = []
 
-        for category, gt_items in gt_elements.items():
-            if not isinstance(gt_items, list) or not gt_items:
-                continue
+        def _score(extracted_dict):
+            category_scores = {}
+            all_f1 = []
+            for category, gt_items in gt_elements.items():
+                if not isinstance(gt_items, list) or not gt_items:
+                    continue
+                keys = get_match_keys(category)
+                extracted = extracted_dict.get(category, [])
+                scores = score_elements(gt_items, extracted, match_keys=keys, gt_is_minimum=gt_is_min)
+                category_scores[category] = scores
+                all_f1.append(scores["f1"])
+            doc_f1 = sum(all_f1) / len(all_f1) if all_f1 else 0.0
+            return doc_f1, category_scores
 
-            keys = get_match_keys(category)
-            extracted = all_extracted.get(category, [])
+        raw_f1 = post_f1 = None
+        if eval_docs:
+            try:
+                post_extracted = postprocess(json.loads(json.dumps(all_extracted))) or {}
+            except Exception as e:
+                print(f"[experiment]   WARN: postprocess failed on merged output: {e}")
+                post_extracted = all_extracted
+            raw_f1, raw_cats = _score(all_extracted)
+            post_f1, post_cats = _score(post_extracted)
+            use_post = bool(phantom and phantom.get("clean"))
+            doc_f1 = post_f1 if use_post else raw_f1
+            category_scores = post_cats if use_post else raw_cats
+            print(f"[experiment]   raw F1={raw_f1:.3f}  post F1={post_f1:.3f}  "
+                  f"fabricated={phantom.get('fabricated') if phantom else '?'}  "
+                  f"effective={'post' if use_post else 'raw'}")
+        else:
+            doc_f1, category_scores = _score(all_extracted)
 
-            scores = score_elements(gt_items, extracted, match_keys=keys, gt_is_minimum=gt_is_min)
-            category_scores[category] = scores
-            all_f1.append(scores["f1"])
-
+        for category, scores in category_scores.items():
             icon = "✓" if scores["f1"] >= 0.8 else "△" if scores["f1"] >= 0.5 else "✗"
             print(f"[experiment]   {icon} {category:20s}  P={scores['precision']:.2f}  R={scores['recall']:.2f}  F1={scores['f1']:.2f}  ({scores['correct']}/{scores['correct']+scores['missed']})")
 
-        doc_f1 = sum(all_f1) / len(all_f1) if all_f1 else 0.0
-
-        results.append({
+        doc_result = {
             "doc_id": doc_id,
             "f1": round(doc_f1, 4),
             "precision": round(sum(s["precision"] for s in category_scores.values()) / max(len(category_scores), 1), 4),
             "recall": round(sum(s["recall"] for s in category_scores.values()) / max(len(category_scores), 1), 4),
             "categories": {k: {"f1": v["f1"], "correct": v["correct"], "missed": v["missed"]} for k, v in category_scores.items()},
             "cost_usd": round(total_cost, 4),
-        })
+        }
+        if eval_docs:
+            doc_result["raw_f1"] = round(raw_f1, 4)
+            doc_result["post_f1"] = round(post_f1, 4)
+        results.append(doc_result)
 
         print(f"[experiment]   Overall F1: {doc_f1:.3f}")
 
@@ -3747,6 +3815,10 @@ def run(ground_truth_dir: str | None = None, doc_filter: str | None = None) -> d
         "overall_f1": round(overall_f1, 4),
         "total_cost_usd": round(total_cost, 4),
     }
+    if eval_docs:
+        summary["eval_mode"] = True
+        summary["eval_docs"] = eval_docs
+        summary["phantom"] = phantom
 
     # Write results to stdout for the orchestrator to parse
     print(f"\n---EXPERIMENT_RESULT---")
@@ -3765,5 +3837,9 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Run autoresearch experiment")
     parser.add_argument("--doc", help="Filter to specific doc_id")
     parser.add_argument("--gt-dir", help="Ground truth directory")
+    parser.add_argument("--eval-docs",
+                        help="Comma-separated doc_ids: real-vision eval mode with "
+                             "raw/post split scoring + fabrication probes (orchestrator use)")
     args = parser.parse_args()
-    run(ground_truth_dir=args.gt_dir, doc_filter=args.doc)
+    run(ground_truth_dir=args.gt_dir, doc_filter=args.doc,
+        eval_docs=[d.strip() for d in args.eval_docs.split(",") if d.strip()] if args.eval_docs else None)
