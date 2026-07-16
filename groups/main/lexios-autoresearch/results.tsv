@@ -422,3 +422,4 @@ exp83-fix-exp72-80-regressions-76-docs	2026-04-24	1.0000	76	0.00	Apply all missi
 2026-07-16T09:25:15Z	exp-20260716-051851	no-result	1.0	0	0	error
 2026-07-16T09:30:53Z	exp-20260716-052515	no-result	1.0	0	0	error
 2026-07-16T09:39:58Z	exp-20260716-053053	no-result	1.0	0	0	error
+2026-07-16T09:57:12Z	exp-20260716-053958	Corpus-registration fix, not a new injection round (memory f	1.0	1.0	0.0	discarded
