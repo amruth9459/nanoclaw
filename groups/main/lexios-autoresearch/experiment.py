@@ -3571,7 +3571,8 @@ def postprocess(extraction: dict, _cache={}) -> dict:
 
 
 def run(ground_truth_dir: str | None = None, doc_filter: str | None = None,
-        eval_docs: list[str] | None = None) -> dict:
+        eval_docs: list[str] | None = None, probe_sentinel: str | None = None,
+        artifacts_out: str | None = None) -> dict:
     """
     Run extraction on test images, score against ground truth.
 
@@ -3641,11 +3642,18 @@ def run(ground_truth_dir: str | None = None, doc_filter: str | None = None,
     total_cost = 0.0
 
     # ── Eval mode: fabrication probes (computed once — postprocess is global).
-    # A postprocess() that emits elements from EMPTY input, or grows a 1-element
+    # A postprocess() that emits elements from EMPTY input, or grows a small
     # decoy, is manufacturing elements from GT knowledge rather than transforming
-    # vision output. A probe that THROWS also fails closed (scored as raw).
+    # vision output. The decoy sentinel is RANDOMIZED per run (supplied by the
+    # orchestrator via --probe-sentinel) so postprocess cannot special-case a
+    # known literal. A probe that THROWS also fails closed (scored as raw).
+    # NOTE: the numbers computed here are UNTRUSTED (this process runs CONFIG
+    # code) — the orchestrator's trusted scorer recounts everything from the
+    # artifacts dump; these are informational.
     phantom = None
+    eval_artifacts: dict = {}
     if eval_docs:
+        sentinel = probe_sentinel or "__PHANTOM_PROBE__"
         try:
             preprocess("")  # apply any subprocess patches once (corpus-mode parity)
         except Exception:
@@ -3653,14 +3661,19 @@ def run(ground_truth_dir: str | None = None, doc_filter: str | None = None,
         try:
             empty_out = postprocess({}) or {}
             n_empty = sum(len(v) for v in empty_out.values() if isinstance(v, list))
-            decoy_out = postprocess(json.loads('{"rooms": [{"name": "__PHANTOM_PROBE__"}]}')) or {}
+            decoy_in = {"rooms": [{"name": sentinel}], "doors": [{"name": sentinel + "-door"}]}
+            decoy_out = postprocess(json.loads(json.dumps(decoy_in))) or {}
             n_decoy = sum(len(v) for v in decoy_out.values() if isinstance(v, list))
-            fabricated = max(n_empty, max(0, n_decoy - 1))
-            phantom = {"empty_injection": n_empty, "decoy_growth": max(0, n_decoy - 1),
-                       "fabricated": fabricated, "clean": fabricated <= 2}
+            fabricated = max(n_empty, max(0, n_decoy - 2))
+            phantom = {"empty_injection": n_empty, "decoy_growth": max(0, n_decoy - 2),
+                       "fabricated": fabricated, "clean": fabricated == 0}
+            eval_artifacts["probe_empty_out"] = empty_out
+            eval_artifacts["probe_decoy_in"] = decoy_in
+            eval_artifacts["probe_decoy_out"] = decoy_out
         except Exception as e:
             phantom = {"empty_injection": -1, "decoy_growth": -1, "fabricated": -1,
                        "clean": False, "probe_error": str(e)[:120]}
+            eval_artifacts["probe_error"] = str(e)[:200]
         print(f"[experiment] Phantom probes: {phantom}")
 
     for entry in manifest:
@@ -3776,6 +3789,9 @@ def run(ground_truth_dir: str | None = None, doc_filter: str | None = None,
             except Exception as e:
                 print(f"[experiment]   WARN: postprocess failed on merged output: {e}")
                 post_extracted = all_extracted
+            eval_artifacts.setdefault("docs", {})[doc_id] = {
+                "raw": all_extracted, "post": post_extracted,
+            }
             raw_f1, raw_cats = _score(all_extracted)
             post_f1, post_cats = _score(post_extracted)
             use_post = bool(phantom and phantom.get("clean"))
@@ -3819,6 +3835,9 @@ def run(ground_truth_dir: str | None = None, doc_filter: str | None = None,
         summary["eval_mode"] = True
         summary["eval_docs"] = eval_docs
         summary["phantom"] = phantom
+        if artifacts_out:
+            Path(artifacts_out).write_text(json.dumps(eval_artifacts))
+            print(f"[experiment] Eval artifacts written to {artifacts_out}")
 
     # Write results to stdout for the orchestrator to parse
     print(f"\n---EXPERIMENT_RESULT---")
@@ -3840,6 +3859,11 @@ if __name__ == "__main__":
     parser.add_argument("--eval-docs",
                         help="Comma-separated doc_ids: real-vision eval mode with "
                              "raw/post split scoring + fabrication probes (orchestrator use)")
+    parser.add_argument("--probe-sentinel",
+                        help="Run-specific random sentinel for the decoy probe (orchestrator use)")
+    parser.add_argument("--artifacts-out",
+                        help="Write raw/post extraction + probe outputs here for trusted re-scoring")
     args = parser.parse_args()
     run(ground_truth_dir=args.gt_dir, doc_filter=args.doc,
-        eval_docs=[d.strip() for d in args.eval_docs.split(",") if d.strip()] if args.eval_docs else None)
+        eval_docs=[d.strip() for d in args.eval_docs.split(",") if d.strip()] if args.eval_docs else None,
+        probe_sentinel=args.probe_sentinel, artifacts_out=args.artifacts_out)

@@ -1,26 +1,38 @@
 #!/bin/bash
 #
-# Lexios Autoresearch — Karpathy-style Nightly Loop (v2, 2026-07-16)
+# Lexios Autoresearch — Karpathy-style Nightly Loop (v2.1, 2026-07-16)
 #
 # ARCHITECTURE (v2 — supersedes the session-runs-everything design):
 #   Sessions form a hypothesis and EDIT experiment.py's CONFIG section. Nothing
-#   else. The ORCHESTRATOR measures: it runs experiment.py in real-vision eval
-#   mode on a fixed doc set, foreground with a timeout. Why:
+#   else. The ORCHESTRATOR measures: the untrusted process (experiment.py,
+#   which executes agent-authored CONFIG code) only DUMPS extraction artifacts;
+#   a TRUSTED scorer (score_eval.py, guard-hashed, never executes CONFIG code)
+#   recomputes every number the gate uses. Why:
 #     - 5/10 sessions on 2026-07-16 produced no result because they backgrounded
-#       the 25-84 min run and exited (print-mode sessions can't wait).
+#       the long run and exited (print-mode sessions can't wait).
 #     - Sessions self-reporting scores was the trust hole behind months of
 #       false "kept" rows.
-#     - The old corpus metric was injection-saturated at F1=1.0 (fake); the
-#       eval mode scores raw vision + phantom-probed postprocess instead.
+#     - Adversarial grade of v2.0 (2026-07-16) showed in-process CONFIG code
+#       could forge scores computed in the same process — hence the artifact
+#       dump + trusted re-scorer split, randomized probe sentinels, GT-source
+#       hashing, and snapshot-restore on violations.
 #
-# Gate: keep iff tonight's effective eval F1 strictly improves. Baseline is
-# measured fresh each night (2026-07-15 ratchet fix — never read all-time
-# history; cross-night numbers aren't comparable).
+# Gate: keep iff tonight's effective eval F1 (TRUSTED scorer) strictly
+# improves. Baseline is measured fresh each night (2026-07-15 ratchet fix —
+# never read all-time history; cross-night numbers aren't comparable).
+#
+# RESIDUAL RISK (documented, accepted): CONFIG code runs unsandboxed during
+# measurement. It can no longer control the arithmetic, but it could still
+# write GT-derived CONTENT into the artifacts (injection). Randomized probes +
+# the raw/post split target that, and every "kept" config is committed for
+# review — but a deliberately adversarial session is not fully contained
+# without a real sandbox. The sessions are instruction-following optimizers,
+# not adversaries; review kept commits before trusting milestone claims.
 #
 # Usage:
 #   bash run_nightly.sh              # Full nightly run (2AM-6AM)
 #   bash run_nightly.sh --test       # Single experiment for testing
-#   bash run_nightly.sh --max 2      # Cap experiment count
+#   bash run_nightly.sh --max 2     # Cap experiment count
 #
 
 set -uo pipefail
@@ -30,6 +42,8 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 LOG_DIR="$SCRIPT_DIR/logs"
 RESULTS_FILE="$SCRIPT_DIR/results.tsv"
 EXPERIMENT_FILE="$SCRIPT_DIR/experiment.py"
+TRUSTED_SCORER="$SCRIPT_DIR/score_eval.py"
+GT_SOURCES_GLOB="$HOME/Lexios/work/eval-*"   # prepare.py copy sources — guarded
 
 mkdir -p "$LOG_DIR"
 
@@ -69,61 +83,114 @@ is_past_end() {
     return 1
 }
 
-# ── Guard: hash of the PROTECTED (non-CONFIG) zones of experiment.py ────────
-# Sessions may only edit between the CONFIG markers. Any change to run(),
-# scoring, arg parsing, or the markers themselves is a gate edit → rejected.
-# The hash also covers the measurement chain OUTSIDE this file: the production
-# scorer (~/Lexios/lexios/eval.py), the local evaluate.py/prepare.py, and the
-# ground-truth manifest — a session with an unexpected escape hatch must not
-# be able to bend the scorer or the GT and pass.
+# ── Guard: hash of everything the measurement's integrity depends on ────────
+# Covers: the non-CONFIG zones of experiment.py (exact-line, unique markers),
+# the trusted scorer, evaluate.py/prepare.py, the production scorer
+# (~/Lexios/lexios/eval.py), and ALL prepare.py GT copy-sources (JSON + PNG)
+# so a tampered GT source can't silently inflate every future night.
 guard_hash() {
     python3 - "$EXPERIMENT_FILE" <<'PY' 2>/dev/null
 import sys, hashlib
 from pathlib import Path
-lines = open(sys.argv[1]).read().splitlines(keepends=True)
-try:
-    start = next(i for i, l in enumerate(lines) if "EXPERIMENT CONFIG (agent edits" in l)
-    end = next(i for i, l in enumerate(lines) if "END EXPERIMENT CONFIG" in l)
-except StopIteration:
-    sys.exit(1)  # markers missing/mangled → caller treats as violation
-h = hashlib.sha256("".join(lines[:start + 1] + lines[end:]).encode())
+
+MARK_START = "# ── EXPERIMENT CONFIG (agent edits this section) ─────────────────────────────"
+MARK_END = "# ── END EXPERIMENT CONFIG ────────────────────────────────────────────────────"
+
+lines = open(sys.argv[1]).read().splitlines()
+starts = [i for i, l in enumerate(lines) if l == MARK_START]
+ends = [i for i, l in enumerate(lines) if l == MARK_END]
+if len(starts) != 1 or len(ends) != 1 or ends[0] <= starts[0]:
+    sys.exit(1)  # missing/duplicated/reordered markers → violation
+protected = "\n".join(lines[:starts[0] + 1] + lines[ends[0]:])
+h = hashlib.sha256(protected.encode())
+
 script_dir = Path(sys.argv[1]).resolve().parent
-for extra in [Path.home() / "Lexios" / "lexios" / "eval.py",
-              script_dir / "evaluate.py", script_dir / "prepare.py"]:
-    if extra.exists():
+extras = [Path.home() / "Lexios" / "lexios" / "eval.py",
+          script_dir / "score_eval.py",
+          script_dir / "evaluate.py",
+          script_dir / "prepare.py"]
+extras += sorted((Path.home() / "Lexios" / "work").glob("eval-*/**/*"))
+for extra in extras:
+    if extra.is_file() and extra.suffix in {".py", ".json", ".png", ".jpg"}:
+        h.update(str(extra).encode())
         h.update(extra.read_bytes())
 print(h.hexdigest())
 PY
 }
 
-# ── Measurement: orchestrator-run, foreground, timed ─────────────────────────
-# Writes parsed JSON to $RESULT_JSON (global) or empty on failure.
+# ── Snapshot / restore of the small protected files ──────────────────────────
+SNAPSHOT_DIR="$LOG_DIR/protected-snapshot"
+snapshot_protected() {
+    rm -rf "$SNAPSHOT_DIR"
+    mkdir -p "$SNAPSHOT_DIR/gt-sources"
+    cp "$TRUSTED_SCORER" "$SCRIPT_DIR/evaluate.py" "$SCRIPT_DIR/prepare.py" "$SNAPSHOT_DIR/" 2>/dev/null
+    # GT source JSONs are small; images are detection-only (abort, human repairs)
+    find "$HOME/Lexios/work" -maxdepth 2 -path "*eval-*" -name "*.json" 2>/dev/null | while read -r f; do
+        mkdir -p "$SNAPSHOT_DIR/gt-sources$(dirname "$f")"
+        cp "$f" "$SNAPSHOT_DIR/gt-sources$f"
+    done
+}
+restore_protected() {
+    cp "$SNAPSHOT_DIR/score_eval.py" "$TRUSTED_SCORER" 2>/dev/null
+    cp "$SNAPSHOT_DIR/evaluate.py" "$SCRIPT_DIR/evaluate.py" 2>/dev/null
+    cp "$SNAPSHOT_DIR/prepare.py" "$SCRIPT_DIR/prepare.py" 2>/dev/null
+    if [ -d "$SNAPSHOT_DIR/gt-sources" ]; then
+        (cd "$SNAPSHOT_DIR/gt-sources" && find . -name "*.json" | while read -r f; do
+            cp "$f" "/${f#./}" 2>/dev/null
+        done)
+    fi
+    git -C "$HOME/Lexios" checkout -- lexios/eval.py 2>/dev/null || true
+}
+
+# ── Measurement: orchestrator-run, foreground, timed, trusted re-score ──────
+# Sets TRUSTED_JSON (gate numbers, from score_eval.py) and UNTRUSTED_JSON
+# (labels only: experiment name/description). Empty on failure.
 measure() {
     local run_log="$1"
-    RESULT_JSON=""
-    # Re-copy ground truth from the Lexios corpus before every measurement so
-    # a tampered/drifted GT file can never inflate a score.
+    TRUSTED_JSON=""
+    UNTRUSTED_JSON=""
+    local sentinel
+    sentinel=$(openssl rand -hex 8 2>/dev/null || date +%s%N)
+    local artifacts="$SCRIPT_DIR/eval-artifacts.json"
+    # Re-copy ground truth from the (guarded) Lexios sources before every
+    # measurement so working-copy GT tampering can never inflate a score.
     python3 "$SCRIPT_DIR/prepare.py" >> "$run_log" 2>&1
-    rm -f "$SCRIPT_DIR/last-result.json" "$(pwd)/last-result.json"
-    timeout "$MEASURE_TIMEOUT" python3 "$EXPERIMENT_FILE" --eval-docs "$EVAL_DOCS" >> "$run_log" 2>&1
+    rm -f "$SCRIPT_DIR/last-result.json" "$(pwd)/last-result.json" "$artifacts"
+    timeout "$MEASURE_TIMEOUT" python3 "$EXPERIMENT_FILE" \
+        --eval-docs "$EVAL_DOCS" \
+        --probe-sentinel "$sentinel" \
+        --artifacts-out "$artifacts" >> "$run_log" 2>&1
     local rc=$?
+    # Reap any stragglers the untrusted process may have detached
+    pkill -9 -f "$EXPERIMENT_FILE" 2>/dev/null
     if [ $rc -eq 124 ]; then
         log "Measurement TIMED OUT after ${MEASURE_TIMEOUT}s"
         return 1
     fi
-    for RESULT_FILE in "$SCRIPT_DIR/last-result.json" "$(pwd)/last-result.json"; do
-        if [ -f "$RESULT_FILE" ]; then
-            RESULT_JSON=$(cat "$RESULT_FILE")
-            rm -f "$RESULT_FILE"
-            return 0
-        fi
-    done
-    log "Measurement produced no last-result.json (exit=$rc)"
-    return 1
+    if [ ! -f "$artifacts" ]; then
+        log "Measurement produced no artifacts dump (exit=$rc)"
+        return 1
+    fi
+    # Labels from the untrusted summary (display only, never gate input)
+    if [ -f "$SCRIPT_DIR/last-result.json" ]; then
+        UNTRUSTED_JSON=$(cat "$SCRIPT_DIR/last-result.json")
+        rm -f "$SCRIPT_DIR/last-result.json"
+    fi
+    # THE numbers: trusted re-score from artifacts + GT
+    TRUSTED_JSON=$(python3 "$TRUSTED_SCORER" "$artifacts" "$SCRIPT_DIR/ground-truth" "$sentinel" "$EVAL_DOCS" 2>>"$run_log" | tail -1)
+    rm -f "$artifacts"
+    if [ -z "$TRUSTED_JSON" ] || [ "$(echo "$TRUSTED_JSON" | python3 -c 'import sys,json; print(json.load(sys.stdin).get("ok", False))' 2>/dev/null)" != "True" ]; then
+        log "Trusted re-score FAILED"
+        return 1
+    fi
+    return 0
 }
 
-jget() {  # jget "$json" key default
+tget() {  # tget "$json" key default
     echo "$1" | python3 -c "import sys,json; print(json.load(sys.stdin).get('$2', $3))" 2>/dev/null || echo "$3"
+}
+sanitize() {  # strip tabs/newlines so agent-authored strings can't corrupt the TSV
+    echo "$1" | tr '\t\n' '  ' | cut -c1-60
 }
 
 # ── Init ─────────────────────────────────────────────────────────────────────
@@ -133,10 +200,10 @@ fi
 
 cd "$(git -C "$SCRIPT_DIR" rev-parse --show-toplevel 2>/dev/null || echo "$SCRIPT_DIR")"
 
-log "Preparing ground truth..."
-python3 "$SCRIPT_DIR/prepare.py" 2>&1 | tee -a "$LOG_DIR/prepare.log"
+snapshot_protected
+log "Protected-file snapshot taken"
 
-# ── Tonight's baseline (real-vision eval on the fixed doc set) ──────────────
+# ── Tonight's baseline (real-vision eval, trusted scorer) ────────────────────
 TOTAL_COST=0
 log "Measuring tonight's baseline: eval docs = $EVAL_DOCS ..."
 BASELINE_LOG="$LOG_DIR/baseline-$(date +%Y%m%d-%H%M%S).log"
@@ -144,18 +211,15 @@ if ! measure "$BASELINE_LOG"; then
     log "FATAL: baseline measurement failed — aborting tonight's loop (measurement path broken; fix before experimenting)"
     exit 1
 fi
-BEST_F1=$(jget "$RESULT_JSON" overall_f1 0)
-BASELINE_COST=$(jget "$RESULT_JSON" total_cost_usd 0)
-TOTAL_COST=$(echo "$TOTAL_COST + $BASELINE_COST" | bc -l)
-BASELINE_DETAIL=$(echo "$RESULT_JSON" | python3 -c "
+BEST_F1=$(tget "$TRUSTED_JSON" overall_f1 0)
+BASELINE_DETAIL=$(echo "$TRUSTED_JSON" | python3 -c "
 import sys, json
 d = json.load(sys.stdin)
 for r in d.get('results', []):
     print(f\"- {r['doc_id']}: raw F1={r.get('raw_f1','?')}, postprocessed F1={r.get('post_f1','?')}, effective F1={r['f1']}\")
-p = d.get('phantom') or {}
-print(f\"- phantom probes: fabricated={p.get('fabricated','?')} (clean={p.get('clean','?')}) — if not clean, postprocess is scored as RAW\")
+print(f\"- phantom probes: fabricated={d.get('phantom_fabricated','?')} (clean={d.get('phantom_clean','?')}) — if not clean, postprocess is scored as RAW\")
 " 2>/dev/null)
-log "Baseline effective F1: $BEST_F1"
+log "Baseline effective F1 (trusted): $BEST_F1"
 log "$BASELINE_DETAIL"
 
 # ── Experiment loop ──────────────────────────────────────────────────────────
@@ -181,6 +245,10 @@ while [ "$EXPERIMENT_COUNT" -lt "$MAX_EXPERIMENTS" ]; do
 
     cp "$EXPERIMENT_FILE" "$EXPERIMENT_FILE.bak"
     PRE_GUARD=$(guard_hash)
+    if [ -z "$PRE_GUARD" ]; then
+        log "FATAL: guard hash unavailable before session (markers mangled?) — aborting"
+        exit 1
+    fi
     PRE_FULL=$(shasum -a 256 "$EXPERIMENT_FILE" | cut -d' ' -f1)
 
     RESULTS_HISTORY=""
@@ -212,17 +280,20 @@ ${RESULTS_HISTORY}
    SYSTEM_PROMPT_OVERRIDE, PARAMS, preprocess(), postprocess().
 3. Set EXPERIMENT_NAME and DESCRIPTION to describe tonight's hypothesis.
 4. End your turn with a one-line summary of the hypothesis. Do NOT run
-   anything — you have no shell. The orchestrator runs the measurement,
-   applies the keep/discard gate, and reverts your edit if it doesn't improve.
+   anything — you have no shell. The orchestrator runs the measurement with a
+   trusted scorer, applies the keep/discard gate, and reverts your edit if it
+   doesn't improve.
 
 ## Hard rules
-- Touching anything outside the CONFIG markers (or the markers) = the whole
-  edit is auto-rejected before measurement.
+- Touching anything outside the CONFIG markers (or the markers, or any scorer
+  or ground-truth file) = the whole edit is auto-rejected before measurement.
 - Do NOT add ground-truth-derived injections to postprocess(). Measurement
-  probes postprocess with empty and decoy inputs; if it manufactures elements
-  from nothing, your postprocess is disqualified and the run is scored on RAW
-  vision output only. postprocess may TRANSFORM what vision returned
-  (rename, dedupe, normalize, split) — never invent elements.
+  probes postprocess with empty and randomized decoy inputs, and an
+  independent scorer recounts everything; fabricated elements disqualify your
+  postprocess and the run is scored on RAW vision output only. postprocess may
+  TRANSFORM what vision returned (rename, dedupe, normalize, split) — never
+  invent elements. Gaming the measurement instead of improving extraction is
+  a wasted night-slot: kept configs are reviewed.
 - One hypothesis per night-slot. Don't repeat rows from the history above.
 "
 
@@ -244,7 +315,7 @@ ${RESULTS_HISTORY}
 
     # ── Guards before spending a measurement run ────────────────────────────
     POST_FULL=$(shasum -a 256 "$EXPERIMENT_FILE" | cut -d' ' -f1)
-    if [ "$POST_FULL" = "$PRE_FULL" ]; then
+    if [ "$POST_FULL" = "$PRE_FULL" ] && [ "$(guard_hash)" = "$PRE_GUARD" ]; then
         log "Session made no edit — skipping measurement"
         echo -e "$(date -u +%Y-%m-%dT%H:%M:%SZ)\t$EXPERIMENT_ID\tno-edit\t$BEST_F1\t0\t0\tno-edit" >> "$RESULTS_FILE"
         rm -f "$EXPERIMENT_FILE.bak"
@@ -252,8 +323,14 @@ ${RESULTS_HISTORY}
     fi
     POST_GUARD=$(guard_hash)
     if [ -z "$POST_GUARD" ] || [ "$POST_GUARD" != "$PRE_GUARD" ]; then
-        log "GUARD VIOLATION: protected zone (or markers) modified — reverting"
+        log "GUARD VIOLATION: protected zone/scorer/GT modified by session — restoring"
         cp "$EXPERIMENT_FILE.bak" "$EXPERIMENT_FILE"
+        restore_protected
+        if [ "$(guard_hash)" != "$PRE_GUARD" ]; then
+            log "FATAL: restore did not converge — human attention required"
+            echo -e "$(date -u +%Y-%m-%dT%H:%M:%SZ)\t$EXPERIMENT_ID\tguard-violation-unrestored\t$BEST_F1\t0\t0\trejected-guard" >> "$RESULTS_FILE"
+            exit 1
+        fi
         echo -e "$(date -u +%Y-%m-%dT%H:%M:%SZ)\t$EXPERIMENT_ID\tguard-violation\t$BEST_F1\t0\t0\trejected-guard" >> "$RESULTS_FILE"
         rm -f "$EXPERIMENT_FILE.bak"
         continue
@@ -266,7 +343,7 @@ ${RESULTS_HISTORY}
         continue
     fi
 
-    # ── Orchestrator-run measurement ─────────────────────────────────────────
+    # ── Orchestrator-run measurement (trusted scorer) ────────────────────────
     log "Measuring edited config (real vision, eval docs)..."
     if ! measure "$EXPERIMENT_LOG"; then
         log "Measurement failed — reverting edit"
@@ -276,39 +353,42 @@ ${RESULTS_HISTORY}
         continue
     fi
 
-    # CONFIG code runs inside the measurement process (preprocess/postprocess
-    # are arbitrary Python) — re-verify the protected files afterwards so
-    # persistent tampering during measurement can't survive. On violation:
-    # restore what we can and ABORT the night fail-closed — the scorer may be
-    # poisoned and no further measurement can be trusted until a human looks.
+    # CONFIG code ran during measurement — re-verify every protected file. On
+    # violation: restore what we can and ABORT fail-closed with a nonzero exit
+    # (the scorer/GT may be poisoned; no further measurement is trustworthy).
     if [ "$(guard_hash)" != "$PRE_GUARD" ]; then
         log "GUARD VIOLATION (post-measurement): protected files changed DURING the run — restoring and ABORTING tonight"
         cp "$EXPERIMENT_FILE.bak" "$EXPERIMENT_FILE"
-        git -C "$HOME/Lexios" checkout -- lexios/eval.py 2>/dev/null || true
+        restore_protected
         echo -e "$(date -u +%Y-%m-%dT%H:%M:%SZ)\t$EXPERIMENT_ID\tguard-violation-postmeasure\t$BEST_F1\t0\t0\trejected-guard" >> "$RESULTS_FILE"
         rm -f "$EXPERIMENT_FILE.bak"
-        break
+        exit 1
     fi
 
-    NEW_F1=$(jget "$RESULT_JSON" overall_f1 0)
-    COST=$(jget "$RESULT_JSON" total_cost_usd 0)
-    EXP_NAME=$(echo "$RESULT_JSON" | python3 -c "import sys,json; print(json.load(sys.stdin).get('experiment', 'unknown'))" 2>/dev/null || echo "unknown")
-    EXP_DESC=$(echo "$RESULT_JSON" | python3 -c "import sys,json; print(json.load(sys.stdin).get('description', '')[:60])" 2>/dev/null || echo "")
-    PHANTOM_CLEAN=$(echo "$RESULT_JSON" | python3 -c "import sys,json; print(json.load(sys.stdin).get('phantom', {}).get('clean', ''))" 2>/dev/null || echo "")
+    NEW_F1=$(tget "$TRUSTED_JSON" overall_f1 0)
+    PHANTOM_CLEAN=$(tget "$TRUSTED_JSON" phantom_clean "''")
+    EXP_NAME=$(sanitize "$(echo "$UNTRUSTED_JSON" | python3 -c "import sys,json; print(json.load(sys.stdin).get('experiment', 'unknown'))" 2>/dev/null || echo unknown)")
+    EXP_DESC=$(sanitize "$(echo "$UNTRUSTED_JSON" | python3 -c "import sys,json; print(json.load(sys.stdin).get('description', ''))" 2>/dev/null || echo '')")
+    COST=$(tget "$UNTRUSTED_JSON" total_cost_usd 0)
     TOTAL_COST=$(echo "$TOTAL_COST + $COST" | bc -l)
 
-    log "Result: effective F1=$NEW_F1 (phantom clean=$PHANTOM_CLEAN), experiment=$EXP_NAME"
+    log "Result (trusted): effective F1=$NEW_F1 (phantom clean=$PHANTOM_CLEAN), experiment=$EXP_NAME"
 
     PREV_BEST=$BEST_F1
-    IS_IMPROVEMENT=$(echo "$NEW_F1 > $BEST_F1" | bc -l)
-    if [ "$IS_IMPROVEMENT" -eq 1 ]; then
-        log "IMPROVEMENT! F1 $PREV_BEST → $NEW_F1 — keeping changes"
-        BEST_F1=$NEW_F1
-        STATUS="kept"
+    IS_IMPROVEMENT=$(echo "$NEW_F1 > $BEST_F1" | bc -l 2>/dev/null || echo 0)
+    if [ "${IS_IMPROVEMENT:-0}" -eq 1 ] 2>/dev/null; then
         # -f REQUIRED: groups/main/* is gitignored; plain add exits 1 even for
-        # tracked files (verified 2026-07-15).
+        # tracked files (verified 2026-07-15). Commit is scoped to this file
+        # and a failed commit downgrades the logged status — never a silent lie.
         git add -f "$EXPERIMENT_FILE"
-        git commit -m "autoresearch: $EXP_NAME (eval F1=$NEW_F1)" 2>/dev/null || true
+        if git commit -m "autoresearch: $EXP_NAME (eval F1=$NEW_F1)" -- "$EXPERIMENT_FILE" >/dev/null 2>&1; then
+            STATUS="kept"
+        else
+            STATUS="kept-uncommitted"
+            log "WARNING: improvement kept on disk but git commit FAILED"
+        fi
+        log "IMPROVEMENT! F1 $PREV_BEST → $NEW_F1 — keeping changes ($STATUS)"
+        BEST_F1=$NEW_F1
     else
         log "No improvement (F1=$NEW_F1 vs best=$BEST_F1) — discarding changes"
         STATUS="discarded"
@@ -326,5 +406,5 @@ done
 log "═══ Nightly autoresearch complete ═══"
 log "Experiments: $EXPERIMENT_COUNT"
 log "Total cost: \$$TOTAL_COST"
-log "Best eval F1 tonight: $BEST_F1  (eval docs: $EVAL_DOCS)"
+log "Best eval F1 tonight (trusted): $BEST_F1  (eval docs: $EVAL_DOCS)"
 log "Results: $RESULTS_FILE"
