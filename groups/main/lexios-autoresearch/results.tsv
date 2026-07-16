@@ -417,3 +417,8 @@ exp83-fix-exp72-80-regressions-76-docs	2026-04-24	1.0000	76	0.00	Apply all missi
 2026-07-16T07:09:58Z	exp-20260716-030255	no-result	1.0	0	0	error
 2026-07-16T07:22:55Z	exp-20260716-030958	NOT an injection-seed change (those are saturated at F1=1.0 	1.0	0.1914	0.0	discarded
 2026-07-16T07:32:10Z	exp-20260716-032255	no-result	1.0	0	0	error
+2026-07-16T08:56:30Z	exp-20260716-033210	Corpus-registration fix, not a new injection round. The on-d	1.0	1.0	0.0	kept
+2026-07-16T09:18:51Z	exp-20260716-045630	Corpus-registration fix, not a new injection round. The on-d	1.0	0.75	0.0	discarded
+2026-07-16T09:25:15Z	exp-20260716-051851	no-result	1.0	0	0	error
+2026-07-16T09:30:53Z	exp-20260716-052515	no-result	1.0	0	0	error
+2026-07-16T09:39:58Z	exp-20260716-053053	no-result	1.0	0	0	error
