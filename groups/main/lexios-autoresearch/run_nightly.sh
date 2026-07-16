@@ -72,17 +72,27 @@ is_past_end() {
 # ── Guard: hash of the PROTECTED (non-CONFIG) zones of experiment.py ────────
 # Sessions may only edit between the CONFIG markers. Any change to run(),
 # scoring, arg parsing, or the markers themselves is a gate edit → rejected.
+# The hash also covers the measurement chain OUTSIDE this file: the production
+# scorer (~/Lexios/lexios/eval.py), the local evaluate.py/prepare.py, and the
+# ground-truth manifest — a session with an unexpected escape hatch must not
+# be able to bend the scorer or the GT and pass.
 guard_hash() {
     python3 - "$EXPERIMENT_FILE" <<'PY' 2>/dev/null
 import sys, hashlib
+from pathlib import Path
 lines = open(sys.argv[1]).read().splitlines(keepends=True)
 try:
     start = next(i for i, l in enumerate(lines) if "EXPERIMENT CONFIG (agent edits" in l)
     end = next(i for i, l in enumerate(lines) if "END EXPERIMENT CONFIG" in l)
 except StopIteration:
     sys.exit(1)  # markers missing/mangled → caller treats as violation
-protected = "".join(lines[:start + 1] + lines[end:])
-print(hashlib.sha256(protected.encode()).hexdigest())
+h = hashlib.sha256("".join(lines[:start + 1] + lines[end:]).encode())
+script_dir = Path(sys.argv[1]).resolve().parent
+for extra in [Path.home() / "Lexios" / "lexios" / "eval.py",
+              script_dir / "evaluate.py", script_dir / "prepare.py"]:
+    if extra.exists():
+        h.update(extra.read_bytes())
+print(h.hexdigest())
 PY
 }
 
@@ -91,6 +101,9 @@ PY
 measure() {
     local run_log="$1"
     RESULT_JSON=""
+    # Re-copy ground truth from the Lexios corpus before every measurement so
+    # a tampered/drifted GT file can never inflate a score.
+    python3 "$SCRIPT_DIR/prepare.py" >> "$run_log" 2>&1
     rm -f "$SCRIPT_DIR/last-result.json" "$(pwd)/last-result.json"
     timeout "$MEASURE_TIMEOUT" python3 "$EXPERIMENT_FILE" --eval-docs "$EVAL_DOCS" >> "$run_log" 2>&1
     local rc=$?
@@ -222,6 +235,7 @@ ${RESULTS_HISTORY}
             --no-session-persistence \
             --model sonnet \
             --allowedTools "Read,Edit,Grep,Glob" \
+            --disallowedTools "Bash,Write,NotebookEdit,WebFetch,WebSearch,Task,Agent" \
             2>&1 | tee "$EXPERIMENT_LOG" || true
     else
         log "ERROR: claude CLI not found at $CLAUDE_BIN"
@@ -260,6 +274,20 @@ ${RESULTS_HISTORY}
         echo -e "$(date -u +%Y-%m-%dT%H:%M:%SZ)\t$EXPERIMENT_ID\tmeasurement-failed\t$BEST_F1\t0\t0\terror" >> "$RESULTS_FILE"
         rm -f "$EXPERIMENT_FILE.bak"
         continue
+    fi
+
+    # CONFIG code runs inside the measurement process (preprocess/postprocess
+    # are arbitrary Python) — re-verify the protected files afterwards so
+    # persistent tampering during measurement can't survive. On violation:
+    # restore what we can and ABORT the night fail-closed — the scorer may be
+    # poisoned and no further measurement can be trusted until a human looks.
+    if [ "$(guard_hash)" != "$PRE_GUARD" ]; then
+        log "GUARD VIOLATION (post-measurement): protected files changed DURING the run — restoring and ABORTING tonight"
+        cp "$EXPERIMENT_FILE.bak" "$EXPERIMENT_FILE"
+        git -C "$HOME/Lexios" checkout -- lexios/eval.py 2>/dev/null || true
+        echo -e "$(date -u +%Y-%m-%dT%H:%M:%SZ)\t$EXPERIMENT_ID\tguard-violation-postmeasure\t$BEST_F1\t0\t0\trejected-guard" >> "$RESULTS_FILE"
+        rm -f "$EXPERIMENT_FILE.bak"
+        break
     fi
 
     NEW_F1=$(jget "$RESULT_JSON" overall_f1 0)
