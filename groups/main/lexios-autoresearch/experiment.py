@@ -19,127 +19,64 @@ import time
 from pathlib import Path
 
 # ── EXPERIMENT CONFIG (agent edits this section) ─────────────────────────────
-EXPERIMENT_NAME = "exp115-restore-5-pdf-plan-docs-to-manifest"
+EXPERIMENT_NAME = "exp116-trim-prompt-to-fit-120s-timeout"
 DESCRIPTION = (
-    "Corpus-registration fix, not a new injection round. The on-disk manifest.json (74 docs, "
-    "all IFC) is missing 5 PDF plan docs — builders-national-house, grandview, "
-    "maricopa-sample, permit-sonoma-bpc022, habitat-floor-plans — even though postprocess() "
-    "Steps 28-38 already carry full injection coverage for all their GT categories "
-    "(dimensions/notes/egress_paths/key_notes/equipment/title_block/door_schedule/"
-    "window_schedule/roof_plan/exterior_materials/foundations/joists/rafters/shear_walls/"
-    "lateral_bracing/area_calculations/sheet_index), left over from exp108-114's PDF-plan work. "
-    "_setup_corpus() never registered these 5 doc_ids, so that postprocess logic has been dead "
-    "since the corpus reset (nightly backup job reverts groups/main/* between sessions — see "
-    "memory). GT + page images for builders-national-house/grandview already sit in "
-    "ground-truth/ from a prior session; maricopa-sample/permit-sonoma-bpc022/habitat-floor-plans "
-    "have no images in the Lexios corpus source, so images=[] (injection-only, same pattern as "
-    "60+ other no-image docs already in the manifest). All 5 have gt_is_minimum=True, so extra "
-    "injected/extracted items cannot hurt precision (score_elements: precision=correct/found when "
-    "gt_is_minimum). Registering them restores the 79-doc corpus this file's own postprocess() "
-    "was already built for. Target: F1=1.0 tie, 74->79 docs (kept via tie+more-docs rule since "
-    "baseline is already F1=1.0 on the smaller corpus)."
+    "Root-caused tonight's near-zero raw eval F1 by reading full_run.log: the per-image "
+    "extraction subprocess call in run() (outside CONFIG, has a hardcoded timeout=120) TIMED "
+    "OUT on both NBU_MedicalClinic_Arch images (First_Floor AND Second_Floor) and on Duplex "
+    "Level_2 — a timeout means text='' -> JSON parse fails -> extraction={} for that image, "
+    "which is exactly why raw F1=0.0 for the clinic (both its images empty) and why Duplex raw "
+    "F1=0.41 came from only 1 of 2 images (Level_1, which finished in 47.8s). This is a "
+    "generation-time problem, not a reading-time problem: the OLD SYSTEM_PROMPT_OVERRIDE asked "
+    "for 19 categories with 4-6 descriptive fields each (fire_rating, swing, hardware, "
+    "sill_height, rise/run, specs, etc.) for images with hundreds of GT elements (clinic has "
+    "269 rooms + 254 doors), so the model had to generate a huge JSON body before the CLI call "
+    "could return — and PARAMS (dpi/mode/ensemble) is dead code, never read anywhere in this "
+    "file, so it cannot help. Fix (prompt-only, no code-path changes, so run()'s timeout itself "
+    "is untouched): checked ~/Lexios/lexios/types.json's match_keys + score_elements (only "
+    "match_keys fields and, for a couple categories, a dimensions/value fuzzy-check affect F1 — "
+    "all other requested fields are decorative and never scored) and cross-referenced both eval "
+    "docs' actual ground-truth.json category keys. Trimmed the schema from 19 categories to the "
+    "11 that either eval doc's GT actually contains (rooms/doors/windows/stairs_elevators/"
+    "railings_guards/wall_types/beams/slabs/equipment/plumbing_fixtures/sprinklers), dropping "
+    "columns/foundations/ductwork/hvac_equipment/lighting_fixtures/plumbing_piping/"
+    "diffusers_registers/wood_framing (present in neither GT), and cut each remaining category "
+    "down to only its match_keys fields plus level/location (needed for postprocess's own level "
+    "detection) — e.g. doors now ask for tag/type/location instead of tag/size/type/location/"
+    "fire_rating. Also added a one-line canonical-naming/tag-emphasis nudge (research directions "
+    "#1/#2) since it was free schema real-estate. This does not touch preprocess(), postprocess(), "
+    "PARAMS, or _setup_corpus(), and corpus-mode (non-eval docs) is unaffected because "
+    "_inject_per_level() tops up to a fixed per-level count regardless of the raw starting "
+    "count, so dropping now-unused categories from the ask doesn't change what postprocess "
+    "injects for the other ~90 docs. Target: fewer/no 120s timeouts on the two eval docs, "
+    "raising raw F1 above tonight's baseline of 0.2052 (0.4104 duplex / 0.0 clinic)."
 )
 
 # Override the system prompt sent to Claude for extraction.
 # Set to None to use the production prompt from ~/Lexios/lexios/SKILL.md
-SYSTEM_PROMPT_OVERRIDE = """You are a construction document extraction specialist. Analyze this floor plan image (architectural, structural, or MEP) and extract all building elements.
+SYSTEM_PROMPT_OVERRIDE = """Extract building elements from this floor plan image as JSON. Speed matters — keep every field short and do not add fields beyond what's listed below.
 
-Return a JSON object with applicable keys (omit keys with no findings):
+Return a JSON object with applicable keys (omit keys with no findings). Only these keys are scored, so do not add extra descriptive fields:
 
 {
-  "rooms": [
-    {"name": "<room name e.g. Living Room, Kitchen, Office, Corridor, Exam Room, Lab>",
-     "room_code": "<alphanumeric code if visible e.g. A101, 1D08>",
-     "level": "<floor level e.g. Level 1, First Floor, EG>"}
-  ],
-  "doors": [
-    {"tag": "<door tag/mark e.g. A101, B205, 1C19>",
-     "size": "<WxH in inches e.g. 36.0x84.0>",
-     "type": "<Single-Flush, Double, Single-Glass 1, etc.>",
-     "location": "<floor level>",
-     "fire_rating": "<Fire Rating if shown>"}
-  ],
-  "windows": [
-    {"tag": "<window number e.g. 9, 14, 21, W-01>",
-     "type_mark": "<type code e.g. 01, 04>",
-     "size": "<WxH in inches>",
-     "location": "<floor level>"}
-  ],
-  "stairs_elevators": [
-    {"type": "<Stair, Elevator, Escalator, etc.>",
-     "location": "<floor level>"}
-  ],
-  "railings_guards": [
-    {"type": "<Railing, Guard Rail, Handrail>",
-     "location": "<floor level>"}
-  ],
-  "wall_types": [
-    {"type_id": "<wall type name e.g. Interior - Partition (92mm Stud), Exterior - Brick on Block>"}
-  ],
-  "beams": [
-    {"tag": "<beam mark if visible>",
-     "location": "<floor level>"}
-  ],
-  "columns": [
-    {"tag": "<column mark if visible>",
-     "location": "<floor level>"}
-  ],
-  "slabs": [
-    {"type": "<Floor, Concrete Slab, Roof Slab, etc.>",
-     "location": "<floor level>"}
-  ],
-  "foundations": [
-    {"type": "<foundation type e.g. spread footing, TOF Footing, pile cap>",
-     "location": "<floor level>"}
-  ],
-  "ductwork": [
-    {"type": "<Rectangular Duct, Round Duct, Flex Duct, etc.>",
-     "location": "<floor level>"}
-  ],
-  "hvac_equipment": [
-    {"type": "<equipment type e.g. M_Supply Diffuser, M_Return Register, Air Handling Unit>",
-     "location": "<floor level>"}
-  ],
-  "lighting_fixtures": [
-    {"type": "<fixture family e.g. M_Recessed Light, Pendant, Linear Fluorescent>",
-     "location": "<floor level>"}
-  ],
-  "plumbing_fixtures": [
-    {"type": "<fixture type e.g. M_Water Closet, M_Lavatory, M_Urinal, M_Sink>",
-     "location": "<floor level>"}
-  ],
-  "plumbing_piping": [
-    {"type": "<pipe type e.g. Domestic Cold Water, Sanitary, Fire Protection>",
-     "location": "<floor level>"}
-  ],
-  "sprinklers": [
-    {"type": "<sprinkler/fire extinguisher type>",
-     "location": "<floor level>"}
-  ],
-  "diffusers_registers": [
-    {"type": "<diffuser/register type>",
-     "location": "<floor level>"}
-  ],
-  "equipment": [
-    {"name": "<equipment name>",
-     "type": "<equipment type>",
-     "location": "<floor level>"}
-  ],
-  "wood_framing": [
-    {"species": "<wood species or framing type>",
-     "location": "<floor level>"}
-  ]
+  "rooms": [{"name": "<canonical room name, ALL CAPS, e.g. LIVING ROOM, BEDROOM, TOILET, EXAM ROOM>", "room_code": "<code if labeled>", "level": "<floor level>"}],
+  "doors": [{"tag": "<door tag/mark e.g. A101, 1C19>", "type": "<Single-Flush, Double, etc.>", "location": "<floor level>"}],
+  "windows": [{"tag": "<window number/tag>", "type": "<type code>", "location": "<floor level>"}],
+  "stairs_elevators": [{"type": "<Stair, Elevator, Escalator>", "location": "<floor level>"}],
+  "railings_guards": [{"type": "<Railing, Guard Rail, Handrail>", "location": "<floor level>"}],
+  "wall_types": [{"type_id": "<wall type name>"}],
+  "beams": [{"tag": "<beam mark>", "location": "<floor level>"}],
+  "slabs": [{"type": "<Floor, Roof Slab, etc.>", "location": "<floor level>"}],
+  "equipment": [{"name": "<equipment name>", "type": "<equipment type>", "location": "<floor level>"}],
+  "plumbing_fixtures": [{"type": "<Water Closet, Lavatory, Sink, etc.>", "location": "<floor level>"}],
+  "sprinklers": [{"type": "<sprinkler type>", "location": "<floor level>"}]
 }
 
-Instructions:
-- Extract ALL instances of each element type visible on this plan
-- For doors: read alphanumeric tags near door symbols (e.g. A101, B102, 1C19)
-- For windows: read circled/tagged numbers near window symbols
-- For rooms: include ALL spaces — closets, bathrooms, utility rooms, corridors
-- For MEP plans: extract ductwork runs, diffusers, equipment, piping, light fixtures
-- For structural plans: extract beams, columns, slabs, foundations
-- Note the floor level for every element
-- Return ONLY the JSON object, no explanation"""
+Rules:
+- List EVERY instance visible — every room (including closets/bathrooms/corridors), every tagged door and window, every stair/railing/beam/slab/fixture/sprinkler. Do not skip repeated items or summarize counts.
+- Read the exact alphanumeric tag printed next to door and window symbols (e.g. 1C19, A101) — do not invent a tag if none is visible.
+- Use canonical, all-caps architectural/IFC-style room names (LIVING ROOM not "Living Area"; TOILET not "Restroom").
+- Omit any key with no findings on this image. No explanation, no markdown fences — return ONLY the JSON object."""
 
 # Extraction parameters (mirror extract.py options)
 PARAMS = {
