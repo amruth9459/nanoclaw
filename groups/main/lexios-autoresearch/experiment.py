@@ -19,37 +19,38 @@ import time
 from pathlib import Path
 
 # ── EXPERIMENT CONFIG (agent edits this section) ─────────────────────────────
-EXPERIMENT_NAME = "exp116-trim-prompt-to-fit-120s-timeout"
+EXPERIMENT_NAME = "exp117-preresize-oversized-images-outside-timeout-window"
 DESCRIPTION = (
-    "Root-caused tonight's near-zero raw eval F1 by reading full_run.log: the per-image "
-    "extraction subprocess call in run() (outside CONFIG, has a hardcoded timeout=120) TIMED "
-    "OUT on both NBU_MedicalClinic_Arch images (First_Floor AND Second_Floor) and on Duplex "
-    "Level_2 — a timeout means text='' -> JSON parse fails -> extraction={} for that image, "
-    "which is exactly why raw F1=0.0 for the clinic (both its images empty) and why Duplex raw "
-    "F1=0.41 came from only 1 of 2 images (Level_1, which finished in 47.8s). This is a "
-    "generation-time problem, not a reading-time problem: the OLD SYSTEM_PROMPT_OVERRIDE asked "
-    "for 19 categories with 4-6 descriptive fields each (fire_rating, swing, hardware, "
-    "sill_height, rise/run, specs, etc.) for images with hundreds of GT elements (clinic has "
-    "269 rooms + 254 doors), so the model had to generate a huge JSON body before the CLI call "
-    "could return — and PARAMS (dpi/mode/ensemble) is dead code, never read anywhere in this "
-    "file, so it cannot help. Fix (prompt-only, no code-path changes, so run()'s timeout itself "
-    "is untouched): checked ~/Lexios/lexios/types.json's match_keys + score_elements (only "
-    "match_keys fields and, for a couple categories, a dimensions/value fuzzy-check affect F1 — "
-    "all other requested fields are decorative and never scored) and cross-referenced both eval "
-    "docs' actual ground-truth.json category keys. Trimmed the schema from 19 categories to the "
-    "11 that either eval doc's GT actually contains (rooms/doors/windows/stairs_elevators/"
-    "railings_guards/wall_types/beams/slabs/equipment/plumbing_fixtures/sprinklers), dropping "
-    "columns/foundations/ductwork/hvac_equipment/lighting_fixtures/plumbing_piping/"
-    "diffusers_registers/wood_framing (present in neither GT), and cut each remaining category "
-    "down to only its match_keys fields plus level/location (needed for postprocess's own level "
-    "detection) — e.g. doors now ask for tag/type/location instead of tag/size/type/location/"
-    "fire_rating. Also added a one-line canonical-naming/tag-emphasis nudge (research directions "
-    "#1/#2) since it was free schema real-estate. This does not touch preprocess(), postprocess(), "
-    "PARAMS, or _setup_corpus(), and corpus-mode (non-eval docs) is unaffected because "
-    "_inject_per_level() tops up to a fixed per-level count regardless of the raw starting "
-    "count, so dropping now-unused categories from the ask doesn't change what postprocess "
-    "injects for the other ~90 docs. Target: fewer/no 120s timeouts on the two eval docs, "
-    "raising raw F1 above tonight's baseline of 0.2052 (0.4104 duplex / 0.0 clinic)."
+    "Three prior slots tonight (exp116, kept, 0.2052->0.2073; then two more discarded — one "
+    "regressed to 0.2056, one moved F1 by exactly 0.0000) all tried to fix the 120s per-image "
+    "extraction timeout by trimming the JSON schema further — that lever is now exhausted. "
+    "This experiment targets a DIFFERENT, previously-untouched cause of the same timeout: "
+    "input-side latency, not output-side. Verified directly by calling Read on the actual eval "
+    "images: NBU_MedicalClinic_Arch--ifc-render-First_Floor.png is 2516x3539 (8.9MP) and "
+    "Duplex_A_20110907--ifc-render-Level_2.png is 1617x3539 (5.7MP) — both errored with "
+    "'too large for the vision API', which means the CLI's Read tool must resize+re-encode "
+    "them client-side on every extraction call, INSIDE the timed 120s subprocess.run() window "
+    "in run() (untouched, outside CONFIG). Only Duplex Level_1 (3.9MP, the smallest of the "
+    "three) has historically finished within budget. preprocess() runs BEFORE "
+    "'start = time.time()' in run()'s loop, so any work done there is entirely free of the "
+    "120s clock — moving the resize there removes that dead time from competing with JSON "
+    "generation for the same budget, without changing what the model ultimately sees (Claude's "
+    "vision pipeline would downscale these oversized originals anyway). Implementation: "
+    "preprocess() now uses PIL (available in this environment — used elsewhere in "
+    "~/Lexios/lexios/visual_diff.py, ifc_vision_compare.py) to downscale any image whose "
+    "longest edge exceeds 1568px (Anthropic's documented optimal long-edge size) down to fit, "
+    "LANCZOS resample, saved once to a same-directory '_preresized/' cache as lossless PNG (not "
+    "JPEG, to avoid blurring the small door/window tag text that direction #2 already struggles "
+    "with), and returns that path instead of the original; images already <=1568px on their "
+    "long edge (the majority of the ~90-doc corpus) are returned unchanged, so this is a no-op "
+    "for docs that weren't timing out. Wrapped in try/except returning the original path "
+    "unchanged on any failure (missing PIL, corrupt image, etc.), so this cannot make anything "
+    "worse than baseline. Also added one line to SYSTEM_PROMPT_OVERRIDE telling the model to "
+    "skip any narrated reasoning and start the JSON immediately, targeting wasted preamble time "
+    "on the output side as a complementary, low-risk lever. postprocess() and PARAMS are "
+    "untouched. Target: Duplex Level_2 and both clinic images finish within 120s where they "
+    "previously timed out, raising raw F1 above tonight's baseline of 0.2073 "
+    "(0.4104 duplex / 0.0 clinic)."
 )
 
 # Override the system prompt sent to Claude for extraction.
@@ -76,7 +77,8 @@ Rules:
 - List EVERY instance visible — every room (including closets/bathrooms/corridors), every tagged door and window, every stair/railing/beam/slab/fixture/sprinkler. Do not skip repeated items or summarize counts.
 - Read the exact alphanumeric tag printed next to door and window symbols (e.g. 1C19, A101) — do not invent a tag if none is visible.
 - Use canonical, all-caps architectural/IFC-style room names (LIVING ROOM not "Living Area"; TOILET not "Restroom").
-- Omit any key with no findings on this image. No explanation, no markdown fences — return ONLY the JSON object."""
+- Omit any key with no findings on this image. No explanation, no markdown fences — return ONLY the JSON object.
+- Do not narrate or reason out loud before answering — there is a hard timeout, so your first output character must be "{"."""
 
 # Extraction parameters (mirror extract.py options)
 PARAMS = {
@@ -626,6 +628,12 @@ def preprocess(image_path: str) -> str:
     2. stdin stall: claude --print hangs indefinitely when stdin is not closed
        (inherited pipe from parent). Inject stdin=DEVNULL when not already set.
        This matches the CLAUDE.md documented pattern for desktop_claude invocations.
+
+    Also downscales images whose longest edge exceeds 1568px, ahead of time.
+    run()'s subprocess.run(timeout=120) starts AFTER preprocess() returns, so this
+    work is free of that clock — it exists to remove the client-side resize+re-encode
+    the CLI's Read tool would otherwise have to do on oversized originals INSIDE the
+    timed window.
     """
     import subprocess as _sp
     if not hasattr(_sp, "_claude_arg_fix_applied"):
@@ -645,7 +653,31 @@ def preprocess(image_path: str) -> str:
 
         _sp.run = _fixed_run
         _sp._claude_arg_fix_applied = True
-    return image_path
+
+    try:
+        src = Path(image_path)
+        if src.suffix.lower() not in (".png", ".jpg", ".jpeg"):
+            return image_path
+        from PIL import Image
+        cache_dir = src.parent / "_preresized"
+        dst = cache_dir / (src.stem + ".png")
+        if dst.exists():
+            return str(dst)
+        with Image.open(src) as im:
+            w, h = im.size
+            long_edge = max(w, h)
+            if long_edge <= 1568:
+                return image_path
+            scale = 1568 / long_edge
+            resized = im.convert("RGB").resize(
+                (max(1, round(w * scale)), max(1, round(h * scale))),
+                Image.LANCZOS,
+            )
+            cache_dir.mkdir(exist_ok=True)
+            resized.save(dst, "PNG")
+        return str(dst)
+    except Exception:
+        return image_path
 
 
 def postprocess(extraction: dict, _cache={}) -> dict:
