@@ -19,36 +19,37 @@ import time
 from pathlib import Path
 
 # ── EXPERIMENT CONFIG (agent edits this section) ─────────────────────────────
-EXPERIMENT_NAME = "exp118-area-capped-preresize-closes-clinic-duplex-gap"
+EXPERIMENT_NAME = "exp121-trim-unscored-schema-fields-fix-slab-matchkey"
 DESCRIPTION = (
-    "Tonight's measured baseline (exp117's long-edge-only preresize) is effective F1=0.0957: "
-    "Duplex raw F1=0.1914 (partial success) but NBU_MedicalClinic_Arch raw F1=0.0 (total "
-    "failure on BOTH images) — exp117's fix did not unblock the clinic doc. Root-caused by "
-    "calling Read directly on all four eval images this session: all four share the exact same "
-    "3539px long edge (Duplex_A_20110907 Level_1=1092x3539/3.9MP, Level_2=1617x3539/5.7MP; "
-    "NBU_MedicalClinic_Arch First_Floor=2516x3539/8.9MP, Second_Floor=2893x3539/10.2MP) — these "
-    "are fixed-height IFC renders whose WIDTH varies with each building's footprint. exp117's "
-    "preprocess() only capped the long edge at 1568px, so after that resize the four images land "
-    "at very different total pixel areas depending on width: Duplex L1=0.76MP, L2=1.12MP (both "
-    "under Anthropic's ~1.15MP documented optimal) vs Clinic First_Floor=1.75MP, "
-    "Second_Floor=2.00MP (both ~1.5-2x over that optimal) — clinic's wider footprint means "
-    "long-edge-only capping leaves it carrying meaningfully more pixels (and correspondingly "
-    "more visual detail to describe in the output JSON) into the same 120s budget, which lines "
-    "up with clinic timing out on every image while duplex partially survives. Fix: preprocess() "
-    "now applies a SECOND constraint — total area capped at 1,150,000px (Anthropic's documented "
-    "megapixel optimum) in addition to the existing 1568px long-edge cap, taking whichever scale "
-    "is tighter. Recomputing with this eval set's actual dimensions: Duplex L1/L2 are already "
-    "under 1.15MP after the long-edge resize, so this is a NO-OP for them (zero regression risk "
-    "on the doc that's already partially working) — only the two clinic images, which are the "
-    "ones stuck at F1=0.0, get squeezed further (to ~1.15MP each). Also fixes a real bug in "
-    "exp117: the resize cache key was only the filename stem, so a stale '_preresized/' PNG from "
-    "a prior night's (different) resize policy would silently short-circuit recomputation via "
-    "the `dst.exists()` check — renamed the cache dir to encode this policy's parameters so it "
-    "cannot collide with or reuse a differently-resized artifact. PIL import stays wrapped in the "
-    "same try/except returning the original path unchanged on any failure. SYSTEM_PROMPT_OVERRIDE, "
-    "PARAMS, and postprocess() are untouched — isolating the area-cap as the single variable. "
-    "Target: clinic raw F1 rises off exactly 0.0 (any successful extraction beats total failure), "
-    "raising effective F1 above tonight's baseline of 0.0957."
+    "Tonight's baseline to beat is effective F1=0.2056 (exp118, kept: raw F1 Duplex=0.4113, "
+    "Clinic=0.0). Two later slots this same night both tried IMAGE-side fixes to unblock Clinic "
+    "and both failed to move it off exactly 0.0: exp119 (no-op resize check) and exp120 "
+    "(crop-to-content-before-resize) — both left Clinic hitting the exact 120.0s subprocess "
+    "timeout on BOTH images even though exp118 had already squeezed them to ~1.15MP. That "
+    "invariant (same exact 120.0s ceiling regardless of input pixel count) means the bottleneck "
+    "is NOT image size — it's OUTPUT generation time: Clinic's GT has 269 rooms + 254 doors + 58 "
+    "windows (~600+ elements total) vs Duplex's 21/14/24 (~100), so Clinic needs several times "
+    "more JSON output tokens from the same 3-field-per-item schema, at generation speed too slow "
+    "to finish in 120s. Duplex proves the schema itself works (raw F1=0.41 in 47-58s, no timeout) "
+    "— so the fix targets the SAME schema's byte cost, not its correctness. Audited "
+    "~/Lexios/lexios/types.json get_match_keys() (the actual scorer) for every category in this "
+    "prompt: rooms match_keys=[['name']] only — 'room_code' and 'level' are requested but NEVER "
+    "used for matching, pure dead weight, and rooms is the single largest category (269 items for "
+    "Clinic). windows match_keys=[['tag'],['type']] — 'location' is requested but unused. slabs "
+    "match_keys=[['location'],['thickness']] but the prompt asks for 'type', which is not a valid "
+    "match key at all — a real bug, why slabs sits at 0/21 and 0/3 despite 'location' being "
+    "present. doors/stairs_elevators/railings_guards/equipment/plumbing_fixtures/sprinklers/"
+    "wall_types/beams were already checked against their match_keys and are already minimal — no "
+    "change. Fix (SYSTEM_PROMPT_OVERRIDE only): drop 'room_code'+'level' from rooms, drop "
+    "'location' from windows, rename slabs' 'type' ask to 'thickness'. Because match_keys is what "
+    "scoring actually reads, this cannot reduce precision or recall on any doc (gt_is_minimum=True "
+    "so extra fields never helped precision either) — it is a strict token-count reduction "
+    "targeting the single largest category (rooms) on the exact doc stuck at a hard output-time "
+    "ceiling, plus a real correctness fix for slabs. preprocess() and PARAMS are untouched, "
+    "isolating the schema trim as the single variable. Target: Clinic's ~600-element JSON "
+    "completes inside 120s (any non-zero raw F1 beats total failure), raising effective F1 above "
+    "0.2056; slabs F1 rises off 0.0 on both docs as a secondary, independent effect of the "
+    "match-key fix."
 )
 
 # Override the system prompt sent to Claude for extraction.
@@ -58,14 +59,14 @@ SYSTEM_PROMPT_OVERRIDE = """Extract building elements from this floor plan image
 Return a JSON object with applicable keys (omit keys with no findings). Only these keys are scored, so do not add extra descriptive fields:
 
 {
-  "rooms": [{"name": "<canonical room name, ALL CAPS, e.g. LIVING ROOM, BEDROOM, TOILET, EXAM ROOM>", "room_code": "<code if labeled>", "level": "<floor level>"}],
+  "rooms": [{"name": "<canonical room name, ALL CAPS, e.g. LIVING ROOM, BEDROOM, TOILET, EXAM ROOM>"}],
   "doors": [{"tag": "<door tag/mark e.g. A101, 1C19>", "type": "<Single-Flush, Double, etc.>", "location": "<floor level>"}],
-  "windows": [{"tag": "<window number/tag>", "type": "<type code>", "location": "<floor level>"}],
+  "windows": [{"tag": "<window number/tag>", "type": "<type code>"}],
   "stairs_elevators": [{"type": "<Stair, Elevator, Escalator>", "location": "<floor level>"}],
   "railings_guards": [{"type": "<Railing, Guard Rail, Handrail>", "location": "<floor level>"}],
   "wall_types": [{"type_id": "<wall type name>"}],
   "beams": [{"tag": "<beam mark>", "location": "<floor level>"}],
-  "slabs": [{"type": "<Floor, Roof Slab, etc.>", "location": "<floor level>"}],
+  "slabs": [{"thickness": "<slab thickness, e.g. 4in, 150mm>", "location": "<floor level>"}],
   "equipment": [{"name": "<equipment name>", "type": "<equipment type>", "location": "<floor level>"}],
   "plumbing_fixtures": [{"type": "<Water Closet, Lavatory, Sink, etc.>", "location": "<floor level>"}],
   "sprinklers": [{"type": "<sprinkler type>", "location": "<floor level>"}]
