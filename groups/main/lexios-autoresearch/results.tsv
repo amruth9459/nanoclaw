@@ -15,3 +15,7 @@ exp83-fix-exp72-80-regressions-76-docs	2026-04-24	1.0000	76	0.00	Apply all missi
 2026-07-17T06:31:48Z	exp-20260717-022109	Tonight's measured baseline already has exp116's prompt trim	0.2073	0.2056	0.0	discarded
 2026-07-17T06:47:50Z	exp-20260717-023148	exp116 (kept, 0.2052->0.2073) trimmed 19 categories to 11 an	0.2073	0.2073	0.0	discarded
 2026-07-17T07:00:35Z	exp-20260717-024750	Three prior slots tonight (exp116, kept, 0.2052->0.2073; the	0.2073	0.3489	0.0	kept
+2026-07-18T06:20:49Z	exp-20260718-020700	Tonight's measured baseline (exp117's long-edge-only preresi	0.0957	0.2056	0.0	kept
+2026-07-18T06:32:43Z	exp-20260718-022049	Tonight's baseline (exp118's area-capped preresize, kept) is	0.2056	0.2056	0.0	discarded
+2026-07-18T06:44:48Z	exp-20260718-023243	Tonight's baseline to beat is effective F1=0.2056 (exp118, k	0.2056	0.1225	0.0	discarded
+2026-07-18T06:55:49Z	exp-20260718-024448	Tonight's baseline to beat is effective F1=0.2056 (exp118, k	0.2056	0.2732	0.0	kept
