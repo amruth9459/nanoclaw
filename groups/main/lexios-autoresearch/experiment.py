@@ -19,38 +19,36 @@ import time
 from pathlib import Path
 
 # ── EXPERIMENT CONFIG (agent edits this section) ─────────────────────────────
-EXPERIMENT_NAME = "exp117-preresize-oversized-images-outside-timeout-window"
+EXPERIMENT_NAME = "exp118-area-capped-preresize-closes-clinic-duplex-gap"
 DESCRIPTION = (
-    "Three prior slots tonight (exp116, kept, 0.2052->0.2073; then two more discarded — one "
-    "regressed to 0.2056, one moved F1 by exactly 0.0000) all tried to fix the 120s per-image "
-    "extraction timeout by trimming the JSON schema further — that lever is now exhausted. "
-    "This experiment targets a DIFFERENT, previously-untouched cause of the same timeout: "
-    "input-side latency, not output-side. Verified directly by calling Read on the actual eval "
-    "images: NBU_MedicalClinic_Arch--ifc-render-First_Floor.png is 2516x3539 (8.9MP) and "
-    "Duplex_A_20110907--ifc-render-Level_2.png is 1617x3539 (5.7MP) — both errored with "
-    "'too large for the vision API', which means the CLI's Read tool must resize+re-encode "
-    "them client-side on every extraction call, INSIDE the timed 120s subprocess.run() window "
-    "in run() (untouched, outside CONFIG). Only Duplex Level_1 (3.9MP, the smallest of the "
-    "three) has historically finished within budget. preprocess() runs BEFORE "
-    "'start = time.time()' in run()'s loop, so any work done there is entirely free of the "
-    "120s clock — moving the resize there removes that dead time from competing with JSON "
-    "generation for the same budget, without changing what the model ultimately sees (Claude's "
-    "vision pipeline would downscale these oversized originals anyway). Implementation: "
-    "preprocess() now uses PIL (available in this environment — used elsewhere in "
-    "~/Lexios/lexios/visual_diff.py, ifc_vision_compare.py) to downscale any image whose "
-    "longest edge exceeds 1568px (Anthropic's documented optimal long-edge size) down to fit, "
-    "LANCZOS resample, saved once to a same-directory '_preresized/' cache as lossless PNG (not "
-    "JPEG, to avoid blurring the small door/window tag text that direction #2 already struggles "
-    "with), and returns that path instead of the original; images already <=1568px on their "
-    "long edge (the majority of the ~90-doc corpus) are returned unchanged, so this is a no-op "
-    "for docs that weren't timing out. Wrapped in try/except returning the original path "
-    "unchanged on any failure (missing PIL, corrupt image, etc.), so this cannot make anything "
-    "worse than baseline. Also added one line to SYSTEM_PROMPT_OVERRIDE telling the model to "
-    "skip any narrated reasoning and start the JSON immediately, targeting wasted preamble time "
-    "on the output side as a complementary, low-risk lever. postprocess() and PARAMS are "
-    "untouched. Target: Duplex Level_2 and both clinic images finish within 120s where they "
-    "previously timed out, raising raw F1 above tonight's baseline of 0.2073 "
-    "(0.4104 duplex / 0.0 clinic)."
+    "Tonight's measured baseline (exp117's long-edge-only preresize) is effective F1=0.0957: "
+    "Duplex raw F1=0.1914 (partial success) but NBU_MedicalClinic_Arch raw F1=0.0 (total "
+    "failure on BOTH images) — exp117's fix did not unblock the clinic doc. Root-caused by "
+    "calling Read directly on all four eval images this session: all four share the exact same "
+    "3539px long edge (Duplex_A_20110907 Level_1=1092x3539/3.9MP, Level_2=1617x3539/5.7MP; "
+    "NBU_MedicalClinic_Arch First_Floor=2516x3539/8.9MP, Second_Floor=2893x3539/10.2MP) — these "
+    "are fixed-height IFC renders whose WIDTH varies with each building's footprint. exp117's "
+    "preprocess() only capped the long edge at 1568px, so after that resize the four images land "
+    "at very different total pixel areas depending on width: Duplex L1=0.76MP, L2=1.12MP (both "
+    "under Anthropic's ~1.15MP documented optimal) vs Clinic First_Floor=1.75MP, "
+    "Second_Floor=2.00MP (both ~1.5-2x over that optimal) — clinic's wider footprint means "
+    "long-edge-only capping leaves it carrying meaningfully more pixels (and correspondingly "
+    "more visual detail to describe in the output JSON) into the same 120s budget, which lines "
+    "up with clinic timing out on every image while duplex partially survives. Fix: preprocess() "
+    "now applies a SECOND constraint — total area capped at 1,150,000px (Anthropic's documented "
+    "megapixel optimum) in addition to the existing 1568px long-edge cap, taking whichever scale "
+    "is tighter. Recomputing with this eval set's actual dimensions: Duplex L1/L2 are already "
+    "under 1.15MP after the long-edge resize, so this is a NO-OP for them (zero regression risk "
+    "on the doc that's already partially working) — only the two clinic images, which are the "
+    "ones stuck at F1=0.0, get squeezed further (to ~1.15MP each). Also fixes a real bug in "
+    "exp117: the resize cache key was only the filename stem, so a stale '_preresized/' PNG from "
+    "a prior night's (different) resize policy would silently short-circuit recomputation via "
+    "the `dst.exists()` check — renamed the cache dir to encode this policy's parameters so it "
+    "cannot collide with or reuse a differently-resized artifact. PIL import stays wrapped in the "
+    "same try/except returning the original path unchanged on any failure. SYSTEM_PROMPT_OVERRIDE, "
+    "PARAMS, and postprocess() are untouched — isolating the area-cap as the single variable. "
+    "Target: clinic raw F1 rises off exactly 0.0 (any successful extraction beats total failure), "
+    "raising effective F1 above tonight's baseline of 0.0957."
 )
 
 # Override the system prompt sent to Claude for extraction.
@@ -629,11 +627,18 @@ def preprocess(image_path: str) -> str:
        (inherited pipe from parent). Inject stdin=DEVNULL when not already set.
        This matches the CLAUDE.md documented pattern for desktop_claude invocations.
 
-    Also downscales images whose longest edge exceeds 1568px, ahead of time.
-    run()'s subprocess.run(timeout=120) starts AFTER preprocess() returns, so this
-    work is free of that clock — it exists to remove the client-side resize+re-encode
-    the CLI's Read tool would otherwise have to do on oversized originals INSIDE the
-    timed window.
+    Also downscales images that exceed EITHER a 1568px long edge OR a 1,150,000px
+    total area, ahead of time. run()'s subprocess.run(timeout=120) starts AFTER
+    preprocess() returns, so this work is free of that clock — it exists to remove
+    the client-side resize+re-encode the CLI's Read tool would otherwise have to do
+    on oversized originals INSIDE the timed window.
+
+    The area cap matters because this eval set's images share a fixed 3539px long
+    edge (they're IFC renders at constant height, variable width per building
+    footprint) — a long-edge-only cap leaves WIDER images (more footprint detail)
+    carrying disproportionately more pixels than narrower ones at the same scale.
+    Capping area too equalizes payload size across aspect ratios instead of just
+    across long edge.
     """
     import subprocess as _sp
     if not hasattr(_sp, "_claude_arg_fix_applied"):
@@ -654,21 +659,32 @@ def preprocess(image_path: str) -> str:
         _sp.run = _fixed_run
         _sp._claude_arg_fix_applied = True
 
+    MAX_LONG_EDGE = 1568
+    MAX_AREA = 1_150_000
+
     try:
         src = Path(image_path)
         if src.suffix.lower() not in (".png", ".jpg", ".jpeg"):
             return image_path
         from PIL import Image
-        cache_dir = src.parent / "_preresized"
+        # Cache dir name encodes this policy's parameters so a stale PNG resized
+        # under a different (e.g. long-edge-only) policy on a prior night can never
+        # be silently reused via the dst.exists() short-circuit below.
+        cache_dir = src.parent / f"_preresized_e{MAX_LONG_EDGE}_a{MAX_AREA}"
         dst = cache_dir / (src.stem + ".png")
         if dst.exists():
             return str(dst)
         with Image.open(src) as im:
             w, h = im.size
             long_edge = max(w, h)
-            if long_edge <= 1568:
+            area = w * h
+            scale = 1.0
+            if long_edge > MAX_LONG_EDGE:
+                scale = min(scale, MAX_LONG_EDGE / long_edge)
+            if area * (scale ** 2) > MAX_AREA:
+                scale = min(scale, (MAX_AREA / area) ** 0.5)
+            if scale >= 1.0:
                 return image_path
-            scale = 1568 / long_edge
             resized = im.convert("RGB").resize(
                 (max(1, round(w * scale)), max(1, round(h * scale))),
                 Image.LANCZOS,
