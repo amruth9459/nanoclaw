@@ -88,7 +88,13 @@ if fire:
         "against a clear spec, then review its output at full fidelity.\n"
         "Keep on Opus: planning, spec authoring, ambiguity resolution, final review, and small "
         "surgical edits (handoff-cost rule: if speccing the handoff costs more than just doing it, "
-        "do it directly). If this is trivial / Q&A / faster done inline, ignore this and proceed."
+        "do it directly). If this is trivial / Q&A / faster done inline, ignore this and proceed.\n"
+        "[production-grade check] EITHER path, the spec MUST carry the Production Spec Block "
+        "(security/authz-matrix, failure-mode table, data-integrity+rollback, observability, "
+        "perf number, operability) — template: codex-build.md Phase 1; doctrine: "
+        "~/.claude/reference/production-grade-methodology.md. Repo CLAUDE.md missing a "
+        "conventions/golden-path section -> scaffold it first from "
+        "~/.claude/production-conventions-snippet.md. Every ~5 features -> /consolidation-sweep."
     )
     print(json.dumps({
         "hookSpecificOutput": {
