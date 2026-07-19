@@ -20,3 +20,6 @@ exp83-fix-exp72-80-regressions-76-docs	2026-04-24	1.0000	76	0.00	Apply all missi
 2026-07-18T06:44:48Z	exp-20260718-023243	Tonight's baseline to beat is effective F1=0.2056 (exp118, k	0.2056	0.1225	0.0	discarded
 2026-07-18T06:55:49Z	exp-20260718-024448	Tonight's baseline to beat is effective F1=0.2056 (exp118, k	0.2056	0.2732	0.0	kept
 2026-07-19T06:25:56Z	exp-20260719-020654	Read the actual last real-vision run instead of reasoning a 	0.2233	0.2035	0.0	discarded
+2026-07-19T06:44:39Z	exp-20260719-022556	Tonight's baseline to beat is effective F1=0.2233 (exp121, k	0.2233	0.1373	0.0	discarded
+2026-07-19T06:59:06Z	exp-20260719-024439	Tonight's baseline to beat is effective F1=0.2233 (exp121, k	0.2233	0.1373	0.0	discarded
+2026-07-19T07:17:55Z	exp-20260719-025906	Tonight's baseline to beat is effective F1=0.2233 (exp121, k	0.2233	0.2097	0.0	discarded
