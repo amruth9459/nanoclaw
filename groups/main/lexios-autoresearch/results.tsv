@@ -23,3 +23,7 @@ exp83-fix-exp72-80-regressions-76-docs	2026-04-24	1.0000	76	0.00	Apply all missi
 2026-07-19T06:44:39Z	exp-20260719-022556	Tonight's baseline to beat is effective F1=0.2233 (exp121, k	0.2233	0.1373	0.0	discarded
 2026-07-19T06:59:06Z	exp-20260719-024439	Tonight's baseline to beat is effective F1=0.2233 (exp121, k	0.2233	0.1373	0.0	discarded
 2026-07-19T07:17:55Z	exp-20260719-025906	Tonight's baseline to beat is effective F1=0.2233 (exp121, k	0.2233	0.2097	0.0	discarded
+2026-07-20T06:28:17Z	exp-20260720-020714	Tonight's baseline to beat is effective F1=0.1373 (Duplex ra	0.1373	0.2949	0.0	kept
+2026-07-20T06:40:01Z	exp-20260720-022817	Tonight's baseline to beat is effective F1=0.2949 (exp126, k	0.2949	0.2546	0.0	discarded
+2026-07-20T06:57:27Z	exp-20260720-024001	Tonight's baseline to beat is effective F1=0.2949 (exp126, k	0.2949	0.3491	0.0	kept
+2026-07-20T07:13:03Z	exp-20260720-025727	Tonight's baseline to beat is effective F1=0.3491 (exp128, k	0.3491	0.3075	0.0	discarded
