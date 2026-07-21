@@ -19,53 +19,49 @@ import time
 from pathlib import Path
 
 # ── EXPERIMENT CONFIG (agent edits this section) ─────────────────────────────
-EXPERIMENT_NAME = "exp128-raise-large-category-cap-25-to-35"
+EXPERIMENT_NAME = "exp130-drop-dead-categories-fund-cap-35-to-45"
 DESCRIPTION = (
-    "Tonight's baseline to beat is effective F1=0.2949 (exp126, kept: reordered schema + 25-item "
-    "caps on rooms/doors/windows + verbatim room-name transcription). Slot 2 tonight "
-    "(exp127-windows-tag-only-schema-drop-dead-type-field, discarded 0.2949->0.2546) dropped "
-    "windows' dead 'type' field; read that log (logs/exp-20260720-022817.log) plus tonight's "
-    "baseline log (logs/exp-20260720-020714.log) directly before picking this edit. Read "
-    "eval.py's score_elements/multi_field_match directly (not guessed): for each GT element, it "
-    "does a GREEDY first-match scan over extracted elements, trying each match_key group in "
-    "priority order and skipping any group where the GT value is empty — first satisfying "
-    "extracted element wins, no bipartite optimization. Checked ~/Lexios/lexios/types.json: doors "
-    "match_keys=[['location'],['tag'],['type']]. Checked both eval docs' ground truth directly: "
-    "every door in Duplex_A_20110907.ground-truth.json has location='Level 1'/'Level 2' (a coarse "
-    "per-floor label shared by every door on that level, not a per-door identifier), and every "
-    "door in NBU_MedicalClinic_Arch.ground-truth.json has location='First Floor'/'Second Floor' "
-    "the same way — and SYSTEM_PROMPT_OVERRIDE already asks for exactly this field on every door. "
-    "That means the 'location' group — first priority — is satisfied whenever the model tags a "
-    "door with the right floor, regardless of tag/type accuracy, so 'tag'/'type' (priorities 2-3) "
-    "are essentially never needed to produce a match. Tonight's own exp126 baseline log proves "
-    "this empirically, not just in theory: Duplex doors matched 13/14 at precision=1.00, and "
-    "Clinic doors matched EXACTLY 25/25 (the per-image cap) at precision=1.00 — every door the "
-    "model listed was accepted, zero rejected. Rooms show the identical pattern (match_keys=[['name']] "
-    "only): Clinic rooms matched EXACTLY 25/25 at precision=1.00. Windows (match_keys=[['tag'],"
-    "['type']], no location escape valve) already sit near saturation for Clinic under the current "
-    "cap — 58/58 matched, F1=1.00 in tonight's baseline — because Clinic's true windows-per-image "
-    "count is under 25, so the cap never actually engages there; only doors and rooms are cap-"
-    "bound on Clinic. Conclusion: for both of Clinic's cap-bound categories, every listed item is "
-    "currently being matched (precision=1.00 twice running), so the enumeration cap — not match "
-    "quality — is the entire ceiling on their recall. Raising it from 25 to 35 should convert close "
-    "to linearly into more matches on any run where both Clinic images complete, with no plausible "
-    "precision cost (nothing in tonight's evidence suggests the 26th-35th listed item would be any "
-    "less likely to match than the first 25 were). Duplex is provably unaffected exactly as under "
-    "exp126: its largest category (windows=24) stays under 35, confirmed inert in both exp126's "
-    "and tonight's own logs where Duplex never approached the old cap either. Honest risk: this "
-    "adds roughly 20 more items (10 more each for doors and rooms) to Clinic's per-image output, "
-    "which could add generation time under the hard 120s cutoff. We are NOT removing the cap "
-    "outright — exp122 tried that and Clinic timed out completely (discarded). We chose a modest "
-    "+40% step instead of a bigger one specifically because tonight's own two Clinic runs (exp126, "
-    "exp127) both finished individual images in 66-80s at cap=25, leaving 40-54s of margin, and "
-    "because the SAME two logs show large image-to-image timing swings unrelated to schema size "
-    "(Duplex Level_1 alone ranged 34s in exp126 to a full 120s timeout in exp127 despite exp127's "
-    "*lighter* schema, and Level_2 ranged 30.8s-74.7s) — that variance looks dominated by an "
-    "external/runtime factor, not output volume, so a moderate cap raise is a bounded bet: if a "
-    "Clinic image times out anyway, that's no worse than tonight's own baseline, which already "
-    "loses one Clinic image to timeout most nights. Windows/doors/rooms schema FIELDS are "
-    "untouched from exp126 (kept, not the discarded exp127 field-drop) — only the numeric cap and "
-    "its one prose reference change, from 25 to 35. preprocess() and PARAMS are untouched."
+    "Tonight's measured baseline (program.md, real vision, current experiment.py which is "
+    "exp128, kept) is effective F1=0.3496: Duplex_A_20110907 raw=0.4146, "
+    "NBU_MedicalClinic_Arch raw=0.2845. Slot 1 tonight errored (API stream stall, "
+    "logs/exp-20260721-020426.log, no usable result to build on). Read exp128's own log "
+    "(logs/exp-20260720-024001.log, kept 0.2949->0.3491) and exp129's log "
+    "(logs/exp-20260720-025727.log, discarded 0.3491->0.3075) directly before picking this "
+    "edit — both confirm the SAME 7 categories sit at literal F1=0.00 on every run this week: "
+    "Duplex beams(0/8) railings_guards(0/4) slabs(0/21) wall_types(0/8); Clinic "
+    "equipment(0/2) plumbing_fixtures(0/3) railings_guards(0/9) slabs(0/3) sprinklers(0/10) "
+    "wall_types(0/7). exp129 is the key new evidence: it added ~900 characters of per-category "
+    "'where to find these' guidance for exactly these 7 categories, and Duplex's zero counts "
+    "were IDENTICAL afterward (still 0/8, 0/4, 0/21, 0/8) despite Duplex images finishing in "
+    "30-58s with time to spare — proving this isn't a time-budget or attention problem, these "
+    "items are genuinely not legible in these IFC-render images (no legends/schedules/text-note "
+    "callouts exist on a pure geometric IFC render, unlike a real drawing sheet). Meanwhile that "
+    "same added bulk pushed Clinic's Second_Floor image over the 120s cutoff into a full timeout "
+    "(0 elements, WARN in the log) — bulk cost real budget for zero possible gain. Separately, "
+    "exp128's own log shows Clinic doors and rooms are STILL exactly cap-bound at precision=1.00: "
+    "70/254 doors = exactly 2x35(cap), 70/269 rooms = exactly 2x35(cap) — every single listed item "
+    "matches, so the enumeration cap (not model attention) remains the entire recall ceiling on "
+    "Clinic's two highest-value categories, exactly as exp128 found going 25->35. This edit is one "
+    "coupled hypothesis, not two independent ones: reallocate the budget exp129 proved is wasted "
+    "on 7 unfindable categories into the one lever (cap) proven twice now (exp126, exp128) to "
+    "convert close to linearly at zero precision cost. Concretely: (1) removed all 7 always-zero "
+    "categories' field definitions from SYSTEM_PROMPT_OVERRIDE's JSON schema and dropped the "
+    "priority-1 sentence listing them, keeping stairs_elevators alone in priority-1 since it's "
+    "the one non-zero category there (Duplex 1/2, Clinic 3/3 in every log this week) — this is "
+    "score-safe because eval.py's per-category breakdown is GT-driven, not schema-driven (exp128's "
+    "own DESCRIPTION already established this): dropping a category from the PROMPT cannot change "
+    "its GT-side denominator, so these 7 stay scored exactly as F1=0.00, no regression possible; "
+    "(2) raised the shared rooms/doors/windows enumeration cap from 35 to 45 — same +10-item step "
+    "size as exp128's successful 25->35 raise — spending the freed schema/search budget on doors "
+    "and rooms specifically, since windows never approaches even the old cap (Clinic=58 total, "
+    "Duplex=24 total, both under 35 already, so windows is provably inert under this change exactly "
+    "as it was under exp128's raise). Honest risk: Clinic images were already at 96-98s of the 120s "
+    "budget in exp128 with the full 7-category schema present; this edit removes roughly 600+ "
+    "characters of now-deleted schema/instruction text (which the model no longer has to read or "
+    "attempt to search for) to help offset the ~10 more doors + ~10 more rooms of output the cap "
+    "raise adds, but if the net still tips a Clinic image over 120s, that reverts no worse than "
+    "exp129's own discard — the downside is bounded to this slot. preprocess() and PARAMS are "
+    "untouched; only SYSTEM_PROMPT_OVERRIDE changed."
 )
 
 # Override the system prompt sent to Claude for extraction.
@@ -76,22 +72,15 @@ Return a JSON object with applicable keys (omit keys with no findings). Only the
 
 {
   "stairs_elevators": [{"type": "<Stair, Elevator, Escalator>", "location": "<floor level>"}],
-  "railings_guards": [{"type": "<Railing, Guard Rail, Handrail>", "location": "<floor level>"}],
-  "wall_types": [{"type_id": "<wall type name>"}],
-  "beams": [{"tag": "<beam mark>", "location": "<floor level>"}],
-  "slabs": [{"thickness": "<slab thickness, e.g. 4in, 150mm>", "location": "<floor level>"}],
-  "equipment": [{"name": "<equipment name>", "type": "<equipment type>", "location": "<floor level>"}],
-  "plumbing_fixtures": [{"type": "<Water Closet, Lavatory, Sink, etc.>", "location": "<floor level>"}],
-  "sprinklers": [{"type": "<sprinkler type>", "location": "<floor level>"}],
   "windows": [{"tag": "<window number/tag>", "type": "<type code>"}],
   "doors": [{"tag": "<door tag/mark e.g. A101, 1C19>", "type": "<Single-Flush, Double, etc.>", "location": "<floor level>"}],
   "rooms": [{"name": "<room label transcribed VERBATIM from the drawing, same abbreviations and wording as printed>"}]
 }
 
 Priority and pacing (this order matters under the time limit):
-1. FIRST, find and completely list every stairs_elevators, railings_guards, wall_types, beams, slabs, equipment, plumbing_fixtures, and sprinklers instance. On real floor plans these categories are usually under 10 items each, so completeness here is cheap, and each category counts equally toward your score no matter how few items it has.
+1. FIRST, find and completely list every stairs_elevators instance — these are usually few and cheap to enumerate completely.
 2. THEN list windows and doors, reading the exact alphanumeric tag printed next to each symbol (e.g. 1C19, A101) — do not invent a tag if none is visible.
-3. FINALLY list rooms. If rooms, doors, or windows each have more than 35 instances on this image, list the first 35 distinct ones you find and stop that category there rather than continuing to search for more — a finished response covering fewer instances of the large categories beats an unfinished one that gets discarded entirely.
+3. FINALLY list rooms. If rooms, doors, or windows each have more than 45 instances on this image, list the first 45 distinct ones you find and stop that category there rather than continuing to search for more — a finished response covering fewer instances of the large categories beats an unfinished one that gets discarded entirely.
 
 Rules:
 - Transcribe each room's printed label exactly as it appears on the drawing, including abbreviations and number suffixes (e.g. "Bathroom 1", "TOILET", "Foyer", "M. TOILET") — do not paraphrase it into a different generic term; that breaks matching even when you read the room correctly.
