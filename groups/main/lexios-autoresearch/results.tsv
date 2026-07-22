@@ -31,3 +31,5 @@ exp83-fix-exp72-80-regressions-76-docs	2026-04-24	1.0000	76	0.00	Apply all missi
 2026-07-21T06:27:05Z	exp-20260721-021402	Tonight's measured baseline (program.md, real vision, curren	0.3496	0.3545	0.0	kept
 2026-07-21T06:38:21Z	exp-20260721-022705	no-edit	0.3545	0	0	no-edit
 2026-07-21T06:54:22Z	exp-20260721-023821	Tonight's baseline to beat is effective F1=0.3545 (exp130, k	0.3545	0.2442	0.0	discarded
+2026-07-22T06:22:14Z	exp-20260722-020517	Tonight's measured baseline (real vision, current experiment	0.3153	0.3609	0.0	kept
+2026-07-22T06:43:36Z	exp-20260722-022214	Tonight's baseline to beat is effective F1=0.3609 (exp132, k	0.3609	0.2097	0.0	discarded
