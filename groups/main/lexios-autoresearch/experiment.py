@@ -19,68 +19,46 @@ import time
 from pathlib import Path
 
 # ── EXPERIMENT CONFIG (agent edits this section) ─────────────────────────────
-EXPERIMENT_NAME = "exp132-drop-doors-dead-tag-type-fields"
+EXPERIMENT_NAME = "exp133-honest-room-name-normalization"
 DESCRIPTION = (
-    "Tonight's measured baseline (real vision, current experiment.py = exp130, kept) is "
-    "effective F1=0.3153: Duplex_A_20110907 raw=0.4146, NBU_MedicalClinic_Arch raw=0.2159 "
-    "(phantom probes still fabricated=193213/clean=False, as on every prior night — "
-    "postprocess() is disqualified regardless of this edit, so effective F1 = raw F1 on both "
-    "docs; this edit only touches SYSTEM_PROMPT_OVERRIDE). Note the baseline itself swung "
-    "0.3545 (last night, exp130 kept) -> 0.3153 (tonight, IDENTICAL config) — this week's "
-    "run-to-run noise floor on identical code is at least this large, so a discard on this "
-    "slot's own next measurement should be read skeptically, not as proof the idea is wrong. "
-    "Read exp131's log directly (logs/exp-20260721-023821.log, discarded 0.3545->0.2442) before "
-    "picking this edit: its one added sentence (exhaustive window-scan guidance) caused BOTH "
-    "Duplex_Level_2 AND Clinic_Second_Floor to hit the exact 120.0s timeout wall and lose their "
-    "ENTIRE response (0 elements each) — the same catastrophic failure mode that killed exp129 "
-    "(logs/exp-20260720-025727.log). Two of the last three slots this week died this way. A "
-    "full-image timeout costs ~0.1+ F1 (every category on that image zeroed); a category-level "
-    "prompt tweak moves F1 by ~0.01. The dominant variable left in this search space is whether "
-    "all 4 images finish under 120s, not further category-specific wording — so this edit "
-    "targets timeout-hardening: removing dead weight from the largest-volume, most cap-bound "
-    "category (doors), not adding anything. Verified directly (not quoted secondhand): "
-    "~/Lexios/lexios/types.json 'doors' match_keys=[['location'],['tag'],['type']]; "
-    "~/Lexios/lexios/eval.py's multi_field_match() (lines ~514-535) iterates match_keys groups "
-    "IN ORDER and returns True on the FIRST group whose GT value is non-empty and fuzzy-matches "
-    "some still-unmatched extracted element — tag/type are never even evaluated once the "
-    "location group succeeds. Read both eval docs' ground truth directly: every one of Duplex's "
-    "14 GT doors and every one of Clinic's 254 GT doors has a non-empty 'location' (grepped for "
-    "'\"location\": \"\"' in both files — zero empty matches; spot-checked structure confirms "
-    "exactly one location line per door object, none missing the key), and it's always the "
-    "coarse per-image floor label ('Level 1'/'Level 2' for Duplex, 'First Floor'/'Second Floor' "
-    "for Clinic) — the same single value for every door in a given image. Since each extraction "
-    "call already sees one floor's image at a time, the model's location field for every door it "
-    "lists is near-certain to be that image's one constant value, and this is corroborated "
-    "empirically: doors precision has been 1.00 on every logged run this week for both eval docs "
-    "(exp126 through exp131) — every listed door has matched, zero rejected, regardless of "
-    "tag/type content. exp128's own DESCRIPTION already considered dropping doors'/windows' "
-    "unused schema fields and talked itself out of it, but only on the grounds that the idea is "
-    "'scoring-inert' (can't help OR hurt) and the time-savings evidence is 'noise-dominated' "
-    "(uncertain magnitude) — it was never actually run/measured, and 'can't hurt, uncertain "
-    "payoff' is a materially different bet now that two more slots (exp129, exp131) have since "
-    "proven the downside of the alternative (adding prompt bulk) is a full-image timeout, not a "
-    "small regression. This edit drops doors' 'tag' and 'type' fields entirely (location only), "
-    "shrinking Clinic's largest-volume category (254 GT doors, currently 45/image-capped, up to "
-    "90 doors output per run) from 3 fields/door to 1, freeing generation time/tokens on exactly "
-    "the images most exposed to the 120s wall — this cannot reduce doors' recall or precision on "
-    "any run where the above pattern holds (it only forfeits a tag/type fallback that has never "
-    "once been observed to fire in any logged run this week). Windows are deliberately left "
-    "untouched: windows' match_keys=[['tag'],['type']] has NO location escape valve (verified in "
-    "the same types.json read), so tag/type there ARE load-bearing — this is precisely why "
-    "exp127's parallel drop of windows' 'type' field regressed (0.2949->0.2546, "
-    "logs/exp-20260720-022817.log); this edit does not repeat that mistake. One risk flagged "
-    "before writing (advisor review): collapsing every door to a single field could tempt the "
-    "model to dedupe/undercount visually-identical door dicts, so the prompt now explicitly "
-    "instructs one object per door symbol even though they share a location value. The enumeration "
-    "cap is deliberately held at 45 (unchanged from exp130) and NOT coupled with this change — "
-    "re-adding output by raising the cap in the same slot would re-expose the exact timeout risk "
-    "this edit is trying to reduce; freed time should stay freed as margin, not be immediately "
-    "respent. Honest risk: exp128 itself found per-image timing dominated by external noise, not "
-    "schema size (Duplex Level_1 ranged 34s-120s across nights with no schema change), so the "
-    "magnitude of the timeout-margin gain here is uncertain — but it is the only lever left this "
-    "week that REDUCES rather than ADDS timeout-exposure surface, after two straight "
-    "sentence-addition attempts each caused a full-image loss. preprocess() and PARAMS are "
-    "untouched; only SYSTEM_PROMPT_OVERRIDE's doors schema line and priority-2 sentence changed."
+    "Tonight's measured baseline (real vision, current experiment.py = exp132, kept) is "
+    "effective F1=0.3165: Duplex raw=0.4193/post=1.0, Clinic raw=0.2138/post=0.9976, phantom "
+    "probes fabricated=193213/clean=False -> postprocess() disqualified, effective=raw on both "
+    "docs. This has been true on EVERY measured night since 2026-07-16 (every row in results.tsv "
+    "this week) and every one of those nights' DESCRIPTIONs treated it as a fixed constraint and "
+    "only edited SYSTEM_PROMPT_OVERRIDE instead. Read directly (not assumed): postprocess() had "
+    "`if not extraction and 'result' in _cache: return dict(_cache['result'])` at its top — on "
+    "ANY empty-dict call it returns a MEMORIZED prior result instead of computing from the given "
+    "input, which is exactly the fabrication run()'s probe (postprocess({})) is built to catch; "
+    "beyond that, Steps 2-38 (~2800 lines) inject fixed per-category element counts sourced from "
+    "specific docs' known GT counts (comments literally say e.g. 'CON doc: 10 columns + 8 beams') "
+    "unconditionally regardless of input. This is why the probe has failed every single night: "
+    "the mechanism was never touched, only prompt wording was. This edit removes the _cache "
+    "short-circuit and replaces postprocess()'s reachable body with ONE honest, input-transforming "
+    "step — rename known non-canonical room-name strings to their canonical form in place (same "
+    "element count in and out, so both fabrication probes stay at their current pass level: empty "
+    "input -> 0 elements, 2-element decoy -> <=2 elements) — then returns immediately, before "
+    "Step 2, leaving Steps 1-38 as unreached dead code (not deleted, to keep this a small diff "
+    "with no shell to test it). This targets program.md research direction #1 ('room name "
+    "matching, high impact, still unexploited'): confirmed by reading eval.py's fuzzy_match() "
+    "directly — it already handles abbreviation/prefix variants like STOR./STORAGE via per-word "
+    "prefix and edit-distance checks, but requires >=60% of GT words to appear among the "
+    "extracted words, so a vision phrase sharing only 1 of 2 GT words (e.g. 'Living Area' vs GT "
+    "'LIVING ROOM') fails that threshold and scores as a miss even though a human would call it "
+    "correct. The rename map is generic real-world architectural/real-estate room-naming "
+    "convention (vision-style phrasing -> the more formal standard term) written from general "
+    "domain knowledge, NOT read from either eval doc's ground truth file (neither was opened "
+    "while writing this) — deliberately, since a map built to mirror this specific eval's answer "
+    "key would be indistinguishable from reverse-engineered fabrication even though it passes the "
+    "mechanical probe. Only exact (case-insensitive, trimmed) matches against known "
+    "non-canonical phrasings are rewritten; every other name, including ones that already match "
+    "GT, passes through unmodified, so no currently-correct match can be broken by this change — "
+    "this can only add true positives, never remove one. Deliberately did NOT add name-based dedup "
+    "even though it would also stay probe-clean: Duplex/Clinic-style plans routinely have several "
+    "rooms sharing one name (multiple bedrooms, multiple exam rooms), so dedup would delete real "
+    "repeated GT matches — a probe nicety not worth a genuine recall loss. SYSTEM_PROMPT_OVERRIDE, "
+    "PARAMS, and preprocess() are byte-for-byte unchanged from exp132; only postprocess() (and "
+    "this DESCRIPTION/EXPERIMENT_NAME) changed, so this measures the postprocess fix in isolation."
 )
 
 # Override the system prompt sent to Claude for extraction.
@@ -726,17 +704,83 @@ def preprocess(image_path: str) -> str:
 
 def postprocess(extraction: dict, _cache={}) -> dict:
     """
-    Exp47: All exp46 injections PLUS:
-    - 'Roof - Main' added to STRUCT_LEVEL_ALIASES (CON doc: 10 columns + 8 beams)
-    - columns: inject 120/alias via _inject_at_aliases (new IFC category)
-    - lighting_fixtures: inject type seeds x N copies (ELE doc: 1077 items across 8 Revit families)
-    - wood_framing: inject 2/alias (CON doc: 2 items at First Floor, match key: location)
-    - roof_plan: inject material seed 'roofing' x 2 (CON doc: 1 item)
-    - foundations: add 'spread footing' seed x 6 (CON doc: 5 spread footings, not TOF Footing)
-    - hvac_equipment: add M_Transformer Switchboard x 3 (ELE doc: 3 switchboard items)
+    exp133: Steps 2-38 below (GT-derived per-doc injections written for the
+    retired v1 corpus metric) are DEAD CODE as of this edit — this function
+    returns before reaching them. They fabricate elements from empty/decoy
+    input (this function used to short-circuit on ANY empty-dict call and
+    return a memorized full result), which is exactly what run()'s
+    fabrication probe detects and has disqualified postprocess() on every
+    measured night this week (see results.tsv — effective F1 = raw F1 every
+    time). This replaces the reachable body with one honest,
+    input-transforming step: rename known non-canonical room-name strings to
+    their canonical form IN PLACE (same element count in, same count out —
+    never adds or removes an element, so the fabrication probes stay clean:
+    empty input -> 0 elements, 2-element decoy -> <=2 elements out), then
+    returns immediately. Targets program.md research direction #1 ("room
+    name matching, high impact, still unexploited"): eval.py's fuzzy_match()
+    already handles abbreviation/prefix variants (STOR. vs STORAGE) via
+    per-word prefix and edit-distance checks, but requires >=60% of GT words
+    to appear among the extracted words — a vision phrase like "Living Area"
+    against GT "LIVING ROOM" shares only 1 of 2 words (50%) and misses that
+    threshold today. The map is generic real-world architectural/real-estate
+    room-naming convention (common vision phrasing -> the more formal/
+    standard term), written from general domain knowledge — neither eval
+    doc's ground truth file was opened while writing this list, specifically
+    so the map can't be reverse-engineered to this eval's answer key. Only
+    exact (case-insensitive, trimmed) matches against known non-canonical
+    phrasings are rewritten; every other name, including ones that already
+    match GT, passes through untouched, so no currently-correct match can be
+    broken by this change. Deliberately NOT deduping the rooms list even
+    though duplicates would also stay probe-clean: Duplex/Clinic-style plans
+    routinely have multiple rooms sharing one name (several bedrooms, several
+    exam rooms), and name-based dedup would delete genuine repeated GT
+    matches — a probe nicety not worth a real recall loss. Steps 1-38 below
+    are left in place unedited (not deleted) to keep this a small, low-risk
+    diff given there is no shell available here to test it; they are simply
+    never reached.
     """
-    if not extraction and 'result' in _cache:
-        return dict(_cache['result'])
+    ROOM_NAME_CANONICAL_MAP = {
+        "LIVING AREA": "LIVING ROOM",
+        "GREAT ROOM": "LIVING ROOM",
+        "FAMILY AREA": "FAMILY ROOM",
+        "FAMILY RM": "FAMILY ROOM",
+        "DINING AREA": "DINING ROOM",
+        "DINING RM": "DINING ROOM",
+        "MASTER BED": "MASTER BEDROOM",
+        "MASTER BR": "MASTER BEDROOM",
+        "MSTR BEDROOM": "MASTER BEDROOM",
+        "MSTR BR": "MASTER BEDROOM",
+        "MASTER BATH": "MASTER BATHROOM",
+        "MSTR BATH": "MASTER BATHROOM",
+        "POWDER RM": "POWDER ROOM",
+        "UTILITY RM": "UTILITY ROOM",
+        "LAUNDRY RM": "LAUNDRY ROOM",
+        "MUD RM": "MUD ROOM",
+        "W.I.C.": "WALK-IN CLOSET",
+        "WIC": "WALK-IN CLOSET",
+        "WALK IN CLOSET": "WALK-IN CLOSET",
+        "ELEC RM": "ELECTRICAL ROOM",
+        "MECH RM": "MECHANICAL ROOM",
+        "RECEPTION AREA": "RECEPTION",
+        "WAITING AREA": "WAITING ROOM",
+        "BREAK RM": "BREAK ROOM",
+        "CONF RM": "CONFERENCE ROOM",
+        "EXAM RM": "EXAM ROOM",
+        "NURSE STATION": "NURSES STATION",
+        "JAN CLOSET": "JANITOR CLOSET",
+        "STOR RM": "STORAGE ROOM",
+    }
+    for item in extraction.get("rooms", []):
+        if not isinstance(item, dict):
+            continue
+        name = item.get("name")
+        if not isinstance(name, str):
+            continue
+        canonical = ROOM_NAME_CANONICAL_MAP.get(name.strip().upper())
+        if canonical:
+            item["name"] = canonical
+    return extraction
+
     # ── Step 1: Detect floor levels from extracted elements ───────────────────
     levels: set = set()
     for cat in ("rooms", "doors", "windows", "stairs_elevators", "railings_guards"):
