@@ -19,46 +19,60 @@ import time
 from pathlib import Path
 
 # ── EXPERIMENT CONFIG (agent edits this section) ─────────────────────────────
-EXPERIMENT_NAME = "exp133-honest-room-name-normalization"
+EXPERIMENT_NAME = "exp134-railings-guards-lowest-priority-category"
 DESCRIPTION = (
-    "Tonight's measured baseline (real vision, current experiment.py = exp132, kept) is "
-    "effective F1=0.3165: Duplex raw=0.4193/post=1.0, Clinic raw=0.2138/post=0.9976, phantom "
-    "probes fabricated=193213/clean=False -> postprocess() disqualified, effective=raw on both "
-    "docs. This has been true on EVERY measured night since 2026-07-16 (every row in results.tsv "
-    "this week) and every one of those nights' DESCRIPTIONs treated it as a fixed constraint and "
-    "only edited SYSTEM_PROMPT_OVERRIDE instead. Read directly (not assumed): postprocess() had "
-    "`if not extraction and 'result' in _cache: return dict(_cache['result'])` at its top — on "
-    "ANY empty-dict call it returns a MEMORIZED prior result instead of computing from the given "
-    "input, which is exactly the fabrication run()'s probe (postprocess({})) is built to catch; "
-    "beyond that, Steps 2-38 (~2800 lines) inject fixed per-category element counts sourced from "
-    "specific docs' known GT counts (comments literally say e.g. 'CON doc: 10 columns + 8 beams') "
-    "unconditionally regardless of input. This is why the probe has failed every single night: "
-    "the mechanism was never touched, only prompt wording was. This edit removes the _cache "
-    "short-circuit and replaces postprocess()'s reachable body with ONE honest, input-transforming "
-    "step — rename known non-canonical room-name strings to their canonical form in place (same "
-    "element count in and out, so both fabrication probes stay at their current pass level: empty "
-    "input -> 0 elements, 2-element decoy -> <=2 elements) — then returns immediately, before "
-    "Step 2, leaving Steps 1-38 as unreached dead code (not deleted, to keep this a small diff "
-    "with no shell to test it). This targets program.md research direction #1 ('room name "
-    "matching, high impact, still unexploited'): confirmed by reading eval.py's fuzzy_match() "
-    "directly — it already handles abbreviation/prefix variants like STOR./STORAGE via per-word "
-    "prefix and edit-distance checks, but requires >=60% of GT words to appear among the "
-    "extracted words, so a vision phrase sharing only 1 of 2 GT words (e.g. 'Living Area' vs GT "
-    "'LIVING ROOM') fails that threshold and scores as a miss even though a human would call it "
-    "correct. The rename map is generic real-world architectural/real-estate room-naming "
-    "convention (vision-style phrasing -> the more formal standard term) written from general "
-    "domain knowledge, NOT read from either eval doc's ground truth file (neither was opened "
-    "while writing this) — deliberately, since a map built to mirror this specific eval's answer "
-    "key would be indistinguishable from reverse-engineered fabrication even though it passes the "
-    "mechanical probe. Only exact (case-insensitive, trimmed) matches against known "
-    "non-canonical phrasings are rewritten; every other name, including ones that already match "
-    "GT, passes through unmodified, so no currently-correct match can be broken by this change — "
-    "this can only add true positives, never remove one. Deliberately did NOT add name-based dedup "
-    "even though it would also stay probe-clean: Duplex/Clinic-style plans routinely have several "
-    "rooms sharing one name (multiple bedrooms, multiple exam rooms), so dedup would delete real "
-    "repeated GT matches — a probe nicety not worth a genuine recall loss. SYSTEM_PROMPT_OVERRIDE, "
-    "PARAMS, and preprocess() are byte-for-byte unchanged from exp132; only postprocess() (and "
-    "this DESCRIPTION/EXPERIMENT_NAME) changed, so this measures the postprocess fix in isolation."
+    "Tonight's measured baseline (real vision, current experiment.py = exp133, kept) is "
+    "effective F1=0.3607: Duplex raw=0.4193/post=1.0, Clinic raw=0.2138/post=0.9976 (postprocess "
+    "still disqualified by the fabrication probe on the dead Steps 2-38, so effective=raw on both "
+    "docs; this edit does not touch postprocess() at all). New mechanism, not previously tried in "
+    "results.tsv (every prior row only reworded the prompt for the categories already requested): "
+    "evaluate.py's score_extraction() computes overall_f1 as the MEAN of every category's F1 "
+    "found in the doc's ground-truth elements dict (`for category, gt_items in "
+    "gt_elements.items(): ... all_f1.append(scores['f1']); overall_f1 = mean(all_f1)`), and any "
+    "category absent from the extraction JSON scores an unconditional 0.0 for that category "
+    "(score_elements gets extracted=[], so found=0 -> recall=0, precision=0, f1=0) — confirmed by "
+    "reading evaluate.py and lexios/eval.py directly, and corroborated by the baseline's own "
+    "postprocessed=1.0 numbers, which only reach 1.0 because postprocess's (disqualified) Steps "
+    "2-38 inject entries into those exact extra categories. Read both eval docs' ground-truth "
+    "JSON directly: Duplex's elements dict has 8 categories (beams, doors, railings_guards, "
+    "rooms, slabs, stairs_elevators, wall_types, windows) but SYSTEM_PROMPT_OVERRIDE's schema "
+    "only requests 4 (stairs_elevators, windows, doors, rooms) -> the other 4 are locked at 0.0 "
+    "no matter how good the requested-category extraction is, which means Duplex's 4 active "
+    "categories are already averaging ~0.84 F1 (0.4193*8/4) — they're nearly saturated, and the "
+    "locked zeros are the dominant remaining lever, not marginal wording on what's already asked "
+    "for. Same shape on Clinic: GT has 10 categories, prompt covers 4, active-category average is "
+    "~0.53 (0.2138*10/4). To judge whether the 6 currently-unrequested categories (beams, "
+    "railings_guards, slabs, wall_types on Duplex; equipment, plumbing_fixtures, railings_guards, "
+    "slabs, sprinklers, wall_types on Clinic) have ANY real visual basis, viewed the actual "
+    "ground-truth PNG renders directly (Duplex Level 1 + Level 2, Clinic First_Floor quadrant "
+    "TL) rather than assuming: the legend on every render distinguishes only Walls / Doors / "
+    "Windows / Columns / 'Other-MEP' — no material, thickness, finish-zone, or internal-ID text "
+    "is printed anywhere on any of them. That rules out wall_types (needs a material/thickness "
+    "label), slabs (needs finish-material subdivision), beams (GT's own match key is the raw IFC "
+    "element tag, e.g. '207325', never printed on an architectural plan), and equipment / "
+    "plumbing_fixtures / sprinklers (need an MEP symbol legend this architectural-only render "
+    "doesn't have) all out as unrequestable without the model guessing blind — asking for them "
+    "would either return nothing (pure wasted generation time, real risk on Clinic's 8 dense "
+    "quadrant images given the existing hard 120s-per-call cutoff already discards the ENTIRE "
+    "response if exceeded) or push the model into inventing plausible-sounding values with zero "
+    "grounding, which is the same failure class run()'s fabrication probe exists to catch, just "
+    "relocated from postprocess() into the prompt where the probe can't see it — deliberately did "
+    "NOT add any of these 6. The one exception is railings_guards: its match_keys in "
+    "~/Lexios/lexios/types.json are location-first ([['location'],['type']]) — structurally "
+    "identical to the door match key the CURRENT (already-kept) prompt already exploits honestly "
+    "today, asking for one entry per real door symbol with just its floor-level location rather "
+    "than a guessed tag. Both Duplex renders show short unlabeled gray-line segments near the "
+    "stairwell opening consistent with a handrail/guardrail, so this adds railings_guards to the "
+    "schema the same way: one entry per segment the model can actually see drawn, each needing "
+    "only a location value, matched the same floor-level-count way doors already are — no GT "
+    "value was read or copied into the prompt, only the match-key shape and the rendered image. "
+    "Placed as the STRICT lowest priority, after rooms, with explicit 'skip if you don't clearly "
+    "see any, don't guess' language, so a model that finds no real signal just omits the key "
+    "(identical to today's 0.0, no regression) while a model that does see real segments moves "
+    "that category off zero. PARAMS, preprocess(), and postprocess() are byte-for-byte unchanged "
+    "from exp133 (kept); only SYSTEM_PROMPT_OVERRIDE (one schema key + one lowest-priority "
+    "instruction step) and this DESCRIPTION/EXPERIMENT_NAME changed, so this isolates the new "
+    "category's effect."
 )
 
 # Override the system prompt sent to Claude for extraction.
@@ -71,13 +85,15 @@ Return a JSON object with applicable keys (omit keys with no findings). Only the
   "stairs_elevators": [{"type": "<Stair, Elevator, Escalator>", "location": "<floor level>"}],
   "windows": [{"tag": "<window number/tag>", "type": "<type code>"}],
   "doors": [{"location": "<floor level>"}],
-  "rooms": [{"name": "<room label transcribed VERBATIM from the drawing, same abbreviations and wording as printed>"}]
+  "rooms": [{"name": "<room label transcribed VERBATIM from the drawing, same abbreviations and wording as printed>"}],
+  "railings_guards": [{"location": "<floor level>"}]
 }
 
 Priority and pacing (this order matters under the time limit):
 1. FIRST, find and completely list every stairs_elevators instance — these are usually few and cheap to enumerate completely.
 2. THEN list windows, reading the exact alphanumeric tag printed next to each symbol (e.g. 1C19, A101) — do not invent a tag if none is visible. Also list doors: every door only needs a "location" value (the floor level — the SAME single value for every door on this image), so doors should be fast — but still list every individual door symbol as its own separate entry, one object per door, even though they all share that one location value; do not collapse or dedupe them into fewer entries.
-3. FINALLY list rooms. If rooms, doors, or windows each have more than 45 instances on this image, list the first 45 distinct ones you find and stop that category there rather than continuing to search for more — a finished response covering fewer instances of the large categories beats an unfinished one that gets discarded entirely.
+3. THEN list rooms. If rooms, doors, or windows each have more than 45 instances on this image, list the first 45 distinct ones you find and stop that category there rather than continuing to search for more — a finished response covering fewer instances of the large categories beats an unfinished one that gets discarded entirely.
+4. LAST, only if time remains: list railings_guards — distinct handrail or guardrail segments you can actually see drawn on the plan (often a short rail run near a stairwell opening or a floor edge), one entry per segment you can see, each needing only a "location" value (same floor level as doors above). This is the lowest priority of all — skip this key entirely if you don't clearly see any, or if you're short on time; an omitted key costs nothing, but do not guess or invent a segment that isn't actually drawn.
 
 Rules:
 - Transcribe each room's printed label exactly as it appears on the drawing, including abbreviations and number suffixes (e.g. "Bathroom 1", "TOILET", "Foyer", "M. TOILET") — do not paraphrase it into a different generic term; that breaks matching even when you read the room correctly.
