@@ -43,3 +43,7 @@ exp83-fix-exp72-80-regressions-76-docs	2026-04-24	1.0000	76	0.00	Apply all missi
 2026-07-24T06:00:59Z	exp-20260724-020047	no-edit	0.0	0	0	no-edit
 2026-07-24T06:01:01Z	exp-20260724-020100	no-edit	0.0	0	0	no-edit
 2026-07-24T06:01:13Z	exp-20260724-020101	no-edit	0.0	0	0	no-edit
+2026-07-25T06:16:59Z	exp-20260725-020507	Tonight's measured baseline (real vision, current experiment	0.3165	0.3607	0.0	kept
+2026-07-25T06:33:35Z	exp-20260725-021659	Tonight's measured baseline (real vision, current experiment	0.3607	0.3611	0.0	kept
+2026-07-25T06:48:37Z	exp-20260725-023335	Tonight's measured baseline (real vision, current experiment	0.3611	0.2883	0.0	discarded
+2026-07-25T06:57:11Z	exp-20260725-024837	no-edit	0.3611	0	0	no-edit
