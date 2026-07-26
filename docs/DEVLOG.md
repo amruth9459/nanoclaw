@@ -5,6 +5,132 @@
 
 ---
 
+### 2026-07-26 04:09
+
+**Areas:** config
+**Files (20):** .cache/zellij/permissions.kdl, .claude-ledger/bin/claude-spend, .claude-ledger/claude-ledger.py, .claude-ledger/routing_gate.sh, .claude-ledger/weekly_usage.py, .claude/.gitattributes, .claude/.gitignore, .claude/CLAUDE.md, .claude/bin/claude-merge-device.sh, .claude/bin/fix-thinking.py, .claude/codex-build-routing-snippet.md, .claude/commands/checkpoint.md, .claude/commands/codex-build.md, .claude/commands/consolidation-sweep.md, .claude/commands/fable.md, .claude/commands/lexios.md, .claude/commands/recall.md, .claude/consolidation-2026-05-29/CONSOLIDATION_PLAN.md, .claude/consolidation-2026-05-29/add_history.py, .claude/consolidation-2026-05-29/batch.sh
+**Diff:** +144 -2 across 4 files
+
+### 2026-07-26 02:42
+
+**Areas:** config
+**Files (20):** .cache/zellij/permissions.kdl, .claude-ledger/bin/claude-spend, .claude-ledger/claude-ledger.py, .claude-ledger/routing_gate.sh, .claude-ledger/weekly_usage.py, .claude/.gitattributes, .claude/.gitignore, .claude/CLAUDE.md, .claude/bin/claude-merge-device.sh, .claude/bin/fix-thinking.py, .claude/codex-build-routing-snippet.md, .claude/commands/checkpoint.md, .claude/commands/codex-build.md, .claude/commands/consolidation-sweep.md, .claude/commands/fable.md, .claude/commands/lexios.md, .claude/commands/recall.md, .claude/consolidation-2026-05-29/CONSOLIDATION_PLAN.md, .claude/consolidation-2026-05-29/add_history.py, .claude/consolidation-2026-05-29/batch.sh
+**Diff:** +175 -56 across 5 files
+
+### 2026-07-26 02:41
+
+**Areas:** config
+**Files (20):** .cache/zellij/permissions.kdl, .claude-ledger/bin/claude-spend, .claude-ledger/claude-ledger.py, .claude-ledger/routing_gate.sh, .claude-ledger/weekly_usage.py, .claude/.gitattributes, .claude/.gitignore, .claude/CLAUDE.md, .claude/bin/claude-merge-device.sh, .claude/bin/fix-thinking.py, .claude/codex-build-routing-snippet.md, .claude/commands/checkpoint.md, .claude/commands/codex-build.md, .claude/commands/consolidation-sweep.md, .claude/commands/fable.md, .claude/commands/lexios.md, .claude/commands/recall.md, .claude/consolidation-2026-05-29/CONSOLIDATION_PLAN.md, .claude/consolidation-2026-05-29/add_history.py, .claude/consolidation-2026-05-29/batch.sh
+**Diff:** +169 -56 across 5 files
+
+### 2026-07-26 02:40
+
+**Areas:** config
+**Files (20):** .cache/zellij/permissions.kdl, .claude-ledger/bin/claude-spend, .claude-ledger/claude-ledger.py, .claude-ledger/routing_gate.sh, .claude-ledger/weekly_usage.py, .claude/.gitattributes, .claude/.gitignore, .claude/CLAUDE.md, .claude/bin/claude-merge-device.sh, .claude/bin/fix-thinking.py, .claude/codex-build-routing-snippet.md, .claude/commands/checkpoint.md, .claude/commands/codex-build.md, .claude/commands/consolidation-sweep.md, .claude/commands/fable.md, .claude/commands/lexios.md, .claude/commands/recall.md, .claude/consolidation-2026-05-29/CONSOLIDATION_PLAN.md, .claude/consolidation-2026-05-29/add_history.py, .claude/consolidation-2026-05-29/batch.sh
+**Diff:** +163 -56 across 5 files
+
+### 2026-07-26 02:39
+
+**Areas:** config
+**Files (20):** .cache/zellij/permissions.kdl, .claude-ledger/bin/claude-spend, .claude-ledger/claude-ledger.py, .claude-ledger/routing_gate.sh, .claude-ledger/weekly_usage.py, .claude/.gitattributes, .claude/.gitignore, .claude/CLAUDE.md, .claude/bin/claude-merge-device.sh, .claude/bin/fix-thinking.py, .claude/codex-build-routing-snippet.md, .claude/commands/checkpoint.md, .claude/commands/codex-build.md, .claude/commands/consolidation-sweep.md, .claude/commands/fable.md, .claude/commands/lexios.md, .claude/commands/recall.md, .claude/consolidation-2026-05-29/CONSOLIDATION_PLAN.md, .claude/consolidation-2026-05-29/add_history.py, .claude/consolidation-2026-05-29/batch.sh
+**Diff:** +157 -56 across 5 files
+
+### 2026-07-26 02:33
+
+**Areas:** config
+**Files (20):** .cache/zellij/permissions.kdl, .claude-ledger/bin/claude-spend, .claude-ledger/claude-ledger.py, .claude-ledger/routing_gate.sh, .claude-ledger/weekly_usage.py, .claude/.gitattributes, .claude/.gitignore, .claude/CLAUDE.md, .claude/bin/claude-merge-device.sh, .claude/bin/fix-thinking.py, .claude/codex-build-routing-snippet.md, .claude/commands/checkpoint.md, .claude/commands/codex-build.md, .claude/commands/consolidation-sweep.md, .claude/commands/fable.md, .claude/commands/lexios.md, .claude/commands/recall.md, .claude/consolidation-2026-05-29/CONSOLIDATION_PLAN.md, .claude/consolidation-2026-05-29/add_history.py, .claude/consolidation-2026-05-29/batch.sh
+**Diff:** +151 -59 across 5 files
+
+### 2026-07-26 02:32
+
+**Areas:** config
+**Files (20):** .cache/zellij/permissions.kdl, .claude-ledger/bin/claude-spend, .claude-ledger/claude-ledger.py, .claude-ledger/routing_gate.sh, .claude-ledger/weekly_usage.py, .claude/.gitattributes, .claude/.gitignore, .claude/CLAUDE.md, .claude/bin/claude-merge-device.sh, .claude/bin/fix-thinking.py, .claude/codex-build-routing-snippet.md, .claude/commands/checkpoint.md, .claude/commands/codex-build.md, .claude/commands/consolidation-sweep.md, .claude/commands/fable.md, .claude/commands/lexios.md, .claude/commands/recall.md, .claude/consolidation-2026-05-29/CONSOLIDATION_PLAN.md, .claude/consolidation-2026-05-29/add_history.py, .claude/consolidation-2026-05-29/batch.sh
+**Diff:** +145 -59 across 5 files
+
+### 2026-07-26 02:31
+
+**Areas:** config
+**Files (20):** .cache/zellij/permissions.kdl, .claude-ledger/bin/claude-spend, .claude-ledger/claude-ledger.py, .claude-ledger/routing_gate.sh, .claude-ledger/weekly_usage.py, .claude/.gitattributes, .claude/.gitignore, .claude/CLAUDE.md, .claude/bin/claude-merge-device.sh, .claude/bin/fix-thinking.py, .claude/codex-build-routing-snippet.md, .claude/commands/checkpoint.md, .claude/commands/codex-build.md, .claude/commands/consolidation-sweep.md, .claude/commands/fable.md, .claude/commands/lexios.md, .claude/commands/recall.md, .claude/consolidation-2026-05-29/CONSOLIDATION_PLAN.md, .claude/consolidation-2026-05-29/add_history.py, .claude/consolidation-2026-05-29/batch.sh
+**Diff:** +139 -59 across 5 files
+
+### 2026-07-26 02:31
+
+**Areas:** config
+**Files (20):** .cache/zellij/permissions.kdl, .claude-ledger/bin/claude-spend, .claude-ledger/claude-ledger.py, .claude-ledger/routing_gate.sh, .claude-ledger/weekly_usage.py, .claude/.gitattributes, .claude/.gitignore, .claude/CLAUDE.md, .claude/bin/claude-merge-device.sh, .claude/bin/fix-thinking.py, .claude/codex-build-routing-snippet.md, .claude/commands/checkpoint.md, .claude/commands/codex-build.md, .claude/commands/consolidation-sweep.md, .claude/commands/fable.md, .claude/commands/lexios.md, .claude/commands/recall.md, .claude/consolidation-2026-05-29/CONSOLIDATION_PLAN.md, .claude/consolidation-2026-05-29/add_history.py, .claude/consolidation-2026-05-29/batch.sh
+**Diff:** +133 -59 across 5 files
+
+### 2026-07-26 02:22
+
+**Areas:** config
+**Files (20):** .cache/zellij/permissions.kdl, .claude-ledger/bin/claude-spend, .claude-ledger/claude-ledger.py, .claude-ledger/routing_gate.sh, .claude-ledger/weekly_usage.py, .claude/.gitattributes, .claude/.gitignore, .claude/CLAUDE.md, .claude/bin/claude-merge-device.sh, .claude/bin/fix-thinking.py, .claude/codex-build-routing-snippet.md, .claude/commands/checkpoint.md, .claude/commands/codex-build.md, .claude/commands/consolidation-sweep.md, .claude/commands/fable.md, .claude/commands/lexios.md, .claude/commands/recall.md, .claude/consolidation-2026-05-29/CONSOLIDATION_PLAN.md, .claude/consolidation-2026-05-29/add_history.py, .claude/consolidation-2026-05-29/batch.sh
+**Diff:** +132 -60 across 5 files
+
+### 2026-07-26 02:21
+
+**Areas:** config
+**Files (20):** .cache/zellij/permissions.kdl, .claude-ledger/bin/claude-spend, .claude-ledger/claude-ledger.py, .claude-ledger/routing_gate.sh, .claude-ledger/weekly_usage.py, .claude/.gitattributes, .claude/.gitignore, .claude/CLAUDE.md, .claude/bin/claude-merge-device.sh, .claude/bin/fix-thinking.py, .claude/codex-build-routing-snippet.md, .claude/commands/checkpoint.md, .claude/commands/codex-build.md, .claude/commands/consolidation-sweep.md, .claude/commands/fable.md, .claude/commands/lexios.md, .claude/commands/recall.md, .claude/consolidation-2026-05-29/CONSOLIDATION_PLAN.md, .claude/consolidation-2026-05-29/add_history.py, .claude/consolidation-2026-05-29/batch.sh
+**Diff:** +126 -60 across 5 files
+
+### 2026-07-26 02:20
+
+**Areas:** config
+**Files (20):** .cache/zellij/permissions.kdl, .claude-ledger/bin/claude-spend, .claude-ledger/claude-ledger.py, .claude-ledger/routing_gate.sh, .claude-ledger/weekly_usage.py, .claude/.gitattributes, .claude/.gitignore, .claude/CLAUDE.md, .claude/bin/claude-merge-device.sh, .claude/bin/fix-thinking.py, .claude/codex-build-routing-snippet.md, .claude/commands/checkpoint.md, .claude/commands/codex-build.md, .claude/commands/consolidation-sweep.md, .claude/commands/fable.md, .claude/commands/lexios.md, .claude/commands/recall.md, .claude/consolidation-2026-05-29/CONSOLIDATION_PLAN.md, .claude/consolidation-2026-05-29/add_history.py, .claude/consolidation-2026-05-29/batch.sh
+**Diff:** +120 -60 across 5 files
+
+### 2026-07-26 02:19
+
+**Areas:** config
+**Files (20):** .cache/zellij/permissions.kdl, .claude-ledger/bin/claude-spend, .claude-ledger/claude-ledger.py, .claude-ledger/routing_gate.sh, .claude-ledger/weekly_usage.py, .claude/.gitattributes, .claude/.gitignore, .claude/CLAUDE.md, .claude/bin/claude-merge-device.sh, .claude/bin/fix-thinking.py, .claude/codex-build-routing-snippet.md, .claude/commands/checkpoint.md, .claude/commands/codex-build.md, .claude/commands/consolidation-sweep.md, .claude/commands/fable.md, .claude/commands/lexios.md, .claude/commands/recall.md, .claude/consolidation-2026-05-29/CONSOLIDATION_PLAN.md, .claude/consolidation-2026-05-29/add_history.py, .claude/consolidation-2026-05-29/batch.sh
+**Diff:** +114 -60 across 5 files
+
+### 2026-07-26 02:12
+
+**Areas:** config
+**Files (20):** .cache/zellij/permissions.kdl, .claude-ledger/bin/claude-spend, .claude-ledger/claude-ledger.py, .claude-ledger/routing_gate.sh, .claude-ledger/weekly_usage.py, .claude/.gitattributes, .claude/.gitignore, .claude/CLAUDE.md, .claude/bin/claude-merge-device.sh, .claude/bin/fix-thinking.py, .claude/codex-build-routing-snippet.md, .claude/commands/checkpoint.md, .claude/commands/codex-build.md, .claude/commands/consolidation-sweep.md, .claude/commands/fable.md, .claude/commands/lexios.md, .claude/commands/recall.md, .claude/consolidation-2026-05-29/CONSOLIDATION_PLAN.md, .claude/consolidation-2026-05-29/add_history.py, .claude/consolidation-2026-05-29/batch.sh
+**Diff:** +89 -58 across 4 files
+
+### 2026-07-26 02:10
+
+**Areas:** config
+**Files (20):** .cache/zellij/permissions.kdl, .claude-ledger/bin/claude-spend, .claude-ledger/claude-ledger.py, .claude-ledger/routing_gate.sh, .claude-ledger/weekly_usage.py, .claude/.gitattributes, .claude/.gitignore, .claude/CLAUDE.md, .claude/bin/claude-merge-device.sh, .claude/bin/fix-thinking.py, .claude/codex-build-routing-snippet.md, .claude/commands/checkpoint.md, .claude/commands/codex-build.md, .claude/commands/consolidation-sweep.md, .claude/commands/fable.md, .claude/commands/lexios.md, .claude/commands/recall.md, .claude/consolidation-2026-05-29/CONSOLIDATION_PLAN.md, .claude/consolidation-2026-05-29/add_history.py, .claude/consolidation-2026-05-29/batch.sh
+**Diff:** +83 -58 across 4 files
+
+### 2026-07-26 02:10
+
+**Areas:** config
+**Files (20):** .cache/zellij/permissions.kdl, .claude-ledger/bin/claude-spend, .claude-ledger/claude-ledger.py, .claude-ledger/routing_gate.sh, .claude-ledger/weekly_usage.py, .claude/.gitattributes, .claude/.gitignore, .claude/CLAUDE.md, .claude/bin/claude-merge-device.sh, .claude/bin/fix-thinking.py, .claude/codex-build-routing-snippet.md, .claude/commands/checkpoint.md, .claude/commands/codex-build.md, .claude/commands/consolidation-sweep.md, .claude/commands/fable.md, .claude/commands/lexios.md, .claude/commands/recall.md, .claude/consolidation-2026-05-29/CONSOLIDATION_PLAN.md, .claude/consolidation-2026-05-29/add_history.py, .claude/consolidation-2026-05-29/batch.sh
+**Diff:** +77 -58 across 4 files
+
+### 2026-07-26 02:09
+
+**Areas:** config
+**Files (20):** .cache/zellij/permissions.kdl, .claude-ledger/bin/claude-spend, .claude-ledger/claude-ledger.py, .claude-ledger/routing_gate.sh, .claude-ledger/weekly_usage.py, .claude/.gitattributes, .claude/.gitignore, .claude/CLAUDE.md, .claude/bin/claude-merge-device.sh, .claude/bin/fix-thinking.py, .claude/codex-build-routing-snippet.md, .claude/commands/checkpoint.md, .claude/commands/codex-build.md, .claude/commands/consolidation-sweep.md, .claude/commands/fable.md, .claude/commands/lexios.md, .claude/commands/recall.md, .claude/consolidation-2026-05-29/CONSOLIDATION_PLAN.md, .claude/consolidation-2026-05-29/add_history.py, .claude/consolidation-2026-05-29/batch.sh
+**Diff:** +71 -58 across 4 files
+
+### 2026-07-26 02:03
+
+**Areas:** config
+**Files (20):** .cache/zellij/permissions.kdl, .claude-ledger/bin/claude-spend, .claude-ledger/claude-ledger.py, .claude-ledger/routing_gate.sh, .claude-ledger/weekly_usage.py, .claude/.gitattributes, .claude/.gitignore, .claude/CLAUDE.md, .claude/bin/claude-merge-device.sh, .claude/bin/fix-thinking.py, .claude/codex-build-routing-snippet.md, .claude/commands/checkpoint.md, .claude/commands/codex-build.md, .claude/commands/consolidation-sweep.md, .claude/commands/fable.md, .claude/commands/lexios.md, .claude/commands/recall.md, .claude/consolidation-2026-05-29/CONSOLIDATION_PLAN.md, .claude/consolidation-2026-05-29/add_history.py, .claude/consolidation-2026-05-29/batch.sh
+**Diff:** +38 -2 across 3 files
+
+### 2026-07-26 02:02
+
+**Areas:** config
+**Files (20):** .cache/zellij/permissions.kdl, .claude-ledger/bin/claude-spend, .claude-ledger/claude-ledger.py, .claude-ledger/routing_gate.sh, .claude-ledger/weekly_usage.py, .claude/.gitattributes, .claude/.gitignore, .claude/CLAUDE.md, .claude/bin/claude-merge-device.sh, .claude/bin/fix-thinking.py, .claude/codex-build-routing-snippet.md, .claude/commands/checkpoint.md, .claude/commands/codex-build.md, .claude/commands/consolidation-sweep.md, .claude/commands/fable.md, .claude/commands/lexios.md, .claude/commands/recall.md, .claude/consolidation-2026-05-29/CONSOLIDATION_PLAN.md, .claude/consolidation-2026-05-29/add_history.py, .claude/consolidation-2026-05-29/batch.sh
+**Diff:** +32 -2 across 3 files
+
+### 2026-07-26 02:01
+
+**Areas:** config
+**Files (20):** .cache/zellij/permissions.kdl, .claude-ledger/bin/claude-spend, .claude-ledger/claude-ledger.py, .claude-ledger/routing_gate.sh, .claude-ledger/weekly_usage.py, .claude/.gitattributes, .claude/.gitignore, .claude/CLAUDE.md, .claude/bin/claude-merge-device.sh, .claude/bin/fix-thinking.py, .claude/codex-build-routing-snippet.md, .claude/commands/checkpoint.md, .claude/commands/codex-build.md, .claude/commands/consolidation-sweep.md, .claude/commands/fable.md, .claude/commands/lexios.md, .claude/commands/recall.md, .claude/consolidation-2026-05-29/CONSOLIDATION_PLAN.md, .claude/consolidation-2026-05-29/add_history.py, .claude/consolidation-2026-05-29/batch.sh
+**Diff:** +26 -2 across 3 files
+
+### 2026-07-26 02:00
+
+**Areas:** config
+**Files (20):** .cache/zellij/permissions.kdl, .claude-ledger/bin/claude-spend, .claude-ledger/claude-ledger.py, .claude-ledger/routing_gate.sh, .claude-ledger/weekly_usage.py, .claude/.gitattributes, .claude/.gitignore, .claude/CLAUDE.md, .claude/bin/claude-merge-device.sh, .claude/bin/fix-thinking.py, .claude/codex-build-routing-snippet.md, .claude/commands/checkpoint.md, .claude/commands/codex-build.md, .claude/commands/consolidation-sweep.md, .claude/commands/fable.md, .claude/commands/lexios.md, .claude/commands/recall.md, .claude/consolidation-2026-05-29/CONSOLIDATION_PLAN.md, .claude/consolidation-2026-05-29/add_history.py, .claude/consolidation-2026-05-29/batch.sh
+**Diff:** +20 -2 across 2 files
+
 ### 2026-07-26 00:09
 
 **Areas:** config
