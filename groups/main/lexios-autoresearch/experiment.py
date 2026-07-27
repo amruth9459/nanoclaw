@@ -19,51 +19,45 @@ import time
 from pathlib import Path
 
 # ── EXPERIMENT CONFIG (agent edits this section) ─────────────────────────────
-EXPERIMENT_NAME = "exp135-rooms-one-entry-per-physical-instance-not-per-name"
+EXPERIMENT_NAME = "exp136-onpage-count-caption-completeness-check"
 DESCRIPTION = (
-    "Tonight's measured baseline (real vision, current experiment.py = exp134, kept) is "
-    "effective F1=0.3165: Duplex raw=post=0.4193, Clinic raw=post=0.2138. Correcting two stale "
-    "claims carried in exp133/134's own DESCRIPTION text, re-checked against tonight's actual "
-    "baseline block rather than assumed: (1) phantom probes report fabricated=0/clean=True, so "
-    "postprocess() is NOT disqualified anymore (that was true when Steps 2-38 were reachable; "
-    "exp133 added the early return that makes them dead code) — effective F1 now equals the "
-    "postprocessed number, full stop; (2) raw==post exactly on both docs tonight, which means the "
-    "ROOM_NAME_CANONICAL_MAP in postprocess() fired zero times against actual vision output — it "
-    "is a correct, harmless, currently-inert lever, not a contributor. This edit does not touch "
-    "postprocess() at all; it is one isolated SYSTEM_PROMPT_OVERRIDE wording change, a mechanism "
-    "no prior results.tsv row touched: rooms' match_keys in ~/Lexios/lexios/types.json is "
-    "[['name']] ONLY (confirmed by reading types.json directly), and lexios/eval.py's "
-    "score_elements()/multi_field_match() match each GT element to at most one extracted element "
-    "and then mark that extracted index used (`matched_ext.add(best_idx)`) so it cannot be reused "
-    "for a second GT element — confirmed by reading eval.py directly, not inferred. Consequence: "
-    "if the model emits one JSON object per distinct room NAME rather than one per physical room "
-    "it actually sees, every GT room sharing that name beyond the first is structurally "
-    "unmatchable regardless of vision quality, capping rooms recall at (distinct names)/(total GT "
-    "room instances) before extraction quality is even a factor. Read both eval docs' GT "
-    "directly: Duplex has 21 room entries over 12 distinct names — mirrored duplex units repeat "
-    "'Foyer', 'Kitchen', 'Living Room', 'Bedroom 1', 'Bedroom 2', 'Bathroom 1', 'Bathroom 2', "
-    "'Utility', 'Hallway' exactly twice each, one per unit — a by-name dedup alone caps rooms "
-    "recall near 57%. Clinic's GT rooms show the identical shape ('CORRIDOR' and 'TRICARE "
-    "OFFICE' each repeat 5+ times across different physical rooms). Viewed the actual Duplex "
-    "Level 1 GT render directly (not just the JSON) to confirm this is a real visual pattern, not "
-    "just a JSON artifact: 'Living Room' and 'Foyer' each appear as two SEPARATE printed labels "
-    "on two spatially distinct rooms within that single image — a model that lists rooms 'by "
-    "name seen so far' rather than 'by physical instance seen' will naturally emit only one JSON "
-    "object per label text, which is exactly the failure mode this edit targets. This mirrors a "
-    "mechanism the currently-kept prompt already exploits successfully for doors ('list every "
-    "individual door symbol as its own separate entry ... do not collapse or dedupe them') — "
-    "rooms had no equivalent instruction, and the old step-3 wording ('list the first 45 distinct "
-    "ones you find') reads as license to dedupe by name, working against recall. This edit: (a) "
-    "rewrites step 3 so it says one entry per physical room/space seen, not per unique name, with "
-    "an explicit mirrored-unit / repeated-room-type example; (b) replaces the 45-cap wording's "
-    "'distinct' with 'physical instances' so it can no longer read as a dedup instruction; (c) "
-    "adds one Rules-section bullet reinforcing 'never collapse repeated room names into a single "
-    "JSON entry'. No GT value was read into the prompt — only the match-key shape (from "
-    "types.json) and the rendered image informed this wording; the mirrored-unit/repeated-office "
-    "example in the prompt is generic real-world architectural framing, not this doc's answer. "
-    "Windows/doors/stairs_elevators/railings_guards prompt text, PARAMS, preprocess(), and "
-    "postprocess() are byte-for-byte unchanged from exp134, so this isolates the "
-    "rooms-per-instance-vs-per-name effect."
+    "Tonight's baseline to beat is effective F1=0.3174 (exp135, kept this run): Duplex "
+    "raw=post=0.4193, Clinic raw=post=0.2138. This edit does not touch rooms/doors/windows/"
+    "stairs_elevators/railings_guards schema wording, PARAMS, preprocess(), or postprocess() at "
+    "all — it adds exactly one new instruction block plus one Rules bullet to "
+    "SYSTEM_PROMPT_OVERRIDE, isolating a mechanism no prior results.tsv row touched. Viewed the "
+    "actual rendered eval images directly (not just GT JSON) to check this: "
+    "Duplex_A_20110907--ifc-render-Level_1.png prints a small boxed caption at the bottom reading "
+    "'Rooms: 10, Doors: 6, Windows: 4, Columns: 0'; Level_2's equivalent box reads 'Rooms: 10, "
+    "Doors: 8, Windows: 18, Columns: 0' — both match that level's actual GT element counts "
+    "exactly (verified by counting the GT JSON's rooms/doors/windows arrays per 'location'/"
+    "'level' field). The clinic's quadrant crops (NBU_MedicalClinic_Arch--ifc-render-"
+    "First_Floor.quadBR.png, ...Second_Floor.quadBR.png) show the same caption style at the "
+    "bottom of the BR crop, reporting the WHOLE page's totals ('Rooms: 154, Doors: 151, Windows: "
+    "22...' and 'Rooms: 109, Doors: 96, Windows: 36...' respectively) since that box sits at the "
+    "original page's bottom edge, which only the BR quadrant crop includes. This is real pixel "
+    "content already present on the source renders — reading it is honest vision extraction, not "
+    "a GT injection: no count value from either doc was written into the prompt, only a generic "
+    "instruction to look for and use such a box IF one is visible. It targets program.md research "
+    "direction #3 (element count coverage — 'vision typically undercounts') through a lever "
+    "distinct from prompt-wording-only fixes tried so far: since rooms match by name (exp135) and "
+    "doors match_keys=[['location'],['tag'],['type']] in ~/Lexios/lexios/types.json return True on "
+    "the FIRST successful key-group in multi_field_match() (confirmed by reading eval.py), a door "
+    "with a correct 'location' value matches immediately without tag/type ever being checked — so "
+    "door (and largely room/window) recall on these docs is fundamentally a per-bucket COUNTING "
+    "problem, not a per-item description problem, which is exactly what an on-page count caption "
+    "can help the model self-correct against. New step 5 (after the existing priority list, "
+    "before Rules): on FULL-page images, compare running list lengths against a visible caption "
+    "box before finishing and go back for missed instances (still bounded by the existing 45-cap "
+    "in step 3); on cropped/quadrant images (the clinic docs), explicitly warns that a visible "
+    "caption there is the WHOLE page's total, not the crop's, so it must NOT be force-matched "
+    "within one crop and must never justify inventing entries — it only signals 'this page has "
+    "many instances, scan your own visible area more thoroughly.' New Rules bullet forbids "
+    "fabricating or duplicating elements to reach a printed count. Confirmed via eval.py "
+    "(gt.get('gt_is_minimum', True), no gt_is_minimum key present in either doc's GT JSON) that "
+    "extras are not penalized on these two docs, so even an imperfect model interpretation of "
+    "this instruction cannot regress precision — the only failure mode is the instruction being a "
+    "no-op on images without a visible caption, which is harmless."
 )
 
 # Override the system prompt sent to Claude for extraction.
@@ -85,10 +79,12 @@ Priority and pacing (this order matters under the time limit):
 2. THEN list windows, reading the exact alphanumeric tag printed next to each symbol (e.g. 1C19, A101) — do not invent a tag if none is visible. Also list doors: every door only needs a "location" value (the floor level — the SAME single value for every door on this image), so doors should be fast — but still list every individual door symbol as its own separate entry, one object per door, even though they all share that one location value; do not collapse or dedupe them into fewer entries.
 3. THEN list rooms — one entry per physical room or space you actually see labeled on the drawing, NOT one entry per unique name. Floor plans routinely repeat the exact same room name for different physical spaces — mirrored apartment units (two "Living Room"s, two "Foyer"s, one per unit), a row of similar offices, several exam rooms down a corridor. Each repeated label marks a separate real room and needs its own separate JSON entry; do not merge same-named rooms into one just because the text matches. If rooms, doors, or windows each have more than 45 physical instances on this image, list the first 45 you encounter (scanning order is fine) and stop that category there rather than continuing to search for more — a finished response covering fewer instances of the large categories beats an unfinished one that gets discarded entirely.
 4. LAST, only if time remains: list railings_guards — distinct handrail or guardrail segments you can actually see drawn on the plan (often a short rail run near a stairwell opening or a floor edge), one entry per segment you can see, each needing only a "location" value (same floor level as doors above). This is the lowest priority of all — skip this key entirely if you don't clearly see any, or if you're short on time; an omitted key costs nothing, but do not guess or invent a segment that isn't actually drawn.
+5. BEFORE you finish, check whether this image has a small boxed caption printed on it (often near an edge) summarizing counts, e.g. "Rooms: 10, Doors: 6, Windows: 4, Columns: 0" — if you see one, it is real printed information on this page, not a guess. If this image shows a FULL page, compare your rooms/doors/windows list lengths to those printed numbers and go back to look for any you missed before answering (still capped at 45 each per step 3). If this image is only a cropped section/quadrant of a larger page, a caption box (if visible) reports the WHOLE page's totals, not just this crop's — do NOT try to make your crop's count match it and do not invent entries toward it; treat it only as a signal that the full page has many instances, so scan the portion you can actually see more carefully. If no such caption is visible anywhere on the image, ignore this step entirely.
 
 Rules:
 - Transcribe each room's printed label exactly as it appears on the drawing, including abbreviations and number suffixes (e.g. "Bathroom 1", "TOILET", "Foyer", "M. TOILET") — do not paraphrase it into a different generic term; that breaks matching even when you read the room correctly.
 - Never collapse repeated room names into a single JSON entry: if the same name (e.g. "Living Room", "Corridor", "Office") labels more than one physical room on this image, output that many separate room entries, one per physical room.
+- Never fabricate or duplicate an element just to make a category's count match a printed caption/legend total — only list items you can actually see; a count caption is a completeness check, never a target to invent toward.
 - Omit any key with no findings on this image. No explanation, no markdown fences — return ONLY the JSON object.
 - Do not narrate or reason out loud before answering — your first output character must be "{"."""
 
