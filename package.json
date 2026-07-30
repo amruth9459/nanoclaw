@@ -13,6 +13,8 @@
     "format": "prettier --write \"src/**/*.ts\"",
     "format:check": "prettier --check \"src/**/*.ts\"",
     "test": "vitest run",
+    "test:skills": "vitest run --config vitest.skills.config.ts",
+    "test:all": "npm run test && npm run test:skills",
     "test:watch": "vitest",
     "watch": "tsx src/dev-watcher.ts",
     "sweeper:review": "tsx scripts/sweeper/review.ts",
