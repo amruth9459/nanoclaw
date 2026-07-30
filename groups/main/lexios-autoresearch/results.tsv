@@ -63,3 +63,7 @@ exp83-fix-exp72-80-regressions-76-docs	2026-04-24	1.0000	76	0.00	Apply all missi
 2026-07-29T06:25:34Z	exp-20260729-021540	Tonight's second slot, building on exp141 (kept, effective F	0.3145	0.3611	0.0	kept
 2026-07-29T06:34:08Z	exp-20260729-022534	Tonight's third slot, building on exp143 (kept, effective F1	0.3611	0.3589	0.0	discarded
 2026-07-29T06:42:42Z	exp-20260729-023408	Tonight's fourth slot, building on exp143 (this file's on-di	0.3611	0.3165	0.0	discarded
+2026-07-30T06:15:56Z	exp-20260730-020555	Tonight's first slot, building on exp143 (kept, effective F1	0.2881	0.3365	0.0	kept
+2026-07-30T06:23:55Z	exp-20260730-021556	Tonight's second slot, building on exp148 (kept, effective F	0.3365	0.3365	0.0	discarded
+2026-07-30T06:34:45Z	exp-20260730-022355	Tonight's third slot, building on exp148 (kept, effective F1	0.3365	0.3046	0.0	discarded
+2026-07-30T06:43:06Z	exp-20260730-023445	Tonight's fourth slot, building on exp148 (kept, effective F	0.3365	0.2796	0.0	discarded
