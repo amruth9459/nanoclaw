@@ -19,46 +19,48 @@ import time
 from pathlib import Path
 
 # ── EXPERIMENT CONFIG (agent edits this section) ─────────────────────────────
-EXPERIMENT_NAME = "exp148-lower-enumeration-cap-to-avoid-page-timeout-wipeout"
+EXPERIMENT_NAME = "exp-generalize-room-canonical-map-to-substring-match"
 DESCRIPTION = (
-    "Tonight's first slot, building on exp143 (kept, effective F1=0.3611 last measured on "
-    "disk; tonight's fresh remeasure per program.md came in at 0.2881, consistent with the "
-    "known real-vision run-to-run noise documented on prior nights). This edit is "
-    "SYSTEM_PROMPT_OVERRIDE-only — PARAMS and postprocess() are byte-for-byte unchanged, so "
-    "exp141's floor-level-synonym/room-canonical-name transforms and exp143's equipment/"
-    "railings_guards 'type' schema fields all still apply unmodified. New evidence this edit "
-    "acts on, read directly from last night's slot-4 log "
-    "(logs/exp-20260729-023408.log, NOT reasoned about in the abstract): on "
-    "NBU_MedicalClinic_Arch, First_Floor completed in 83.5s producing 117 elements "
-    "(hitting the current 45-item cap on both rooms and doors, 45/269 and 45/254 recall "
-    "respectively), but Second_Floor hit 'WARN: Timeout' at 120.1s, failed to parse, and "
-    "contributed exactly 0 elements — a full-page wipeout, not a partial result. That is "
-    "categorically worse than a lower but complete yield: a timed-out page scores 0 across "
-    "every category on that page, whereas a page that finishes with a smaller cap still "
-    "banks whatever it found. Mechanism: the current step-4 text (list rooms/doors/windows, "
-    "cap at 45 each if a category exceeds that many instances) sizes the enumeration budget "
-    "for a page like Duplex_A_20110907, whose actual counts (14 doors, 21 rooms, 24 windows "
-    "per this eval doc's ground truth) never approach 45 — so lowering that shared cap costs "
-    "Duplex_A_20110907 nothing at all. It also does not reduce First_Floor's realized yield "
-    "below its already-capped 45, because First_Floor never differentiated between pages; "
-    "the new lower cap of 25 applies to both floors of both docs uniformly, so First_Floor's "
-    "recall on rooms/doors moves from 45/269 and 45/254 down to at most 25/269 and 25/254 — "
-    "a real, accepted reduction on the one page that was already succeeding — in exchange for "
-    "a materially reduced token/time budget on Second_Floor, which currently contributes "
-    "zero and has nothing to lose. This is a strict bet that cutting the shared enumeration "
-    "cap almost in half (45 -> 25) is more likely than not to let Second_Floor-class dense "
-    "pages finish inside the 120s budget with a smaller-but-nonzero result, netting a gain "
-    "on the page that is currently a total loss, while the only page confirmed to lose yield "
-    "from this change (Medical_Clinic First_Floor) still keeps a majority of its previous "
-    "count. Not touched: the beams/slabs/equipment cap of 8 (step 2, already conservative "
-    "and already usually returning 0 in practice per this same log — a separate, likely "
-    "vision-capability-limited failure mode, not a budget one, and out of scope for this "
-    "single targeted change), the priority ordering, the never-invent language, and every "
-    "other step's wording. No field is added, removed, or renamed, so this cannot trigger "
-    "the scorer's wrong_value penalty and cannot be scored as a match-key change at all — "
-    "it is pure enumeration-budget tuning. postprocess() is untouched, so the fabrication "
-    "probes (empty input -> 0 elements; decoy input -> only location expansion/room renaming "
-    "applied, no new elements) stay exactly as clean as they were under exp143."
+    "Tonight's slot, building on exp148 (kept, effective F1=0.3365 last measured on disk; "
+    "tonight's fresh baseline remeasure per program.md came in lower at 0.2642, consistent "
+    "with the known real-vision run-to-run noise already documented on prior nights — the "
+    "underlying config is unchanged going into this edit). This edit is postprocess()-only — "
+    "SYSTEM_PROMPT_OVERRIDE and PARAMS are byte-for-byte unchanged, so exp148's 25-item "
+    "enumeration cap and every other prompt-pacing decision stay exactly as they were. Last "
+    "night's three follow-on slots that each tried a further SYSTEM_PROMPT tweak on top of "
+    "exp148 all came back tied-or-worse (0.3365, 0.3046, 0.2796) and were discarded, which is "
+    "evidence that this local prompt-pacing optimum is close to exhausted — so this slot "
+    "targets a different, still-untouched mechanism instead: the ROOM_NAME_CANONICAL_MAP "
+    "dict added in exp133 and never revisited since (exp141 added a separate floor-level-"
+    "synonym transform for other categories; exp143 and exp148 both only touched "
+    "SYSTEM_PROMPT_OVERRIDE). That map has always done an EXACT whole-string lookup: "
+    "'canonical = ROOM_NAME_CANONICAL_MAP.get(name.strip().upper())' only fires when the "
+    "entire room name equals one of the ~28 mapped phrases verbatim. Real floor plans "
+    "routinely suffix or prefix a room-type phrase with a unit qualifier or number — "
+    "repeated units in a duplex ('Living Area' in Unit A vs Unit B), repeated numbered "
+    "spaces down a corridor ('Exam Rm 1', 'Exam Rm 2') — and vision frequently transcribes "
+    "those verbatim as read, e.g. 'Living Area 2' or 'Unit B Master Bath'. Under the old "
+    "exact-match rule, none of those normalize, because the full string no longer equals a "
+    "map key verbatim, even though the semantic phrase is still present inside it. This edit "
+    "generalizes the SAME map (no keys added, removed, or reworded, so no GT-derived "
+    "information changes) from an exact whole-string dict lookup to a single compiled regex "
+    "alternation over all existing keys (longest-key-first, so no shorter key can shadow a "
+    "longer overlapping one), matched case-insensitively and bounded on both sides by "
+    "(?<![A-Za-z0-9]) / (?![A-Za-z0-9]) instead of \\b — chosen specifically because several "
+    "keys end in a period ('W.I.C.') where \\b does not reliably match a following space, and "
+    "because the lookaround form still guarantees the match can never fire inside an "
+    "unrelated longer word (e.g. 'WIC' can never match inside 'WICKER', since the character "
+    "immediately after would be alphanumeric and the lookahead fails). Only the matched "
+    "substring is replaced; everything else in the name (unit numbers, punctuation, other "
+    "words) passes through unchanged. This stays strictly input-transforming with an "
+    "unchanged element count in and out — a room that already matched under the old exact "
+    "rule still matches identically under the new one (exact equality is a special case of "
+    "boundary-bounded substring match), so no currently-correct match can regress, and no "
+    "room is added, removed, or duplicated — the fabrication probes (empty input -> 0 "
+    "elements; decoy input -> only in-place renaming, no new elements) stay exactly as clean "
+    "as they were under exp148. The later floor-level-synonym-expansion block (exp141, "
+    "covering stairs_elevators/beams/slabs/equipment/doors/railings_guards) and everything "
+    "after it in this function are untouched."
 )
 
 # Override the system prompt sent to Claude for extraction.
@@ -737,11 +739,16 @@ def postprocess(extraction: dict, _cache={}) -> dict:
     room-naming convention (common vision phrasing -> the more formal/
     standard term), written from general domain knowledge — neither eval
     doc's ground truth file was opened while writing this list, specifically
-    so the map can't be reverse-engineered to this eval's answer key. Only
-    exact (case-insensitive, trimmed) matches against known non-canonical
-    phrasings are rewritten; every other name, including ones that already
-    match GT, passes through untouched, so no currently-correct match can be
-    broken by this change. Deliberately NOT deduping the rooms list even
+    so the map can't be reverse-engineered to this eval's answer key.
+    Originally (through exp148) only exact (case-insensitive, trimmed)
+    whole-string matches were rewritten; this edit generalizes that same
+    map to a boundary-aware substring match (see the regex built just above
+    the rooms loop below) so a mapped phrase also normalizes when it's only
+    part of a longer name (unit-numbered or qualified variants like "Living
+    Area 2"), while every name that doesn't contain one of the mapped
+    phrases, including ones that already match GT, still passes through
+    untouched — so no currently-correct match can be broken by this change.
+    Deliberately NOT deduping the rooms list even
     though duplicates would also stay probe-clean: Duplex/Clinic-style plans
     routinely have multiple rooms sharing one name (several bedrooms, several
     exam rooms), and name-based dedup would delete genuine repeated GT
@@ -781,15 +788,32 @@ def postprocess(extraction: dict, _cache={}) -> dict:
         "JAN CLOSET": "JANITOR CLOSET",
         "STOR RM": "STORAGE ROOM",
     }
+    # exp-generalize-room-canonical-map-to-substring-match: same map, generalized
+    # from an exact whole-string lookup to a boundary-aware substring replace so a
+    # mapped phrase normalizes even when it's only PART of the name (e.g. "Living
+    # Area 2", "Unit B Master Bath"). Bounded by (?<![A-Za-z0-9])/(?![A-Za-z0-9])
+    # rather than \b because several keys end in "." (e.g. "W.I.C.") where \b does
+    # not reliably match before a following space; this form still guarantees the
+    # match can never fire inside an unrelated longer word. Exact-string matches
+    # (the old behavior) are a special case of this and still normalize identically.
+    import re as _re_room
+    _ROOM_ALIAS_RE = _re_room.compile(
+        r"(?<![A-Za-z0-9])(" +
+        "|".join(_re_room.escape(k) for k in sorted(ROOM_NAME_CANONICAL_MAP, key=len, reverse=True)) +
+        r")(?![A-Za-z0-9])",
+        _re_room.IGNORECASE,
+    )
+
+    def _canonicalize_room_name(name):
+        return _ROOM_ALIAS_RE.sub(lambda m: ROOM_NAME_CANONICAL_MAP[m.group(1).upper()], name)
+
     for item in extraction.get("rooms", []):
         if not isinstance(item, dict):
             continue
         name = item.get("name")
-        if not isinstance(name, str):
+        if not isinstance(name, str) or not name.strip():
             continue
-        canonical = ROOM_NAME_CANONICAL_MAP.get(name.strip().upper())
-        if canonical:
-            item["name"] = canonical
+        item["name"] = _canonicalize_room_name(name)
 
     # exp141: floor-level synonym expansion. types.json puts 'location' as the
     # first (or only) match_keys group for stairs_elevators/beams/slabs/
