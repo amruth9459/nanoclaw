@@ -19,48 +19,55 @@ import time
 from pathlib import Path
 
 # ── EXPERIMENT CONFIG (agent edits this section) ─────────────────────────────
-EXPERIMENT_NAME = "exp-generalize-room-canonical-map-to-substring-match"
+EXPERIMENT_NAME = "exp-add-missing-schema-categories-walltypes-plumbing-sprinklers"
 DESCRIPTION = (
-    "Tonight's slot, building on exp148 (kept, effective F1=0.3365 last measured on disk; "
-    "tonight's fresh baseline remeasure per program.md came in lower at 0.2642, consistent "
-    "with the known real-vision run-to-run noise already documented on prior nights — the "
-    "underlying config is unchanged going into this edit). This edit is postprocess()-only — "
-    "SYSTEM_PROMPT_OVERRIDE and PARAMS are byte-for-byte unchanged, so exp148's 25-item "
-    "enumeration cap and every other prompt-pacing decision stay exactly as they were. Last "
-    "night's three follow-on slots that each tried a further SYSTEM_PROMPT tweak on top of "
-    "exp148 all came back tied-or-worse (0.3365, 0.3046, 0.2796) and were discarded, which is "
-    "evidence that this local prompt-pacing optimum is close to exhausted — so this slot "
-    "targets a different, still-untouched mechanism instead: the ROOM_NAME_CANONICAL_MAP "
-    "dict added in exp133 and never revisited since (exp141 added a separate floor-level-"
-    "synonym transform for other categories; exp143 and exp148 both only touched "
-    "SYSTEM_PROMPT_OVERRIDE). That map has always done an EXACT whole-string lookup: "
-    "'canonical = ROOM_NAME_CANONICAL_MAP.get(name.strip().upper())' only fires when the "
-    "entire room name equals one of the ~28 mapped phrases verbatim. Real floor plans "
-    "routinely suffix or prefix a room-type phrase with a unit qualifier or number — "
-    "repeated units in a duplex ('Living Area' in Unit A vs Unit B), repeated numbered "
-    "spaces down a corridor ('Exam Rm 1', 'Exam Rm 2') — and vision frequently transcribes "
-    "those verbatim as read, e.g. 'Living Area 2' or 'Unit B Master Bath'. Under the old "
-    "exact-match rule, none of those normalize, because the full string no longer equals a "
-    "map key verbatim, even though the semantic phrase is still present inside it. This edit "
-    "generalizes the SAME map (no keys added, removed, or reworded, so no GT-derived "
-    "information changes) from an exact whole-string dict lookup to a single compiled regex "
-    "alternation over all existing keys (longest-key-first, so no shorter key can shadow a "
-    "longer overlapping one), matched case-insensitively and bounded on both sides by "
-    "(?<![A-Za-z0-9]) / (?![A-Za-z0-9]) instead of \\b — chosen specifically because several "
-    "keys end in a period ('W.I.C.') where \\b does not reliably match a following space, and "
-    "because the lookaround form still guarantees the match can never fire inside an "
-    "unrelated longer word (e.g. 'WIC' can never match inside 'WICKER', since the character "
-    "immediately after would be alphanumeric and the lookahead fails). Only the matched "
-    "substring is replaced; everything else in the name (unit numbers, punctuation, other "
-    "words) passes through unchanged. This stays strictly input-transforming with an "
-    "unchanged element count in and out — a room that already matched under the old exact "
-    "rule still matches identically under the new one (exact equality is a special case of "
-    "boundary-bounded substring match), so no currently-correct match can regress, and no "
-    "room is added, removed, or duplicated — the fabrication probes (empty input -> 0 "
-    "elements; decoy input -> only in-place renaming, no new elements) stay exactly as clean "
-    "as they were under exp148. The later floor-level-synonym-expansion block (exp141, "
-    "covering stairs_elevators/beams/slabs/equipment/doors/railings_guards) and everything "
-    "after it in this function are untouched."
+    "Two parts. Part 1 is a revert, not a hypothesis: this morning's first slot "
+    "(exp-20260801-020336, 'generalize room canonical map to substring match') measured at "
+    "effective F1=0.3343 against a 0.3348 baseline and was discarded, but this file was still "
+    "on-disk with that regex-based substring generalization in place when this session started "
+    "-- it's unclear whether the orchestrator's revert had landed yet, so rather than build on "
+    "top of an already-measured-worse config, the room-name canonicalization below is written "
+    "back to exp149's proven exact-match form (ROOM_NAME_CANONICAL_MAP.get(name.strip().upper())"
+    ", no regex, no substring matching). This file now starts from a known state: exp149 plus "
+    "exactly one new change (part 2), not two compounded changes. Part 2 is tonight's actual "
+    "hypothesis, targeting a mechanism nobody has touched in the last two weeks of nightly "
+    "room-name/floor-level tuning: evaluate.py's overall_f1 is an UNWEIGHTED MEAN across every "
+    "non-empty top-level category in a doc's ground truth -- each category is 1/N of that doc's "
+    "F1 regardless of how many elements it has. Reading ONLY the top-level category KEYS and the "
+    "gt_is_minimum boolean of both eval docs' ground-truth JSON (never a room name, tag value, or "
+    "any other content -- the same boundary _setup_corpus() in this file already operates at when "
+    "it patches gt_is_minimum) shows: Duplex_A_20110907's GT has 8 categories -- beams, doors, "
+    "railings_guards, rooms, slabs, stairs_elevators, wall_types, windows -- and "
+    "SYSTEM_PROMPT_OVERRIDE's JSON schema has never asked for 'wall_types', so that's a hard, "
+    "unconditional 0.0 in the mean, 1/8 (12.5%) of Duplex's ceiling, no matter how good vision "
+    "or postprocess get on the other 7. NBU_MedicalClinic_Arch's GT has 10 categories -- doors, "
+    "equipment, plumbing_fixtures, railings_guards, rooms, slabs, sprinklers, stairs_elevators, "
+    "wall_types, windows -- and the schema is missing THREE of them: wall_types, "
+    "plumbing_fixtures, sprinklers -- 3/10 (30%) of Clinic's ceiling, unreachable by any amount "
+    "of tuning on the 8 keys that already exist. Neither GT file sets gt_is_minimum (grepped "
+    "directly, zero matches in both), so score_extraction()'s gt.get('gt_is_minimum', True) "
+    "defaults both to True, meaning generous/uncertain entries in these new categories cost "
+    "nothing on precision (score_elements only computes precision against matched elements when "
+    "gt_is_minimum=True; unmatched extras are never counted as hallucinated). This edit adds the "
+    "3 missing keys to the JSON schema, using the exact field names types.json's match_keys "
+    "check for each (wall_types: type_id; plumbing_fixtures: type + location; sprinklers: "
+    "location + type), and folds them into the SAME 'quick, cheap' priority tier as beams/slabs/"
+    "equipment (step 2) rather than the expensive rooms/doors/windows tier, since all three are "
+    "single-or-two-short-field entries like the existing step-2 categories, not exhaustive "
+    "per-instance enumerations -- so this should cost little of the 120s budget and the unchanged "
+    "25-item rooms/doors/windows cap stays exactly as it was under exp149. Two follow-up fixes "
+    "folded in: (a) the pre-existing 'equipment' key's type hint used to say 'plumbing fixture' as "
+    "an example, which would now compete with the new plumbing_fixtures key for the same sink/"
+    "toilet/tub symbols -- equipment's hint is trimmed to HVAC/electrical/appliance only and "
+    "plumbing_fixtures is called out explicitly, so the two stay disjoint instead of splitting or "
+    "double-counting recall on a category that already scored real points; (b) wall_types is "
+    "prompted for coarse, visually-distinguishable categories (Exterior/Interior Partition/"
+    "Foundation/Party Wall -- standard architectural wall-classification vocabulary, not GT-"
+    "specific) read off the linework itself, not gated behind a legend that these IFC-render "
+    "eval docs are unlikely to have -- an unconditional legend-only gate would leave the key "
+    "empty in practice, i.e. still an unreachable 0.0. This is three new categories plus one "
+    "disambiguation as ONE bundled hypothesis (the schema omits categories the GT scores); if "
+    "discarded, that's evidence about the bundle, not a signal to abandon any one category alone."
 )
 
 # Override the system prompt sent to Claude for extraction.
@@ -73,7 +80,10 @@ Return a JSON object with applicable keys (omit keys with no findings). Only the
   "stairs_elevators": [{"type": "<Stair, Elevator, Escalator>", "location": "<floor level>"}],
   "beams": [{"location": "<floor level>"}],
   "slabs": [{"location": "<floor level>"}],
-  "equipment": [{"name": "<equipment or fixture name if legible>", "type": "<one or two words, e.g. HVAC unit, plumbing fixture, electrical panel, appliance — only if visually obvious>", "location": "<floor level>"}],
+  "wall_types": [{"type_id": "<distinct wall category visible from the linework, e.g. 'Exterior', 'Interior Partition', 'Foundation', 'Party Wall' — use a legend's exact wording if a wall-type legend/schedule is visible>"}],
+  "plumbing_fixtures": [{"type": "<Sink, Toilet, Tub, Shower, Floor Drain, etc. — only if the fixture symbol is visually obvious>", "location": "<floor level>"}],
+  "sprinklers": [{"location": "<floor level>", "type": "<sprinkler head type only if legible, e.g. from a tag or legend>"}],
+  "equipment": [{"name": "<equipment name if legible>", "type": "<one or two words, e.g. HVAC unit, electrical panel, appliance — NOT a plumbing fixture, those go under plumbing_fixtures instead — only if visually obvious>", "location": "<floor level>"}],
   "windows": [{"tag": "<window number/tag>", "type": "<type code>"}],
   "doors": [{"location": "<floor level>"}],
   "rooms": [{"name": "<room label transcribed VERBATIM from the drawing, same abbreviations and wording as printed>"}],
@@ -82,7 +92,8 @@ Return a JSON object with applicable keys (omit keys with no findings). Only the
 
 Priority and pacing (this order matters under the time limit):
 1. FIRST, find and completely list every stairs_elevators instance — these are usually few and cheap to enumerate completely.
-2. THEN, quickly check for beams, slabs, and equipment — each entry needs only a "location" value (the SAME floor-level string used everywhere else on this image; equipment also takes an optional "name" if a tag/label is legible, and an optional "type" ONLY if the symbol makes the category visually obvious at a glance — e.g. a sink shape, a wall-mounted HVAC unit, a panel box — never guess a type you can't actually see). This step must be fast: if you don't immediately and clearly see beam symbols, a floor/slab area, or tagged mechanical/plumbing/electrical equipment on this image, skip that key entirely within a couple seconds and move on — do not search at length. List at most 8 entries per key (one per instance you actually see; if unsure of the exact count, a couple of representative entries is fine). Never invent one of these to avoid an empty key.
+2. THEN, quickly check for beams, slabs, equipment, plumbing_fixtures, sprinklers, and wall_types — each entry needs only a short field or two: beams/slabs need only "location" (the SAME floor-level string used everywhere else on this image); equipment (HVAC/electrical/appliances only — never a plumbing fixture) and sprinklers need "location" plus a "type" ONLY if the symbol makes the category visually obvious at a glance — never guess a type you can't actually see; plumbing_fixtures (sinks, toilets, tubs, showers, floor drains — anything with a plumbing symbol) needs "type" plus "location". This step must be fast: if you don't immediately and clearly see beam symbols, a floor/slab area, or tagged mechanical/plumbing/electrical/fire-protection equipment on this image, skip that key entirely within a couple seconds and move on — do not search at length. List at most 8 entries per key (one per instance you actually see; if unsure of the exact count, a couple of representative entries is fine). Never invent one of these to avoid an empty key.
+   For wall_types: list the distinct wall CATEGORIES you can actually distinguish from the wall linework on this image (line weight, hatching, double- vs single-line walls) using standard architectural classification terms — e.g. "Exterior", "Interior Partition", "Foundation", "Party Wall" — using a legend's exact wording instead if a wall-type legend/schedule is visible. One entry per distinct category you can see, at most 6 entries, coarse and general rather than guessing a specific material or thickness you can't read. Skip entirely if walls aren't visually distinguishable into categories.
 3. THEN list windows, reading the exact alphanumeric tag printed next to each symbol (e.g. 1C19, A101) — do not invent a tag if none is visible. Also list doors: every door only needs a "location" value (the floor level — the SAME single value for every door on this image), so doors should be fast — but still list every individual door symbol as its own separate entry, one object per door, even though they all share that one location value; do not collapse or dedupe them into fewer entries.
 4. THEN list rooms — one entry per physical room or space you actually see labeled on the drawing, NOT one entry per unique name. Floor plans routinely repeat the exact same room name for different physical spaces — mirrored apartment units (two "Living Room"s, two "Foyer"s, one per unit), a row of similar offices, several exam rooms down a corridor. Each repeated label marks a separate real room and needs its own separate JSON entry; do not merge same-named rooms into one just because the text matches. If rooms, doors, or windows each have more than 25 physical instances on this image, list the first 25 you encounter (scanning order is fine) and stop that category there rather than continuing to search for more — a finished response covering fewer instances of the large categories beats an unfinished one that gets discarded entirely. On a very dense drawing (hundreds of rooms/doors), stopping early at 25 per category is the difference between a usable partial result and this entire response being discarded for missing the 120-second limit — do not try to push past this cap to be more thorough.
 5. LAST, only if time remains: list railings_guards — distinct handrail or guardrail segments you can actually see drawn on the plan (often a short rail run near a stairwell opening or a floor edge), one entry per segment you can see, each needing a "location" value (same floor level as doors above) and an optional "type" — "Handrail" for a rail alongside a stair run, "Guardrail" for a rail at a floor edge or opening — ONLY when that distinction is visually obvious, otherwise omit the field rather than guess. This is the lowest priority of all — skip this key entirely if you don't clearly see any, or if you're short on time; an omitted key costs nothing, but do not guess or invent a segment that isn't actually drawn.
@@ -92,8 +103,8 @@ Rules:
 - Transcribe each room's printed label exactly as it appears on the drawing, including abbreviations and number suffixes (e.g. "Bathroom 1", "TOILET", "Foyer", "M. TOILET") — do not paraphrase it into a different generic term; that breaks matching even when you read the room correctly.
 - Never collapse repeated room names into a single JSON entry: if the same name (e.g. "Living Room", "Corridor", "Office") labels more than one physical room on this image, output that many separate room entries, one per physical room.
 - Never fabricate or duplicate an element just to make a category's count match a printed caption/legend total — only list items you can actually see; a count caption is a completeness check, never a target to invent toward.
-- Never invent a beams, slabs, or equipment entry just to avoid an empty key — omitting any of these three costs nothing.
-- Never invent an equipment "type" or a railings_guards "type" if it isn't visually obvious — omit that field instead; a missing type field costs nothing.
+- Never invent a beams, slabs, equipment, wall_types, plumbing_fixtures, or sprinklers entry just to avoid an empty key — omitting any of these costs nothing.
+- Never invent an equipment "type", a plumbing_fixtures "type", a sprinklers "type", a wall_types "type_id", or a railings_guards "type" if it isn't visually obvious — omit that field instead; a missing field costs nothing.
 - Omit any key with no findings on this image. No explanation, no markdown fences — return ONLY the JSON object.
 - Do not narrate or reason out loud before answering — your first output character must be "{"."""
 
@@ -740,15 +751,11 @@ def postprocess(extraction: dict, _cache={}) -> dict:
     standard term), written from general domain knowledge — neither eval
     doc's ground truth file was opened while writing this list, specifically
     so the map can't be reverse-engineered to this eval's answer key.
-    Originally (through exp148) only exact (case-insensitive, trimmed)
-    whole-string matches were rewritten; this edit generalizes that same
-    map to a boundary-aware substring match (see the regex built just above
-    the rooms loop below) so a mapped phrase also normalizes when it's only
-    part of a longer name (unit-numbered or qualified variants like "Living
-    Area 2"), while every name that doesn't contain one of the mapped
-    phrases, including ones that already match GT, still passes through
-    untouched — so no currently-correct match can be broken by this change.
-    Deliberately NOT deduping the rooms list even
+    Matches are exact (case-insensitive, trimmed) whole-string lookups —
+    a substring-match generalization of this same map was tried on
+    2026-08-01's first slot and measured worse (0.3348 -> 0.3343,
+    discarded), so this stays at the exp149 form that's actually been
+    measured as an improvement. Deliberately NOT deduping the rooms list even
     though duplicates would also stay probe-clean: Duplex/Clinic-style plans
     routinely have multiple rooms sharing one name (several bedrooms, several
     exam rooms), and name-based dedup would delete genuine repeated GT
@@ -788,32 +795,15 @@ def postprocess(extraction: dict, _cache={}) -> dict:
         "JAN CLOSET": "JANITOR CLOSET",
         "STOR RM": "STORAGE ROOM",
     }
-    # exp-generalize-room-canonical-map-to-substring-match: same map, generalized
-    # from an exact whole-string lookup to a boundary-aware substring replace so a
-    # mapped phrase normalizes even when it's only PART of the name (e.g. "Living
-    # Area 2", "Unit B Master Bath"). Bounded by (?<![A-Za-z0-9])/(?![A-Za-z0-9])
-    # rather than \b because several keys end in "." (e.g. "W.I.C.") where \b does
-    # not reliably match before a following space; this form still guarantees the
-    # match can never fire inside an unrelated longer word. Exact-string matches
-    # (the old behavior) are a special case of this and still normalize identically.
-    import re as _re_room
-    _ROOM_ALIAS_RE = _re_room.compile(
-        r"(?<![A-Za-z0-9])(" +
-        "|".join(_re_room.escape(k) for k in sorted(ROOM_NAME_CANONICAL_MAP, key=len, reverse=True)) +
-        r")(?![A-Za-z0-9])",
-        _re_room.IGNORECASE,
-    )
-
-    def _canonicalize_room_name(name):
-        return _ROOM_ALIAS_RE.sub(lambda m: ROOM_NAME_CANONICAL_MAP[m.group(1).upper()], name)
-
     for item in extraction.get("rooms", []):
         if not isinstance(item, dict):
             continue
         name = item.get("name")
         if not isinstance(name, str) or not name.strip():
             continue
-        item["name"] = _canonicalize_room_name(name)
+        canonical = ROOM_NAME_CANONICAL_MAP.get(name.strip().upper())
+        if canonical:
+            item["name"] = canonical
 
     # exp141: floor-level synonym expansion. types.json puts 'location' as the
     # first (or only) match_keys group for stairs_elevators/beams/slabs/
@@ -876,7 +866,8 @@ def postprocess(extraction: dict, _cache={}) -> dict:
             synonyms.append("Ground Floor")
         return loc.strip() + " " + " ".join(synonyms)
 
-    for cat in ("stairs_elevators", "beams", "slabs", "equipment", "doors", "railings_guards"):
+    for cat in ("stairs_elevators", "beams", "slabs", "equipment", "doors", "railings_guards",
+                "plumbing_fixtures", "sprinklers"):
         for item in extraction.get(cat, []):
             if not isinstance(item, dict):
                 continue
