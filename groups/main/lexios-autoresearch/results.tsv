@@ -75,3 +75,7 @@ exp83-fix-exp72-80-regressions-76-docs	2026-04-24	1.0000	76	0.00	Apply all missi
 2026-08-01T06:28:56Z	exp-20260801-021353	Two parts. Part 1 is a revert, not a hypothesis: this mornin	0.3348	0.3503	0.0	kept
 2026-08-01T06:38:56Z	exp-20260801-022856	Building on exp-20260801-021353 (kept, effective F1=0.3348->	0.3503	0.3343	0.0	discarded
 2026-08-01T06:48:20Z	exp-20260801-023856	Tonight's 4th slot, building on exp-20260801-021353 (kept, e	0.3503	0.2075	0.0	discarded
+2026-08-02T06:15:34Z	exp-20260802-020419	Builds on last night's kept 4th slot (exp-20260801-023856-eq	0.3664	0.232	0.0	discarded
+2026-08-02T06:23:53Z	exp-20260802-021534	Verified via grep that the schema-categories bundle already 	0.3664	0.3365	0.0	discarded
+2026-08-02T06:38:05Z	exp-20260802-022353	Tonight's baseline to beat is effective F1=0.3664 (this file	0.3664	0.3515	0.0	discarded
+2026-08-02T06:50:57Z	exp-20260802-023805	Tonight's baseline to beat is effective F1=0.3664 (this file	0.3664	0.3365	0.0	discarded
