@@ -19,55 +19,44 @@ import time
 from pathlib import Path
 
 # ── EXPERIMENT CONFIG (agent edits this section) ─────────────────────────────
-EXPERIMENT_NAME = "exp-add-missing-schema-categories-walltypes-plumbing-sprinklers"
+EXPERIMENT_NAME = "exp-raise-room-door-window-cap-25-to-45-demote-dead-categories"
 DESCRIPTION = (
-    "Two parts. Part 1 is a revert, not a hypothesis: this morning's first slot "
-    "(exp-20260801-020336, 'generalize room canonical map to substring match') measured at "
-    "effective F1=0.3343 against a 0.3348 baseline and was discarded, but this file was still "
-    "on-disk with that regex-based substring generalization in place when this session started "
-    "-- it's unclear whether the orchestrator's revert had landed yet, so rather than build on "
-    "top of an already-measured-worse config, the room-name canonicalization below is written "
-    "back to exp149's proven exact-match form (ROOM_NAME_CANONICAL_MAP.get(name.strip().upper())"
-    ", no regex, no substring matching). This file now starts from a known state: exp149 plus "
-    "exactly one new change (part 2), not two compounded changes. Part 2 is tonight's actual "
-    "hypothesis, targeting a mechanism nobody has touched in the last two weeks of nightly "
-    "room-name/floor-level tuning: evaluate.py's overall_f1 is an UNWEIGHTED MEAN across every "
-    "non-empty top-level category in a doc's ground truth -- each category is 1/N of that doc's "
-    "F1 regardless of how many elements it has. Reading ONLY the top-level category KEYS and the "
-    "gt_is_minimum boolean of both eval docs' ground-truth JSON (never a room name, tag value, or "
-    "any other content -- the same boundary _setup_corpus() in this file already operates at when "
-    "it patches gt_is_minimum) shows: Duplex_A_20110907's GT has 8 categories -- beams, doors, "
-    "railings_guards, rooms, slabs, stairs_elevators, wall_types, windows -- and "
-    "SYSTEM_PROMPT_OVERRIDE's JSON schema has never asked for 'wall_types', so that's a hard, "
-    "unconditional 0.0 in the mean, 1/8 (12.5%) of Duplex's ceiling, no matter how good vision "
-    "or postprocess get on the other 7. NBU_MedicalClinic_Arch's GT has 10 categories -- doors, "
-    "equipment, plumbing_fixtures, railings_guards, rooms, slabs, sprinklers, stairs_elevators, "
-    "wall_types, windows -- and the schema is missing THREE of them: wall_types, "
-    "plumbing_fixtures, sprinklers -- 3/10 (30%) of Clinic's ceiling, unreachable by any amount "
-    "of tuning on the 8 keys that already exist. Neither GT file sets gt_is_minimum (grepped "
-    "directly, zero matches in both), so score_extraction()'s gt.get('gt_is_minimum', True) "
-    "defaults both to True, meaning generous/uncertain entries in these new categories cost "
-    "nothing on precision (score_elements only computes precision against matched elements when "
-    "gt_is_minimum=True; unmatched extras are never counted as hallucinated). This edit adds the "
-    "3 missing keys to the JSON schema, using the exact field names types.json's match_keys "
-    "check for each (wall_types: type_id; plumbing_fixtures: type + location; sprinklers: "
-    "location + type), and folds them into the SAME 'quick, cheap' priority tier as beams/slabs/"
-    "equipment (step 2) rather than the expensive rooms/doors/windows tier, since all three are "
-    "single-or-two-short-field entries like the existing step-2 categories, not exhaustive "
-    "per-instance enumerations -- so this should cost little of the 120s budget and the unchanged "
-    "25-item rooms/doors/windows cap stays exactly as it was under exp149. Two follow-up fixes "
-    "folded in: (a) the pre-existing 'equipment' key's type hint used to say 'plumbing fixture' as "
-    "an example, which would now compete with the new plumbing_fixtures key for the same sink/"
-    "toilet/tub symbols -- equipment's hint is trimmed to HVAC/electrical/appliance only and "
-    "plumbing_fixtures is called out explicitly, so the two stay disjoint instead of splitting or "
-    "double-counting recall on a category that already scored real points; (b) wall_types is "
-    "prompted for coarse, visually-distinguishable categories (Exterior/Interior Partition/"
-    "Foundation/Party Wall -- standard architectural wall-classification vocabulary, not GT-"
-    "specific) read off the linework itself, not gated behind a legend that these IFC-render "
-    "eval docs are unlikely to have -- an unconditional legend-only gate would leave the key "
-    "empty in practice, i.e. still an unreachable 0.0. This is three new categories plus one "
-    "disambiguation as ONE bundled hypothesis (the schema omits categories the GT scores); if "
-    "discarded, that's evidence about the bundle, not a signal to abandon any one category alone."
+    "Tonight's baseline (0.3503: Duplex 0.447, Clinic 0.2537) is the exp149+schema-bundle state "
+    "-- unchanged from that except for this one edit, confirmed by reading tonight's own "
+    "baseline-20260803-020006.log category breakdown before touching anything. This is a "
+    "refinement of exp-20260802-022353 ('deprioritize dead categories, raise cap 25->35'), which "
+    "was tried once, measured 0.3515 (Duplex 0.4193, Clinic 0.2836), and was discarded only "
+    "because that particular night's baseline (0.3664) happened to be unusually high -- not "
+    "because the mechanism failed. Per-category evidence from that run and three other logged "
+    "real-vision runs this week (exp151/kept, exp-20260802-022353, tonight's own baseline) is "
+    "unanimous: beams, slabs, equipment, plumbing_fixtures, and sprinklers score EXACTLY 0 "
+    "correct in BOTH eval docs in every single one of these 4 independent samples -- 20 "
+    "category-doc data points, all zero. wall_types is the one exception: 1/8 in two of the four "
+    "samples (including tonight's actual baseline), 0/8 in the other two -- noisy but not "
+    "provably dead, so unlike exp-20260802-022353 this edit leaves wall_types in its own early "
+    "'quick check' tier instead of demoting it with the other five, on the theory that it's cheap "
+    "(a few seconds, one coarse field) and might be preserving real signal that a single n=1 "
+    "sample can't rule out. Meanwhile Clinic's doors and rooms are demonstrably cap-bound, not "
+    "content-exhausted: doors correct has been exactly 2x the per-image cap in every logged run "
+    "(50 at cap 25, 70 at cap 35) against 254 GT doors, with precision=1.00 both times -- the "
+    "model is being told to stop, not running out of real doors to find. Since gt_is_minimum "
+    "defaults True for both eval docs (verified: neither GT file sets the key), unmatched extras "
+    "are never penalized, so raising the cap is asymmetric upside as long as it doesn't cause a "
+    "response timeout. The one measured data point at cap 35 (with the dead tier already moved "
+    "last) shows per-image times of 47.5/58.7/81.6/89.3s -- comfortably under the 120s hard "
+    "limit, meaning the demotion itself recovers real time headroom rather than the cap raise "
+    "eating it. This edit pushes the cap further, to 45 (not 35, since 35 is already close to a "
+    "measured row in results.tsv and the 89.3s datum leaves visible room before 45 approaches "
+    "risk) and moves ONLY beams/slabs/equipment/plumbing_fixtures/sprinklers to a new 'only if "
+    "time remains' tier after windows/doors/rooms (railings_guards was already last and stays "
+    "there). Net structure: 1) stairs_elevators, 2) wall_types (quick, kept early), 3) windows+"
+    "doors, 4) rooms (cap 25->45, all three 'more than 25'/'first 25'/'stopping early at 25' "
+    "references updated together), 5) beams/slabs/equipment/plumbing_fixtures/sprinklers (new, "
+    "demoted, low-priority framing added), 6) railings_guards (unchanged content), 7) stop-"
+    "rescanning reminder (renumbered only). JSON schema keys, PARAMS, and postprocess() are all "
+    "untouched -- this is a SYSTEM_PROMPT_OVERRIDE-only edit, no fabrication-probe exposure. If "
+    "discarded, the informative reading is 'cap 45 doesn't clear,' not a claim about wall_types "
+    "tier placement, which is a defensive hedge rather than the hypothesis."
 )
 
 # Override the system prompt sent to Claude for extraction.
@@ -92,12 +81,12 @@ Return a JSON object with applicable keys (omit keys with no findings). Only the
 
 Priority and pacing (this order matters under the time limit):
 1. FIRST, find and completely list every stairs_elevators instance — these are usually few and cheap to enumerate completely.
-2. THEN, quickly check for beams, slabs, equipment, plumbing_fixtures, sprinklers, and wall_types — each entry needs only a short field or two: beams/slabs need only "location" (the SAME floor-level string used everywhere else on this image); equipment (HVAC/electrical/appliances only — never a plumbing fixture) and sprinklers need "location" plus a "type" ONLY if the symbol makes the category visually obvious at a glance — never guess a type you can't actually see; plumbing_fixtures (sinks, toilets, tubs, showers, floor drains — anything with a plumbing symbol) needs "type" plus "location". This step must be fast: if you don't immediately and clearly see beam symbols, a floor/slab area, or tagged mechanical/plumbing/electrical/fire-protection equipment on this image, skip that key entirely within a couple seconds and move on — do not search at length. List at most 8 entries per key (one per instance you actually see; if unsure of the exact count, a couple of representative entries is fine). Never invent one of these to avoid an empty key.
-   For wall_types: list the distinct wall CATEGORIES you can actually distinguish from the wall linework on this image (line weight, hatching, double- vs single-line walls) using standard architectural classification terms — e.g. "Exterior", "Interior Partition", "Foundation", "Party Wall" — using a legend's exact wording instead if a wall-type legend/schedule is visible. One entry per distinct category you can see, at most 6 entries, coarse and general rather than guessing a specific material or thickness you can't read. Skip entirely if walls aren't visually distinguishable into categories.
+2. THEN, quickly check wall_types: list the distinct wall CATEGORIES you can actually distinguish from the wall linework on this image (line weight, hatching, double- vs single-line walls) using standard architectural classification terms — e.g. "Exterior", "Interior Partition", "Foundation", "Party Wall" — using a legend's exact wording instead if a wall-type legend/schedule is visible. One entry per distinct category you can see, at most 6 entries, coarse and general rather than guessing a specific material or thickness you can't read. Skip entirely if walls aren't visually distinguishable into categories. This step should take only a few seconds.
 3. THEN list windows, reading the exact alphanumeric tag printed next to each symbol (e.g. 1C19, A101) — do not invent a tag if none is visible. Also list doors: every door only needs a "location" value (the floor level — the SAME single value for every door on this image), so doors should be fast — but still list every individual door symbol as its own separate entry, one object per door, even though they all share that one location value; do not collapse or dedupe them into fewer entries.
-4. THEN list rooms — one entry per physical room or space you actually see labeled on the drawing, NOT one entry per unique name. Floor plans routinely repeat the exact same room name for different physical spaces — mirrored apartment units (two "Living Room"s, two "Foyer"s, one per unit), a row of similar offices, several exam rooms down a corridor. Each repeated label marks a separate real room and needs its own separate JSON entry; do not merge same-named rooms into one just because the text matches. If rooms, doors, or windows each have more than 25 physical instances on this image, list the first 25 you encounter (scanning order is fine) and stop that category there rather than continuing to search for more — a finished response covering fewer instances of the large categories beats an unfinished one that gets discarded entirely. On a very dense drawing (hundreds of rooms/doors), stopping early at 25 per category is the difference between a usable partial result and this entire response being discarded for missing the 120-second limit — do not try to push past this cap to be more thorough.
-5. LAST, only if time remains: list railings_guards — distinct handrail or guardrail segments you can actually see drawn on the plan (often a short rail run near a stairwell opening or a floor edge), one entry per segment you can see, each needing a "location" value (same floor level as doors above) and an optional "type" — "Handrail" for a rail alongside a stair run, "Guardrail" for a rail at a floor edge or opening — ONLY when that distinction is visually obvious, otherwise omit the field rather than guess. This is the lowest priority of all — skip this key entirely if you don't clearly see any, or if you're short on time; an omitted key costs nothing, but do not guess or invent a segment that isn't actually drawn.
-6. Once you've finished a category, do not go back and re-scan the image for it — move straight to the next category or finish the response. A completed, on-time JSON covering fewer instances beats a more thorough one that misses the 120-second limit and gets discarded entirely.
+4. THEN list rooms — one entry per physical room or space you actually see labeled on the drawing, NOT one entry per unique name. Floor plans routinely repeat the exact same room name for different physical spaces — mirrored apartment units (two "Living Room"s, two "Foyer"s, one per unit), a row of similar offices, several exam rooms down a corridor. Each repeated label marks a separate real room and needs its own separate JSON entry; do not merge same-named rooms into one just because the text matches. If rooms, doors, or windows each have more than 45 physical instances on this image, list the first 45 you encounter (scanning order is fine) and stop that category there rather than continuing to search for more — a finished response covering fewer instances of the large categories beats an unfinished one that gets discarded entirely. On a very dense drawing (hundreds of rooms/doors), stopping early at 45 per category is the difference between a usable partial result and this entire response being discarded for missing the 120-second limit — do not try to push past this cap to be more thorough.
+5. ONLY IF TIME REMAINS after steps 1-4, quickly check for beams, slabs, equipment, plumbing_fixtures, and sprinklers — each entry needs only a short field or two: beams/slabs need only "location" (the SAME floor-level string used everywhere else on this image); equipment (HVAC/electrical/appliances only — never a plumbing fixture) and sprinklers need "location" plus a "type" ONLY if the symbol makes the category visually obvious at a glance — never guess a type you can't actually see; plumbing_fixtures (sinks, toilets, tubs, showers, floor drains — anything with a plumbing symbol) needs "type" plus "location". This step must be fast: if you don't immediately and clearly see beam symbols, a floor/slab area, or tagged mechanical/plumbing/electrical/fire-protection equipment on this image, skip that key entirely within a couple seconds and move on — do not search at length. List at most 8 entries per key (one per instance you actually see; if unsure of the exact count, a couple of representative entries is fine). Never invent one of these to avoid an empty key. This is a low-priority tier — skip it entirely without hesitation if steps 1-4 already used most of the time budget.
+6. LAST, only if time remains: list railings_guards — distinct handrail or guardrail segments you can actually see drawn on the plan (often a short rail run near a stairwell opening or a floor edge), one entry per segment you can see, each needing a "location" value (same floor level as doors above) and an optional "type" — "Handrail" for a rail alongside a stair run, "Guardrail" for a rail at a floor edge or opening — ONLY when that distinction is visually obvious, otherwise omit the field rather than guess. This is the lowest priority of all — skip this key entirely if you don't clearly see any, or if you're short on time; an omitted key costs nothing, but do not guess or invent a segment that isn't actually drawn.
+7. Once you've finished a category, do not go back and re-scan the image for it — move straight to the next category or finish the response. A completed, on-time JSON covering fewer instances beats a more thorough one that misses the 120-second limit and gets discarded entirely.
 
 Rules:
 - Transcribe each room's printed label exactly as it appears on the drawing, including abbreviations and number suffixes (e.g. "Bathroom 1", "TOILET", "Foyer", "M. TOILET") — do not paraphrase it into a different generic term; that breaks matching even when you read the room correctly.
