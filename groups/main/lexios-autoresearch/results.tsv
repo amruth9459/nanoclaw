@@ -91,3 +91,7 @@ exp83-fix-exp72-80-regressions-76-docs	2026-04-24	1.0000	76	0.00	Apply all missi
 2026-08-05T06:28:12Z	exp-20260805-021938	Tonight's fresh baseline (0.3011: Duplex 0.2747, Clinic 0.32	0.3011	0.2386	0.0	discarded
 2026-08-05T06:39:11Z	exp-20260805-022812	Tonight's fresh baseline (0.3011: Duplex 0.2747, Clinic 0.32	0.3011	0.3745	0.0	kept
 2026-08-05T06:48:36Z	exp-20260805-023911	Tonight's kept baseline (this file's on-disk state going int	0.3745	0.3607	0.0	discarded
+2026-08-06T06:00:44Z	exp-20260806-020032	no-edit	0.0	0	0	no-edit
+2026-08-06T06:00:55Z	exp-20260806-020044	no-edit	0.0	0	0	no-edit
+2026-08-06T06:01:07Z	exp-20260806-020055	no-edit	0.0	0	0	no-edit
+2026-08-06T06:01:19Z	exp-20260806-020107	no-edit	0.0	0	0	no-edit
