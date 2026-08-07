@@ -19,53 +19,55 @@ import time
 from pathlib import Path
 
 # ── EXPERIMENT CONFIG (agent edits this section) ─────────────────────────────
-EXPERIMENT_NAME = "exp-buy-back-output-budget-location-shorthand-minify-json-drop-dead-categories"
+EXPERIMENT_NAME = "exp-unlock-walltypes-and-railings-guess-anyway-second-application"
 DESCRIPTION = (
-    "Tonight's fresh baseline (0.3011: Duplex 0.2747, Clinic 0.3274, baseline-20260805-020005.log) "
-    "is the cap-45/demoted-dead-tier state kept on 2026-08-03. Two slots already ran tonight: slot1 "
-    "(exp-20260805-020559.log, window-tag wording, cap unchanged at 45, discarded 0.2579) and slot2 "
-    "(exp-20260805-021938.log, cap 45->35 revert, discarded 0.2386). Reading all three of tonight's "
-    "logs line by line surfaces the real driver neither slot fixed: Duplex_A_20110907--ifc-render-"
-    "Level_2.png timed out (120.0s, 0 elements, 'WARN: Timeout', 'WARN: Failed to parse JSON') in "
-    "ALL THREE runs regardless of cap (45 in baseline+slot1, 35 in slot2) or window-tag wording. "
-    "Worse, slot2's cap cut -- the direct attempt to fix exactly this -- did not save Level_2 AND "
-    "newly broke NBU_MedicalClinic_Arch--ifc-render-Second_Floor.png, which had completed fine at "
-    "cap 45 in baseline (130 elements, 88.5s) but timed out at cap 35 in slot2 (0 elements, "
-    "120.0s) -- same image, only the cap differs, and the smaller cap made it worse, not better. "
-    "Every image that DID complete across all three runs finished within 20-40s of the 120s wall "
-    "(Clinic images: 103.9/88.5 baseline, 97.1/timeout slot1, timeout/77.1 slot2) -- margin is thin "
-    "everywhere, and which single image dies each run looks close to noise rather than pinned to "
-    "cap size. Cutting caps further is also a guaranteed recall cost, not just a maybe: Clinic "
-    "doors/rooms are demonstrably cap-bound at precision=1.00 in every logged run this week, so "
-    "trading cap for time-safety trades away real, already-measured recall. This edit instead buys "
-    "back generation budget from tokens-per-element and prompt overhead, leaving the cap at 45: "
-    "(1) location SHORTHAND for the three remaining location-bearing categories (stairs_elevators, "
-    "doors, railings_guards) -- schema/prompt now asks for short forms like 'L1'/'L2' instead of a "
-    "full descriptive phrase, cutting characters on every one of up to 45 door entries per image. "
-    "Verified safe against postprocess(): _floor_num()'s `\\bL0*(\\d{1,2})\\b` pattern (this file, "
-    "~line 820, untouched) matches 'L1'/'L2', and _expand_location() (same function, untouched) "
-    "appends every synonym form (Level 1, First Floor, etc.) before scoring -- shorthand can only "
-    "help or be neutral at match time, never hurt it. (2) explicit minified-JSON instruction (no "
-    "indentation, no line breaks between elements) -- removes formatting-whitespace tokens that "
-    "scale with total element count, exactly what's ballooning on the two images sitting closest "
-    "to the wall. (3) full REMOVAL (not demotion) of beams/slabs/equipment/plumbing_fixtures/"
-    "sprinklers from the schema and prompt entirely -- these have scored EXACTLY 0 correct in "
-    "every category-doc sample across at least 7 independent real-vision runs logged this week "
-    "(tonight's 3 plus exp151/exp-20260802-022353/the prior baseline cited in the on-disk "
-    "DESCRIPTION this edit replaces), so they no longer cost schema-explanation tokens or response "
-    "scanning time on categories with zero measured value. wall_types stays (nonzero in some "
-    "samples, <=6 entries, cheap) and railings_guards stays (schema-cheap, low priority, not "
-    "confirmed dead across as many samples as the removed five). These three changes are bundled "
-    "in one slot because all three push the same direction (recover budget without cutting the cap "
-    "that's already known to cost recall) -- noted plainly as a bundle, not a single mechanism, "
-    "since that costs attribution if kept. Prediction, checkable from tomorrow's log without a "
-    "shell: if this works, all four images across both eval docs finish with zero 'WARN: Timeout' "
-    "lines. If any image still times out at 120.0s, output volume was not the whole binding "
-    "constraint and the next slot should attack input-side latency (preprocess() image resolution) "
-    "instead of continuing to tune prompt-side budget. PARAMS, preprocess(), and postprocess() are "
-    "all untouched -- SYSTEM_PROMPT_OVERRIDE-only edit; postprocess()'s per-category location-"
-    "expansion loop already iterates the now-removed category names via .get(cat, []) so their "
-    "absence from the schema is a silent no-op there, not a break."
+    "Tonight's baseline (0.3165: Duplex 0.4193, Clinic 0.2138, baseline-20260807-020001.log) is "
+    "this file's on-disk state. Slot 1 tonight (exp-20260807-020441, discarded 0.3147) removed the "
+    "'skip entirely'/'costs nothing to omit' wording from the wall_types instruction and replaced "
+    "it with a 'guess Exterior anyway' instruction. Reading that log's actual numbers instead of "
+    "just its keep/discard verdict: wall_types went from 0/8+0/7 (both docs, tonight's baseline) to "
+    "1/8 (F1=0.222, P=1.00) on Duplex and 1/7 (F1=0.25, P=1.00) on Clinic -- the mechanism worked "
+    "exactly as predicted, at P=1.00 (the guess landed, it wasn't a forgiven false positive). Slot "
+    "1 was discarded anyway because Duplex_A_20110907--ifc-render-Level_2.png timed out in that run "
+    "(0 elements, killing that image's doors/rooms/windows contribution) -- an image that did NOT "
+    "time out in tonight's baseline run. That is very likely noise, not caused by the wall_types "
+    "edit: this same on-disk file measured 0.3745 on 2026-08-05 and 0.3165 on 2026-08-07 with ZERO "
+    "code change in between (a 0.058 swing), so slot 1's -0.0018 net delta sits well inside the "
+    "existing run-to-run noise band. There's also no output-volume mechanism connecting a small "
+    "wall_types prompt addition to a timeout: slot 1's own log shows Clinic First_Floor completing "
+    "in 60.9s tonight vs 97.1s on 2026-08-05 for near-identical output (117 vs 116 elements) -- "
+    "elapsed time is not simply a function of output length, so a few dozen added prompt words is "
+    "not a credible timeout trigger. This slot reapplies slot 1's validated mechanism (it is not a "
+    "repeat -- the wording differs and it is extended to a second site) and, per the same "
+    "unweighted-mean doc_f1 logic slot 1 established (each GT category is worth 1/8 or 1/10 of a "
+    "doc's score regardless of GT item count), applies the identical 'guess anyway, it's free' "
+    "treatment to the ONE OTHER small-GT category still in-schema and still scoring exactly 0 on "
+    "both eval docs every logged run: railings_guards (Duplex 0/4, Clinic 0/9, tonight's baseline "
+    "and every prior run). railings_guards carries the same shape of escape hatch wall_types had -- "
+    "'skip this key entirely ... an omitted key costs nothing' -- under the same gt_is_minimum=True "
+    "scorer where a guess that lands costs nothing and a guess that misses also costs nothing (only "
+    "recall is at stake, not precision). Changed: step 2 (wall_types) now instructs adding one "
+    "type_id='Exterior' entry whenever any outer perimeter wall line is visible, even if finer "
+    "categories aren't distinguishable -- same instruction slot 1 validated, reworded. Step 5 "
+    "(railings_guards) now instructs checking the stairwell(s) already found in step 1 for a rail "
+    "line and adding one entry for it (omitting the optional 'type' field if Handrail/Guardrail "
+    "isn't obvious) instead of skipping the whole key. The Rules section: removed the bullet "
+    "'Never invent a wall_types entry just to avoid an empty key -- omitting it costs nothing' "
+    "(directly contradicted the new step 2 instruction, same contradiction slot 1 had to resolve). "
+    "Replaced it and the old combined wall_types/railings_guards field-guessing bullet with two "
+    "separate bullets that each distinguish 'the one guaranteed guess' (Exterior wall / stairwell "
+    "rail) from 'inventing specifics you can't see' (a finer wall category, a confident Handrail-vs-"
+    "Guardrail call, a rail segment that isn't drawn at all) -- the guess-anyway license is scoped "
+    "narrowly so it can't be read as license to fabricate detail. Net prompt length change is small "
+    "(roughly +400 characters across both edited steps and the Rules section) and is NOT being sold "
+    "as timeout mitigation -- per the paragraph above there is no established causal link between "
+    "prompt input length and the 120s output-generation clock, so this is not a lever being pulled "
+    "here. Prediction, checkable from tomorrow's log without a shell: railings_guards and wall_types "
+    "both go nonzero on at least one doc. If wall_types repeats its slot-1 unlock but railings_guards "
+    "stays 0/4 and 0/9 on both docs, railings_guards is detection-bound (rail segments genuinely hard "
+    "to pick out of an IFC render) rather than permission-bound, and future slots should stop trying "
+    "wording-only unlocks on it. Schema, the other four priority steps, PARAMS, preprocess(), and "
+    "postprocess() are all untouched."
 )
 
 # Override the system prompt sent to Claude for extraction.
@@ -85,18 +87,18 @@ Return a JSON object with applicable keys (omit keys with no findings). Only the
 
 Priority and pacing (this order matters under the time limit):
 1. FIRST, find and completely list every stairs_elevators instance — these are usually few and cheap to enumerate completely. Use the SHORT floor-level form (e.g. "L1") for every location value on this image, not a full phrase like "First Floor" — it means the same thing and costs fewer tokens.
-2. THEN, quickly check wall_types: list the distinct wall CATEGORIES you can actually distinguish from the wall linework on this image (line weight, hatching, double- vs single-line walls) using standard architectural classification terms — e.g. "Exterior", "Interior Partition", "Foundation", "Party Wall" — using a legend's exact wording instead if a wall-type legend/schedule is visible. One entry per distinct category you can see, at most 6 entries, coarse and general rather than guessing a specific material or thickness you can't read. Skip entirely if walls aren't visually distinguishable into categories. This step should take only a few seconds.
+2. THEN, quickly check wall_types: list the distinct wall CATEGORIES you can actually distinguish from the wall linework on this image (line weight, hatching, double- vs single-line walls) using standard architectural classification terms — e.g. "Exterior", "Interior Partition", "Foundation", "Party Wall" — using a legend's exact wording instead if a wall-type legend/schedule is visible. One entry per distinct category you can see, at most 6 entries, coarse and general rather than guessing a specific material or thickness you can't read. Even if you can't tell finer categories apart, still add one entry with type_id "Exterior" whenever you can see any outer perimeter wall line (usually the thickest or outermost line on the plan, or a double line) — nearly every floor plan has one, and adding this entry when you can see it costs nothing. This step should take only a few seconds.
 3. THEN list windows, reading the exact alphanumeric tag printed next to each symbol (e.g. 1C19, A101) — do not invent a tag if none is visible. Also list doors: every door only needs a "location" value in the SHORT form above (the SAME single short value for every door on this image), so doors should be fast — but still list every individual door symbol as its own separate entry, one object per door, even though they all share that one location value; do not collapse or dedupe them into fewer entries.
 4. THEN list rooms — one entry per physical room or space you actually see labeled on the drawing, NOT one entry per unique name. Floor plans routinely repeat the exact same room name for different physical spaces — mirrored apartment units (two "Living Room"s, two "Foyer"s, one per unit), a row of similar offices, several exam rooms down a corridor. Each repeated label marks a separate real room and needs its own separate JSON entry; do not merge same-named rooms into one just because the text matches. If rooms, doors, or windows each have more than 45 physical instances on this image, list the first 45 you encounter (scanning order is fine) and stop that category there rather than continuing to search for more — a finished response covering fewer instances of the large categories beats an unfinished one that gets discarded entirely. On a very dense drawing (hundreds of rooms/doors), stopping early at 45 per category is the difference between a usable partial result and this entire response being discarded for missing the 120-second limit — do not try to push past this cap to be more thorough.
-5. LAST, only if time remains: list railings_guards — distinct handrail or guardrail segments you can actually see drawn on the plan (often a short rail run near a stairwell opening or a floor edge), one entry per segment you can see, each needing a "location" value (same SHORT form as doors above) and an optional "type" — "Handrail" for a rail alongside a stair run, "Guardrail" for a rail at a floor edge or opening — ONLY when that distinction is visually obvious, otherwise omit the field rather than guess. This is the lowest priority of all — skip this key entirely if you don't clearly see any, or if you're short on time; an omitted key costs nothing, but do not guess or invent a segment that isn't actually drawn.
+5. LAST, only if time remains: list railings_guards — distinct handrail or guardrail segments you can actually see drawn on the plan (often a short rail run near a stairwell opening or a floor edge), one entry per segment you can see, each needing a "location" value (same SHORT form as doors above) and an optional "type" — "Handrail" for a rail alongside a stair run, "Guardrail" for a rail at a floor edge or opening — ONLY when that distinction is visually obvious, otherwise omit the field rather than guess. This is the lowest priority of all, but specifically re-check the stairwell(s) you already found in step 1 first: if there is any rail line next to a stair run or floor opening, add one entry for it even if you're not sure whether it's a Handrail or Guardrail — omit the "type" field in that case rather than guessing it, but still add the entry, since adding it when you can see it costs nothing. Do not invent a segment where no rail line is actually drawn.
 6. Once you've finished a category, do not go back and re-scan the image for it — move straight to the next category or finish the response. A completed, on-time JSON covering fewer instances beats a more thorough one that misses the 120-second limit and gets discarded entirely.
 
 Rules:
 - Transcribe each room's printed label exactly as it appears on the drawing, including abbreviations and number suffixes (e.g. "Bathroom 1", "TOILET", "Foyer", "M. TOILET") — do not paraphrase it into a different generic term; that breaks matching even when you read the room correctly.
 - Never collapse repeated room names into a single JSON entry: if the same name (e.g. "Living Room", "Corridor", "Office") labels more than one physical room on this image, output that many separate room entries, one per physical room.
 - Never fabricate or duplicate an element just to make a category's count match a printed caption/legend total — only list items you can actually see; a count caption is a completeness check, never a target to invent toward.
-- Never invent a wall_types entry just to avoid an empty key — omitting it costs nothing.
-- Never invent a wall_types "type_id" or a railings_guards "type" if it isn't visually obvious — omit that field instead; a missing field costs nothing.
+- For wall_types: the one guaranteed guess is the "Exterior" perimeter-wall entry described in step 2 above — add it whenever you can see an outer wall line, even without distinguishing finer categories. Beyond that one guess, never invent a more specific wall_types "type_id" (a finer category, a material, a thickness) that isn't visually obvious — omit the entry instead.
+- For railings_guards: the one guaranteed guess is the stairwell-rail entry described in step 5 above — add it whenever you can see a rail line at a stair or opening, even without a confident "type". Beyond that one guess, never invent a "type" (Handrail vs Guardrail) that isn't visually obvious, and never invent a railings_guards segment where no rail line is actually drawn.
 - Omit any key with no findings on this image. No explanation, no markdown fences — return ONLY the JSON object, minified (no pretty-printing, no indentation).
 - Do not narrate or reason out loud before answering — your first output character must be "{"."""
 
