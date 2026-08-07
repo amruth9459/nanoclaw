@@ -95,3 +95,7 @@ exp83-fix-exp72-80-regressions-76-docs	2026-04-24	1.0000	76	0.00	Apply all missi
 2026-08-06T06:00:55Z	exp-20260806-020044	no-edit	0.0	0	0	no-edit
 2026-08-06T06:01:07Z	exp-20260806-020055	no-edit	0.0	0	0	no-edit
 2026-08-06T06:01:19Z	exp-20260806-020107	no-edit	0.0	0	0	no-edit
+2026-08-07T06:24:58Z	exp-20260807-020441	Tonight's baseline (this file's on-disk state, unchanged sin	0.3165	0.3147	0.0	discarded
+2026-08-07T06:35:24Z	exp-20260807-022458	Tonight's baseline (0.3165: Duplex 0.4193, Clinic 0.2138, ba	0.3165	0.4165	0.0	kept
+2026-08-07T06:43:27Z	exp-20260807-023524	Tonight's baseline to beat is effective F1=0.4165 (Duplex 0.	0.4165	0.3423	0.0	discarded
+2026-08-07T06:56:50Z	exp-20260807-024327	Tonight's baseline to beat is effective F1=0.4165 (Duplex 0.	0.4165	0.4476	0.0	kept
