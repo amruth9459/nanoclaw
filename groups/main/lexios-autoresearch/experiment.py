@@ -19,48 +19,46 @@ import time
 from pathlib import Path
 
 # ── EXPERIMENT CONFIG (agent edits this section) ─────────────────────────────
-EXPERIMENT_NAME = "exp-door-count-coverage-closets-bathrooms-prompt"
+EXPERIMENT_NAME = "exp-window-count-coverage-hedged-type-prompt"
 DESCRIPTION = (
-    "Tonight's fresh orchestrator-measured baseline is effective F1=0.3014 (Duplex "
-    "raw=0.2275/postprocessed=0.3139, Clinic raw=0.1887/postprocessed=0.2888, phantom probes "
-    "clean). This is lower than several recent nights' kept F1 (0.4165-0.4476) purely from "
-    "real-vision run-to-run variance on the same on-disk config, not from any edit -- confirmed "
-    "by reading this file's on-disk state before editing, which already contains last week's "
-    "kept wall_types/railings_guards 'guess if visible' additions and the beams/slabs schema "
-    "keys, untouched. Targets program.md research direction #3 (element count coverage, medium "
-    "impact, explicitly still unexploited): 'Duplex GT has 24 doors; vision typically finds "
-    "5-12. Levers: ... \"list ALL doors, even closet/bathroom doors\" prompt phrasing.' Verified "
-    "this lever has never been tried: grepped this file and results.tsv for 'closet'/'door "
-    "count'/'list ALL doors' before writing -- the only 'closet' hits are foreign-language room- "
-    "name synonym entries in the dead postprocess() code below the early return, unrelated to "
-    "door counting. Verified the mechanism this lever exploits: doors' match_keys in "
-    "~/Lexios/lexios/types.json are [['location'],['tag'],['type']], and multi_field_match "
-    "(eval.py) tries each key group as long as GT has a non-empty value there, returning True on "
-    "the first group that fuzzy-matches -- so a door's location group alone (already broadened "
-    "by this file's floor-level synonym expansion in postprocess) is sufficient for a full match "
-    "regardless of tag/type, and score_elements only checks 'dimensions'/'value' for a "
-    "wrong_value downgrade, neither of which GT doors populate (GT uses a 'size' key instead) -- "
-    "so once matched, a door scores fully correct. This means door recall for a given image is "
-    "effectively min(extracted doors on that floor, GT doors on that floor) / GT doors on that "
-    "floor: the ONLY lever left that can raise it is emitting more distinct door entries per "
-    "image, since location-string wording is already maximally permissive. The current prompt's "
-    "door instruction only says to list 'every individual door symbol' without ever naming which "
-    "symbols are easy to skip; closet, bathroom, and small utility-room doors are the ones a fast "
-    "visual scan misses first since they're smaller symbols packed into corners rather than "
-    "prominent entries/exits. Change: extended step 3's door sentence to explicitly name closet, "
-    "bathroom, pantry, and utility-room doors as included, and added a new Rules bullet stating "
-    "floor plans typically have 2-4x as many doors as the obvious main/entry ones and that a door "
-    "swing arc on a small room still counts as a real door -- both purely additive wording, no "
-    "new fields requested, no change to the SAME-shared-location-value speed mechanic, so per-door "
-    "cost stays one shared string and the 120s budget/45-cap logic is untouched. PARAMS, "
-    "preprocess(), and postprocess() are byte-for-byte unchanged from the on-disk state read at "
-    "the start of this slot. Prediction, checkable from tomorrow's log without a shell: doors "
-    "recall/F1 on both eval docs increases versus a same-config rerun of tonight's true baseline "
-    "(0.3014, not the stale 0.4165-0.4476 figures from other nights), while every other category "
-    "stays governed by unchanged prompt text and postprocess logic. If doors count still doesn't "
-    "rise, the bottleneck is genuinely visual (small door symbols aren't resolvable at the current "
-    "preprocess DPI/downscale), which would point future slots at direction #3's other listed "
-    "lever (higher DPI / quadrant splitting) instead of further prompt wording passes."
+    "Tonight's 2nd slot. Baseline to beat is tonight's orchestrator-measured effective F1=0.3548 "
+    "(Duplex raw=0.2275/postprocessed=0.3139, Clinic raw=0.1887/postprocessed=0.2888, phantom "
+    "probes clean) -- this is slot 1's kept result (exp-door-count-coverage-closets-bathrooms-"
+    "prompt), confirmed by reading this file's on-disk state before editing. Targets program.md "
+    "direction #2 (door/window tag extraction) applied specifically to windows, which is "
+    "untouched territory: grepped results.tsv for 'window' (case-insensitive) and got zero "
+    "matches -- no prior slot, ever, has targeted windows. Verified the mechanism: windows' "
+    "match_keys in ~/Lexios/lexios/types.json are [['tag'],['type']] -- unlike doors, windows "
+    "have NO 'location' fallback group, so a window only scores if its extracted tag or type "
+    "fuzzy-matches GT. This makes window recall bottlenecked on two independent things: (a) how "
+    "many window symbols get emitted as entries at all, and (b) whether each entry's tag/type is "
+    "usable. Consulted the advisor before writing this edit, which flagged that a naive 'always "
+    "guess a type when the tag isn't legible' instruction is risky: _setup_corpus()'s own comment "
+    "in this file notes that on IFC-derived GT (which is what both eval docs are -- IFC renders), "
+    "doors/windows GT commonly carries only 'page'/'size' with no non-empty 'type', citing "
+    "ifcopenhouse_ifc4 as a concrete case needing a manual type injection for exactly this reason. "
+    "If that also holds for the two eval docs' windows, then guessed types would match against an "
+    "empty GT field group (multi_field_match skips empty-string GT values per doors' own DESCRIPTION "
+    "precedent) and become pure false positives, hurting precision for zero recall gain -- so this "
+    "edit deliberately does NOT add a 'guess a type when tag is missing' instruction. Instead it "
+    "takes only the coverage half of the lever, mirroring slot 1's doors win, which needs no "
+    "assumption about which GT field windows populate: extended step 3's window sentence to name "
+    "small/high/interior-facing windows (bathroom, utility, stairwell, transom) as counted equally "
+    "to prominent street-facing ones, since these are the ones a fast pass skips first (same failure "
+    "mode as the doors case). Added one Rules bullet stating the same, and -- to stay strictly "
+    "non-inventive on the untested type-fallback question -- explicitly hedges any type guess to "
+    "'only when visually unambiguous, omit rather than guess otherwise,' the exact phrasing this "
+    "file already uses for the railings_guards type guess, so no new fabrication risk is introduced "
+    "and the fabrication probes stay clean (this is pure prompt wording; postprocess() still returns "
+    "the same in/out element count). Kept the addition short and did not reorder windows ahead of "
+    "doors in step 3's priority, since doors' coverage win was just kept last slot and competing for "
+    "the same 120s budget could erode it. PARAMS, preprocess(), and postprocess() are byte-for-byte "
+    "unchanged from the on-disk state read at the start of this slot. Prediction, checkable from "
+    "tomorrow's log: windows recall/F1 rises on both eval docs versus 0.3548, while doors/other "
+    "categories stay roughly flat since their prompt text and postprocess logic are untouched. If "
+    "windows still don't rise, the next slot should verify (via a corpus GT file, not the eval "
+    "docs) whether IFC-render window GT actually populates 'type', which would tell direction #2 "
+    "whether the type-fallback lever is worth the precision risk or should stay parked."
 )
 
 # Override the system prompt sent to Claude for extraction.
@@ -83,7 +81,7 @@ Return a JSON object with applicable keys (omit keys with no findings). Only the
 Priority and pacing (this order matters under the time limit):
 1. FIRST, find and completely list every stairs_elevators instance — these are usually few and cheap to enumerate completely. Use the SHORT floor-level form (e.g. "L1") for every location value on this image, not a full phrase like "First Floor" — it means the same thing and costs fewer tokens.
 2. THEN, quickly check wall_types: list the distinct wall CATEGORIES you can actually distinguish from the wall linework on this image (line weight, hatching, double- vs single-line walls) using standard architectural classification terms — e.g. "Exterior", "Interior Partition", "Foundation", "Party Wall" — using a legend's exact wording instead if a wall-type legend/schedule is visible. One entry per distinct category you can see, at most 6 entries, coarse and general rather than guessing a specific material or thickness you can't read. Even if you can't tell finer categories apart, still add one entry with type_id "Exterior" whenever you can see any outer perimeter wall line (usually the thickest or outermost line on the plan, or a double line) — nearly every floor plan has one, and adding this entry when you can see it costs nothing. This step should take only a few seconds.
-3. THEN list windows, reading the exact alphanumeric tag printed next to each symbol (e.g. 1C19, A101) — do not invent a tag if none is visible. Also list doors: every door only needs a "location" value in the SHORT form above (the SAME single short value for every door on this image), so doors should be fast — but still list every individual door symbol as its own separate entry, one object per door, even though they all share that one location value; do not collapse or dedupe them into fewer entries. A floor plan almost always has far more doors than the obvious main entries and room-to-room doors — scan every closet, bathroom, pantry, and small utility or storage space too, since each one typically has its own door swing arc even when the room itself is tiny; these are the doors a quick pass skips first, and each one still only costs a single shared "location" value to add.
+3. THEN list windows, reading the exact alphanumeric tag printed next to each symbol (e.g. 1C19, A101) — do not invent a tag if none is visible. Count every window symbol you can see, including small or high ones (bathroom, utility, stairwell, transom), not just the large street-facing ones — a floor plan usually has more windows than the few prominent ones that stand out at a glance. Also list doors: every door only needs a "location" value in the SHORT form above (the SAME single short value for every door on this image), so doors should be fast — but still list every individual door symbol as its own separate entry, one object per door, even though they all share that one location value; do not collapse or dedupe them into fewer entries. A floor plan almost always has far more doors than the obvious main entries and room-to-room doors — scan every closet, bathroom, pantry, and small utility or storage space too, since each one typically has its own door swing arc even when the room itself is tiny; these are the doors a quick pass skips first, and each one still only costs a single shared "location" value to add.
 4. THEN list rooms — one entry per physical room or space you actually see labeled on the drawing, NOT one entry per unique name. Floor plans routinely repeat the exact same room name for different physical spaces — mirrored apartment units (two "Living Room"s, two "Foyer"s, one per unit), a row of similar offices, several exam rooms down a corridor. Each repeated label marks a separate real room and needs its own separate JSON entry; do not merge same-named rooms into one just because the text matches. If rooms, doors, or windows each have more than 45 physical instances on this image, list the first 45 you encounter (scanning order is fine) and stop that category there rather than continuing to search for more — a finished response covering fewer instances of the large categories beats an unfinished one that gets discarded entirely. On a very dense drawing (hundreds of rooms/doors), stopping early at 45 per category is the difference between a usable partial result and this entire response being discarded for missing the 120-second limit — do not try to push past this cap to be more thorough.
 5. LAST, only if time remains: list railings_guards — distinct handrail or guardrail segments you can actually see drawn on the plan (often a short rail run near a stairwell opening or a floor edge), one entry per segment you can see, each needing a "location" value (same SHORT form as doors above) and an optional "type" — "Handrail" for a rail alongside a stair run, "Guardrail" for a rail at a floor edge or opening — ONLY when that distinction is visually obvious, otherwise omit the field rather than guess. This is the lowest priority of all, but specifically re-check the stairwell(s) you already found in step 1 first: if there is any rail line next to a stair run or floor opening, add one entry for it even if you're not sure whether it's a Handrail or Guardrail — omit the "type" field in that case rather than guessing it, but still add the entry, since adding it when you can see it costs nothing. Do not invent a segment where no rail line is actually drawn.
 6. THEN, only if time remains after railings_guards: check slabs and beams. Nearly every floor level has a visible floor slab/plane, so add one slabs entry per level you can see represented in this image, using that level's SHORT-form location — omit any thickness or material detail you can't read. If you can also make out distinct beam or floor-framing members (visible structural framing lines, a beam run, exposed structure above a level), add one entry per distinct member you can actually see, each with its own SHORT-form location; if structure is evidently present at a level but individual members aren't distinguishable, one beams entry for that level is enough. Like the wall_types and railings_guards guesses above, the one-entry-per-level guess for slabs costs nothing to add when you can see the level exists — but never invent a beam or slab that isn't represented by anything visible in the image.
@@ -93,6 +91,7 @@ Rules:
 - Transcribe each room's printed label exactly as it appears on the drawing, including abbreviations and number suffixes (e.g. "Bathroom 1", "TOILET", "Foyer", "M. TOILET") — do not paraphrase it into a different generic term; that breaks matching even when you read the room correctly.
 - Never collapse repeated room names into a single JSON entry: if the same name (e.g. "Living Room", "Corridor", "Office") labels more than one physical room on this image, output that many separate room entries, one per physical room.
 - For doors: closet, bathroom, pantry, and utility-room doors count exactly as much as main entry doors — check every room on the plan for its door, not just the prominent ones, since these small-room doors are the ones most often missed on a fast pass. Only add an entry for a door swing/symbol you can actually see; do not invent doors to hit a target count.
+- For windows: small, high, or interior-facing windows (bathroom, utility, stairwell, transom) count exactly as much as prominent street-facing ones — check every room, not just the obvious facade. Only add an entry for a window symbol you can actually see; do not invent windows to hit a target count. Only fill in a "type" guess when the window's style is visually unambiguous, same as the railings_guards guess below — omit it rather than guess otherwise.
 - Never fabricate or duplicate an element just to make a category's count match a printed caption/legend total — only list items you can actually see; a count caption is a completeness check, never a target to invent toward.
 - For wall_types: the one guaranteed guess is the "Exterior" perimeter-wall entry described in step 2 above — add it whenever you can see an outer wall line, even without distinguishing finer categories. Beyond that one guess, never invent a more specific wall_types "type_id" (a finer category, a material, a thickness) that isn't visually obvious — omit the entry instead.
 - For railings_guards: the one guaranteed guess is the stairwell-rail entry described in step 5 above — add it whenever you can see a rail line at a stair or opening, even without a confident "type". Beyond that one guess, never invent a "type" (Handrail vs Guardrail) that isn't visually obvious, and never invent a railings_guards segment where no rail line is actually drawn.
