@@ -107,3 +107,7 @@ exp83-fix-exp72-80-regressions-76-docs	2026-04-24	1.0000	76	0.00	Apply all missi
 2026-08-09T06:23:14Z	exp-20260809-021441	Tonight's 2nd slot. Baseline to beat is tonight's orchestrat	0.3548	0.444	0.0	kept
 2026-08-09T06:32:03Z	exp-20260809-022314	Tonight's 3rd slot. Baseline to beat is tonight's orchestrat	0.444	0.4413	0.0	discarded
 2026-08-09T06:43:47Z	exp-20260809-023203	Tonight's 4th slot. Baseline to beat is tonight's orchestrat	0.444	0.4424	0.0	discarded
+2026-08-10T06:17:26Z	exp-20260810-020429	Tonight's baseline to beat is the orchestrator-measured effe	0.4208	0.4413	0.0	kept
+2026-08-10T06:31:28Z	exp-20260810-021726	Tonight's baseline to beat is effective F1=0.4413 (Duplex ra	0.4413	0.4411	0.0	discarded
+2026-08-10T06:39:09Z	exp-20260810-023128	Tonight's 3rd slot. Baseline to beat is tonight's orchestrat	0.4413	0.4387	0.0	discarded
+2026-08-10T06:55:40Z	exp-20260810-023909	Tonight's baseline to beat is this file's on-disk state at t	0.4413	0.3559	0.0	discarded
