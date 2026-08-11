@@ -157,3 +157,12 @@ agent-browser get text @e1  # Get product title
 agent-browser get attr @e2 href  # Get link URL
 agent-browser screenshot products.png
 ```
+
+## Related
+
+- [[QUICK_REFERENCE|Quick Reference Guide]]
+- [[r2-security-analysis|R2 Backup Security Analysis & Threat Model]]
+- [[nc-sec-09-r2-token-security|Security Review: R2 Backup Token Least Privilege]]
+- [[2026-02-25-conversation-1133|Conversation]]
+- [[2026-02-24-conversation-2341|Conversation]]
+- [[testing-reality-checker|Integration Agent Personality]]

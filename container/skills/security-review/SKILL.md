@@ -119,3 +119,12 @@ _Next review: tomorrow 2 AM_
 
 If there are HIGH findings, prefix the message with 🚨 instead of 🛡️.
 Send only one message. Keep it under 400 words.
+
+## Related
+
+- [[SKILL|Check if nanoclaw launchd service is running]]
+- [[2026-02-26-conversation-1536|Conversation]]
+- [[2026-02-25-conversation-1133|Conversation]]
+- [[SECURITY_ANALYSIS_REMOTE_SHELL|Security Analysis: Remote Shell Attack Surface]]
+- [[SAFETY_PROTOCOL|NanoClaw Safety Protocol]]
+- [[SECURITY|NanoClaw Security Model]]

@@ -6,13 +6,18 @@ Query local Ollama models running on the host Mac via IPC.
 
 Run `ollama-query --model list` or check with the user. Key models:
 
-| Model | Size | Notes |
-|-------|------|-------|
-| `huihui_ai/qwen3-vl-abliterated:8b` | 6.1GB | **Uncensored** Qwen3-VL 8B — text + images, no refusals |
-| `huihui_ai/qwen3-vl-abliterated:32b` | 21GB | **Uncensored** Qwen3-VL 32B — more capable, slower |
-| `qwen3-vl:8b` | 6.1GB | Standard (censored) Qwen3-VL 8B |
-| `qwen3-vl:32b` | 20GB | Standard (censored) Qwen3-VL 32B |
-| `deepseek-coder-v2:latest` | 8.9GB | Code specialist |
+| Model | Size | Best For | Notes |
+|-------|------|----------|-------|
+| `gemma4:26b` | 18GB | Reasoning, vision, code | Google Gemma 4 MoE — multimodal, 256K context, best reasoning locally |
+| `gemma4:31b` | 20GB | Quality-critical tasks | Dense 31B — slightly more capable, slower |
+| `glm-4.7-flash` | 5GB | Fast agentic loops | ZhipuAI 30B MoE/3B active — 200K context, very fast |
+| `huihui_ai/qwen3-vl-abliterated:8b` | 6.1GB | Uncensored tasks | **Uncensored** Qwen3-VL 8B — text + images, no refusals |
+| `huihui_ai/qwen3-vl-abliterated:32b` | 21GB | Uncensored + capable | **Uncensored** Qwen3-VL 32B — more capable, slower |
+| `qwen3-vl:8b` | 6.1GB | Vision (standard) | Standard Qwen3-VL 8B |
+| `qwen3-vl:32b` | 20GB | Vision (standard) | Standard Qwen3-VL 32B |
+| `qwen2.5-coder:latest` | 4.7GB | Code generation | Fast coding specialist |
+| `deepseek-coder-v2:latest` | 8.9GB | Complex code | Larger code specialist |
+| `llama3:latest` | 4.7GB | General purpose | Meta Llama 3 8B |
 
 ## Usage
 
