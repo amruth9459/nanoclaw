@@ -115,3 +115,7 @@ exp83-fix-exp72-80-regressions-76-docs	2026-04-24	1.0000	76	0.00	Apply all missi
 2026-08-11T06:32:17Z	exp-20260811-021459	Tonight's baseline to beat is program.md's stated effective 	0.3788	0.2344	0.0	discarded
 2026-08-11T06:48:33Z	exp-20260811-023217	Tonight's baseline to beat is this file's on-disk state goin	0.3788	0.3406	0.0	discarded
 2026-08-11T06:56:27Z	exp-20260811-024833	Tonight's 4th slot. This file's on-disk state going in is to	0.3788	0.3788	0.0	discarded
+2026-08-12T06:14:42Z	exp-20260812-020536	Tonight's orchestrator-measured baseline (2026-08-12) to bea	0.4229	0.3785	0.0	discarded
+2026-08-12T06:40:11Z	exp-20260812-021442	Slabs recall is count-capped, not location-capped -- raised 	0.4229	0.4897	0.0	kept
+2026-08-12T06:50:46Z	exp-20260812-024011	Three of NBU_MedicalClinic_Arch's 10 GT categories -- equipm	0.4897	0.3946	0.0	discarded
+2026-08-12T07:02:39Z	exp-20260812-025046	Tonight's 4th slot. Baseline to beat is this file's on-disk 	0.4897	0.4574	0.0	discarded
