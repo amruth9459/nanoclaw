@@ -5,6 +5,240 @@
 
 ---
 
+### 2026-08-11 23:27
+
+**Areas:** config, extraction
+**Files (20):** .cache/zellij/permissions.kdl, .claude-ledger/bin/claude-spend, .claude-ledger/claude-ledger.py, .claude-ledger/routing_gate.sh, .claude-ledger/weekly_usage.py, .claude/.gitattributes, .claude/.gitignore, .claude/CLAUDE.md, .claude/agents/grok-multi-agent.md, .claude/agents/grok.md, .claude/agents/kimi-k3.md, .claude/bin/cc-set-provider-key, .claude/bin/claude-merge-device.sh, .claude/bin/cmux-unroute, .claude/bin/fix-thinking.py, .claude/bin/grok-swarm, .claude/bin/session-extract.py, .claude/codex-build-routing-snippet.md, .claude/commands/account.md, .claude/commands/checkpoint.md
+**Diff:** +249 -2 across 3 files
+
+### 2026-08-11 23:25
+
+**Areas:** config, extraction
+**Files (20):** .cache/zellij/permissions.kdl, .claude-ledger/bin/claude-spend, .claude-ledger/claude-ledger.py, .claude-ledger/routing_gate.sh, .claude-ledger/weekly_usage.py, .claude/.gitattributes, .claude/.gitignore, .claude/CLAUDE.md, .claude/agents/grok-multi-agent.md, .claude/agents/grok.md, .claude/agents/kimi-k3.md, .claude/bin/cc-set-provider-key, .claude/bin/claude-merge-device.sh, .claude/bin/cmux-unroute, .claude/bin/fix-thinking.py, .claude/bin/grok-swarm, .claude/bin/session-extract.py, .claude/codex-build-routing-snippet.md, .claude/commands/account.md, .claude/commands/checkpoint.md
+**Diff:** +243 -2 across 3 files
+
+### 2026-08-11 23:22
+
+**Areas:** config, extraction
+**Files (20):** .cache/zellij/permissions.kdl, .claude-ledger/bin/claude-spend, .claude-ledger/claude-ledger.py, .claude-ledger/routing_gate.sh, .claude-ledger/weekly_usage.py, .claude/.gitattributes, .claude/.gitignore, .claude/CLAUDE.md, .claude/agents/grok-multi-agent.md, .claude/agents/grok.md, .claude/agents/kimi-k3.md, .claude/bin/cc-set-provider-key, .claude/bin/claude-merge-device.sh, .claude/bin/cmux-unroute, .claude/bin/fix-thinking.py, .claude/bin/grok-swarm, .claude/bin/session-extract.py, .claude/codex-build-routing-snippet.md, .claude/commands/account.md, .claude/commands/checkpoint.md
+**Diff:** +237 -2 across 3 files
+
+### 2026-08-11 23:21
+
+**Areas:** config, extraction
+**Files (20):** .cache/zellij/permissions.kdl, .claude-ledger/bin/claude-spend, .claude-ledger/claude-ledger.py, .claude-ledger/routing_gate.sh, .claude-ledger/weekly_usage.py, .claude/.gitattributes, .claude/.gitignore, .claude/CLAUDE.md, .claude/agents/grok-multi-agent.md, .claude/agents/grok.md, .claude/agents/kimi-k3.md, .claude/bin/cc-set-provider-key, .claude/bin/claude-merge-device.sh, .claude/bin/cmux-unroute, .claude/bin/fix-thinking.py, .claude/bin/grok-swarm, .claude/bin/session-extract.py, .claude/codex-build-routing-snippet.md, .claude/commands/account.md, .claude/commands/checkpoint.md
+**Diff:** +231 -2 across 3 files
+
+### 2026-08-11 23:20
+
+**Areas:** config, extraction
+**Files (20):** .cache/zellij/permissions.kdl, .claude-ledger/bin/claude-spend, .claude-ledger/claude-ledger.py, .claude-ledger/routing_gate.sh, .claude-ledger/weekly_usage.py, .claude/.gitattributes, .claude/.gitignore, .claude/CLAUDE.md, .claude/agents/grok-multi-agent.md, .claude/agents/grok.md, .claude/agents/kimi-k3.md, .claude/bin/cc-set-provider-key, .claude/bin/claude-merge-device.sh, .claude/bin/cmux-unroute, .claude/bin/fix-thinking.py, .claude/bin/grok-swarm, .claude/bin/session-extract.py, .claude/codex-build-routing-snippet.md, .claude/commands/account.md, .claude/commands/checkpoint.md
+**Diff:** +225 -2 across 3 files
+
+### 2026-08-11 23:16
+
+**Areas:** config, extraction
+**Files (20):** .cache/zellij/permissions.kdl, .claude-ledger/bin/claude-spend, .claude-ledger/claude-ledger.py, .claude-ledger/routing_gate.sh, .claude-ledger/weekly_usage.py, .claude/.gitattributes, .claude/.gitignore, .claude/CLAUDE.md, .claude/agents/grok-multi-agent.md, .claude/agents/grok.md, .claude/agents/kimi-k3.md, .claude/bin/cc-set-provider-key, .claude/bin/claude-merge-device.sh, .claude/bin/cmux-unroute, .claude/bin/fix-thinking.py, .claude/bin/grok-swarm, .claude/bin/session-extract.py, .claude/codex-build-routing-snippet.md, .claude/commands/account.md, .claude/commands/checkpoint.md
+**Diff:** +219 -2 across 3 files
+
+### 2026-08-11 23:16
+
+**Areas:** config, extraction
+**Files (20):** .cache/zellij/permissions.kdl, .claude-ledger/bin/claude-spend, .claude-ledger/claude-ledger.py, .claude-ledger/routing_gate.sh, .claude-ledger/weekly_usage.py, .claude/.gitattributes, .claude/.gitignore, .claude/CLAUDE.md, .claude/agents/grok-multi-agent.md, .claude/agents/grok.md, .claude/agents/kimi-k3.md, .claude/bin/cc-set-provider-key, .claude/bin/claude-merge-device.sh, .claude/bin/cmux-unroute, .claude/bin/fix-thinking.py, .claude/bin/grok-swarm, .claude/bin/session-extract.py, .claude/codex-build-routing-snippet.md, .claude/commands/account.md, .claude/commands/checkpoint.md
+**Diff:** +213 -2 across 3 files
+
+### 2026-08-11 23:13
+
+**Areas:** config, extraction
+**Files (20):** .cache/zellij/permissions.kdl, .claude-ledger/bin/claude-spend, .claude-ledger/claude-ledger.py, .claude-ledger/routing_gate.sh, .claude-ledger/weekly_usage.py, .claude/.gitattributes, .claude/.gitignore, .claude/CLAUDE.md, .claude/agents/grok-multi-agent.md, .claude/agents/grok.md, .claude/agents/kimi-k3.md, .claude/bin/cc-set-provider-key, .claude/bin/claude-merge-device.sh, .claude/bin/cmux-unroute, .claude/bin/fix-thinking.py, .claude/bin/grok-swarm, .claude/bin/session-extract.py, .claude/codex-build-routing-snippet.md, .claude/commands/account.md, .claude/commands/checkpoint.md
+**Diff:** +207 -2 across 3 files
+
+### 2026-08-11 23:07
+
+**Areas:** config, extraction
+**Files (20):** .cache/zellij/permissions.kdl, .claude-ledger/bin/claude-spend, .claude-ledger/claude-ledger.py, .claude-ledger/routing_gate.sh, .claude-ledger/weekly_usage.py, .claude/.gitattributes, .claude/.gitignore, .claude/CLAUDE.md, .claude/agents/grok-multi-agent.md, .claude/agents/grok.md, .claude/agents/kimi-k3.md, .claude/bin/cc-set-provider-key, .claude/bin/claude-merge-device.sh, .claude/bin/cmux-unroute, .claude/bin/fix-thinking.py, .claude/bin/grok-swarm, .claude/bin/session-extract.py, .claude/codex-build-routing-snippet.md, .claude/commands/account.md, .claude/commands/checkpoint.md
+**Diff:** +201 -2 across 3 files
+
+### 2026-08-11 23:00
+
+**Areas:** config, extraction
+**Files (20):** .cache/zellij/permissions.kdl, .claude-ledger/bin/claude-spend, .claude-ledger/claude-ledger.py, .claude-ledger/routing_gate.sh, .claude-ledger/weekly_usage.py, .claude/.gitattributes, .claude/.gitignore, .claude/CLAUDE.md, .claude/agents/grok-multi-agent.md, .claude/agents/grok.md, .claude/agents/kimi-k3.md, .claude/bin/cc-set-provider-key, .claude/bin/claude-merge-device.sh, .claude/bin/cmux-unroute, .claude/bin/fix-thinking.py, .claude/bin/grok-swarm, .claude/bin/session-extract.py, .claude/codex-build-routing-snippet.md, .claude/commands/account.md, .claude/commands/checkpoint.md
+**Diff:** +195 -2 across 3 files
+
+### 2026-08-11 22:57
+
+**Areas:** config, extraction
+**Files (20):** .cache/zellij/permissions.kdl, .claude-ledger/bin/claude-spend, .claude-ledger/claude-ledger.py, .claude-ledger/routing_gate.sh, .claude-ledger/weekly_usage.py, .claude/.gitattributes, .claude/.gitignore, .claude/CLAUDE.md, .claude/agents/grok-multi-agent.md, .claude/agents/grok.md, .claude/agents/kimi-k3.md, .claude/bin/cc-set-provider-key, .claude/bin/claude-merge-device.sh, .claude/bin/cmux-unroute, .claude/bin/fix-thinking.py, .claude/bin/grok-swarm, .claude/bin/session-extract.py, .claude/codex-build-routing-snippet.md, .claude/commands/account.md, .claude/commands/checkpoint.md
+**Diff:** +189 -2 across 3 files
+
+### 2026-08-11 22:56
+
+**Areas:** config, extraction
+**Files (20):** .cache/zellij/permissions.kdl, .claude-ledger/bin/claude-spend, .claude-ledger/claude-ledger.py, .claude-ledger/routing_gate.sh, .claude-ledger/weekly_usage.py, .claude/.gitattributes, .claude/.gitignore, .claude/CLAUDE.md, .claude/agents/grok-multi-agent.md, .claude/agents/grok.md, .claude/agents/kimi-k3.md, .claude/bin/cc-set-provider-key, .claude/bin/claude-merge-device.sh, .claude/bin/cmux-unroute, .claude/bin/fix-thinking.py, .claude/bin/grok-swarm, .claude/bin/session-extract.py, .claude/codex-build-routing-snippet.md, .claude/commands/account.md, .claude/commands/checkpoint.md
+**Diff:** +183 -2 across 3 files
+
+### 2026-08-11 22:55
+
+**Areas:** config, extraction
+**Files (20):** .cache/zellij/permissions.kdl, .claude-ledger/bin/claude-spend, .claude-ledger/claude-ledger.py, .claude-ledger/routing_gate.sh, .claude-ledger/weekly_usage.py, .claude/.gitattributes, .claude/.gitignore, .claude/CLAUDE.md, .claude/agents/grok-multi-agent.md, .claude/agents/grok.md, .claude/agents/kimi-k3.md, .claude/bin/cc-set-provider-key, .claude/bin/claude-merge-device.sh, .claude/bin/cmux-unroute, .claude/bin/fix-thinking.py, .claude/bin/grok-swarm, .claude/bin/session-extract.py, .claude/codex-build-routing-snippet.md, .claude/commands/account.md, .claude/commands/checkpoint.md
+**Diff:** +177 -2 across 3 files
+
+### 2026-08-11 22:40
+
+**Areas:** config, extraction
+**Files (20):** .cache/zellij/permissions.kdl, .claude-ledger/bin/claude-spend, .claude-ledger/claude-ledger.py, .claude-ledger/routing_gate.sh, .claude-ledger/weekly_usage.py, .claude/.gitattributes, .claude/.gitignore, .claude/CLAUDE.md, .claude/agents/grok-multi-agent.md, .claude/agents/grok.md, .claude/agents/kimi-k3.md, .claude/bin/cc-set-provider-key, .claude/bin/claude-merge-device.sh, .claude/bin/cmux-unroute, .claude/bin/fix-thinking.py, .claude/bin/grok-swarm, .claude/bin/session-extract.py, .claude/codex-build-routing-snippet.md, .claude/commands/account.md, .claude/commands/checkpoint.md
+**Diff:** +171 -2 across 3 files
+
+### 2026-08-11 22:38
+
+**Areas:** config, extraction
+**Files (20):** .cache/zellij/permissions.kdl, .claude-ledger/bin/claude-spend, .claude-ledger/claude-ledger.py, .claude-ledger/routing_gate.sh, .claude-ledger/weekly_usage.py, .claude/.gitattributes, .claude/.gitignore, .claude/CLAUDE.md, .claude/agents/grok-multi-agent.md, .claude/agents/grok.md, .claude/agents/kimi-k3.md, .claude/bin/cc-set-provider-key, .claude/bin/claude-merge-device.sh, .claude/bin/cmux-unroute, .claude/bin/fix-thinking.py, .claude/bin/grok-swarm, .claude/bin/session-extract.py, .claude/codex-build-routing-snippet.md, .claude/commands/account.md, .claude/commands/checkpoint.md
+**Diff:** +165 -2 across 3 files
+
+### 2026-08-11 22:37
+
+**Areas:** config, extraction
+**Files (20):** .cache/zellij/permissions.kdl, .claude-ledger/bin/claude-spend, .claude-ledger/claude-ledger.py, .claude-ledger/routing_gate.sh, .claude-ledger/weekly_usage.py, .claude/.gitattributes, .claude/.gitignore, .claude/CLAUDE.md, .claude/agents/grok-multi-agent.md, .claude/agents/grok.md, .claude/agents/kimi-k3.md, .claude/bin/cc-set-provider-key, .claude/bin/claude-merge-device.sh, .claude/bin/cmux-unroute, .claude/bin/fix-thinking.py, .claude/bin/grok-swarm, .claude/bin/session-extract.py, .claude/codex-build-routing-snippet.md, .claude/commands/account.md, .claude/commands/checkpoint.md
+**Diff:** +159 -2 across 3 files
+
+### 2026-08-11 22:37
+
+**Areas:** config, extraction
+**Files (20):** .cache/zellij/permissions.kdl, .claude-ledger/bin/claude-spend, .claude-ledger/claude-ledger.py, .claude-ledger/routing_gate.sh, .claude-ledger/weekly_usage.py, .claude/.gitattributes, .claude/.gitignore, .claude/CLAUDE.md, .claude/agents/grok-multi-agent.md, .claude/agents/grok.md, .claude/agents/kimi-k3.md, .claude/bin/cc-set-provider-key, .claude/bin/claude-merge-device.sh, .claude/bin/cmux-unroute, .claude/bin/fix-thinking.py, .claude/bin/grok-swarm, .claude/bin/session-extract.py, .claude/codex-build-routing-snippet.md, .claude/commands/account.md, .claude/commands/checkpoint.md
+**Diff:** +153 -2 across 3 files
+
+### 2026-08-11 22:35
+
+**Areas:** config, extraction
+**Files (20):** .cache/zellij/permissions.kdl, .claude-ledger/bin/claude-spend, .claude-ledger/claude-ledger.py, .claude-ledger/routing_gate.sh, .claude-ledger/weekly_usage.py, .claude/.gitattributes, .claude/.gitignore, .claude/CLAUDE.md, .claude/agents/grok-multi-agent.md, .claude/agents/grok.md, .claude/agents/kimi-k3.md, .claude/bin/cc-set-provider-key, .claude/bin/claude-merge-device.sh, .claude/bin/cmux-unroute, .claude/bin/fix-thinking.py, .claude/bin/grok-swarm, .claude/bin/session-extract.py, .claude/codex-build-routing-snippet.md, .claude/commands/account.md, .claude/commands/checkpoint.md
+**Diff:** +147 -2 across 3 files
+
+### 2026-08-11 22:27
+
+**Areas:** config, extraction
+**Files (20):** .cache/zellij/permissions.kdl, .claude-ledger/bin/claude-spend, .claude-ledger/claude-ledger.py, .claude-ledger/routing_gate.sh, .claude-ledger/weekly_usage.py, .claude/.gitattributes, .claude/.gitignore, .claude/CLAUDE.md, .claude/agents/grok-multi-agent.md, .claude/agents/grok.md, .claude/agents/kimi-k3.md, .claude/bin/cc-set-provider-key, .claude/bin/claude-merge-device.sh, .claude/bin/cmux-unroute, .claude/bin/fix-thinking.py, .claude/bin/grok-swarm, .claude/bin/session-extract.py, .claude/codex-build-routing-snippet.md, .claude/commands/account.md, .claude/commands/checkpoint.md
+**Diff:** +141 -2 across 3 files
+
+### 2026-08-11 22:13
+
+**Areas:** config
+**Files (20):** .cache/zellij/permissions.kdl, .claude-ledger/bin/claude-spend, .claude-ledger/claude-ledger.py, .claude-ledger/routing_gate.sh, .claude-ledger/weekly_usage.py, .claude/.gitattributes, .claude/.gitignore, .claude/CLAUDE.md, .claude/agents/grok-multi-agent.md, .claude/agents/grok.md, .claude/agents/kimi-k3.md, .claude/bin/cc-set-provider-key, .claude/bin/claude-merge-device.sh, .claude/bin/cmux-unroute, .claude/bin/fix-thinking.py, .claude/bin/grok-swarm, .claude/codex-build-routing-snippet.md, .claude/commands/account.md, .claude/commands/checkpoint.md, .claude/commands/codex-build.md
+**Diff:** +135 -2 across 3 files
+
+### 2026-08-11 22:13
+
+**Areas:** config
+**Files (20):** .cache/zellij/permissions.kdl, .claude-ledger/bin/claude-spend, .claude-ledger/claude-ledger.py, .claude-ledger/routing_gate.sh, .claude-ledger/weekly_usage.py, .claude/.gitattributes, .claude/.gitignore, .claude/CLAUDE.md, .claude/agents/grok-multi-agent.md, .claude/agents/grok.md, .claude/agents/kimi-k3.md, .claude/bin/cc-set-provider-key, .claude/bin/claude-merge-device.sh, .claude/bin/cmux-unroute, .claude/bin/fix-thinking.py, .claude/bin/grok-swarm, .claude/codex-build-routing-snippet.md, .claude/commands/account.md, .claude/commands/checkpoint.md, .claude/commands/codex-build.md
+**Diff:** +129 -2 across 3 files
+
+### 2026-08-11 22:12
+
+**Areas:** config
+**Files (20):** .cache/zellij/permissions.kdl, .claude-ledger/bin/claude-spend, .claude-ledger/claude-ledger.py, .claude-ledger/routing_gate.sh, .claude-ledger/weekly_usage.py, .claude/.gitattributes, .claude/.gitignore, .claude/CLAUDE.md, .claude/agents/grok-multi-agent.md, .claude/agents/grok.md, .claude/agents/kimi-k3.md, .claude/bin/cc-set-provider-key, .claude/bin/claude-merge-device.sh, .claude/bin/cmux-unroute, .claude/bin/fix-thinking.py, .claude/bin/grok-swarm, .claude/codex-build-routing-snippet.md, .claude/commands/account.md, .claude/commands/checkpoint.md, .claude/commands/codex-build.md
+**Diff:** +123 -2 across 3 files
+
+### 2026-08-11 22:11
+
+**Areas:** config
+**Files (20):** .cache/zellij/permissions.kdl, .claude-ledger/bin/claude-spend, .claude-ledger/claude-ledger.py, .claude-ledger/routing_gate.sh, .claude-ledger/weekly_usage.py, .claude/.gitattributes, .claude/.gitignore, .claude/CLAUDE.md, .claude/agents/grok-multi-agent.md, .claude/agents/grok.md, .claude/agents/kimi-k3.md, .claude/bin/cc-set-provider-key, .claude/bin/claude-merge-device.sh, .claude/bin/cmux-unroute, .claude/bin/fix-thinking.py, .claude/bin/grok-swarm, .claude/codex-build-routing-snippet.md, .claude/commands/account.md, .claude/commands/checkpoint.md, .claude/commands/codex-build.md
+**Diff:** +117 -2 across 3 files
+
+### 2026-08-11 22:09
+
+**Areas:** config
+**Files (20):** .cache/zellij/permissions.kdl, .claude-ledger/bin/claude-spend, .claude-ledger/claude-ledger.py, .claude-ledger/routing_gate.sh, .claude-ledger/weekly_usage.py, .claude/.gitattributes, .claude/.gitignore, .claude/CLAUDE.md, .claude/agents/grok-multi-agent.md, .claude/agents/grok.md, .claude/agents/kimi-k3.md, .claude/bin/cc-set-provider-key, .claude/bin/claude-merge-device.sh, .claude/bin/cmux-unroute, .claude/bin/fix-thinking.py, .claude/bin/grok-swarm, .claude/codex-build-routing-snippet.md, .claude/commands/account.md, .claude/commands/checkpoint.md, .claude/commands/codex-build.md
+**Diff:** +111 -2 across 3 files
+
+### 2026-08-11 22:08
+
+**Areas:** config
+**Files (20):** .cache/zellij/permissions.kdl, .claude-ledger/bin/claude-spend, .claude-ledger/claude-ledger.py, .claude-ledger/routing_gate.sh, .claude-ledger/weekly_usage.py, .claude/.gitattributes, .claude/.gitignore, .claude/CLAUDE.md, .claude/agents/grok-multi-agent.md, .claude/agents/grok.md, .claude/agents/kimi-k3.md, .claude/bin/cc-set-provider-key, .claude/bin/claude-merge-device.sh, .claude/bin/cmux-unroute, .claude/bin/fix-thinking.py, .claude/bin/grok-swarm, .claude/codex-build-routing-snippet.md, .claude/commands/account.md, .claude/commands/checkpoint.md, .claude/commands/codex-build.md
+**Diff:** +105 -2 across 3 files
+
+### 2026-08-11 22:07
+
+**Areas:** config
+**Files (20):** .cache/zellij/permissions.kdl, .claude-ledger/bin/claude-spend, .claude-ledger/claude-ledger.py, .claude-ledger/routing_gate.sh, .claude-ledger/weekly_usage.py, .claude/.gitattributes, .claude/.gitignore, .claude/CLAUDE.md, .claude/agents/grok-multi-agent.md, .claude/agents/grok.md, .claude/agents/kimi-k3.md, .claude/bin/cc-set-provider-key, .claude/bin/claude-merge-device.sh, .claude/bin/cmux-unroute, .claude/bin/fix-thinking.py, .claude/bin/grok-swarm, .claude/codex-build-routing-snippet.md, .claude/commands/account.md, .claude/commands/checkpoint.md, .claude/commands/codex-build.md
+**Diff:** +99 -2 across 3 files
+
+### 2026-08-11 22:04
+
+**Areas:** config
+**Files (20):** .cache/zellij/permissions.kdl, .claude-ledger/bin/claude-spend, .claude-ledger/claude-ledger.py, .claude-ledger/routing_gate.sh, .claude-ledger/weekly_usage.py, .claude/.gitattributes, .claude/.gitignore, .claude/CLAUDE.md, .claude/agents/grok-multi-agent.md, .claude/agents/grok.md, .claude/agents/kimi-k3.md, .claude/bin/cc-set-provider-key, .claude/bin/claude-merge-device.sh, .claude/bin/cmux-unroute, .claude/bin/fix-thinking.py, .claude/bin/grok-swarm, .claude/codex-build-routing-snippet.md, .claude/commands/account.md, .claude/commands/checkpoint.md, .claude/commands/codex-build.md
+**Diff:** +93 -2 across 3 files
+
+### 2026-08-11 22:04
+
+**Areas:** config
+**Files (20):** .cache/zellij/permissions.kdl, .claude-ledger/bin/claude-spend, .claude-ledger/claude-ledger.py, .claude-ledger/routing_gate.sh, .claude-ledger/weekly_usage.py, .claude/.gitattributes, .claude/.gitignore, .claude/CLAUDE.md, .claude/agents/grok-multi-agent.md, .claude/agents/grok.md, .claude/agents/kimi-k3.md, .claude/bin/cc-set-provider-key, .claude/bin/claude-merge-device.sh, .claude/bin/cmux-unroute, .claude/bin/fix-thinking.py, .claude/bin/grok-swarm, .claude/codex-build-routing-snippet.md, .claude/commands/account.md, .claude/commands/checkpoint.md, .claude/commands/codex-build.md
+**Diff:** +87 -2 across 3 files
+
+### 2026-08-11 22:03
+
+**Areas:** config
+**Files (20):** .cache/zellij/permissions.kdl, .claude-ledger/bin/claude-spend, .claude-ledger/claude-ledger.py, .claude-ledger/routing_gate.sh, .claude-ledger/weekly_usage.py, .claude/.gitattributes, .claude/.gitignore, .claude/CLAUDE.md, .claude/agents/grok-multi-agent.md, .claude/agents/grok.md, .claude/agents/kimi-k3.md, .claude/bin/cc-set-provider-key, .claude/bin/claude-merge-device.sh, .claude/bin/cmux-unroute, .claude/bin/fix-thinking.py, .claude/bin/grok-swarm, .claude/codex-build-routing-snippet.md, .claude/commands/account.md, .claude/commands/checkpoint.md, .claude/commands/codex-build.md
+**Diff:** +81 -2 across 3 files
+
+### 2026-08-11 21:59
+
+**Areas:** config
+**Files (20):** .cache/zellij/permissions.kdl, .claude-ledger/bin/claude-spend, .claude-ledger/claude-ledger.py, .claude-ledger/routing_gate.sh, .claude-ledger/weekly_usage.py, .claude/.gitattributes, .claude/.gitignore, .claude/CLAUDE.md, .claude/agents/grok-multi-agent.md, .claude/agents/grok.md, .claude/agents/kimi-k3.md, .claude/bin/cc-set-provider-key, .claude/bin/claude-merge-device.sh, .claude/bin/cmux-unroute, .claude/bin/fix-thinking.py, .claude/bin/grok-swarm, .claude/codex-build-routing-snippet.md, .claude/commands/account.md, .claude/commands/checkpoint.md, .claude/commands/codex-build.md
+**Diff:** +75 -2 across 3 files
+
+### 2026-08-11 21:56
+
+**Areas:** config
+**Files (20):** .cache/zellij/permissions.kdl, .claude-ledger/bin/claude-spend, .claude-ledger/claude-ledger.py, .claude-ledger/routing_gate.sh, .claude-ledger/weekly_usage.py, .claude/.gitattributes, .claude/.gitignore, .claude/CLAUDE.md, .claude/agents/grok-multi-agent.md, .claude/agents/grok.md, .claude/agents/kimi-k3.md, .claude/bin/cc-set-provider-key, .claude/bin/claude-merge-device.sh, .claude/bin/cmux-unroute, .claude/bin/fix-thinking.py, .claude/bin/grok-swarm, .claude/codex-build-routing-snippet.md, .claude/commands/account.md, .claude/commands/checkpoint.md, .claude/commands/codex-build.md
+**Diff:** +69 -2 across 3 files
+
+### 2026-08-11 21:55
+
+**Areas:** config
+**Files (20):** .cache/zellij/permissions.kdl, .claude-ledger/bin/claude-spend, .claude-ledger/claude-ledger.py, .claude-ledger/routing_gate.sh, .claude-ledger/weekly_usage.py, .claude/.gitattributes, .claude/.gitignore, .claude/CLAUDE.md, .claude/agents/grok-multi-agent.md, .claude/agents/grok.md, .claude/agents/kimi-k3.md, .claude/bin/cc-set-provider-key, .claude/bin/claude-merge-device.sh, .claude/bin/cmux-unroute, .claude/bin/fix-thinking.py, .claude/bin/grok-swarm, .claude/codex-build-routing-snippet.md, .claude/commands/account.md, .claude/commands/checkpoint.md, .claude/commands/codex-build.md
+**Diff:** +63 -2 across 3 files
+
+### 2026-08-11 21:47
+
+**Areas:** config
+**Files (20):** .cache/zellij/permissions.kdl, .claude-ledger/bin/claude-spend, .claude-ledger/claude-ledger.py, .claude-ledger/routing_gate.sh, .claude-ledger/weekly_usage.py, .claude/.gitattributes, .claude/.gitignore, .claude/CLAUDE.md, .claude/agents/grok-multi-agent.md, .claude/agents/grok.md, .claude/agents/kimi-k3.md, .claude/bin/cc-set-provider-key, .claude/bin/claude-merge-device.sh, .claude/bin/cmux-unroute, .claude/bin/fix-thinking.py, .claude/bin/grok-swarm, .claude/codex-build-routing-snippet.md, .claude/commands/account.md, .claude/commands/checkpoint.md, .claude/commands/codex-build.md
+**Diff:** +57 -2 across 3 files
+
+### 2026-08-11 21:42
+
+**Areas:** config
+**Files (20):** .cache/zellij/permissions.kdl, .claude-ledger/bin/claude-spend, .claude-ledger/claude-ledger.py, .claude-ledger/routing_gate.sh, .claude-ledger/weekly_usage.py, .claude/.gitattributes, .claude/.gitignore, .claude/CLAUDE.md, .claude/agents/grok-multi-agent.md, .claude/agents/grok.md, .claude/agents/kimi-k3.md, .claude/bin/cc-set-provider-key, .claude/bin/claude-merge-device.sh, .claude/bin/cmux-unroute, .claude/bin/fix-thinking.py, .claude/bin/grok-swarm, .claude/codex-build-routing-snippet.md, .claude/commands/account.md, .claude/commands/checkpoint.md, .claude/commands/codex-build.md
+**Diff:** +51 -2 across 3 files
+
+### 2026-08-11 21:40
+
+**Areas:** config
+**Files (20):** .cache/zellij/permissions.kdl, .claude-ledger/bin/claude-spend, .claude-ledger/claude-ledger.py, .claude-ledger/routing_gate.sh, .claude-ledger/weekly_usage.py, .claude/.gitattributes, .claude/.gitignore, .claude/CLAUDE.md, .claude/agents/grok-multi-agent.md, .claude/agents/grok.md, .claude/agents/kimi-k3.md, .claude/bin/cc-set-provider-key, .claude/bin/claude-merge-device.sh, .claude/bin/cmux-unroute, .claude/bin/fix-thinking.py, .claude/bin/grok-swarm, .claude/codex-build-routing-snippet.md, .claude/commands/account.md, .claude/commands/checkpoint.md, .claude/commands/codex-build.md
+**Diff:** +45 -2 across 3 files
+
+### 2026-08-11 21:37
+
+**Areas:** config
+**Files (20):** .cache/zellij/permissions.kdl, .claude-ledger/bin/claude-spend, .claude-ledger/claude-ledger.py, .claude-ledger/routing_gate.sh, .claude-ledger/weekly_usage.py, .claude/.gitattributes, .claude/.gitignore, .claude/CLAUDE.md, .claude/agents/grok-multi-agent.md, .claude/agents/grok.md, .claude/agents/kimi-k3.md, .claude/bin/cc-set-provider-key, .claude/bin/claude-merge-device.sh, .claude/bin/cmux-unroute, .claude/bin/fix-thinking.py, .claude/bin/grok-swarm, .claude/codex-build-routing-snippet.md, .claude/commands/account.md, .claude/commands/checkpoint.md, .claude/commands/codex-build.md
+**Diff:** +39 -2 across 3 files
+
+### 2026-08-11 21:30
+
+**Areas:** config
+**Files (20):** .cache/zellij/permissions.kdl, .claude-ledger/bin/claude-spend, .claude-ledger/claude-ledger.py, .claude-ledger/routing_gate.sh, .claude-ledger/weekly_usage.py, .claude/.gitattributes, .claude/.gitignore, .claude/CLAUDE.md, .claude/agents/grok-multi-agent.md, .claude/agents/grok.md, .claude/agents/kimi-k3.md, .claude/bin/cc-set-provider-key, .claude/bin/claude-merge-device.sh, .claude/bin/cmux-unroute, .claude/bin/fix-thinking.py, .claude/bin/grok-swarm, .claude/codex-build-routing-snippet.md, .claude/commands/account.md, .claude/commands/checkpoint.md, .claude/commands/codex-build.md
+**Diff:** +33 -2 across 3 files
+
+### 2026-08-11 21:29
+
+**Areas:** config
+**Files (20):** .cache/zellij/permissions.kdl, .claude-ledger/bin/claude-spend, .claude-ledger/claude-ledger.py, .claude-ledger/routing_gate.sh, .claude-ledger/weekly_usage.py, .claude/.gitattributes, .claude/.gitignore, .claude/CLAUDE.md, .claude/agents/grok-multi-agent.md, .claude/agents/grok.md, .claude/agents/kimi-k3.md, .claude/bin/cc-set-provider-key, .claude/bin/claude-merge-device.sh, .claude/bin/cmux-unroute, .claude/bin/fix-thinking.py, .claude/bin/grok-swarm, .claude/codex-build-routing-snippet.md, .claude/commands/account.md, .claude/commands/checkpoint.md, .claude/commands/codex-build.md
+**Diff:** +27 -2 across 3 files
+
+### 2026-08-11 20:56
+
+**Areas:** config
+**Files (20):** .cache/zellij/permissions.kdl, .claude-ledger/bin/claude-spend, .claude-ledger/claude-ledger.py, .claude-ledger/routing_gate.sh, .claude-ledger/weekly_usage.py, .claude/.gitattributes, .claude/.gitignore, .claude/CLAUDE.md, .claude/agents/grok-multi-agent.md, .claude/agents/grok.md, .claude/agents/kimi-k3.md, .claude/bin/cc-set-provider-key, .claude/bin/claude-merge-device.sh, .claude/bin/cmux-unroute, .claude/bin/fix-thinking.py, .claude/bin/grok-swarm, .claude/codex-build-routing-snippet.md, .claude/commands/account.md, .claude/commands/checkpoint.md, .claude/commands/codex-build.md
+**Diff:** +21 -2 across 2 files
+
 ### 2026-08-11 20:32
 
 **Areas:** config
