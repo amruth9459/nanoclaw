@@ -119,3 +119,4 @@ exp83-fix-exp72-80-regressions-76-docs	2026-04-24	1.0000	76	0.00	Apply all missi
 2026-08-12T06:40:11Z	exp-20260812-021442	Slabs recall is count-capped, not location-capped -- raised 	0.4229	0.4897	0.0	kept
 2026-08-12T06:50:46Z	exp-20260812-024011	Three of NBU_MedicalClinic_Arch's 10 GT categories -- equipm	0.4897	0.3946	0.0	discarded
 2026-08-12T07:02:39Z	exp-20260812-025046	Tonight's 4th slot. Baseline to beat is this file's on-disk 	0.4897	0.4574	0.0	discarded
+2026-08-13T06:14:37Z	exp-20260813-020450	Adds a 'tag' field to the doors output schema and prompt ins	0.4361	0.2557	0.0	discarded
