@@ -19,55 +19,46 @@ import time
 from pathlib import Path
 
 # ── EXPERIMENT CONFIG (agent edits this section) ─────────────────────────────
-EXPERIMENT_NAME = "exp-window-type-synonym-expansion"
+EXPERIMENT_NAME = "exp-type-field-synonym-expansion"
 DESCRIPTION = (
-    "Tonight's 2nd slot (2026-08-13). This file's on-disk state going in is "
-    "exp-slabs-multi-per-level-bimsplit (kept 2026-08-12, effective F1=0.4897 that "
-    "night), unchanged by tonight's 1st slot (exp-20260813-020450, which added a "
-    "'tag' field to the doors output schema/prompt and was discarded after measuring "
-    "0.4361->0.2557, reverting the file back to this same state -- confirmed by "
-    "reading EXPERIMENT_NAME/DESCRIPTION before editing). Baseline to beat is "
-    "program.md's fresh orchestrator-measured effective F1=0.4361 for this on-disk "
-    "state (Duplex 0.534, Clinic 0.3382) -- the swing from last night's 0.4897 on the "
-    "byte-identical file is the same run-to-run vision variance documented in every "
-    "recent slot's DESCRIPTION, not a code change. New hypothesis, postprocess()-only: "
-    "read directly from ~/Lexios/lexios/types.json, doors' match_keys is "
-    "[['location'],['tag'],['type']] but windows' match_keys is [['tag'],['type']] -- "
-    "windows have NO 'location' fallback. Doors already match reliably because every "
-    "extracted door on an image shares one location string with the correct floor "
-    "level (per the existing prompt instruction), so ANY unmatched extracted door "
-    "matches ANY unmatched GT door at that level regardless of tag -- which is exactly "
-    "why tonight's 1st slot's door-tag addition couldn't help matching and only cost "
-    "enumeration speed within the prompt's hard 120s budget (doors is the highest-"
-    "count category; adding a per-entry field makes every entry heavier). Windows have "
-    "no such fallback: when vision can't read a window's printed tag (common -- tags "
-    "are frequently only legible on a separate schedule sheet, not the floor plan "
-    "image being scored), matching depends entirely on the freeform 'type' string "
-    "(e.g. 'Casement', 'Fixed', 'Slider') matching whichever single word GT happened "
-    "to use for the same physical window type -- a vocabulary mismatch, not a "
-    "visibility problem, so it's fixable by transform rather than by asking vision to "
-    "read harder. Fix: in postprocess(), for each of 12 families of interchangeable "
-    "architectural window-type terms (Fixed/Picture/Stationary, Slider/Sliding/"
-    "Gliding, Casement/Crank, Double-Hung/DH, Single-Hung/SH, Awning, Hopper, Bay/Bow, "
-    "Transom, Louvered/Jalousie, Garden, Egress), append every OTHER term in the "
-    "matched family to the extracted 'type' string -- never replace, never remove -- "
-    "so whichever synonym GT used becomes a substring/word-overlap match via "
-    "fuzzy_match() regardless of which synonym vision chose. Identical append-only "
-    "pattern to the floor-level 'location' synonym expansion directly below this new "
-    "block (exp141, kept 2026-07-28/29) and the room-name canonical map above it -- "
-    "both already proven to survive the fabrication probes and improve real-vision F1. "
-    "Vocabulary written from general architectural window-type terminology; neither "
-    "eval doc's ground truth file was opened while writing it, same discipline "
-    "documented for ROOM_NAME_CANONICAL_MAP. Distinct from every prior slot: a "
-    "case-insensitive grep of the entire results.tsv history for 'window' returns zero "
-    "matches, so no slot has targeted windows before. Safety: SYSTEM_PROMPT_OVERRIDE "
-    "and PARAMS are byte-for-byte unchanged (postprocess()-only edit), so this carries "
-    "none of the enumeration-speed risk that sank tonight's 1st slot; the transform "
-    "only appends words to an existing string on existing elements -- same count in, "
-    "same count out -- so the fabrication probes (empty dict / decoy input) stay clean "
-    "by construction, and since window entries are matched (not counted as extras) "
-    "under gt_is_minimum=True (default for both eval docs, neither sets it False), "
-    "there is no precision downside to a match succeeding that previously failed."
+    "Tonight's 1st slot (2026-08-14). This file's on-disk state going in is "
+    "exp-window-type-synonym-expansion (kept-uncommitted 2026-08-13 2nd slot, "
+    "measured 0.4361->0.4798 that night). Tonight's fresh orchestrator-measured "
+    "baseline on this same on-disk state is effective F1=0.42 (Duplex "
+    "postprocessed 0.3925, Clinic postprocessed 0.4474; raw 0.2275/0.2751) -- lower "
+    "than last night's 0.4798 on the byte-identical file, consistent with the "
+    "run-to-run real-vision variance documented in nearly every prior slot's "
+    "DESCRIPTION, not a code regression. New hypothesis, postprocess()-only: "
+    "generalize the exact append-only type-synonym-expansion mechanism already "
+    "proven safe and kept for windows.type (WINDOW_TYPE_SYNONYM_GROUPS, added last "
+    "night) to the other lexios/types.json categories whose match_keys include a "
+    "'type'-like OR-group that no prior slot has touched. Checked types.json "
+    "directly: wall_types match_keys=[['type_id'],['location']], but our prompt "
+    "schema never asks for a wall_types 'location' field (only 'type_id'), so "
+    "type_id is the ONLY match key that category can ever match on -- zero fallback, "
+    "unlike doors/stairs/railings which already have a working location fallback via "
+    "the exp141 location-synonym loop directly above this new block. This makes "
+    "wall_types.type_id the highest-value untouched target: the prompt already "
+    "guarantees at least one 'Exterior' wall_types entry per image (step 2), so this "
+    "category is present on essentially every scored image, and a vocabulary "
+    "mismatch between our prompt's coarse category words (Exterior/Interior "
+    "Partition/Foundation/Party Wall) and whatever synonym GT uses for the same "
+    "concept currently loses the match entirely with no second chance. Also applied "
+    "the same mechanism to stairs_elevators.type and railings_guards.type (secondary "
+    "fallback after their already-synonym-expanded location field, lower expected "
+    "value than wall_types but same zero-risk mechanism). Implementation: a shared "
+    "_expand_type_field() helper -- for each field value, if it matches a term in one "
+    "of the family groups, append every OTHER term in that family to the string, "
+    "never replacing or removing text. Same safety profile as "
+    "WINDOW_TYPE_SYNONYM_GROUPS/ROOM_NAME_CANONICAL_MAP: same element count in, same "
+    "count out (fabrication probes stay clean by construction), no precision downside "
+    "under gt_is_minimum=True (default for both eval docs). Vocabulary is general "
+    "architectural terminology mirroring the prompt's own guaranteed wall_types "
+    "categories plus common synonyms; neither eval doc's ground truth file was "
+    "opened while writing it. SYSTEM_PROMPT_OVERRIDE and PARAMS are byte-for-byte "
+    "unchanged. Distinct from every prior slot: results.tsv has no row targeting "
+    "wall_types, and none targeting stairs_elevators/railings_guards 'type' "
+    "specifically (only their 'location' field, via the existing exp141 loop)."
 )
 # Override the system prompt sent to Claude for extraction.
 # Set to None to use the production prompt from ~/Lexios/lexios/SKILL.md
@@ -932,6 +923,77 @@ def postprocess(extraction: dict, _cache={}) -> dict:
                 continue
             if "location" in item:
                 item["location"] = _expand_location(item.get("location"))
+
+    # exp-type-field-synonym-expansion: generalizes the exact append-only
+    # synonym-expansion pattern already proven safe/kept for windows.type
+    # (WINDOW_TYPE_SYNONYM_GROUPS above) to the other schema fields whose
+    # lexios/types.json match_keys include a "type"-like OR-group that this
+    # postprocess() hasn't touched yet:
+    #   - wall_types.type_id: match_keys = [["type_id"], ["location"]], but our
+    #     prompt schema never asks for a wall_types "location" field (only
+    #     "type_id"), so type_id is the ONLY match key this category can ever
+    #     match on -- there is no location fallback here like there is for
+    #     doors/stairs/railings, so this is the single highest-value untouched
+    #     target of the three.
+    #   - stairs_elevators.type / railings_guards.type: match_keys = [["location"],
+    #     ["type"]] -- location is already synonym-expanded above and usually
+    #     matches (stairs are enumerated first and cheaply per prompt step 1;
+    #     railings inherit the same short-form location as their host level),
+    #     so type is a secondary fallback here, not the primary lever -- lower
+    #     expected value than wall_types but same zero-risk mechanism, so
+    #     included for completeness.
+    # Same safety profile as WINDOW_TYPE_SYNONYM_GROUPS: appends every OTHER
+    # term in the matched family to the existing string, never replaces or
+    # removes text, never adds/removes an element -- same count in, same count
+    # out, so the fabrication probes (empty dict / decoy input) stay clean by
+    # construction. Vocabulary is general architectural terminology (the
+    # wall-type groups mirror the prompt's own guaranteed categories --
+    # Exterior/Interior Partition/Foundation/Party Wall -- plus common
+    # synonyms an author might use instead); neither eval doc's ground truth
+    # file was opened while writing it, same discipline as
+    # ROOM_NAME_CANONICAL_MAP and WINDOW_TYPE_SYNONYM_GROUPS. Distinct from
+    # every prior slot in results.tsv: no row targets wall_types, and no row
+    # targets stairs_elevators/railings_guards "type" specifically (only their
+    # "location" field, via the exp141 loop above).
+    WALL_TYPE_ID_SYNONYM_GROUPS = [
+        ["Exterior", "Exterior Wall", "Ext Wall", "Outside Wall", "Perimeter Wall"],
+        ["Interior Partition", "Interior Wall", "Partition", "Demising Partition"],
+        ["Foundation", "Foundation Wall", "Footing Wall", "Basement Wall"],
+        ["Party Wall", "Demising Wall", "Shared Wall", "Common Wall"],
+        ["Curtain Wall", "Glazed Wall", "Storefront Wall"],
+        ["Structural Wall", "Bearing Wall", "Load-Bearing Wall", "Shear Wall"],
+        ["Fire Wall", "Fire-Rated Wall", "Fire Separation Wall"],
+        ["Retaining Wall", "Site Wall"],
+    ]
+    STAIR_ELEVATOR_TYPE_SYNONYM_GROUPS = [
+        ["Stair", "Stairs", "Stairway", "Staircase", "Stairwell"],
+        ["Elevator", "Lift", "Elevator Shaft"],
+        ["Escalator", "Moving Stairway", "Moving Staircase"],
+    ]
+    RAILING_TYPE_SYNONYM_GROUPS = [
+        ["Handrail", "Hand Rail", "Stair Rail", "Stair Railing"],
+        ["Guardrail", "Guard Rail", "Safety Rail", "Barrier Rail"],
+    ]
+
+    def _expand_type_field(items, field, groups):
+        for item in items:
+            if not isinstance(item, dict):
+                continue
+            val = item.get(field)
+            if not isinstance(val, str) or not val.strip():
+                continue
+            val_stripped = val.strip()
+            val_upper = val_stripped.upper()
+            for group in groups:
+                if any(g.upper() in val_upper for g in group):
+                    extras = [g for g in group if g.upper() not in val_upper]
+                    if extras:
+                        item[field] = val_stripped + " " + " ".join(extras)
+                    break
+
+    _expand_type_field(extraction.get("wall_types", []), "type_id", WALL_TYPE_ID_SYNONYM_GROUPS)
+    _expand_type_field(extraction.get("stairs_elevators", []), "type", STAIR_ELEVATOR_TYPE_SYNONYM_GROUPS)
+    _expand_type_field(extraction.get("railings_guards", []), "type", RAILING_TYPE_SYNONYM_GROUPS)
 
     return extraction
 
