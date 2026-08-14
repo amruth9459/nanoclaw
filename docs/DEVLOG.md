@@ -5,6 +5,30 @@
 
 ---
 
+### 2026-08-14 15:47
+
+**Areas:** general
+**Files (20):** .buzz/.scratch/standup-2026-08-14.md, .buzz/harness/ollama-coordinator, .buzz/harness/ollama-qwen, .buzz/ops/PLAN.md, .buzz/ops/README.md, .buzz/ops/brief.sh, .buzz/ops/lib/bz-bot.sh, .buzz/ops/lib/bz-owner.sh, .buzz/ops/lib/common.sh, .buzz/ops/runner.sh, .buzz/ops/standup.sh, .buzz/ops/watch/buzz-health.sh, .buzz/ops/watch/hosts.sh, .buzz/ops/watchers.conf, .cache/zellij/permissions.kdl, .claude-ledger/bin/claude-spend, .claude-ledger/claude-ledger.py, .claude-ledger/routing_gate.sh, .claude-ledger/weekly_usage.py, .claude/.gitattributes
+**Diff:** +39 -2 across 3 files
+
+### 2026-08-14 15:03
+
+**Areas:** general
+**Files (20):** .buzz/.scratch/standup-2026-08-14.md, .buzz/harness/ollama-coordinator, .buzz/harness/ollama-qwen, .buzz/ops/PLAN.md, .buzz/ops/README.md, .buzz/ops/brief.sh, .buzz/ops/lib/bz-bot.sh, .buzz/ops/lib/bz-owner.sh, .buzz/ops/lib/common.sh, .buzz/ops/runner.sh, .buzz/ops/standup.sh, .buzz/ops/watch/buzz-health.sh, .buzz/ops/watch/hosts.sh, .buzz/ops/watchers.conf, .cache/zellij/permissions.kdl, .claude-ledger/bin/claude-spend, .claude-ledger/claude-ledger.py, .claude-ledger/routing_gate.sh, .claude-ledger/weekly_usage.py, .claude/.gitattributes
+**Diff:** +33 -2 across 3 files
+
+### 2026-08-14 14:47
+
+**Areas:** general
+**Files (20):** .buzz/.scratch/standup-2026-08-14.md, .buzz/harness/ollama-coordinator, .buzz/harness/ollama-qwen, .buzz/ops/PLAN.md, .buzz/ops/README.md, .buzz/ops/brief.sh, .buzz/ops/lib/bz-bot.sh, .buzz/ops/lib/bz-owner.sh, .buzz/ops/lib/common.sh, .buzz/ops/runner.sh, .buzz/ops/standup.sh, .buzz/ops/watch/buzz-health.sh, .buzz/ops/watch/hosts.sh, .buzz/ops/watchers.conf, .cache/zellij/permissions.kdl, .claude-ledger/bin/claude-spend, .claude-ledger/claude-ledger.py, .claude-ledger/routing_gate.sh, .claude-ledger/weekly_usage.py, .claude/.gitattributes
+**Diff:** +27 -2 across 3 files
+
+### 2026-08-14 13:47
+
+**Areas:** general
+**Files (20):** .buzz/.scratch/standup-2026-08-14.md, .buzz/harness/ollama-coordinator, .buzz/harness/ollama-qwen, .buzz/ops/PLAN.md, .buzz/ops/README.md, .buzz/ops/brief.sh, .buzz/ops/lib/bz-bot.sh, .buzz/ops/lib/bz-owner.sh, .buzz/ops/lib/common.sh, .buzz/ops/runner.sh, .buzz/ops/standup.sh, .buzz/ops/watch/buzz-health.sh, .buzz/ops/watch/hosts.sh, .buzz/ops/watchers.conf, .cache/zellij/permissions.kdl, .claude-ledger/bin/claude-spend, .claude-ledger/claude-ledger.py, .claude-ledger/routing_gate.sh, .claude-ledger/weekly_usage.py, .claude/.gitattributes
+**Diff:** +21 -2 across 2 files
+
 ### 2026-08-14 13:02
 
 **Areas:** general
