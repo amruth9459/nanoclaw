@@ -5,6 +5,174 @@
 
 ---
 
+### 2026-08-14 03:44
+
+**Areas:** config, extraction
+**Files (20):** .buzz/harness/ollama-coordinator, .buzz/harness/ollama-qwen, .cache/zellij/permissions.kdl, .claude-ledger/bin/claude-spend, .claude-ledger/claude-ledger.py, .claude-ledger/routing_gate.sh, .claude-ledger/weekly_usage.py, .claude/.gitattributes, .claude/.gitignore, .claude/CLAUDE.md, .claude/agents/grok-multi-agent.md, .claude/agents/grok.md, .claude/agents/kimi-k3.md, .claude/bin/cc-set-provider-key, .claude/bin/claude-merge-device.sh, .claude/bin/cmux-unroute, .claude/bin/fix-thinking.py, .claude/bin/grok-swarm, .claude/bin/session-extract.py, .claude/codex-build-routing-snippet.md
+**Diff:** +187 -2 across 4 files
+
+### 2026-08-14 02:52
+
+**Areas:** config, extraction
+**Files (20):** .buzz/harness/ollama-coordinator, .buzz/harness/ollama-qwen, .cache/zellij/permissions.kdl, .claude-ledger/bin/claude-spend, .claude-ledger/claude-ledger.py, .claude-ledger/routing_gate.sh, .claude-ledger/weekly_usage.py, .claude/.gitattributes, .claude/.gitignore, .claude/CLAUDE.md, .claude/agents/grok-multi-agent.md, .claude/agents/grok.md, .claude/agents/kimi-k3.md, .claude/bin/cc-set-provider-key, .claude/bin/claude-merge-device.sh, .claude/bin/cmux-unroute, .claude/bin/fix-thinking.py, .claude/bin/grok-swarm, .claude/bin/session-extract.py, .claude/codex-build-routing-snippet.md
+**Diff:** +226 -55 across 5 files
+
+### 2026-08-14 02:51
+
+**Areas:** config, extraction
+**Files (20):** .buzz/harness/ollama-coordinator, .buzz/harness/ollama-qwen, .cache/zellij/permissions.kdl, .claude-ledger/bin/claude-spend, .claude-ledger/claude-ledger.py, .claude-ledger/routing_gate.sh, .claude-ledger/weekly_usage.py, .claude/.gitattributes, .claude/.gitignore, .claude/CLAUDE.md, .claude/agents/grok-multi-agent.md, .claude/agents/grok.md, .claude/agents/kimi-k3.md, .claude/bin/cc-set-provider-key, .claude/bin/claude-merge-device.sh, .claude/bin/cmux-unroute, .claude/bin/fix-thinking.py, .claude/bin/grok-swarm, .claude/bin/session-extract.py, .claude/codex-build-routing-snippet.md
+**Diff:** +220 -55 across 5 files
+
+### 2026-08-14 02:50
+
+**Areas:** config, extraction
+**Files (20):** .buzz/harness/ollama-coordinator, .buzz/harness/ollama-qwen, .cache/zellij/permissions.kdl, .claude-ledger/bin/claude-spend, .claude-ledger/claude-ledger.py, .claude-ledger/routing_gate.sh, .claude-ledger/weekly_usage.py, .claude/.gitattributes, .claude/.gitignore, .claude/CLAUDE.md, .claude/agents/grok-multi-agent.md, .claude/agents/grok.md, .claude/agents/kimi-k3.md, .claude/bin/cc-set-provider-key, .claude/bin/claude-merge-device.sh, .claude/bin/cmux-unroute, .claude/bin/fix-thinking.py, .claude/bin/grok-swarm, .claude/bin/session-extract.py, .claude/codex-build-routing-snippet.md
+**Diff:** +214 -55 across 5 files
+
+### 2026-08-14 02:49
+
+**Areas:** config, extraction
+**Files (20):** .buzz/harness/ollama-coordinator, .buzz/harness/ollama-qwen, .cache/zellij/permissions.kdl, .claude-ledger/bin/claude-spend, .claude-ledger/claude-ledger.py, .claude-ledger/routing_gate.sh, .claude-ledger/weekly_usage.py, .claude/.gitattributes, .claude/.gitignore, .claude/CLAUDE.md, .claude/agents/grok-multi-agent.md, .claude/agents/grok.md, .claude/agents/kimi-k3.md, .claude/bin/cc-set-provider-key, .claude/bin/claude-merge-device.sh, .claude/bin/cmux-unroute, .claude/bin/fix-thinking.py, .claude/bin/grok-swarm, .claude/bin/session-extract.py, .claude/codex-build-routing-snippet.md
+**Diff:** +208 -55 across 5 files
+
+### 2026-08-14 02:48
+
+**Areas:** config, extraction
+**Files (20):** .buzz/harness/ollama-coordinator, .buzz/harness/ollama-qwen, .cache/zellij/permissions.kdl, .claude-ledger/bin/claude-spend, .claude-ledger/claude-ledger.py, .claude-ledger/routing_gate.sh, .claude-ledger/weekly_usage.py, .claude/.gitattributes, .claude/.gitignore, .claude/CLAUDE.md, .claude/agents/grok-multi-agent.md, .claude/agents/grok.md, .claude/agents/kimi-k3.md, .claude/bin/cc-set-provider-key, .claude/bin/claude-merge-device.sh, .claude/bin/cmux-unroute, .claude/bin/fix-thinking.py, .claude/bin/grok-swarm, .claude/bin/session-extract.py, .claude/codex-build-routing-snippet.md
+**Diff:** +202 -55 across 5 files
+
+### 2026-08-14 02:43
+
+**Areas:** config, extraction
+**Files (20):** .buzz/harness/ollama-coordinator, .buzz/harness/ollama-qwen, .cache/zellij/permissions.kdl, .claude-ledger/bin/claude-spend, .claude-ledger/claude-ledger.py, .claude-ledger/routing_gate.sh, .claude-ledger/weekly_usage.py, .claude/.gitattributes, .claude/.gitignore, .claude/CLAUDE.md, .claude/agents/grok-multi-agent.md, .claude/agents/grok.md, .claude/agents/kimi-k3.md, .claude/bin/cc-set-provider-key, .claude/bin/claude-merge-device.sh, .claude/bin/cmux-unroute, .claude/bin/fix-thinking.py, .claude/bin/grok-swarm, .claude/bin/session-extract.py, .claude/codex-build-routing-snippet.md
+**Diff:** +211 -52 across 5 files
+
+### 2026-08-14 02:41
+
+**Areas:** config, extraction
+**Files (20):** .buzz/harness/ollama-coordinator, .buzz/harness/ollama-qwen, .cache/zellij/permissions.kdl, .claude-ledger/bin/claude-spend, .claude-ledger/claude-ledger.py, .claude-ledger/routing_gate.sh, .claude-ledger/weekly_usage.py, .claude/.gitattributes, .claude/.gitignore, .claude/CLAUDE.md, .claude/agents/grok-multi-agent.md, .claude/agents/grok.md, .claude/agents/kimi-k3.md, .claude/bin/cc-set-provider-key, .claude/bin/claude-merge-device.sh, .claude/bin/cmux-unroute, .claude/bin/fix-thinking.py, .claude/bin/grok-swarm, .claude/bin/session-extract.py, .claude/codex-build-routing-snippet.md
+**Diff:** +205 -52 across 5 files
+
+### 2026-08-14 02:40
+
+**Areas:** config, extraction
+**Files (20):** .buzz/harness/ollama-coordinator, .buzz/harness/ollama-qwen, .cache/zellij/permissions.kdl, .claude-ledger/bin/claude-spend, .claude-ledger/claude-ledger.py, .claude-ledger/routing_gate.sh, .claude-ledger/weekly_usage.py, .claude/.gitattributes, .claude/.gitignore, .claude/CLAUDE.md, .claude/agents/grok-multi-agent.md, .claude/agents/grok.md, .claude/agents/kimi-k3.md, .claude/bin/cc-set-provider-key, .claude/bin/claude-merge-device.sh, .claude/bin/cmux-unroute, .claude/bin/fix-thinking.py, .claude/bin/grok-swarm, .claude/bin/session-extract.py, .claude/codex-build-routing-snippet.md
+**Diff:** +199 -52 across 5 files
+
+### 2026-08-14 02:39
+
+**Areas:** config, extraction
+**Files (20):** .buzz/harness/ollama-coordinator, .buzz/harness/ollama-qwen, .cache/zellij/permissions.kdl, .claude-ledger/bin/claude-spend, .claude-ledger/claude-ledger.py, .claude-ledger/routing_gate.sh, .claude-ledger/weekly_usage.py, .claude/.gitattributes, .claude/.gitignore, .claude/CLAUDE.md, .claude/agents/grok-multi-agent.md, .claude/agents/grok.md, .claude/agents/kimi-k3.md, .claude/bin/cc-set-provider-key, .claude/bin/claude-merge-device.sh, .claude/bin/cmux-unroute, .claude/bin/fix-thinking.py, .claude/bin/grok-swarm, .claude/bin/session-extract.py, .claude/codex-build-routing-snippet.md
+**Diff:** +193 -52 across 5 files
+
+### 2026-08-14 02:39
+
+**Areas:** config, extraction
+**Files (20):** .buzz/harness/ollama-coordinator, .buzz/harness/ollama-qwen, .cache/zellij/permissions.kdl, .claude-ledger/bin/claude-spend, .claude-ledger/claude-ledger.py, .claude-ledger/routing_gate.sh, .claude-ledger/weekly_usage.py, .claude/.gitattributes, .claude/.gitignore, .claude/CLAUDE.md, .claude/agents/grok-multi-agent.md, .claude/agents/grok.md, .claude/agents/kimi-k3.md, .claude/bin/cc-set-provider-key, .claude/bin/claude-merge-device.sh, .claude/bin/cmux-unroute, .claude/bin/fix-thinking.py, .claude/bin/grok-swarm, .claude/bin/session-extract.py, .claude/codex-build-routing-snippet.md
+**Diff:** +187 -52 across 5 files
+
+### 2026-08-14 02:24
+
+**Areas:** config, extraction
+**Files (20):** .buzz/harness/ollama-coordinator, .buzz/harness/ollama-qwen, .cache/zellij/permissions.kdl, .claude-ledger/bin/claude-spend, .claude-ledger/claude-ledger.py, .claude-ledger/routing_gate.sh, .claude-ledger/weekly_usage.py, .claude/.gitattributes, .claude/.gitignore, .claude/CLAUDE.md, .claude/agents/grok-multi-agent.md, .claude/agents/grok.md, .claude/agents/kimi-k3.md, .claude/bin/cc-set-provider-key, .claude/bin/claude-merge-device.sh, .claude/bin/cmux-unroute, .claude/bin/fix-thinking.py, .claude/bin/grok-swarm, .claude/bin/session-extract.py, .claude/codex-build-routing-snippet.md
+**Diff:** +163 -42 across 5 files
+
+### 2026-08-14 02:21
+
+**Areas:** config, extraction
+**Files (20):** .buzz/harness/ollama-coordinator, .buzz/harness/ollama-qwen, .cache/zellij/permissions.kdl, .claude-ledger/bin/claude-spend, .claude-ledger/claude-ledger.py, .claude-ledger/routing_gate.sh, .claude-ledger/weekly_usage.py, .claude/.gitattributes, .claude/.gitignore, .claude/CLAUDE.md, .claude/agents/grok-multi-agent.md, .claude/agents/grok.md, .claude/agents/kimi-k3.md, .claude/bin/cc-set-provider-key, .claude/bin/claude-merge-device.sh, .claude/bin/cmux-unroute, .claude/bin/fix-thinking.py, .claude/bin/grok-swarm, .claude/bin/session-extract.py, .claude/codex-build-routing-snippet.md
+**Diff:** +157 -42 across 5 files
+
+### 2026-08-14 02:20
+
+**Areas:** config, extraction
+**Files (20):** .buzz/harness/ollama-coordinator, .buzz/harness/ollama-qwen, .cache/zellij/permissions.kdl, .claude-ledger/bin/claude-spend, .claude-ledger/claude-ledger.py, .claude-ledger/routing_gate.sh, .claude-ledger/weekly_usage.py, .claude/.gitattributes, .claude/.gitignore, .claude/CLAUDE.md, .claude/agents/grok-multi-agent.md, .claude/agents/grok.md, .claude/agents/kimi-k3.md, .claude/bin/cc-set-provider-key, .claude/bin/claude-merge-device.sh, .claude/bin/cmux-unroute, .claude/bin/fix-thinking.py, .claude/bin/grok-swarm, .claude/bin/session-extract.py, .claude/codex-build-routing-snippet.md
+**Diff:** +151 -42 across 5 files
+
+### 2026-08-14 02:13
+
+**Areas:** config, extraction
+**Files (20):** .buzz/harness/ollama-coordinator, .buzz/harness/ollama-qwen, .cache/zellij/permissions.kdl, .claude-ledger/bin/claude-spend, .claude-ledger/claude-ledger.py, .claude-ledger/routing_gate.sh, .claude-ledger/weekly_usage.py, .claude/.gitattributes, .claude/.gitignore, .claude/CLAUDE.md, .claude/agents/grok-multi-agent.md, .claude/agents/grok.md, .claude/agents/kimi-k3.md, .claude/bin/cc-set-provider-key, .claude/bin/claude-merge-device.sh, .claude/bin/cmux-unroute, .claude/bin/fix-thinking.py, .claude/bin/grok-swarm, .claude/bin/session-extract.py, .claude/codex-build-routing-snippet.md
+**Diff:** +209 -50 across 4 files
+
+### 2026-08-14 02:11
+
+**Areas:** config, extraction
+**Files (20):** .buzz/harness/ollama-coordinator, .buzz/harness/ollama-qwen, .cache/zellij/permissions.kdl, .claude-ledger/bin/claude-spend, .claude-ledger/claude-ledger.py, .claude-ledger/routing_gate.sh, .claude-ledger/weekly_usage.py, .claude/.gitattributes, .claude/.gitignore, .claude/CLAUDE.md, .claude/agents/grok-multi-agent.md, .claude/agents/grok.md, .claude/agents/kimi-k3.md, .claude/bin/cc-set-provider-key, .claude/bin/claude-merge-device.sh, .claude/bin/cmux-unroute, .claude/bin/fix-thinking.py, .claude/bin/grok-swarm, .claude/bin/session-extract.py, .claude/codex-build-routing-snippet.md
+**Diff:** +203 -50 across 4 files
+
+### 2026-08-14 02:10
+
+**Areas:** config, extraction
+**Files (20):** .buzz/harness/ollama-coordinator, .buzz/harness/ollama-qwen, .cache/zellij/permissions.kdl, .claude-ledger/bin/claude-spend, .claude-ledger/claude-ledger.py, .claude-ledger/routing_gate.sh, .claude-ledger/weekly_usage.py, .claude/.gitattributes, .claude/.gitignore, .claude/CLAUDE.md, .claude/agents/grok-multi-agent.md, .claude/agents/grok.md, .claude/agents/kimi-k3.md, .claude/bin/cc-set-provider-key, .claude/bin/claude-merge-device.sh, .claude/bin/cmux-unroute, .claude/bin/fix-thinking.py, .claude/bin/grok-swarm, .claude/bin/session-extract.py, .claude/codex-build-routing-snippet.md
+**Diff:** +197 -50 across 4 files
+
+### 2026-08-14 02:09
+
+**Areas:** config, extraction
+**Files (20):** .buzz/harness/ollama-coordinator, .buzz/harness/ollama-qwen, .cache/zellij/permissions.kdl, .claude-ledger/bin/claude-spend, .claude-ledger/claude-ledger.py, .claude-ledger/routing_gate.sh, .claude-ledger/weekly_usage.py, .claude/.gitattributes, .claude/.gitignore, .claude/CLAUDE.md, .claude/agents/grok-multi-agent.md, .claude/agents/grok.md, .claude/agents/kimi-k3.md, .claude/bin/cc-set-provider-key, .claude/bin/claude-merge-device.sh, .claude/bin/cmux-unroute, .claude/bin/fix-thinking.py, .claude/bin/grok-swarm, .claude/bin/session-extract.py, .claude/codex-build-routing-snippet.md
+**Diff:** +191 -50 across 4 files
+
+### 2026-08-14 02:09
+
+**Areas:** config, extraction
+**Files (20):** .buzz/harness/ollama-coordinator, .buzz/harness/ollama-qwen, .cache/zellij/permissions.kdl, .claude-ledger/bin/claude-spend, .claude-ledger/claude-ledger.py, .claude-ledger/routing_gate.sh, .claude-ledger/weekly_usage.py, .claude/.gitattributes, .claude/.gitignore, .claude/CLAUDE.md, .claude/agents/grok-multi-agent.md, .claude/agents/grok.md, .claude/agents/kimi-k3.md, .claude/bin/cc-set-provider-key, .claude/bin/claude-merge-device.sh, .claude/bin/cmux-unroute, .claude/bin/fix-thinking.py, .claude/bin/grok-swarm, .claude/bin/session-extract.py, .claude/codex-build-routing-snippet.md
+**Diff:** +185 -50 across 4 files
+
+### 2026-08-14 02:06
+
+**Areas:** config, extraction
+**Files (20):** .buzz/harness/ollama-coordinator, .buzz/harness/ollama-qwen, .cache/zellij/permissions.kdl, .claude-ledger/bin/claude-spend, .claude-ledger/claude-ledger.py, .claude-ledger/routing_gate.sh, .claude-ledger/weekly_usage.py, .claude/.gitattributes, .claude/.gitignore, .claude/CLAUDE.md, .claude/agents/grok-multi-agent.md, .claude/agents/grok.md, .claude/agents/kimi-k3.md, .claude/bin/cc-set-provider-key, .claude/bin/claude-merge-device.sh, .claude/bin/cmux-unroute, .claude/bin/fix-thinking.py, .claude/bin/grok-swarm, .claude/bin/session-extract.py, .claude/codex-build-routing-snippet.md
+**Diff:** +69 -2 across 3 files
+
+### 2026-08-14 02:04
+
+**Areas:** config, extraction
+**Files (20):** .buzz/harness/ollama-coordinator, .buzz/harness/ollama-qwen, .cache/zellij/permissions.kdl, .claude-ledger/bin/claude-spend, .claude-ledger/claude-ledger.py, .claude-ledger/routing_gate.sh, .claude-ledger/weekly_usage.py, .claude/.gitattributes, .claude/.gitignore, .claude/CLAUDE.md, .claude/agents/grok-multi-agent.md, .claude/agents/grok.md, .claude/agents/kimi-k3.md, .claude/bin/cc-set-provider-key, .claude/bin/claude-merge-device.sh, .claude/bin/cmux-unroute, .claude/bin/fix-thinking.py, .claude/bin/grok-swarm, .claude/bin/session-extract.py, .claude/codex-build-routing-snippet.md
+**Diff:** +63 -2 across 3 files
+
+### 2026-08-14 02:00
+
+**Areas:** config, extraction
+**Files (20):** .buzz/harness/ollama-coordinator, .buzz/harness/ollama-qwen, .cache/zellij/permissions.kdl, .claude-ledger/bin/claude-spend, .claude-ledger/claude-ledger.py, .claude-ledger/routing_gate.sh, .claude-ledger/weekly_usage.py, .claude/.gitattributes, .claude/.gitignore, .claude/CLAUDE.md, .claude/agents/grok-multi-agent.md, .claude/agents/grok.md, .claude/agents/kimi-k3.md, .claude/bin/cc-set-provider-key, .claude/bin/claude-merge-device.sh, .claude/bin/cmux-unroute, .claude/bin/fix-thinking.py, .claude/bin/grok-swarm, .claude/bin/session-extract.py, .claude/codex-build-routing-snippet.md
+**Diff:** +57 -2 across 3 files
+
+### 2026-08-14 00:43
+
+**Areas:** config, extraction
+**Files (20):** .buzz/harness/ollama-coordinator, .buzz/harness/ollama-qwen, .cache/zellij/permissions.kdl, .claude-ledger/bin/claude-spend, .claude-ledger/claude-ledger.py, .claude-ledger/routing_gate.sh, .claude-ledger/weekly_usage.py, .claude/.gitattributes, .claude/.gitignore, .claude/CLAUDE.md, .claude/agents/grok-multi-agent.md, .claude/agents/grok.md, .claude/agents/kimi-k3.md, .claude/bin/cc-set-provider-key, .claude/bin/claude-merge-device.sh, .claude/bin/cmux-unroute, .claude/bin/fix-thinking.py, .claude/bin/grok-swarm, .claude/bin/session-extract.py, .claude/codex-build-routing-snippet.md
+**Diff:** +51 -2 across 3 files
+
+### 2026-08-14 00:40
+
+**Areas:** config, extraction
+**Files (20):** .buzz/harness/ollama-coordinator, .buzz/harness/ollama-qwen, .cache/zellij/permissions.kdl, .claude-ledger/bin/claude-spend, .claude-ledger/claude-ledger.py, .claude-ledger/routing_gate.sh, .claude-ledger/weekly_usage.py, .claude/.gitattributes, .claude/.gitignore, .claude/CLAUDE.md, .claude/agents/grok-multi-agent.md, .claude/agents/grok.md, .claude/agents/kimi-k3.md, .claude/bin/cc-set-provider-key, .claude/bin/claude-merge-device.sh, .claude/bin/cmux-unroute, .claude/bin/fix-thinking.py, .claude/bin/grok-swarm, .claude/bin/session-extract.py, .claude/codex-build-routing-snippet.md
+**Diff:** +45 -2 across 3 files
+
+### 2026-08-14 00:33
+
+**Areas:** config, extraction
+**Files (20):** .buzz/harness/ollama-coordinator, .buzz/harness/ollama-qwen, .cache/zellij/permissions.kdl, .claude-ledger/bin/claude-spend, .claude-ledger/claude-ledger.py, .claude-ledger/routing_gate.sh, .claude-ledger/weekly_usage.py, .claude/.gitattributes, .claude/.gitignore, .claude/CLAUDE.md, .claude/agents/grok-multi-agent.md, .claude/agents/grok.md, .claude/agents/kimi-k3.md, .claude/bin/cc-set-provider-key, .claude/bin/claude-merge-device.sh, .claude/bin/cmux-unroute, .claude/bin/fix-thinking.py, .claude/bin/grok-swarm, .claude/bin/session-extract.py, .claude/codex-build-routing-snippet.md
+**Diff:** +39 -2 across 3 files
+
+### 2026-08-14 00:33
+
+**Areas:** config, extraction
+**Files (20):** .buzz/harness/ollama-coordinator, .buzz/harness/ollama-qwen, .cache/zellij/permissions.kdl, .claude-ledger/bin/claude-spend, .claude-ledger/claude-ledger.py, .claude-ledger/routing_gate.sh, .claude-ledger/weekly_usage.py, .claude/.gitattributes, .claude/.gitignore, .claude/CLAUDE.md, .claude/agents/grok-multi-agent.md, .claude/agents/grok.md, .claude/agents/kimi-k3.md, .claude/bin/cc-set-provider-key, .claude/bin/claude-merge-device.sh, .claude/bin/cmux-unroute, .claude/bin/fix-thinking.py, .claude/bin/grok-swarm, .claude/bin/session-extract.py, .claude/codex-build-routing-snippet.md
+**Diff:** +33 -2 across 3 files
+
+### 2026-08-14 00:30
+
+**Areas:** config, extraction
+**Files (20):** .buzz/harness/ollama-coordinator, .buzz/harness/ollama-qwen, .cache/zellij/permissions.kdl, .claude-ledger/bin/claude-spend, .claude-ledger/claude-ledger.py, .claude-ledger/routing_gate.sh, .claude-ledger/weekly_usage.py, .claude/.gitattributes, .claude/.gitignore, .claude/CLAUDE.md, .claude/agents/grok-multi-agent.md, .claude/agents/grok.md, .claude/agents/kimi-k3.md, .claude/bin/cc-set-provider-key, .claude/bin/claude-merge-device.sh, .claude/bin/cmux-unroute, .claude/bin/fix-thinking.py, .claude/bin/grok-swarm, .claude/bin/session-extract.py, .claude/codex-build-routing-snippet.md
+**Diff:** +27 -2 across 3 files
+
+### 2026-08-14 00:21
+
+**Areas:** config, extraction
+**Files (20):** .buzz/harness/ollama-coordinator, .buzz/harness/ollama-qwen, .cache/zellij/permissions.kdl, .claude-ledger/bin/claude-spend, .claude-ledger/claude-ledger.py, .claude-ledger/routing_gate.sh, .claude-ledger/weekly_usage.py, .claude/.gitattributes, .claude/.gitignore, .claude/CLAUDE.md, .claude/agents/grok-multi-agent.md, .claude/agents/grok.md, .claude/agents/kimi-k3.md, .claude/bin/cc-set-provider-key, .claude/bin/claude-merge-device.sh, .claude/bin/cmux-unroute, .claude/bin/fix-thinking.py, .claude/bin/grok-swarm, .claude/bin/session-extract.py, .claude/codex-build-routing-snippet.md
+**Diff:** +21 -2 across 2 files
+
 ### 2026-08-14 00:17
 
 **Areas:** config, extraction
