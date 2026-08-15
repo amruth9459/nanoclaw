@@ -5,6 +5,156 @@
 
 ---
 
+### 2026-08-15 03:49
+
+**Areas:** general
+**Files (20):** .buzz/.scratch/standup-2026-08-14.md, .buzz/harness/ollama-coordinator, .buzz/harness/ollama-qwen, .buzz/harness/qwen-acp/buzz-acp, .buzz/harness/qwen-acp/claude-agent-acp, .buzz/ops/PLAN.md, .buzz/ops/README.md, .buzz/ops/brief.sh, .buzz/ops/lib/bz-bot.sh, .buzz/ops/lib/bz-bumble.sh, .buzz/ops/lib/bz-owner.sh, .buzz/ops/lib/common.sh, .buzz/ops/runner.sh, .buzz/ops/standup.sh, .buzz/ops/watch/buzz-health.sh, .buzz/ops/watch/hosts.sh, .buzz/ops/watchers.conf, .cache/zellij/permissions.kdl, .claude-ledger/bin/claude-spend, .claude-ledger/claude-ledger.py
+**Diff:** +169 -2 across 4 files
+
+### 2026-08-15 02:57
+
+**Areas:** general
+**Files (20):** .buzz/.scratch/standup-2026-08-14.md, .buzz/harness/ollama-coordinator, .buzz/harness/ollama-qwen, .buzz/harness/qwen-acp/buzz-acp, .buzz/harness/qwen-acp/claude-agent-acp, .buzz/ops/PLAN.md, .buzz/ops/README.md, .buzz/ops/brief.sh, .buzz/ops/lib/bz-bot.sh, .buzz/ops/lib/bz-bumble.sh, .buzz/ops/lib/bz-owner.sh, .buzz/ops/lib/common.sh, .buzz/ops/runner.sh, .buzz/ops/standup.sh, .buzz/ops/watch/buzz-health.sh, .buzz/ops/watch/hosts.sh, .buzz/ops/watchers.conf, .cache/zellij/permissions.kdl, .claude-ledger/bin/claude-spend, .claude-ledger/claude-ledger.py
+**Diff:** +252 -66 across 5 files
+
+### 2026-08-15 02:55
+
+**Areas:** general
+**Files (20):** .buzz/.scratch/standup-2026-08-14.md, .buzz/harness/ollama-coordinator, .buzz/harness/ollama-qwen, .buzz/harness/qwen-acp/buzz-acp, .buzz/harness/qwen-acp/claude-agent-acp, .buzz/ops/PLAN.md, .buzz/ops/README.md, .buzz/ops/brief.sh, .buzz/ops/lib/bz-bot.sh, .buzz/ops/lib/bz-bumble.sh, .buzz/ops/lib/bz-owner.sh, .buzz/ops/lib/common.sh, .buzz/ops/runner.sh, .buzz/ops/standup.sh, .buzz/ops/watch/buzz-health.sh, .buzz/ops/watch/hosts.sh, .buzz/ops/watchers.conf, .cache/zellij/permissions.kdl, .claude-ledger/bin/claude-spend, .claude-ledger/claude-ledger.py
+**Diff:** +246 -66 across 5 files
+
+### 2026-08-15 02:54
+
+**Areas:** general
+**Files (20):** .buzz/.scratch/standup-2026-08-14.md, .buzz/harness/ollama-coordinator, .buzz/harness/ollama-qwen, .buzz/harness/qwen-acp/buzz-acp, .buzz/harness/qwen-acp/claude-agent-acp, .buzz/ops/PLAN.md, .buzz/ops/README.md, .buzz/ops/brief.sh, .buzz/ops/lib/bz-bot.sh, .buzz/ops/lib/bz-bumble.sh, .buzz/ops/lib/bz-owner.sh, .buzz/ops/lib/common.sh, .buzz/ops/runner.sh, .buzz/ops/standup.sh, .buzz/ops/watch/buzz-health.sh, .buzz/ops/watch/hosts.sh, .buzz/ops/watchers.conf, .cache/zellij/permissions.kdl, .claude-ledger/bin/claude-spend, .claude-ledger/claude-ledger.py
+**Diff:** +240 -66 across 5 files
+
+### 2026-08-15 02:53
+
+**Areas:** general
+**Files (20):** .buzz/.scratch/standup-2026-08-14.md, .buzz/harness/ollama-coordinator, .buzz/harness/ollama-qwen, .buzz/harness/qwen-acp/buzz-acp, .buzz/harness/qwen-acp/claude-agent-acp, .buzz/ops/PLAN.md, .buzz/ops/README.md, .buzz/ops/brief.sh, .buzz/ops/lib/bz-bot.sh, .buzz/ops/lib/bz-bumble.sh, .buzz/ops/lib/bz-owner.sh, .buzz/ops/lib/common.sh, .buzz/ops/runner.sh, .buzz/ops/standup.sh, .buzz/ops/watch/buzz-health.sh, .buzz/ops/watch/hosts.sh, .buzz/ops/watchers.conf, .cache/zellij/permissions.kdl, .claude-ledger/bin/claude-spend, .claude-ledger/claude-ledger.py
+**Diff:** +234 -66 across 5 files
+
+### 2026-08-15 02:53
+
+**Areas:** general
+**Files (20):** .buzz/.scratch/standup-2026-08-14.md, .buzz/harness/ollama-coordinator, .buzz/harness/ollama-qwen, .buzz/harness/qwen-acp/buzz-acp, .buzz/harness/qwen-acp/claude-agent-acp, .buzz/ops/PLAN.md, .buzz/ops/README.md, .buzz/ops/brief.sh, .buzz/ops/lib/bz-bot.sh, .buzz/ops/lib/bz-bumble.sh, .buzz/ops/lib/bz-owner.sh, .buzz/ops/lib/common.sh, .buzz/ops/runner.sh, .buzz/ops/standup.sh, .buzz/ops/watch/buzz-health.sh, .buzz/ops/watch/hosts.sh, .buzz/ops/watchers.conf, .cache/zellij/permissions.kdl, .claude-ledger/bin/claude-spend, .claude-ledger/claude-ledger.py
+**Diff:** +228 -66 across 5 files
+
+### 2026-08-15 02:47
+
+**Areas:** general
+**Files (20):** .buzz/.scratch/standup-2026-08-14.md, .buzz/harness/ollama-coordinator, .buzz/harness/ollama-qwen, .buzz/harness/qwen-acp/buzz-acp, .buzz/harness/qwen-acp/claude-agent-acp, .buzz/ops/PLAN.md, .buzz/ops/README.md, .buzz/ops/brief.sh, .buzz/ops/lib/bz-bot.sh, .buzz/ops/lib/bz-bumble.sh, .buzz/ops/lib/bz-owner.sh, .buzz/ops/lib/common.sh, .buzz/ops/runner.sh, .buzz/ops/standup.sh, .buzz/ops/watch/buzz-health.sh, .buzz/ops/watch/hosts.sh, .buzz/ops/watchers.conf, .cache/zellij/permissions.kdl, .claude-ledger/bin/claude-spend, .claude-ledger/claude-ledger.py
+**Diff:** +200 -68 across 5 files
+
+### 2026-08-15 02:46
+
+**Areas:** general
+**Files (20):** .buzz/.scratch/standup-2026-08-14.md, .buzz/harness/ollama-coordinator, .buzz/harness/ollama-qwen, .buzz/harness/qwen-acp/buzz-acp, .buzz/harness/qwen-acp/claude-agent-acp, .buzz/ops/PLAN.md, .buzz/ops/README.md, .buzz/ops/brief.sh, .buzz/ops/lib/bz-bot.sh, .buzz/ops/lib/bz-bumble.sh, .buzz/ops/lib/bz-owner.sh, .buzz/ops/lib/common.sh, .buzz/ops/runner.sh, .buzz/ops/standup.sh, .buzz/ops/watch/buzz-health.sh, .buzz/ops/watch/hosts.sh, .buzz/ops/watchers.conf, .cache/zellij/permissions.kdl, .claude-ledger/bin/claude-spend, .claude-ledger/claude-ledger.py
+**Diff:** +194 -68 across 5 files
+
+### 2026-08-15 02:45
+
+**Areas:** general
+**Files (20):** .buzz/.scratch/standup-2026-08-14.md, .buzz/harness/ollama-coordinator, .buzz/harness/ollama-qwen, .buzz/harness/qwen-acp/buzz-acp, .buzz/harness/qwen-acp/claude-agent-acp, .buzz/ops/PLAN.md, .buzz/ops/README.md, .buzz/ops/brief.sh, .buzz/ops/lib/bz-bot.sh, .buzz/ops/lib/bz-bumble.sh, .buzz/ops/lib/bz-owner.sh, .buzz/ops/lib/common.sh, .buzz/ops/runner.sh, .buzz/ops/standup.sh, .buzz/ops/watch/buzz-health.sh, .buzz/ops/watch/hosts.sh, .buzz/ops/watchers.conf, .cache/zellij/permissions.kdl, .claude-ledger/bin/claude-spend, .claude-ledger/claude-ledger.py
+**Diff:** +188 -68 across 5 files
+
+### 2026-08-15 02:41
+
+**Areas:** general
+**Files (20):** .buzz/.scratch/standup-2026-08-14.md, .buzz/harness/ollama-coordinator, .buzz/harness/ollama-qwen, .buzz/harness/qwen-acp/buzz-acp, .buzz/harness/qwen-acp/claude-agent-acp, .buzz/ops/PLAN.md, .buzz/ops/README.md, .buzz/ops/brief.sh, .buzz/ops/lib/bz-bot.sh, .buzz/ops/lib/bz-bumble.sh, .buzz/ops/lib/bz-owner.sh, .buzz/ops/lib/common.sh, .buzz/ops/runner.sh, .buzz/ops/standup.sh, .buzz/ops/watch/buzz-health.sh, .buzz/ops/watch/hosts.sh, .buzz/ops/watchers.conf, .cache/zellij/permissions.kdl, .claude-ledger/bin/claude-spend, .claude-ledger/claude-ledger.py
+**Diff:** +182 -68 across 5 files
+
+### 2026-08-15 02:33
+
+**Areas:** general
+**Files (20):** .buzz/.scratch/standup-2026-08-14.md, .buzz/harness/ollama-coordinator, .buzz/harness/ollama-qwen, .buzz/harness/qwen-acp/buzz-acp, .buzz/harness/qwen-acp/claude-agent-acp, .buzz/ops/PLAN.md, .buzz/ops/README.md, .buzz/ops/brief.sh, .buzz/ops/lib/bz-bot.sh, .buzz/ops/lib/bz-bumble.sh, .buzz/ops/lib/bz-owner.sh, .buzz/ops/lib/common.sh, .buzz/ops/runner.sh, .buzz/ops/standup.sh, .buzz/ops/watch/buzz-health.sh, .buzz/ops/watch/hosts.sh, .buzz/ops/watchers.conf, .cache/zellij/permissions.kdl, .claude-ledger/bin/claude-spend, .claude-ledger/claude-ledger.py
+**Diff:** +176 -66 across 5 files
+
+### 2026-08-15 02:31
+
+**Areas:** general
+**Files (20):** .buzz/.scratch/standup-2026-08-14.md, .buzz/harness/ollama-coordinator, .buzz/harness/ollama-qwen, .buzz/harness/qwen-acp/buzz-acp, .buzz/harness/qwen-acp/claude-agent-acp, .buzz/ops/PLAN.md, .buzz/ops/README.md, .buzz/ops/brief.sh, .buzz/ops/lib/bz-bot.sh, .buzz/ops/lib/bz-bumble.sh, .buzz/ops/lib/bz-owner.sh, .buzz/ops/lib/common.sh, .buzz/ops/runner.sh, .buzz/ops/standup.sh, .buzz/ops/watch/buzz-health.sh, .buzz/ops/watch/hosts.sh, .buzz/ops/watchers.conf, .cache/zellij/permissions.kdl, .claude-ledger/bin/claude-spend, .claude-ledger/claude-ledger.py
+**Diff:** +170 -66 across 5 files
+
+### 2026-08-15 02:27
+
+**Areas:** general
+**Files (20):** .buzz/.scratch/standup-2026-08-14.md, .buzz/harness/ollama-coordinator, .buzz/harness/ollama-qwen, .buzz/harness/qwen-acp/buzz-acp, .buzz/harness/qwen-acp/claude-agent-acp, .buzz/ops/PLAN.md, .buzz/ops/README.md, .buzz/ops/brief.sh, .buzz/ops/lib/bz-bot.sh, .buzz/ops/lib/bz-bumble.sh, .buzz/ops/lib/bz-owner.sh, .buzz/ops/lib/common.sh, .buzz/ops/runner.sh, .buzz/ops/standup.sh, .buzz/ops/watch/buzz-health.sh, .buzz/ops/watch/hosts.sh, .buzz/ops/watchers.conf, .cache/zellij/permissions.kdl, .claude-ledger/bin/claude-spend, .claude-ledger/claude-ledger.py
+**Diff:** +164 -66 across 5 files
+
+### 2026-08-15 02:27
+
+**Areas:** general
+**Files (20):** .buzz/.scratch/standup-2026-08-14.md, .buzz/harness/ollama-coordinator, .buzz/harness/ollama-qwen, .buzz/harness/qwen-acp/buzz-acp, .buzz/harness/qwen-acp/claude-agent-acp, .buzz/ops/PLAN.md, .buzz/ops/README.md, .buzz/ops/brief.sh, .buzz/ops/lib/bz-bot.sh, .buzz/ops/lib/bz-bumble.sh, .buzz/ops/lib/bz-owner.sh, .buzz/ops/lib/common.sh, .buzz/ops/runner.sh, .buzz/ops/standup.sh, .buzz/ops/watch/buzz-health.sh, .buzz/ops/watch/hosts.sh, .buzz/ops/watchers.conf, .cache/zellij/permissions.kdl, .claude-ledger/bin/claude-spend, .claude-ledger/claude-ledger.py
+**Diff:** +158 -66 across 5 files
+
+### 2026-08-15 02:19
+
+**Areas:** general
+**Files (20):** .buzz/.scratch/standup-2026-08-14.md, .buzz/harness/ollama-coordinator, .buzz/harness/ollama-qwen, .buzz/harness/qwen-acp/buzz-acp, .buzz/harness/qwen-acp/claude-agent-acp, .buzz/ops/PLAN.md, .buzz/ops/README.md, .buzz/ops/brief.sh, .buzz/ops/lib/bz-bot.sh, .buzz/ops/lib/bz-bumble.sh, .buzz/ops/lib/bz-owner.sh, .buzz/ops/lib/common.sh, .buzz/ops/runner.sh, .buzz/ops/standup.sh, .buzz/ops/watch/buzz-health.sh, .buzz/ops/watch/hosts.sh, .buzz/ops/watchers.conf, .cache/zellij/permissions.kdl, .claude-ledger/bin/claude-spend, .claude-ledger/claude-ledger.py
+**Diff:** +145 -48 across 4 files
+
+### 2026-08-15 02:18
+
+**Areas:** general
+**Files (20):** .buzz/.scratch/standup-2026-08-14.md, .buzz/harness/ollama-coordinator, .buzz/harness/ollama-qwen, .buzz/harness/qwen-acp/buzz-acp, .buzz/harness/qwen-acp/claude-agent-acp, .buzz/ops/PLAN.md, .buzz/ops/README.md, .buzz/ops/brief.sh, .buzz/ops/lib/bz-bot.sh, .buzz/ops/lib/bz-bumble.sh, .buzz/ops/lib/bz-owner.sh, .buzz/ops/lib/common.sh, .buzz/ops/runner.sh, .buzz/ops/standup.sh, .buzz/ops/watch/buzz-health.sh, .buzz/ops/watch/hosts.sh, .buzz/ops/watchers.conf, .cache/zellij/permissions.kdl, .claude-ledger/bin/claude-spend, .claude-ledger/claude-ledger.py
+**Diff:** +139 -48 across 4 files
+
+### 2026-08-15 02:16
+
+**Areas:** general
+**Files (20):** .buzz/.scratch/standup-2026-08-14.md, .buzz/harness/ollama-coordinator, .buzz/harness/ollama-qwen, .buzz/harness/qwen-acp/buzz-acp, .buzz/harness/qwen-acp/claude-agent-acp, .buzz/ops/PLAN.md, .buzz/ops/README.md, .buzz/ops/brief.sh, .buzz/ops/lib/bz-bot.sh, .buzz/ops/lib/bz-bumble.sh, .buzz/ops/lib/bz-owner.sh, .buzz/ops/lib/common.sh, .buzz/ops/runner.sh, .buzz/ops/standup.sh, .buzz/ops/watch/buzz-health.sh, .buzz/ops/watch/hosts.sh, .buzz/ops/watchers.conf, .cache/zellij/permissions.kdl, .claude-ledger/bin/claude-spend, .claude-ledger/claude-ledger.py
+**Diff:** +133 -48 across 4 files
+
+### 2026-08-15 02:14
+
+**Areas:** general
+**Files (20):** .buzz/.scratch/standup-2026-08-14.md, .buzz/harness/ollama-coordinator, .buzz/harness/ollama-qwen, .buzz/harness/qwen-acp/buzz-acp, .buzz/harness/qwen-acp/claude-agent-acp, .buzz/ops/PLAN.md, .buzz/ops/README.md, .buzz/ops/brief.sh, .buzz/ops/lib/bz-bot.sh, .buzz/ops/lib/bz-bumble.sh, .buzz/ops/lib/bz-owner.sh, .buzz/ops/lib/common.sh, .buzz/ops/runner.sh, .buzz/ops/standup.sh, .buzz/ops/watch/buzz-health.sh, .buzz/ops/watch/hosts.sh, .buzz/ops/watchers.conf, .cache/zellij/permissions.kdl, .claude-ledger/bin/claude-spend, .claude-ledger/claude-ledger.py
+**Diff:** +127 -48 across 4 files
+
+### 2026-08-15 02:14
+
+**Areas:** general
+**Files (20):** .buzz/.scratch/standup-2026-08-14.md, .buzz/harness/ollama-coordinator, .buzz/harness/ollama-qwen, .buzz/harness/qwen-acp/buzz-acp, .buzz/harness/qwen-acp/claude-agent-acp, .buzz/ops/PLAN.md, .buzz/ops/README.md, .buzz/ops/brief.sh, .buzz/ops/lib/bz-bot.sh, .buzz/ops/lib/bz-bumble.sh, .buzz/ops/lib/bz-owner.sh, .buzz/ops/lib/common.sh, .buzz/ops/runner.sh, .buzz/ops/standup.sh, .buzz/ops/watch/buzz-health.sh, .buzz/ops/watch/hosts.sh, .buzz/ops/watchers.conf, .cache/zellij/permissions.kdl, .claude-ledger/bin/claude-spend, .claude-ledger/claude-ledger.py
+**Diff:** +121 -48 across 4 files
+
+### 2026-08-15 02:05
+
+**Areas:** general
+**Files (20):** .buzz/.scratch/standup-2026-08-14.md, .buzz/harness/ollama-coordinator, .buzz/harness/ollama-qwen, .buzz/harness/qwen-acp/buzz-acp, .buzz/harness/qwen-acp/claude-agent-acp, .buzz/ops/PLAN.md, .buzz/ops/README.md, .buzz/ops/brief.sh, .buzz/ops/lib/bz-bot.sh, .buzz/ops/lib/bz-bumble.sh, .buzz/ops/lib/bz-owner.sh, .buzz/ops/lib/common.sh, .buzz/ops/runner.sh, .buzz/ops/standup.sh, .buzz/ops/watch/buzz-health.sh, .buzz/ops/watch/hosts.sh, .buzz/ops/watchers.conf, .cache/zellij/permissions.kdl, .claude-ledger/bin/claude-spend, .claude-ledger/claude-ledger.py
+**Diff:** +51 -2 across 3 files
+
+### 2026-08-15 02:03
+
+**Areas:** general
+**Files (20):** .buzz/.scratch/standup-2026-08-14.md, .buzz/harness/ollama-coordinator, .buzz/harness/ollama-qwen, .buzz/harness/qwen-acp/buzz-acp, .buzz/harness/qwen-acp/claude-agent-acp, .buzz/ops/PLAN.md, .buzz/ops/README.md, .buzz/ops/brief.sh, .buzz/ops/lib/bz-bot.sh, .buzz/ops/lib/bz-bumble.sh, .buzz/ops/lib/bz-owner.sh, .buzz/ops/lib/common.sh, .buzz/ops/runner.sh, .buzz/ops/standup.sh, .buzz/ops/watch/buzz-health.sh, .buzz/ops/watch/hosts.sh, .buzz/ops/watchers.conf, .cache/zellij/permissions.kdl, .claude-ledger/bin/claude-spend, .claude-ledger/claude-ledger.py
+**Diff:** +45 -2 across 3 files
+
+### 2026-08-15 02:02
+
+**Areas:** general
+**Files (20):** .buzz/.scratch/standup-2026-08-14.md, .buzz/harness/ollama-coordinator, .buzz/harness/ollama-qwen, .buzz/harness/qwen-acp/buzz-acp, .buzz/harness/qwen-acp/claude-agent-acp, .buzz/ops/PLAN.md, .buzz/ops/README.md, .buzz/ops/brief.sh, .buzz/ops/lib/bz-bot.sh, .buzz/ops/lib/bz-bumble.sh, .buzz/ops/lib/bz-owner.sh, .buzz/ops/lib/common.sh, .buzz/ops/runner.sh, .buzz/ops/standup.sh, .buzz/ops/watch/buzz-health.sh, .buzz/ops/watch/hosts.sh, .buzz/ops/watchers.conf, .cache/zellij/permissions.kdl, .claude-ledger/bin/claude-spend, .claude-ledger/claude-ledger.py
+**Diff:** +39 -2 across 3 files
+
+### 2026-08-15 02:00
+
+**Areas:** general
+**Files (20):** .buzz/.scratch/standup-2026-08-14.md, .buzz/harness/ollama-coordinator, .buzz/harness/ollama-qwen, .buzz/harness/qwen-acp/buzz-acp, .buzz/harness/qwen-acp/claude-agent-acp, .buzz/ops/PLAN.md, .buzz/ops/README.md, .buzz/ops/brief.sh, .buzz/ops/lib/bz-bot.sh, .buzz/ops/lib/bz-bumble.sh, .buzz/ops/lib/bz-owner.sh, .buzz/ops/lib/common.sh, .buzz/ops/runner.sh, .buzz/ops/standup.sh, .buzz/ops/watch/buzz-health.sh, .buzz/ops/watch/hosts.sh, .buzz/ops/watchers.conf, .cache/zellij/permissions.kdl, .claude-ledger/bin/claude-spend, .claude-ledger/claude-ledger.py
+**Diff:** +33 -2 across 3 files
+
+### 2026-08-15 01:11
+
+**Areas:** general
+**Files (20):** .buzz/.scratch/standup-2026-08-14.md, .buzz/harness/ollama-coordinator, .buzz/harness/ollama-qwen, .buzz/harness/qwen-acp/buzz-acp, .buzz/harness/qwen-acp/claude-agent-acp, .buzz/ops/PLAN.md, .buzz/ops/README.md, .buzz/ops/brief.sh, .buzz/ops/lib/bz-bot.sh, .buzz/ops/lib/bz-bumble.sh, .buzz/ops/lib/bz-owner.sh, .buzz/ops/lib/common.sh, .buzz/ops/runner.sh, .buzz/ops/standup.sh, .buzz/ops/watch/buzz-health.sh, .buzz/ops/watch/hosts.sh, .buzz/ops/watchers.conf, .cache/zellij/permissions.kdl, .claude-ledger/bin/claude-spend, .claude-ledger/claude-ledger.py
+**Diff:** +27 -2 across 3 files
+
+### 2026-08-15 01:06
+
+**Areas:** general
+**Files (20):** .buzz/.scratch/standup-2026-08-14.md, .buzz/harness/ollama-coordinator, .buzz/harness/ollama-qwen, .buzz/harness/qwen-acp/buzz-acp, .buzz/harness/qwen-acp/claude-agent-acp, .buzz/ops/PLAN.md, .buzz/ops/README.md, .buzz/ops/brief.sh, .buzz/ops/lib/bz-bot.sh, .buzz/ops/lib/bz-bumble.sh, .buzz/ops/lib/bz-owner.sh, .buzz/ops/lib/common.sh, .buzz/ops/runner.sh, .buzz/ops/standup.sh, .buzz/ops/watch/buzz-health.sh, .buzz/ops/watch/hosts.sh, .buzz/ops/watchers.conf, .cache/zellij/permissions.kdl, .claude-ledger/bin/claude-spend, .claude-ledger/claude-ledger.py
+**Diff:** +21 -2 across 2 files
+
 ### 2026-08-14 23:51
 
 **Areas:** general
