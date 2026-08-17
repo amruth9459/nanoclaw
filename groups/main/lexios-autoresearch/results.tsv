@@ -135,3 +135,7 @@ exp83-fix-exp72-80-regressions-76-docs	2026-04-24	1.0000	76	0.00	Apply all missi
 2026-08-16T06:39:16Z	exp-20260816-022202	Tonight's 2nd slot (2026-08-16). This file's on-disk state g	0.5075	0.5274	0.0	kept
 2026-08-16T06:51:40Z	exp-20260816-023916	Tonight's 3rd slot (2026-08-16). This file's on-disk state g	0.5274	0.5729	0.0	kept
 2026-08-16T07:06:32Z	exp-20260816-025140	Tonight's 4th slot (2026-08-16). This file's on-disk state g	0.5729	0.3172	0.0	discarded
+2026-08-17T06:24:23Z	exp-20260817-020729	Tonight's 1st slot (2026-08-17). ANOMALY DISCLOSURE FIRST, f	0.0859	0.2957	0.0	kept
+2026-08-17T06:35:04Z	exp-20260817-022423	Tonight's 2nd slot (2026-08-17). This file's on-disk state g	0.2957	0.5254	0.0	kept
+2026-08-17T06:47:02Z	exp-20260817-023504	Tonight's 3rd slot (2026-08-17). Baseline to beat: this file	0.5254	0.2957	0.0	discarded
+2026-08-17T06:59:12Z	exp-20260817-024702	Tonight's 4th slot (2026-08-17). Baseline to beat: this file	0.5254	0.5274	0.0	kept
