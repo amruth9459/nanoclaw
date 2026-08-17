@@ -19,8 +19,82 @@ import time
 from pathlib import Path
 
 # ── EXPERIMENT CONFIG (agent edits this section) ─────────────────────────────
-EXPERIMENT_NAME = "exp-railings-revert-unconditional-3-to-1plus1-timeout-fix"
+EXPERIMENT_NAME = "exp-soft-90s-internal-budget-early-json-closure"
 DESCRIPTION = (
+    "Tonight's 2nd slot (2026-08-17). This file's on-disk state going in is "
+    "slot 1's kept railings revert (exp-railings-revert-unconditional-3-to-"
+    "1plus1-timeout-fix), which measured effective F1=0.2957 "
+    "(logs/exp-20260817-020729.log) -- that is tonight's baseline to beat, "
+    "NOT the older 0.0859 pre-slot-1 number or the stale per-doc breakdown "
+    "quoted in program.md's 'Tonight's measured baseline' section (that "
+    "text is describing the run BEFORE slot 1 edited anything; I read "
+    "slot 1's own result log directly and it's a different split, see "
+    "below). "
+    "WHAT I ACTUALLY FOUND: comparing baseline-20260817-020006.log (pre-"
+    "slot-1) against exp-20260817-020729.log (slot 1's own measured "
+    "result, same unedited image content, same eval docs) shows the SET OF "
+    "WHICH DOC TIMES OUT FLIPPED COMPLETELY between the two runs. Pre-slot-1: "
+    "Duplex timed out on BOTH images (Level_1 120.1s, Level_2 120.0s), "
+    "Clinic timed out on First_Floor only (Second_Floor completed at 81.8s, "
+    "raw F1=0.2103). Slot 1's own run, ~20 minutes later, same prompt class "
+    "reverted back to slot-2 wording: Duplex now completed BOTH images "
+    "cleanly (Level_1 30.9s, Level_2 78.6s, F1=0.591) but Clinic now timed "
+    "out on BOTH images (First_Floor 120.1s, Second_Floor 120.0s, F1=0.0 "
+    "-- note Second_Floor had completed fine at 81.8s in the PRE-slot-1 run "
+    "on the exact same image, then timed out in slot 1's run with a wording "
+    "class slot 1's own description claims is the 'clean, zero-timeout' "
+    "formulation). A prompt-content explanation (e.g. slot 3's railings "
+    "tension) cannot account for a complete flip of which specific doc "
+    "survives while the wording that's supposedly the fix stays constant "
+    "across both those runs (baseline used slot-4's wording, slot 1's "
+    "result used slot 1's newly-reverted wording -- different wording, "
+    "sure, but Second_Floor going from 81.8s clean to 120.0s timeout is the "
+    "wrong direction if the revert were the dominant fix, since Second_Floor "
+    "never touches railings_guards logic differently between these prompts "
+    "any more than First_Floor does, yet only Second_Floor got WORSE). The "
+    "more consistent read: every image right now is running close enough "
+    "to the 120s wall that outcome is dominated by run-to-run generation-"
+    "speed variance (server load, sampling variance in how verbose the "
+    "model gets), not by which specific wording variant is loaded -- and "
+    "critically, when an image DOES cross 120s, the logged behavior is "
+    "'WARN: Failed to parse JSON' -- the process is killed mid-generation "
+    "with an INVALID, unparseable partial JSON, scoring a hard zero for "
+    "every category on that image, not a graceful degraded-but-valid "
+    "partial result. That all-or-nothing cliff, not the railings wording "
+    "specifically, is what's costing whole documents. "
+    "FIX (one isolated variable, orthogonal to slot 1's railings edit and "
+    "to any category-specific wording -- railings/slabs/wall_types/doors/"
+    "windows/rooms instructions are byte-for-byte unchanged from the "
+    "on-disk state I started from): added explicit internal soft-budget "
+    "pacing language near the top of SYSTEM_PROMPT_OVERRIDE and one new "
+    "Rules bullet, telling the model it cannot see a real clock and should "
+    "treat its own usable budget as roughly 90 seconds of the true 120, "
+    "and that closing out valid, parseable JSON early -- even with some "
+    "low-priority categories thin or omitted -- scores far better than "
+    "being killed mid-generation with nothing parseable at all. This "
+    "targets the exact failure mode in both logs above: not 'ran out of "
+    "things worth enumerating' (already handled by the existing priority "
+    "order and per-category caps) but 'was still generating, unfinished "
+    "and unparseable, when the external 120s cutoff hit.' Trade-off stated "
+    "honestly: on a run that would have finished at, say, 115s anyway, an "
+    "instruction to wrap up around 90s could cost a few low-priority "
+    "elements (e.g. trailing wall_types or slabs entries) that would "
+    "otherwise have made it in under the wire. That's a small, bounded "
+    "downside against the alternative shown twice this week: an image "
+    "that runs past 120s loses 100% of every category's credit, not just "
+    "the last few elements. No change to PARAMS, preprocess(), "
+    "postprocess(), or to any category-specific enumeration wording -- "
+    "this is purely a pacing/self-cutoff instruction layered on top of the "
+    "existing priority-ordered step list. CAVEAT for tomorrow's session: "
+    "if this measures a strict improvement, check the run's own log for "
+    "per-image completion times before crediting the mechanism -- given "
+    "the flip-flop evidence above, a single improved run is still weak "
+    "confirming evidence on its own; look specifically for whether images "
+    "that previously timed out now complete with SOME valid output (even "
+    "if incomplete) rather than 'WARN: Failed to parse JSON'. "
+    "[Retained below, byte-for-byte, is slot 1's own prior-night disclosure "
+    "for continuity of the historical record -- not re-asserted as this "
+    "slot's claim.] "
     "Tonight's 1st slot (2026-08-17). ANOMALY DISCLOSURE FIRST, for any "
     "future session reading results.tsv: tonight's orchestrator-measured "
     "baseline (logs/baseline-20260817-020006.log) shows effective F1=0.0859 "
@@ -103,7 +177,7 @@ DESCRIPTION = (
 )
 # Override the system prompt sent to Claude for extraction.
 # Set to None to use the production prompt from ~/Lexios/lexios/SKILL.md
-SYSTEM_PROMPT_OVERRIDE = """Extract building elements from this floor plan image as JSON. The file path you were told to read ends with a floor-level segment (e.g. "-Level_1.png", "-Second_Floor.png", "-Ground_Floor.png") — BIM/IFC floor-plan exports are rendered one image per building level, and that filename segment is the authoritative level for every element on THIS image. Use it as the source for every "location" field below — still write it in the SHORT form specified per field (e.g. "L1", "L2", "Ground"), never the raw filename text — instead of relying only on a level label that may or may not be printed inside the drawing itself. Speed matters — keep every field short and do not add fields beyond what's listed below. Output MINIFIED JSON: no indentation, no line breaks between elements, no extra whitespace anywhere — every token spent on formatting is a token not spent enumerating real elements before the deadline. There is a hard 120-second limit on this call; if the full JSON is not finished by then, the ENTIRE response is discarded (nothing partial is kept) — so pace yourself using the priority and caps below rather than trying to be exhaustive on every category.
+SYSTEM_PROMPT_OVERRIDE = """Extract building elements from this floor plan image as JSON. The file path you were told to read ends with a floor-level segment (e.g. "-Level_1.png", "-Second_Floor.png", "-Ground_Floor.png") — BIM/IFC floor-plan exports are rendered one image per building level, and that filename segment is the authoritative level for every element on THIS image. Use it as the source for every "location" field below — still write it in the SHORT form specified per field (e.g. "L1", "L2", "Ground"), never the raw filename text — instead of relying only on a level label that may or may not be printed inside the drawing itself. Speed matters — keep every field short and do not add fields beyond what's listed below. Output MINIFIED JSON: no indentation, no line breaks between elements, no extra whitespace anywhere — every token spent on formatting is a token not spent enumerating real elements before the deadline. There is a hard 120-second limit on this call; if the full JSON is not finished by then, the ENTIRE response is discarded (nothing partial is kept) — so pace yourself using the priority and caps below rather than trying to be exhaustive on every category. You cannot see a real clock, so build in a safety margin: treat your own usable budget as roughly 90 seconds, not the full 120 — a valid, parseable JSON closed out early with some low-priority categories thin or omitted scores far better than being cut off mid-generation with nothing parseable at all, which scores zero for every category on this image, not just the unfinished ones.
 
 Return a JSON object with applicable keys (omit keys with no findings). Only these keys are scored, so do not add extra descriptive fields:
 
@@ -138,6 +212,7 @@ Rules:
 - For slabs: the guaranteed guess is 10 entries per visible floor level (not just one), described in step 5 above — nearly every level has a floor slab, and BIM models commonly split it into several Floor objects. Never invent a thickness, material, or joint detail you can't read — omit those fields entirely.
 - For beams: only add an entry for a beam or framing member you can actually see, or — per step 5 — one entry per level where structure is evidently present but individual members aren't distinguishable. Never invent a specific count, size, or material for a beam that isn't visible.
 - Omit any key with no findings on this image. No explanation, no markdown fences — return ONLY the JSON object, minified (no pretty-printing, no indentation).
+- If you sense you are running short on your internal ~90-second budget and multiple categories are still incomplete, stop adding new instances immediately and close out valid JSON with whatever you have — do not keep enumerating toward the true 120-second cutoff. A response that closes cleanly early with fewer instances is scored; a response still open when the hard limit hits is discarded in full.
 - Do not narrate or reason out loud before answering — your first output character must be "{"."""
 
 # Extraction parameters (mirror extract.py options)
