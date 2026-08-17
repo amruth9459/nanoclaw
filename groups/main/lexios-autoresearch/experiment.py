@@ -19,8 +19,91 @@ import time
 from pathlib import Path
 
 # ── EXPERIMENT CONFIG (agent edits this section) ─────────────────────────────
-EXPERIMENT_NAME = "exp-soft-90s-internal-budget-early-json-closure"
+EXPERIMENT_NAME = "exp-add-missing-mep-categories-equipment-plumbing-sprinklers"
 DESCRIPTION = (
+    "Tonight's 4th slot (2026-08-17). Baseline to beat: this file's on-disk "
+    "state going in is slot 2's kept soft-90s-budget edit "
+    "(exp-soft-90s-internal-budget-early-json-closure), whose own measured "
+    "result is effective F1=0.5254 (results.tsv row, prev_f1=0.2957 -> "
+    "new_f1=0.5254, kept; log exp-20260817-022423.log). Slot 3 (doors-"
+    "before-windows reorder) then measured 0.5254 -> 0.2957 and was "
+    "discarded/reverted, so this file's on-disk state is back to slot 2's "
+    "text byte-for-byte, confirmed by reading this file before editing. "
+    "program.md's 'Effective F1 to beat: 0.5254' header above is, for once, "
+    "current -- but its per-doc breakdown line (Duplex 0.0, Clinic "
+    "raw=0.2103/post=0.1718) is still the STALE pre-slot-1 split that "
+    "averages to the old 0.0859, not to 0.5254 -- same trap slot 2 and slot "
+    "3 already flagged; go by results.tsv and the log files, not that prose. "
+    "CALLED advisor() before editing. It ran the actual arithmetic on slot "
+    "2's own per-category log breakdown and confirmed eval.py's F1 is a "
+    "MACRO average over a doc's GT categories, not element-weighted: Clinic "
+    "= (0.523+0+0+0.615+0.501+1.0+0+1.0+0+1.0)/10 = 0.4639, exactly the "
+    "logged doc F1 (log exp-20260817-022423.log). That means a 2-instance "
+    "GT category is worth exactly as much to the score as a 254-instance "
+    "one, and Clinic's GT has 10 scored categories while this prompt's JSON "
+    "schema (lines 184-193, before this edit) only requested 8 -- "
+    "'equipment', 'plumbing_fixtures', and 'sprinklers' were never in the "
+    "schema at all, confirmed by grepping SYSTEM_PROMPT_OVERRIDE for those "
+    "three strings before this edit (zero hits) -- so those 3 categories "
+    "were scoring a hard 0 every night not because vision can't see them "
+    "but because they were never asked for. That is 3 of Clinic's 10 "
+    "categories = 0.30 of Clinic's doc F1 = 0.15 of tonight's overall F1 if "
+    "even partially populated, a far larger lever than my first plan "
+    "(raising the doors per-image cap from 45 to 90 for Clinic, which "
+    "advisor priced at at most +0.015 overall given macro-averaging and "
+    "which I dropped after this -- doors' cap-binding math still belongs in "
+    "the durable record for whoever revisits it: slot 2's log shows doors "
+    "correct=90/254 and rooms correct=90/269 both landing on exactly 2x45 "
+    "with P=1.00 on both, which is the per-image 45-cap binding cleanly, "
+    "not a vision recall failure -- but with macro-averaging that gain is "
+    "too small to clear this gate's noise floor, which swung 0.5729->0.0859 "
+    "on a BYTE-IDENTICAL config four days ago per slot 1's own log "
+    "comparison this same night). "
+    "EDIT (single variable: add 3 missing MEP category keys, lowest "
+    "priority, vision-grounded only): grepped ~/Lexios/lexios/types.json "
+    "for match_keys (never opened either eval doc's ground-truth file) -- "
+    "equipment=[[name],[type],[location]], "
+    "plumbing_fixtures=[[type],[location]], sprinklers=[[location],[type]]. "
+    "Added all 3 as new JSON schema keys (plumbing_fixtures: type+location; "
+    "equipment: type+location; sprinklers: location only, matching the "
+    "minimal-field pattern already used for doors/slabs/beams), added a new "
+    "step 7 (LAST, only after wall_types, explicit 'skip all three outright "
+    "if near your ~90s budget' clause per advisor's placement advice so "
+    "this can't cannibalize the categories already tuned), renumbered the "
+    "old step 7 move-on rule to step 8, and added one new Rules bullet with "
+    "the same 'only what you can see, omit rather than guess' discipline "
+    "every other category bullet already uses. Zero touch to PARAMS, "
+    "preprocess(), postprocess(), the doors/rooms/windows 45-cap, the "
+    "railings/slabs/wall_types guaranteed-guess bullets, or slot 2's ~90s "
+    "pacing language -- all left byte-for-byte intact, since that pacing "
+    "instruction is the safety net that makes this kind of additive edit "
+    "survivable at all (confirmed postprocess() doesn't drop unrecognized "
+    "keys: read lines 836-1114, the reachable body only renames rooms/"
+    "windows fields in place and returns, everything else passes through "
+    "unmodified). Asymmetry worth noting: Duplex's GT has no equipment/"
+    "plumbing_fixtures/sprinklers rows at all, so this costs Duplex a few "
+    "seconds of the model glancing at 3 near-certainly-empty categories "
+    "(each omittable) without touching its denominator. Honest trade-off: "
+    "these symbols may simply not be visible on an architectural-only "
+    "rendering (sprinklers especially are usually MEP-sheet-only), in which "
+    "case the categories stay at 0 and this costs a small amount of "
+    "generation time for nothing -- but step 7's placement (dead last, "
+    "explicit skip-near-budget clause) bounds that cost, and the potential "
+    "upside (any nonzero recall on 2 of the 3 categories, given Clinic GT "
+    "counts of just 2 equipment / 3 plumbing_fixtures / 10 sprinklers -- "
+    "small absolute counts that don't need high recall to move a macro-"
+    "averaged category from 0 to a real number) is large relative to that "
+    "cost under this scoring rule. CAVEAT for tomorrow: check the run's own "
+    "log for (1) per-image completion times, confirming this didn't push "
+    "Clinic back toward the 120s wall slot 1/2/3 spent this whole night "
+    "fighting, and (2) whether equipment/plumbing_fixtures/sprinklers show "
+    "up as nonzero F1 rows at all versus staying at 0 because nothing was "
+    "visible -- either result is informative, but only the log distinguishes "
+    "them from a generic run-to-run swing given how noisy this gate has "
+    "been proven to be tonight. "
+    "[Retained below, byte-for-byte, is slot 2's own prior-night description "
+    "for continuity of the historical record -- not re-asserted as this "
+    "slot's claim.] "
     "Tonight's 2nd slot (2026-08-17). This file's on-disk state going in is "
     "slot 1's kept railings revert (exp-railings-revert-unconditional-3-to-"
     "1plus1-timeout-fix), which measured effective F1=0.2957 "
@@ -189,7 +272,10 @@ Return a JSON object with applicable keys (omit keys with no findings). Only the
   "railings_guards": [{"type": "<Guardrail or Handrail — only if visually obvious>", "location": "<floor level, SHORT form only — e.g. 'L1', 'L2', 'Ground' — never a full descriptive phrase>"}],
   "slabs": [{"location": "<floor level, SHORT form only — e.g. 'L1', 'L2', 'Ground'>"}],
   "beams": [{"location": "<floor level, SHORT form only — e.g. 'L1', 'L2', 'Ground'>"}],
-  "wall_types": [{"type_id": "<distinct wall category visible from the linework, e.g. 'Exterior', 'Interior Partition', 'Foundation', 'Party Wall' — use a legend's exact wording if a wall-type legend/schedule is visible>"}]
+  "wall_types": [{"type_id": "<distinct wall category visible from the linework, e.g. 'Exterior', 'Interior Partition', 'Foundation', 'Party Wall' — use a legend's exact wording if a wall-type legend/schedule is visible>"}],
+  "plumbing_fixtures": [{"type": "<Toilet, Sink, Tub, Shower — only if visually obvious from the symbol>", "location": "<floor level, SHORT form only — e.g. 'L1', 'L2', 'Ground'>"}],
+  "equipment": [{"type": "<e.g. HVAC unit, electrical panel, water heater — only if visually obvious from the symbol or label>", "location": "<floor level, SHORT form only — e.g. 'L1', 'L2', 'Ground'>"}],
+  "sprinklers": [{"location": "<floor level, SHORT form only — e.g. 'L1', 'L2', 'Ground'>"}]
 }
 
 Priority and pacing (this order matters under the time limit):
@@ -198,8 +284,9 @@ Priority and pacing (this order matters under the time limit):
 3. THEN list rooms — one entry per physical room or space you actually see labeled on the drawing, NOT one entry per unique name. Floor plans routinely repeat the exact same room name for different physical spaces — mirrored apartment units (two "Living Room"s, two "Foyer"s, one per unit), a row of similar offices, several exam rooms down a corridor. Each repeated label marks a separate real room and needs its own separate JSON entry; do not merge same-named rooms into one just because the text matches. If rooms, doors, or windows each have more than 45 physical instances on this image, list the first 45 you encounter (scanning order is fine) and stop that category there rather than continuing to search for more — a finished response covering fewer instances of the large categories beats an unfinished one that gets discarded entirely. On a very dense drawing (hundreds of rooms/doors), stopping early at 45 per category is the difference between a usable partial result and this entire response being discarded for missing the 120-second limit — do not try to push past this cap to be more thorough.
 4. THEN, only if time remains: list railings_guards — distinct handrail or guardrail segments you can actually see drawn on the plan (often a short rail run near a stairwell opening or a floor edge), one entry per segment you can see, each needing a "location" value (same SHORT form as doors above) and an optional "type" — "Handrail" for a rail alongside a stair run, "Guardrail" for a rail at a floor edge or opening — ONLY when that distinction is visually obvious, otherwise omit the field rather than guess. This is a low priority category, but there is a guaranteed guess that costs nothing to add: BIM/IFC authoring tools typically model at least one railing object for an occupied level's vertical circulation, even when the rendering doesn't clearly show it or you weren't able to confidently resolve a stairwell in step 1 on THIS specific image. So add ONE railings_guards entry for THIS image's level (SHORT form location, omit "type") regardless of what step 1 found or what you can currently see on this image. Add a SECOND guaranteed entry only if this image visibly shows more than one stairwell — do not add a second one otherwise. Beyond those guaranteed entries, only add a further entry for a rail line you can actually see — do not invent more than that.
 5. THEN, only if time remains after railings_guards: check slabs and beams. Nearly every floor level has a visible floor slab/plane — and BIM/IFC authoring tools typically model that one visible floor plate as SEVERAL separate Floor objects (split per room, per material layer, or per construction phase) even though it renders as one continuous surface, so add 10 slabs entries for each level you can see represented in this image, not just one — one for each distinguishable floor grouping you can point to (e.g. a different flooring material, or a separate room cluster), and identical entries where you cannot tell them apart, since they all share the same level's SHORT-form location — omit any thickness or material detail you can't read. If you can also make out distinct beam or floor-framing members (visible structural framing lines, a beam run, exposed structure above a level), add one entry per distinct member you can actually see, each with its own SHORT-form location; if structure is evidently present at a level but individual members aren't distinguishable, one beams entry for that level is enough. The slabs-per-level guess costs nothing to add when you can see the level exists — but never invent a beam that isn't represented by anything visible in the image.
-6. LAST, only if time remains after slabs and beams: wall_types. List the distinct wall CATEGORIES you can identify from the linework or a visible legend (e.g. "Exterior", "Interior Partition", "Foundation", "Party Wall" — use a legend's exact wording if one is visible), at most 6 entries. Nearly every occupied building has at minimum an exterior envelope wall and an interior partition wall — even when no legend is printed and you cannot tell more specific categories apart, it is still safe to output those two universal categories ("Exterior" and "Interior Partition") rather than skip the category outright, since both are true of virtually every building shown on a floor plan. Do not invent anything more specific than that (a material, thickness, or fire rating) that isn't visually obvious. This is still the lowest-priority category of all — do not let it take time away from any category above.
-7. Once you've finished a category, do not go back and re-scan the image for it — move straight to the next category or finish the response. A completed, on-time JSON covering fewer instances beats a more thorough one that misses the 120-second limit and gets discarded entirely.
+6. LAST, only if time remains after slabs and beams: wall_types. List the distinct wall CATEGORIES you can identify from the linework or a visible legend (e.g. "Exterior", "Interior Partition", "Foundation", "Party Wall" — use a legend's exact wording if one is visible), at most 6 entries. Nearly every occupied building has at minimum an exterior envelope wall and an interior partition wall — even when no legend is printed and you cannot tell more specific categories apart, it is still safe to output those two universal categories ("Exterior" and "Interior Partition") rather than skip the category outright, since both are true of virtually every building shown on a floor plan. Do not invent anything more specific than that (a material, thickness, or fire rating) that isn't visually obvious. This is a very low-priority category — do not let it take time away from any category above.
+7. LAST, only if time remains after wall_types: check for plumbing_fixtures (toilets, sinks, tubs, showers — usually visible as symbols inside bathroom/utility rooms), equipment (HVAC units, electrical panels, water heaters — visible as labeled boxes or distinct symbols), and sprinklers (small circle symbols; often only shown on MEP-specific sheets and frequently absent from an architectural plan — that's fine, omit the key if you don't see any). Add one entry per instance you can actually see, each with a SHORT-form location and an optional "type" only when visually unambiguous. These are the lowest-priority categories of all — if you're already near your internal ~90-second budget when you reach this step, skip all three entirely rather than spend time on them; a JSON that never touches these keys is still valid and scores nothing worse than a category never attempted. Never invent an instance you can't see.
+8. Once you've finished a category, do not go back and re-scan the image for it — move straight to the next category or finish the response. A completed, on-time JSON covering fewer instances beats a more thorough one that misses the 120-second limit and gets discarded entirely.
 
 Rules:
 - Transcribe each room's printed label exactly as it appears on the drawing, including abbreviations and number suffixes (e.g. "Bathroom 1", "TOILET", "Foyer", "M. TOILET") — do not paraphrase it into a different generic term; that breaks matching even when you read the room correctly.
@@ -211,6 +298,7 @@ Rules:
 - For railings_guards: the guaranteed guess is one entry per level, unconditional (not gated on step 1's stair detection), described in step 4 above — add it regardless of whether you can see or confirm an actual rail line, since a level's railing run is typically modeled as its own object and virtually every occupied floor level has at least one. Add a second guaranteed entry only when this image visibly shows more than one stairwell. Beyond that, only add a further entry for a rail line you can actually see, and never invent a "type" (Handrail vs Guardrail) that isn't visually obvious.
 - For slabs: the guaranteed guess is 10 entries per visible floor level (not just one), described in step 5 above — nearly every level has a floor slab, and BIM models commonly split it into several Floor objects. Never invent a thickness, material, or joint detail you can't read — omit those fields entirely.
 - For beams: only add an entry for a beam or framing member you can actually see, or — per step 5 — one entry per level where structure is evidently present but individual members aren't distinguishable. Never invent a specific count, size, or material for a beam that isn't visible.
+- For plumbing_fixtures, equipment, and sprinklers: these are the lowest-priority categories (step 7) — only attempt them once every higher-priority category above is already complete, and skip all three outright if you're near your internal ~90-second budget. Only add an entry for a symbol you can actually see; do not invent one to fill an otherwise-empty category, and only fill in a "type" guess when it's visually unambiguous — omit that field rather than guess.
 - Omit any key with no findings on this image. No explanation, no markdown fences — return ONLY the JSON object, minified (no pretty-printing, no indentation).
 - If you sense you are running short on your internal ~90-second budget and multiple categories are still incomplete, stop adding new instances immediately and close out valid JSON with whatever you have — do not keep enumerating toward the true 120-second cutoff. A response that closes cleanly early with fewer instances is scored; a response still open when the hard limit hits is discarded in full.
 - Do not narrate or reason out loud before answering — your first output character must be "{"."""
