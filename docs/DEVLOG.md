@@ -5,6 +5,138 @@
 
 ---
 
+### 2026-08-20 05:50
+
+**Areas:** general
+**Files (20):** .buzz/.scratch/standup-2026-08-14.md, .buzz/.scratch/standup-2026-08-15-post.md, .buzz/.scratch/standup-2026-08-15.md, .buzz/OUTBOX/2026-08-16-standup-correction.md, .buzz/OUTBOX/2026-08-16-standup.md, .buzz/RESEARCH/NN_SIGNAGE_TOPOLOGY.md, .buzz/harness/debug/buzz-acp, .buzz/harness/ollama-coordinator, .buzz/harness/ollama-qwen, .buzz/harness/qwen-acp/buzz-acp, .buzz/harness/qwen-acp/claude-agent-acp, .buzz/ops/PLAN.md, .buzz/ops/README.md, .buzz/ops/brief.sh, .buzz/ops/lib/bz-bot.sh, .buzz/ops/lib/bz-bumble.sh, .buzz/ops/lib/bz-honey.sh, .buzz/ops/lib/bz-owner.sh, .buzz/ops/lib/common.sh, .buzz/ops/runner.sh
+**Diff:** +151 -2 across 4 files
+
+### 2026-08-20 04:50
+
+**Areas:** general
+**Files (20):** .buzz/.scratch/standup-2026-08-14.md, .buzz/.scratch/standup-2026-08-15-post.md, .buzz/.scratch/standup-2026-08-15.md, .buzz/OUTBOX/2026-08-16-standup-correction.md, .buzz/OUTBOX/2026-08-16-standup.md, .buzz/RESEARCH/NN_SIGNAGE_TOPOLOGY.md, .buzz/harness/debug/buzz-acp, .buzz/harness/ollama-coordinator, .buzz/harness/ollama-qwen, .buzz/harness/qwen-acp/buzz-acp, .buzz/harness/qwen-acp/claude-agent-acp, .buzz/ops/PLAN.md, .buzz/ops/README.md, .buzz/ops/brief.sh, .buzz/ops/lib/bz-bot.sh, .buzz/ops/lib/bz-bumble.sh, .buzz/ops/lib/bz-honey.sh, .buzz/ops/lib/bz-owner.sh, .buzz/ops/lib/common.sh, .buzz/ops/runner.sh
+**Diff:** +145 -2 across 4 files
+
+### 2026-08-20 03:50
+
+**Areas:** general
+**Files (20):** .buzz/.scratch/standup-2026-08-14.md, .buzz/.scratch/standup-2026-08-15-post.md, .buzz/.scratch/standup-2026-08-15.md, .buzz/OUTBOX/2026-08-16-standup-correction.md, .buzz/OUTBOX/2026-08-16-standup.md, .buzz/RESEARCH/NN_SIGNAGE_TOPOLOGY.md, .buzz/harness/debug/buzz-acp, .buzz/harness/ollama-coordinator, .buzz/harness/ollama-qwen, .buzz/harness/qwen-acp/buzz-acp, .buzz/harness/qwen-acp/claude-agent-acp, .buzz/ops/PLAN.md, .buzz/ops/README.md, .buzz/ops/brief.sh, .buzz/ops/lib/bz-bot.sh, .buzz/ops/lib/bz-bumble.sh, .buzz/ops/lib/bz-honey.sh, .buzz/ops/lib/bz-owner.sh, .buzz/ops/lib/common.sh, .buzz/ops/runner.sh
+**Diff:** +139 -2 across 4 files
+
+### 2026-08-20 03:06
+
+**Areas:** general
+**Files (20):** .buzz/.scratch/standup-2026-08-14.md, .buzz/.scratch/standup-2026-08-15-post.md, .buzz/.scratch/standup-2026-08-15.md, .buzz/OUTBOX/2026-08-16-standup-correction.md, .buzz/OUTBOX/2026-08-16-standup.md, .buzz/RESEARCH/NN_SIGNAGE_TOPOLOGY.md, .buzz/harness/debug/buzz-acp, .buzz/harness/ollama-coordinator, .buzz/harness/ollama-qwen, .buzz/harness/qwen-acp/buzz-acp, .buzz/harness/qwen-acp/claude-agent-acp, .buzz/ops/PLAN.md, .buzz/ops/README.md, .buzz/ops/brief.sh, .buzz/ops/lib/bz-bot.sh, .buzz/ops/lib/bz-bumble.sh, .buzz/ops/lib/bz-honey.sh, .buzz/ops/lib/bz-owner.sh, .buzz/ops/lib/common.sh, .buzz/ops/runner.sh
+**Diff:** +213 -74 across 5 files
+
+### 2026-08-20 03:04
+
+**Areas:** general
+**Files (20):** .buzz/.scratch/standup-2026-08-14.md, .buzz/.scratch/standup-2026-08-15-post.md, .buzz/.scratch/standup-2026-08-15.md, .buzz/OUTBOX/2026-08-16-standup-correction.md, .buzz/OUTBOX/2026-08-16-standup.md, .buzz/RESEARCH/NN_SIGNAGE_TOPOLOGY.md, .buzz/harness/debug/buzz-acp, .buzz/harness/ollama-coordinator, .buzz/harness/ollama-qwen, .buzz/harness/qwen-acp/buzz-acp, .buzz/harness/qwen-acp/claude-agent-acp, .buzz/ops/PLAN.md, .buzz/ops/README.md, .buzz/ops/brief.sh, .buzz/ops/lib/bz-bot.sh, .buzz/ops/lib/bz-bumble.sh, .buzz/ops/lib/bz-honey.sh, .buzz/ops/lib/bz-owner.sh, .buzz/ops/lib/common.sh, .buzz/ops/runner.sh
+**Diff:** +207 -74 across 5 files
+
+### 2026-08-20 03:03
+
+**Areas:** general
+**Files (20):** .buzz/.scratch/standup-2026-08-14.md, .buzz/.scratch/standup-2026-08-15-post.md, .buzz/.scratch/standup-2026-08-15.md, .buzz/OUTBOX/2026-08-16-standup-correction.md, .buzz/OUTBOX/2026-08-16-standup.md, .buzz/RESEARCH/NN_SIGNAGE_TOPOLOGY.md, .buzz/harness/debug/buzz-acp, .buzz/harness/ollama-coordinator, .buzz/harness/ollama-qwen, .buzz/harness/qwen-acp/buzz-acp, .buzz/harness/qwen-acp/claude-agent-acp, .buzz/ops/PLAN.md, .buzz/ops/README.md, .buzz/ops/brief.sh, .buzz/ops/lib/bz-bot.sh, .buzz/ops/lib/bz-bumble.sh, .buzz/ops/lib/bz-honey.sh, .buzz/ops/lib/bz-owner.sh, .buzz/ops/lib/common.sh, .buzz/ops/runner.sh
+**Diff:** +201 -74 across 5 files
+
+### 2026-08-20 03:03
+
+**Areas:** general
+**Files (20):** .buzz/.scratch/standup-2026-08-14.md, .buzz/.scratch/standup-2026-08-15-post.md, .buzz/.scratch/standup-2026-08-15.md, .buzz/OUTBOX/2026-08-16-standup-correction.md, .buzz/OUTBOX/2026-08-16-standup.md, .buzz/RESEARCH/NN_SIGNAGE_TOPOLOGY.md, .buzz/harness/debug/buzz-acp, .buzz/harness/ollama-coordinator, .buzz/harness/ollama-qwen, .buzz/harness/qwen-acp/buzz-acp, .buzz/harness/qwen-acp/claude-agent-acp, .buzz/ops/PLAN.md, .buzz/ops/README.md, .buzz/ops/brief.sh, .buzz/ops/lib/bz-bot.sh, .buzz/ops/lib/bz-bumble.sh, .buzz/ops/lib/bz-honey.sh, .buzz/ops/lib/bz-owner.sh, .buzz/ops/lib/common.sh, .buzz/ops/runner.sh
+**Diff:** +195 -74 across 5 files
+
+### 2026-08-20 02:56
+
+**Areas:** general
+**Files (20):** .buzz/.scratch/standup-2026-08-14.md, .buzz/.scratch/standup-2026-08-15-post.md, .buzz/.scratch/standup-2026-08-15.md, .buzz/OUTBOX/2026-08-16-standup-correction.md, .buzz/OUTBOX/2026-08-16-standup.md, .buzz/RESEARCH/NN_SIGNAGE_TOPOLOGY.md, .buzz/harness/debug/buzz-acp, .buzz/harness/ollama-coordinator, .buzz/harness/ollama-qwen, .buzz/harness/qwen-acp/buzz-acp, .buzz/harness/qwen-acp/claude-agent-acp, .buzz/ops/PLAN.md, .buzz/ops/README.md, .buzz/ops/brief.sh, .buzz/ops/lib/bz-bot.sh, .buzz/ops/lib/bz-bumble.sh, .buzz/ops/lib/bz-honey.sh, .buzz/ops/lib/bz-owner.sh, .buzz/ops/lib/common.sh, .buzz/ops/runner.sh
+**Diff:** +178 -73 across 5 files
+
+### 2026-08-20 02:54
+
+**Areas:** general
+**Files (20):** .buzz/.scratch/standup-2026-08-14.md, .buzz/.scratch/standup-2026-08-15-post.md, .buzz/.scratch/standup-2026-08-15.md, .buzz/OUTBOX/2026-08-16-standup-correction.md, .buzz/OUTBOX/2026-08-16-standup.md, .buzz/RESEARCH/NN_SIGNAGE_TOPOLOGY.md, .buzz/harness/debug/buzz-acp, .buzz/harness/ollama-coordinator, .buzz/harness/ollama-qwen, .buzz/harness/qwen-acp/buzz-acp, .buzz/harness/qwen-acp/claude-agent-acp, .buzz/ops/PLAN.md, .buzz/ops/README.md, .buzz/ops/brief.sh, .buzz/ops/lib/bz-bot.sh, .buzz/ops/lib/bz-bumble.sh, .buzz/ops/lib/bz-honey.sh, .buzz/ops/lib/bz-owner.sh, .buzz/ops/lib/common.sh, .buzz/ops/runner.sh
+**Diff:** +172 -73 across 5 files
+
+### 2026-08-20 02:53
+
+**Areas:** general
+**Files (20):** .buzz/.scratch/standup-2026-08-14.md, .buzz/.scratch/standup-2026-08-15-post.md, .buzz/.scratch/standup-2026-08-15.md, .buzz/OUTBOX/2026-08-16-standup-correction.md, .buzz/OUTBOX/2026-08-16-standup.md, .buzz/RESEARCH/NN_SIGNAGE_TOPOLOGY.md, .buzz/harness/debug/buzz-acp, .buzz/harness/ollama-coordinator, .buzz/harness/ollama-qwen, .buzz/harness/qwen-acp/buzz-acp, .buzz/harness/qwen-acp/claude-agent-acp, .buzz/ops/PLAN.md, .buzz/ops/README.md, .buzz/ops/brief.sh, .buzz/ops/lib/bz-bot.sh, .buzz/ops/lib/bz-bumble.sh, .buzz/ops/lib/bz-honey.sh, .buzz/ops/lib/bz-owner.sh, .buzz/ops/lib/common.sh, .buzz/ops/runner.sh
+**Diff:** +166 -73 across 5 files
+
+### 2026-08-20 02:51
+
+**Areas:** general
+**Files (20):** .buzz/.scratch/standup-2026-08-14.md, .buzz/.scratch/standup-2026-08-15-post.md, .buzz/.scratch/standup-2026-08-15.md, .buzz/OUTBOX/2026-08-16-standup-correction.md, .buzz/OUTBOX/2026-08-16-standup.md, .buzz/RESEARCH/NN_SIGNAGE_TOPOLOGY.md, .buzz/harness/debug/buzz-acp, .buzz/harness/ollama-coordinator, .buzz/harness/ollama-qwen, .buzz/harness/qwen-acp/buzz-acp, .buzz/harness/qwen-acp/claude-agent-acp, .buzz/ops/PLAN.md, .buzz/ops/README.md, .buzz/ops/brief.sh, .buzz/ops/lib/bz-bot.sh, .buzz/ops/lib/bz-bumble.sh, .buzz/ops/lib/bz-honey.sh, .buzz/ops/lib/bz-owner.sh, .buzz/ops/lib/common.sh, .buzz/ops/runner.sh
+**Diff:** +160 -73 across 5 files
+
+### 2026-08-20 02:50
+
+**Areas:** general
+**Files (20):** .buzz/.scratch/standup-2026-08-14.md, .buzz/.scratch/standup-2026-08-15-post.md, .buzz/.scratch/standup-2026-08-15.md, .buzz/OUTBOX/2026-08-16-standup-correction.md, .buzz/OUTBOX/2026-08-16-standup.md, .buzz/RESEARCH/NN_SIGNAGE_TOPOLOGY.md, .buzz/harness/debug/buzz-acp, .buzz/harness/ollama-coordinator, .buzz/harness/ollama-qwen, .buzz/harness/qwen-acp/buzz-acp, .buzz/harness/qwen-acp/claude-agent-acp, .buzz/ops/PLAN.md, .buzz/ops/README.md, .buzz/ops/brief.sh, .buzz/ops/lib/bz-bot.sh, .buzz/ops/lib/bz-bumble.sh, .buzz/ops/lib/bz-honey.sh, .buzz/ops/lib/bz-owner.sh, .buzz/ops/lib/common.sh, .buzz/ops/runner.sh
+**Diff:** +154 -73 across 5 files
+
+### 2026-08-20 02:49
+
+**Areas:** general
+**Files (20):** .buzz/.scratch/standup-2026-08-14.md, .buzz/.scratch/standup-2026-08-15-post.md, .buzz/.scratch/standup-2026-08-15.md, .buzz/OUTBOX/2026-08-16-standup-correction.md, .buzz/OUTBOX/2026-08-16-standup.md, .buzz/RESEARCH/NN_SIGNAGE_TOPOLOGY.md, .buzz/harness/debug/buzz-acp, .buzz/harness/ollama-coordinator, .buzz/harness/ollama-qwen, .buzz/harness/qwen-acp/buzz-acp, .buzz/harness/qwen-acp/claude-agent-acp, .buzz/ops/PLAN.md, .buzz/ops/README.md, .buzz/ops/brief.sh, .buzz/ops/lib/bz-bot.sh, .buzz/ops/lib/bz-bumble.sh, .buzz/ops/lib/bz-honey.sh, .buzz/ops/lib/bz-owner.sh, .buzz/ops/lib/common.sh, .buzz/ops/runner.sh
+**Diff:** +77 -2 across 4 files
+
+### 2026-08-20 02:40
+
+**Areas:** general
+**Files (20):** .buzz/.scratch/standup-2026-08-14.md, .buzz/.scratch/standup-2026-08-15-post.md, .buzz/.scratch/standup-2026-08-15.md, .buzz/OUTBOX/2026-08-16-standup-correction.md, .buzz/OUTBOX/2026-08-16-standup.md, .buzz/RESEARCH/NN_SIGNAGE_TOPOLOGY.md, .buzz/harness/debug/buzz-acp, .buzz/harness/ollama-coordinator, .buzz/harness/ollama-qwen, .buzz/harness/qwen-acp/buzz-acp, .buzz/harness/qwen-acp/claude-agent-acp, .buzz/ops/PLAN.md, .buzz/ops/README.md, .buzz/ops/brief.sh, .buzz/ops/lib/bz-bot.sh, .buzz/ops/lib/bz-bumble.sh, .buzz/ops/lib/bz-honey.sh, .buzz/ops/lib/bz-owner.sh, .buzz/ops/lib/common.sh, .buzz/ops/runner.sh
+**Diff:** +141 -313 across 5 files
+
+### 2026-08-20 02:38
+
+**Areas:** general
+**Files (20):** .buzz/.scratch/standup-2026-08-14.md, .buzz/.scratch/standup-2026-08-15-post.md, .buzz/.scratch/standup-2026-08-15.md, .buzz/OUTBOX/2026-08-16-standup-correction.md, .buzz/OUTBOX/2026-08-16-standup.md, .buzz/RESEARCH/NN_SIGNAGE_TOPOLOGY.md, .buzz/harness/debug/buzz-acp, .buzz/harness/ollama-coordinator, .buzz/harness/ollama-qwen, .buzz/harness/qwen-acp/buzz-acp, .buzz/harness/qwen-acp/claude-agent-acp, .buzz/ops/PLAN.md, .buzz/ops/README.md, .buzz/ops/brief.sh, .buzz/ops/lib/bz-bot.sh, .buzz/ops/lib/bz-bumble.sh, .buzz/ops/lib/bz-honey.sh, .buzz/ops/lib/bz-owner.sh, .buzz/ops/lib/common.sh, .buzz/ops/runner.sh
+**Diff:** +135 -313 across 5 files
+
+### 2026-08-20 02:37
+
+**Areas:** general
+**Files (20):** .buzz/.scratch/standup-2026-08-14.md, .buzz/.scratch/standup-2026-08-15-post.md, .buzz/.scratch/standup-2026-08-15.md, .buzz/OUTBOX/2026-08-16-standup-correction.md, .buzz/OUTBOX/2026-08-16-standup.md, .buzz/RESEARCH/NN_SIGNAGE_TOPOLOGY.md, .buzz/harness/debug/buzz-acp, .buzz/harness/ollama-coordinator, .buzz/harness/ollama-qwen, .buzz/harness/qwen-acp/buzz-acp, .buzz/harness/qwen-acp/claude-agent-acp, .buzz/ops/PLAN.md, .buzz/ops/README.md, .buzz/ops/brief.sh, .buzz/ops/lib/bz-bot.sh, .buzz/ops/lib/bz-bumble.sh, .buzz/ops/lib/bz-honey.sh, .buzz/ops/lib/bz-owner.sh, .buzz/ops/lib/common.sh, .buzz/ops/runner.sh
+**Diff:** +129 -313 across 5 files
+
+### 2026-08-20 02:35
+
+**Areas:** general
+**Files (20):** .buzz/.scratch/standup-2026-08-14.md, .buzz/.scratch/standup-2026-08-15-post.md, .buzz/.scratch/standup-2026-08-15.md, .buzz/OUTBOX/2026-08-16-standup-correction.md, .buzz/OUTBOX/2026-08-16-standup.md, .buzz/RESEARCH/NN_SIGNAGE_TOPOLOGY.md, .buzz/harness/debug/buzz-acp, .buzz/harness/ollama-coordinator, .buzz/harness/ollama-qwen, .buzz/harness/qwen-acp/buzz-acp, .buzz/harness/qwen-acp/claude-agent-acp, .buzz/ops/PLAN.md, .buzz/ops/README.md, .buzz/ops/brief.sh, .buzz/ops/lib/bz-bot.sh, .buzz/ops/lib/bz-bumble.sh, .buzz/ops/lib/bz-honey.sh, .buzz/ops/lib/bz-owner.sh, .buzz/ops/lib/common.sh, .buzz/ops/runner.sh
+**Diff:** +123 -313 across 5 files
+
+### 2026-08-20 02:35
+
+**Areas:** general
+**Files (20):** .buzz/.scratch/standup-2026-08-14.md, .buzz/.scratch/standup-2026-08-15-post.md, .buzz/.scratch/standup-2026-08-15.md, .buzz/OUTBOX/2026-08-16-standup-correction.md, .buzz/OUTBOX/2026-08-16-standup.md, .buzz/RESEARCH/NN_SIGNAGE_TOPOLOGY.md, .buzz/harness/debug/buzz-acp, .buzz/harness/ollama-coordinator, .buzz/harness/ollama-qwen, .buzz/harness/qwen-acp/buzz-acp, .buzz/harness/qwen-acp/claude-agent-acp, .buzz/ops/PLAN.md, .buzz/ops/README.md, .buzz/ops/brief.sh, .buzz/ops/lib/bz-bot.sh, .buzz/ops/lib/bz-bumble.sh, .buzz/ops/lib/bz-honey.sh, .buzz/ops/lib/bz-owner.sh, .buzz/ops/lib/common.sh, .buzz/ops/runner.sh
+**Diff:** +117 -313 across 5 files
+
+### 2026-08-20 02:18
+
+**Areas:** general
+**Files (20):** .buzz/.scratch/standup-2026-08-14.md, .buzz/.scratch/standup-2026-08-15-post.md, .buzz/.scratch/standup-2026-08-15.md, .buzz/OUTBOX/2026-08-16-standup-correction.md, .buzz/OUTBOX/2026-08-16-standup.md, .buzz/RESEARCH/NN_SIGNAGE_TOPOLOGY.md, .buzz/harness/debug/buzz-acp, .buzz/harness/ollama-coordinator, .buzz/harness/ollama-qwen, .buzz/harness/qwen-acp/buzz-acp, .buzz/harness/qwen-acp/claude-agent-acp, .buzz/ops/PLAN.md, .buzz/ops/README.md, .buzz/ops/brief.sh, .buzz/ops/lib/bz-bot.sh, .buzz/ops/lib/bz-bumble.sh, .buzz/ops/lib/bz-honey.sh, .buzz/ops/lib/bz-owner.sh, .buzz/ops/lib/common.sh, .buzz/ops/runner.sh
+**Diff:** +113 -3 across 4 files
+
+### 2026-08-20 02:16
+
+**Areas:** general
+**Files (20):** .buzz/.scratch/standup-2026-08-14.md, .buzz/.scratch/standup-2026-08-15-post.md, .buzz/.scratch/standup-2026-08-15.md, .buzz/OUTBOX/2026-08-16-standup-correction.md, .buzz/OUTBOX/2026-08-16-standup.md, .buzz/RESEARCH/NN_SIGNAGE_TOPOLOGY.md, .buzz/harness/debug/buzz-acp, .buzz/harness/ollama-coordinator, .buzz/harness/ollama-qwen, .buzz/harness/qwen-acp/buzz-acp, .buzz/harness/qwen-acp/claude-agent-acp, .buzz/ops/PLAN.md, .buzz/ops/README.md, .buzz/ops/brief.sh, .buzz/ops/lib/bz-bot.sh, .buzz/ops/lib/bz-bumble.sh, .buzz/ops/lib/bz-honey.sh, .buzz/ops/lib/bz-owner.sh, .buzz/ops/lib/common.sh, .buzz/ops/runner.sh
+**Diff:** +107 -3 across 4 files
+
+### 2026-08-20 02:15
+
+**Areas:** general
+**Files (20):** .buzz/.scratch/standup-2026-08-14.md, .buzz/.scratch/standup-2026-08-15-post.md, .buzz/.scratch/standup-2026-08-15.md, .buzz/OUTBOX/2026-08-16-standup-correction.md, .buzz/OUTBOX/2026-08-16-standup.md, .buzz/RESEARCH/NN_SIGNAGE_TOPOLOGY.md, .buzz/harness/debug/buzz-acp, .buzz/harness/ollama-coordinator, .buzz/harness/ollama-qwen, .buzz/harness/qwen-acp/buzz-acp, .buzz/harness/qwen-acp/claude-agent-acp, .buzz/ops/PLAN.md, .buzz/ops/README.md, .buzz/ops/brief.sh, .buzz/ops/lib/bz-bot.sh, .buzz/ops/lib/bz-bumble.sh, .buzz/ops/lib/bz-honey.sh, .buzz/ops/lib/bz-owner.sh, .buzz/ops/lib/common.sh, .buzz/ops/runner.sh
+**Diff:** +101 -3 across 4 files
+
+### 2026-08-20 02:15
+
+**Areas:** general
+**Files (20):** .buzz/.scratch/standup-2026-08-14.md, .buzz/.scratch/standup-2026-08-15-post.md, .buzz/.scratch/standup-2026-08-15.md, .buzz/OUTBOX/2026-08-16-standup-correction.md, .buzz/OUTBOX/2026-08-16-standup.md, .buzz/RESEARCH/NN_SIGNAGE_TOPOLOGY.md, .buzz/harness/debug/buzz-acp, .buzz/harness/ollama-coordinator, .buzz/harness/ollama-qwen, .buzz/harness/qwen-acp/buzz-acp, .buzz/harness/qwen-acp/claude-agent-acp, .buzz/ops/PLAN.md, .buzz/ops/README.md, .buzz/ops/brief.sh, .buzz/ops/lib/bz-bot.sh, .buzz/ops/lib/bz-bumble.sh, .buzz/ops/lib/bz-honey.sh, .buzz/ops/lib/bz-owner.sh, .buzz/ops/lib/common.sh, .buzz/ops/runner.sh
+**Diff:** +95 -3 across 3 files
+
 ### 2026-08-20 02:05
 
 **Areas:** general
