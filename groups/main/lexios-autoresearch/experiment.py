@@ -19,7 +19,7 @@ import time
 from pathlib import Path
 
 # ── EXPERIMENT CONFIG (agent edits this section) ─────────────────────────────
-EXPERIMENT_NAME = "exp-add-missing-mep-categories-equipment-plumbing-sprinklers"
+EXPERIMENT_NAME = "exp-raise-room-door-window-per-image-cap-45-to-70"
 DESCRIPTION = (
     "Tonight's 4th slot (2026-08-17). Baseline to beat: this file's on-disk "
     "state going in is slot 2's kept soft-90s-budget edit "
