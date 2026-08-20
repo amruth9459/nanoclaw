@@ -1,0 +1,182 @@
+{
+  "doc_id": "two-story-residential-building",
+  "pdf": "two-story-residential-building.ifc",
+  "doc_type": "residential",
+  "difficulty": "easy",
+  "elements": {
+    "rooms": [
+      {
+        "name": "Room 1.1",
+        "page": 1,
+        "level": "Ground floor"
+      },
+      {
+        "name": "Room 1.2",
+        "page": 1,
+        "level": "Ground floor"
+      },
+      {
+        "name": "Room 1.3",
+        "page": 1,
+        "level": "Ground floor"
+      },
+      {
+        "name": "Room 2.1",
+        "page": 1,
+        "level": "Upper floor"
+      },
+      {
+        "name": "Room 2.2",
+        "page": 1,
+        "level": "Upper floor"
+      },
+      {
+        "name": "Room 2.3",
+        "page": 1,
+        "level": "Upper floor"
+      }
+    ],
+    "slabs": [
+      {
+        "page": 1,
+        "type": "Base slab",
+        "location": "Ground floor"
+      },
+      {
+        "page": 1,
+        "type": "First floor slab",
+        "location": "Upper floor"
+      }
+    ],
+    "stairs_elevators": [
+      {
+        "location": "Central area",
+        "type": "stair",
+        "floors_served": 2,
+        "page": 1
+      }
+    ],
+    "title_block": [
+      {
+        "project_name": "two-story-residential-ifc4",
+        "drawing_number": "IFC Plan View",
+        "page": 1
+      }
+    ],
+    "wall_types": [
+      {
+        "page": 1,
+        "type_id": "South wall, ground floor"
+      },
+      {
+        "page": 1,
+        "type_id": "Inner wall, ground floor"
+      },
+      {
+        "page": 1,
+        "type_id": "North wall, ground floor"
+      },
+      {
+        "page": 1,
+        "type_id": "West wall, ground floor"
+      },
+      {
+        "page": 1,
+        "type_id": "East wall, ground floor"
+      },
+      {
+        "page": 1,
+        "type_id": "South wall, upper floor"
+      },
+      {
+        "page": 1,
+        "type_id": "Inner wall, upper floor"
+      },
+      {
+        "page": 1,
+        "type_id": "North wall, upper floor"
+      },
+      {
+        "page": 1,
+        "type_id": "West wall, upper floor"
+      },
+      {
+        "page": 1,
+        "type_id": "East wall, upper floor"
+      }
+    ]
+  },
+  "gt_is_minimum": true,
+  "consensus_stats": {
+    "models": 4,
+    "auto_included": 20,
+    "flagged": 5
+  },
+  "flagged": [
+    {
+      "category": "dimensions",
+      "element": {
+        "description": "overall building width",
+        "between": "left wall to right wall",
+        "page": 1
+      },
+      "reason": "single_model_only",
+      "models": [
+        "gpt4.1"
+      ]
+    },
+    {
+      "category": "doors",
+      "element": {
+        "type": "single",
+        "swing": "right",
+        "location": "between main room and right room",
+        "page": 1
+      },
+      "reason": "single_model_only",
+      "models": [
+        "gpt4.1"
+      ]
+    },
+    {
+      "category": "windows",
+      "element": {
+        "location": "top left wall of main room",
+        "page": 1
+      },
+      "reason": "single_model_only",
+      "models": [
+        "gpt4.1"
+      ]
+    },
+    {
+      "category": "windows",
+      "element": {
+        "location": "top right wall of right room",
+        "page": 1
+      },
+      "reason": "single_model_only",
+      "models": [
+        "gpt4.1"
+      ]
+    },
+    {
+      "category": "windows",
+      "element": {
+        "location": "right wall of right room",
+        "page": 1
+      },
+      "reason": "single_model_only",
+      "models": [
+        "gpt4.1"
+      ]
+    }
+  ],
+  "built_at": "2026-03-13T19:47:56.472191",
+  "models_used": [
+    "ifc_programmatic",
+    "claude",
+    "gpt4.1",
+    "gemini"
+  ]
+}

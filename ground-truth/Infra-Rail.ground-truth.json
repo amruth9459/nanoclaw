@@ -1,0 +1,452 @@
+{
+  "doc_id": "Infra-Rail",
+  "pdf": "Infra-Rail.ifc",
+  "doc_type": "infrastructure",
+  "difficulty": "easy",
+  "gt_source": "ifc_programmatic",
+  "ifc_elements": 73,
+  "elements": {
+    "site_elements": [
+      {
+        "type": "IFCBUILDINGELEMENTPROXY",
+        "name": "rail",
+        "tag": "3Ixq0Ala",
+        "location": ""
+      },
+      {
+        "type": "IFCBUILDINGELEMENTPROXY",
+        "name": "rail",
+        "tag": "0gOEB3nv",
+        "location": ""
+      },
+      {
+        "type": "IFCBUILDINGELEMENTPROXY",
+        "name": "ballastbed",
+        "tag": "2VSzSEJi",
+        "location": ""
+      },
+      {
+        "type": "IFCBUILDINGELEMENTPROXY",
+        "name": "sleeper wood",
+        "tag": "0mApyqgb",
+        "location": ""
+      },
+      {
+        "type": "IFCBUILDINGELEMENTPROXY",
+        "name": "sleeper wood",
+        "tag": "1gG3H$M4",
+        "location": ""
+      },
+      {
+        "type": "IFCBUILDINGELEMENTPROXY",
+        "name": "sleeper wood",
+        "tag": "2pFyoP4c",
+        "location": ""
+      },
+      {
+        "type": "IFCBUILDINGELEMENTPROXY",
+        "name": "sleeper wood",
+        "tag": "0LmYrpL3",
+        "location": ""
+      },
+      {
+        "type": "IFCBUILDINGELEMENTPROXY",
+        "name": "sleeper wood",
+        "tag": "3CF5zUVr",
+        "location": ""
+      },
+      {
+        "type": "IFCBUILDINGELEMENTPROXY",
+        "name": "sleeper wood",
+        "tag": "1jPuNq33",
+        "location": ""
+      },
+      {
+        "type": "IFCBUILDINGELEMENTPROXY",
+        "name": "sleeper wood",
+        "tag": "2hC6KuMW",
+        "location": ""
+      },
+      {
+        "type": "IFCBUILDINGELEMENTPROXY",
+        "name": "sleeper wood",
+        "tag": "3ooxVTKo",
+        "location": ""
+      },
+      {
+        "type": "IFCBUILDINGELEMENTPROXY",
+        "name": "sleeper wood",
+        "tag": "3QRjVXoH",
+        "location": ""
+      },
+      {
+        "type": "IFCBUILDINGELEMENTPROXY",
+        "name": "sleeper wood",
+        "tag": "1A14NvUh",
+        "location": ""
+      },
+      {
+        "type": "IFCBUILDINGELEMENTPROXY",
+        "name": "sleeper wood",
+        "tag": "0rTKpqwf",
+        "location": ""
+      },
+      {
+        "type": "IFCBUILDINGELEMENTPROXY",
+        "name": "sleeper wood",
+        "tag": "0bjxY5ed",
+        "location": ""
+      },
+      {
+        "type": "IFCBUILDINGELEMENTPROXY",
+        "name": "sleeper wood",
+        "tag": "1p7IOkE9",
+        "location": ""
+      },
+      {
+        "type": "IFCBUILDINGELEMENTPROXY",
+        "name": "sleeper wood",
+        "tag": "0X2A_iiN",
+        "location": ""
+      },
+      {
+        "type": "IFCBUILDINGELEMENTPROXY",
+        "name": "sleeper wood",
+        "tag": "240DDX4Z",
+        "location": ""
+      },
+      {
+        "type": "IFCBUILDINGELEMENTPROXY",
+        "name": "sleeper wood",
+        "tag": "0SNcQbys",
+        "location": ""
+      },
+      {
+        "type": "IFCBUILDINGELEMENTPROXY",
+        "name": "sleeper wood",
+        "tag": "1KgKJls3",
+        "location": ""
+      },
+      {
+        "type": "IFCBUILDINGELEMENTPROXY",
+        "name": "sleeper wood",
+        "tag": "3b4O_fC9",
+        "location": ""
+      },
+      {
+        "type": "IFCBUILDINGELEMENTPROXY",
+        "name": "sleeper wood",
+        "tag": "20FBV5Tc",
+        "location": ""
+      },
+      {
+        "type": "IFCBUILDINGELEMENTPROXY",
+        "name": "sleeper wood",
+        "tag": "1J8_j1nR",
+        "location": ""
+      },
+      {
+        "type": "IFCBUILDINGELEMENTPROXY",
+        "name": "sleeper wood",
+        "tag": "3jf03qOP",
+        "location": ""
+      },
+      {
+        "type": "IFCBUILDINGELEMENTPROXY",
+        "name": "sleeper wood",
+        "tag": "2SCufMLT",
+        "location": ""
+      },
+      {
+        "type": "IFCBUILDINGELEMENTPROXY",
+        "name": "sleeper wood",
+        "tag": "3BWkltsL",
+        "location": ""
+      },
+      {
+        "type": "IFCBUILDINGELEMENTPROXY",
+        "name": "sleeper wood",
+        "tag": "0NjD4eL$",
+        "location": ""
+      },
+      {
+        "type": "IFCBUILDINGELEMENTPROXY",
+        "name": "sleeper wood",
+        "tag": "0y55PkXX",
+        "location": ""
+      },
+      {
+        "type": "IFCBUILDINGELEMENTPROXY",
+        "name": "sleeper wood",
+        "tag": "1DlyW6vE",
+        "location": ""
+      },
+      {
+        "type": "IFCBUILDINGELEMENTPROXY",
+        "name": "sleeper wood",
+        "tag": "3yQtEGRL",
+        "location": ""
+      },
+      {
+        "type": "IFCBUILDINGELEMENTPROXY",
+        "name": "sleeper wood",
+        "tag": "2mQystxX",
+        "location": ""
+      },
+      {
+        "type": "IFCBUILDINGELEMENTPROXY",
+        "name": "sleeper wood",
+        "tag": "2aNIR9HK",
+        "location": ""
+      },
+      {
+        "type": "IFCBUILDINGELEMENTPROXY",
+        "name": "sleeper wood",
+        "tag": "2dSJ10Gx",
+        "location": ""
+      },
+      {
+        "type": "IFCBUILDINGELEMENTPROXY",
+        "name": "sleeper wood",
+        "tag": "225m02QH",
+        "location": ""
+      },
+      {
+        "type": "IFCBUILDINGELEMENTPROXY",
+        "name": "sleeper wood",
+        "tag": "2HKuqlX7",
+        "location": ""
+      },
+      {
+        "type": "IFCBUILDINGELEMENTPROXY",
+        "name": "sleeper wood",
+        "tag": "3615LYII",
+        "location": ""
+      },
+      {
+        "type": "IFCBUILDINGELEMENTPROXY",
+        "name": "rail",
+        "tag": "14O93KCH",
+        "location": ""
+      },
+      {
+        "type": "IFCBUILDINGELEMENTPROXY",
+        "name": "rail",
+        "tag": "2$czTi6G",
+        "location": ""
+      },
+      {
+        "type": "IFCBUILDINGELEMENTPROXY",
+        "name": "ballastbed",
+        "tag": "29NeQDl9",
+        "location": ""
+      },
+      {
+        "type": "IFCBUILDINGELEMENTPROXY",
+        "name": "sleeper wood",
+        "tag": "2G0mFQhK",
+        "location": ""
+      },
+      {
+        "type": "IFCBUILDINGELEMENTPROXY",
+        "name": "sleeper wood",
+        "tag": "1Hb6PCbl",
+        "location": ""
+      },
+      {
+        "type": "IFCBUILDINGELEMENTPROXY",
+        "name": "sleeper wood",
+        "tag": "15Q88nz5",
+        "location": ""
+      },
+      {
+        "type": "IFCBUILDINGELEMENTPROXY",
+        "name": "sleeper wood",
+        "tag": "0JskQH3C",
+        "location": ""
+      },
+      {
+        "type": "IFCBUILDINGELEMENTPROXY",
+        "name": "sleeper wood",
+        "tag": "1dc6DrbT",
+        "location": ""
+      },
+      {
+        "type": "IFCBUILDINGELEMENTPROXY",
+        "name": "sleeper wood",
+        "tag": "3eijguL1",
+        "location": ""
+      },
+      {
+        "type": "IFCBUILDINGELEMENTPROXY",
+        "name": "sleeper wood",
+        "tag": "2xpMIc_0",
+        "location": ""
+      },
+      {
+        "type": "IFCBUILDINGELEMENTPROXY",
+        "name": "sleeper wood",
+        "tag": "3qB7jvnz",
+        "location": ""
+      },
+      {
+        "type": "IFCBUILDINGELEMENTPROXY",
+        "name": "sleeper wood",
+        "tag": "2vvVUDLq",
+        "location": ""
+      },
+      {
+        "type": "IFCBUILDINGELEMENTPROXY",
+        "name": "sleeper wood",
+        "tag": "0v0w97H9",
+        "location": ""
+      },
+      {
+        "type": "IFCBUILDINGELEMENTPROXY",
+        "name": "sleeper wood",
+        "tag": "1j_ofp0_",
+        "location": ""
+      },
+      {
+        "type": "IFCBUILDINGELEMENTPROXY",
+        "name": "sleeper wood",
+        "tag": "3a7SkZ5A",
+        "location": ""
+      },
+      {
+        "type": "IFCBUILDINGELEMENTPROXY",
+        "name": "sleeper wood",
+        "tag": "1VhaT3K8",
+        "location": ""
+      },
+      {
+        "type": "IFCBUILDINGELEMENTPROXY",
+        "name": "sleeper wood",
+        "tag": "0W$6qwCi",
+        "location": ""
+      },
+      {
+        "type": "IFCBUILDINGELEMENTPROXY",
+        "name": "sleeper wood",
+        "tag": "0BRh6j4b",
+        "location": ""
+      },
+      {
+        "type": "IFCBUILDINGELEMENTPROXY",
+        "name": "sleeper wood",
+        "tag": "0xoA7NQg",
+        "location": ""
+      },
+      {
+        "type": "IFCBUILDINGELEMENTPROXY",
+        "name": "sleeper wood",
+        "tag": "0l0npIYp",
+        "location": ""
+      },
+      {
+        "type": "IFCBUILDINGELEMENTPROXY",
+        "name": "sleeper wood",
+        "tag": "28xYqtZ4",
+        "location": ""
+      },
+      {
+        "type": "IFCBUILDINGELEMENTPROXY",
+        "name": "sleeper wood",
+        "tag": "1qU3xMaZ",
+        "location": ""
+      },
+      {
+        "type": "IFCBUILDINGELEMENTPROXY",
+        "name": "sleeper wood",
+        "tag": "30nYk7ZU",
+        "location": ""
+      },
+      {
+        "type": "IFCBUILDINGELEMENTPROXY",
+        "name": "sleeper wood",
+        "tag": "2fLDxlSJ",
+        "location": ""
+      },
+      {
+        "type": "IFCBUILDINGELEMENTPROXY",
+        "name": "sleeper wood",
+        "tag": "3A9NNgob",
+        "location": ""
+      },
+      {
+        "type": "IFCBUILDINGELEMENTPROXY",
+        "name": "sleeper wood",
+        "tag": "0KPcs1y3",
+        "location": ""
+      },
+      {
+        "type": "IFCBUILDINGELEMENTPROXY",
+        "name": "sleeper wood",
+        "tag": "3qFv979e",
+        "location": ""
+      },
+      {
+        "type": "IFCBUILDINGELEMENTPROXY",
+        "name": "sleeper wood",
+        "tag": "2ea9Ntvw",
+        "location": ""
+      },
+      {
+        "type": "IFCBUILDINGELEMENTPROXY",
+        "name": "sleeper wood",
+        "tag": "1TPGJrtG",
+        "location": ""
+      },
+      {
+        "type": "IFCBUILDINGELEMENTPROXY",
+        "name": "sleeper wood",
+        "tag": "3PcU1ZuF",
+        "location": ""
+      },
+      {
+        "type": "IFCBUILDINGELEMENTPROXY",
+        "name": "sleeper wood",
+        "tag": "0dRF_swO",
+        "location": ""
+      },
+      {
+        "type": "IFCBUILDINGELEMENTPROXY",
+        "name": "sleeper wood",
+        "tag": "1XcDIiNy",
+        "location": ""
+      },
+      {
+        "type": "IFCBUILDINGELEMENTPROXY",
+        "name": "sleeper wood",
+        "tag": "2UXPKrUx",
+        "location": ""
+      },
+      {
+        "type": "IFCBUILDINGELEMENTPROXY",
+        "name": "sleeper wood",
+        "tag": "1o4sQbZY",
+        "location": ""
+      },
+      {
+        "type": "IFCBUILDINGELEMENTPROXY",
+        "name": "sleeper wood",
+        "tag": "1_XScBOS",
+        "location": ""
+      },
+      {
+        "type": "IFCBUILDINGELEMENTPROXY",
+        "name": "sleeper wood",
+        "tag": "3_fqSk$j",
+        "location": ""
+      },
+      {
+        "type": "IFCBUILDINGELEMENTPROXY",
+        "name": "geo-reference",
+        "tag": "3Fit2Fad",
+        "location": ""
+      }
+    ]
+  },
+  "gt_is_minimum": true,
+  "built_at": "2026-04-14T09:38:55.722614"
+}

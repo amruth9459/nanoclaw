@@ -52,3 +52,7 @@ scripts/lexios-tests/corpus/
 .nanoclaw/
 
 agents-sdk-docs
+
+# Transient agent worktrees + venvs
+**/.claude/worktrees/
+.venv/

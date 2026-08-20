@@ -1,0 +1,27 @@
+{
+  "id": "compatibility-rules",
+  "category": "compatibility",
+  "sources": [
+    "compatibility-rules.md"
+  ],
+  "created": "2026-04-21T12:13:46.719301",
+  "last_updated": "2026-04-25T14:05:29.652564",
+  "last_confirmed": "2026-04-25T14:05:29.652565",
+  "confidence": 0.4,
+  "version": 2,
+  "status": "active",
+  "claims": [],
+  "entities": [
+    "Moon",
+    "Mars",
+    "Jupiter",
+    "Venus",
+    "7th house",
+    "8th house",
+    "Dusthana",
+    "Manglik"
+  ],
+  "entity_count": 8,
+  "relationship_count": 0,
+  "tier": "semantic"
+}

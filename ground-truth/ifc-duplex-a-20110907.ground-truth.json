@@ -1,0 +1,846 @@
+{
+  "doc_id": "Duplex_A_20110907",
+  "source": "/Users/amrut/Lexios/lexios/corpus/ifc/duplex/Duplex_A_20110907.ifc",
+  "doc_type": "mixed",
+  "difficulty": "medium",
+  "gt_source": "ifc_only",
+  "elements": {
+    "rooms": [
+      {
+        "name": "A101",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "A201",
+        "page": 1,
+        "level": "Level 2"
+      },
+      {
+        "name": "B104",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "B101",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "B201",
+        "page": 1,
+        "level": "Level 2"
+      },
+      {
+        "name": "A205",
+        "page": 1,
+        "level": "Level 2"
+      },
+      {
+        "name": "B205",
+        "page": 1,
+        "level": "Level 2"
+      },
+      {
+        "name": "A105",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "B105",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "R301",
+        "page": 1,
+        "level": "Roof"
+      },
+      {
+        "name": "B102",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "A102",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "A103",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "B103",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "B204",
+        "page": 1,
+        "level": "Level 2"
+      },
+      {
+        "name": "A204",
+        "page": 1,
+        "level": "Level 2"
+      },
+      {
+        "name": "A104",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "B203",
+        "page": 1,
+        "level": "Level 2"
+      },
+      {
+        "name": "A202",
+        "page": 1,
+        "level": "Level 2"
+      },
+      {
+        "name": "B202",
+        "page": 1,
+        "level": "Level 2"
+      },
+      {
+        "name": "A203",
+        "page": 1,
+        "level": "Level 2"
+      }
+    ],
+    "doors": [
+      {
+        "page": 1,
+        "tag": "146596",
+        "size": "49.2x79.1",
+        "type": "OperationType",
+        "location": "Level 1",
+        "fire_rating": "Fire Rating"
+      },
+      {
+        "page": 1,
+        "tag": "146678",
+        "size": "49.2x79.1",
+        "type": "OperationType",
+        "location": "Level 1",
+        "fire_rating": "Fire Rating"
+      },
+      {
+        "page": 1,
+        "tag": "150173",
+        "size": "30.0x80.0",
+        "type": "OperationType",
+        "location": "Level 1",
+        "fire_rating": "Fire Rating"
+      },
+      {
+        "page": 1,
+        "tag": "150257",
+        "size": "30.0x80.0",
+        "type": "OperationType",
+        "location": "Level 1",
+        "fire_rating": "Fire Rating"
+      },
+      {
+        "page": 1,
+        "tag": "150378",
+        "size": "34.0x80.0",
+        "type": "OperationType",
+        "location": "Level 2",
+        "fire_rating": "Fire Rating"
+      },
+      {
+        "page": 1,
+        "tag": "150478",
+        "size": "34.0x80.0",
+        "type": "OperationType",
+        "location": "Level 2",
+        "fire_rating": "Fire Rating"
+      },
+      {
+        "page": 1,
+        "tag": "159734",
+        "size": "34.0x80.0",
+        "type": "OperationType",
+        "location": "Level 2",
+        "fire_rating": "Fire Rating"
+      },
+      {
+        "page": 1,
+        "tag": "159834",
+        "size": "34.0x80.0",
+        "type": "OperationType",
+        "location": "Level 2",
+        "fire_rating": "Fire Rating"
+      },
+      {
+        "page": 1,
+        "tag": "160065",
+        "size": "34.0x80.0",
+        "type": "OperationType",
+        "location": "Level 2",
+        "fire_rating": "Fire Rating"
+      },
+      {
+        "page": 1,
+        "tag": "160208",
+        "size": "34.0x80.0",
+        "type": "OperationType",
+        "location": "Level 2",
+        "fire_rating": "Fire Rating"
+      },
+      {
+        "page": 1,
+        "tag": "171853",
+        "size": "32.0x95.3",
+        "type": "OperationType",
+        "location": "Level 1",
+        "fire_rating": "Fire Rating"
+      },
+      {
+        "page": 1,
+        "tag": "171975",
+        "size": "32.0x95.3",
+        "type": "OperationType",
+        "location": "Level 1",
+        "fire_rating": "Fire Rating"
+      },
+      {
+        "page": 1,
+        "tag": "203720",
+        "size": "30.0x80.0",
+        "type": "OperationType",
+        "location": "Level 2",
+        "fire_rating": "Fire Rating"
+      },
+      {
+        "page": 1,
+        "tag": "204034",
+        "size": "30.0x80.0",
+        "type": "OperationType",
+        "location": "Level 2",
+        "fire_rating": "Fire Rating"
+      }
+    ],
+    "windows": [
+      {
+        "page": 1,
+        "tag": "145788",
+        "size": "190.4x95.3",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "146016",
+        "size": "190.4x95.3",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "146885",
+        "size": "29.5x86.6",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "147051",
+        "size": "29.5x86.6",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "147686",
+        "size": "110.2x94.9",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "147994",
+        "size": "32.2x29.9",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "148607",
+        "size": "32.2x29.9",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "148722",
+        "size": "32.2x29.9",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "149278",
+        "size": "110.2x94.9",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "149537",
+        "size": "32.2x29.9",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "149736",
+        "size": "32.2x29.9",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "149924",
+        "size": "32.2x29.9",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "180318",
+        "size": "110.2x94.9",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "180663",
+        "size": "32.2x29.9",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "180864",
+        "size": "32.2x29.9",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "180994",
+        "size": "32.2x29.9",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "181096",
+        "size": "110.2x94.9",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "181285",
+        "size": "32.2x29.9",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "181548",
+        "size": "32.2x29.9",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "181583",
+        "size": "32.2x29.9",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "181930",
+        "size": "29.5x86.6",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "182101",
+        "size": "29.5x86.6",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "185337",
+        "size": "46.2x25.0",
+        "location": "Roof"
+      },
+      {
+        "page": 1,
+        "tag": "185718",
+        "size": "46.2x25.0",
+        "location": "Roof"
+      }
+    ],
+    "wall_types": [
+      {
+        "page": 1,
+        "type_id": "Basic Wall:Party Wall - CMU Residential Unit Dimising Wall:143239",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type_id": "Basic Wall:Interior - Partition (92mm Stud):138584",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type_id": "Basic Wall:Party Wall - CMU Residential Unit Dimising Wall:139234",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type_id": "Basic Wall:Party Wall - CMU Residential Unit Dimising Wall:139347",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type_id": "Basic Wall:Party Wall - CMU Residential Unit Dimising Wall:139374",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type_id": "Basic Wall:Interior - Partition (92mm Stud):139783",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type_id": "Basic Wall:Interior - Partition (92mm Stud):139939",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type_id": "Basic Wall:Foundation - Concrete (417mm):140479",
+        "location": "T/FDN"
+      },
+      {
+        "page": 1,
+        "type_id": "Basic Wall:Foundation - Concrete (417mm):140520",
+        "location": "T/FDN"
+      },
+      {
+        "page": 1,
+        "type_id": "Basic Wall:Foundation - Concrete (417mm):140554",
+        "location": "T/FDN"
+      },
+      {
+        "page": 1,
+        "type_id": "Basic Wall:Foundation - Concrete (417mm):140602",
+        "location": "T/FDN"
+      },
+      {
+        "page": 1,
+        "type_id": "Basic Wall:Foundation - Concrete (435mm):140913",
+        "location": "T/FDN"
+      },
+      {
+        "page": 1,
+        "type_id": "Basic Wall:Foundation - Concrete (435mm):140987",
+        "location": "T/FDN"
+      },
+      {
+        "page": 1,
+        "type_id": "Basic Wall:Foundation - Concrete (435mm):141018",
+        "location": "T/FDN"
+      },
+      {
+        "page": 1,
+        "type_id": "Basic Wall:Interior - Plumbing (152mm Stud):144138",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type_id": "Basic Wall:Interior - Partition (92mm Stud):144301",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type_id": "Basic Wall:Interior - Partition (92mm Stud):144684",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type_id": "Basic Wall:Interior - Plumbing (152mm Stud):144783",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type_id": "Basic Wall:Exterior - Brick on Block:138157",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type_id": "Basic Wall:Exterior - Brick on Block:138310",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type_id": "Basic Wall:Exterior - Brick on Block:143410",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type_id": "Basic Wall:Exterior - Brick on Block:143534",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type_id": "Basic Wall:Interior - Partition (92mm Stud):139682",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type_id": "Basic Wall:Interior - Partition (92mm Stud):139143",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type_id": "Basic Wall:Interior - Partition (92mm Stud):143856",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type_id": "Basic Wall:Interior - Partition (92mm Stud):144518",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type_id": "Basic Wall:Interior - Partition (92mm Stud):143960",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type_id": "Basic Wall:Interior - Partition (92mm Stud):144633",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type_id": "Basic Wall:Interior - Partition (92mm Stud):143921",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type_id": "Basic Wall:Interior - Partition (92mm Stud):144586",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type_id": "Basic Wall:Exterior - Brick on Block:138062",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type_id": "Basic Wall:Exterior - Brick on Block:138237",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type_id": "Basic Wall:Exterior - Brick on Block:143478",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type_id": "Basic Wall:Exterior - Brick on Block:143590",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type_id": "Basic Wall:Exterior - Brick on Block:184944",
+        "location": "Roof"
+      },
+      {
+        "page": 1,
+        "type_id": "Basic Wall:Exterior - Brick on Block:185014",
+        "location": "Roof"
+      },
+      {
+        "page": 1,
+        "type_id": "Basic Wall:Exterior - Brick on Block:185064",
+        "location": "Roof"
+      },
+      {
+        "page": 1,
+        "type_id": "Basic Wall:Exterior - Brick on Block:185101",
+        "location": "Roof"
+      },
+      {
+        "page": 1,
+        "type_id": "Basic Wall:Interior - Furring (152 mm Stud):189074",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type_id": "Basic Wall:Interior - Furring (152 mm Stud):189901",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type_id": "Basic Wall:Interior - Partition (92mm Stud):190140",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type_id": "Basic Wall:Interior - Furring (152 mm Stud):190774",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type_id": "Basic Wall:Interior - Furring (152 mm Stud):190933",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type_id": "Basic Wall:Interior - Furring (152 mm Stud):193247",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type_id": "Basic Wall:Interior - Furring (152 mm Stud):194166",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type_id": "Basic Wall:Interior - Partition (92mm Stud):203347",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type_id": "Basic Wall:Interior - Partition (92mm Stud):203998",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type_id": "Basic Wall:Interior - Partition (92mm Stud):204300",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type_id": "Basic Wall:Interior - Partition (92mm Stud):204493",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type_id": "Basic Wall:Interior - Furring (38 mm Stud):217414",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type_id": "Basic Wall:Interior - Furring (38 mm Stud):217415",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type_id": "Basic Wall:Interior - Furring (38 mm Stud):217416",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type_id": "Basic Wall:Interior - Furring (38 mm Stud):217417",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type_id": "Basic Wall:Interior - Furring (38 mm Stud):217577",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type_id": "Basic Wall:Interior - Furring (38 mm Stud):217578",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type_id": "Basic Wall:Interior - Furring (38 mm Stud):217579",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type_id": "Basic Wall:Interior - Furring (38 mm Stud):217580",
+        "location": "Level 2"
+      }
+    ],
+    "beams": [
+      {
+        "page": 1,
+        "tag": "207325",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "208949",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "209121",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "209166",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "209260",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "209261",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "209262",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "209263",
+        "location": "Level 2"
+      }
+    ],
+    "slabs": [
+      {
+        "page": 1,
+        "type": "Floor:127mm Slab on Grade:141232",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Floor:127mm Slab on Grade:143106",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Floor:Residential - Wood Joist with Subflooring:144800",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Floor:Residential - Wood Joist with Subflooring:144872",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Floor:Finish Floor - Wood:169093",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Floor:Finish Floor - Wood:169188",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Floor:Finish Floor - Wood:169308",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Floor:Finish Floor - Wood:169354",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Floor:Finish Floor - Wood:169395",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Floor:Finish Floor - Wood:169701",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Floor:Finish Floor - Ceramic Tile:169772",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Floor:Finish Floor - Ceramic Tile:169866",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Floor:Finish Floor - Wood:170352",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Floor:Finish Floor - Ceramic Tile:170785",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Floor:Finish Floor - Ceramic Tile:171230",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Floor:Finish Floor - Ceramic Tile:171261",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Floor:Finish Floor - Wood:171292",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Floor:Finish Floor - Ceramic Tile:171444",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Basic Roof:Live Roof over Wood Joist Flat Roof:184483",
+        "location": "Roof"
+      },
+      {
+        "page": 1,
+        "type": "Floor:150mm Exterior Slab on Grade:216507",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Floor:150mm Exterior Slab on Grade:216552",
+        "location": "Level 1"
+      }
+    ],
+    "stairs_elevators": [
+      {
+        "page": 1,
+        "type": "Stair:Residential - 200mm Max Riser 250mm Tread:151086",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Stair:Residential - 200mm Max Riser 250mm Tread:198878",
+        "location": "Level 1"
+      }
+    ],
+    "railings_guards": [
+      {
+        "page": 1,
+        "type": "Railing:900mm Handrail Only:151162",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Railing:1100mm Guard Rail:151166",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Railing:900mm Handrail Only:198880",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Railing:1100mm Guard Rail:198972",
+        "location": "Level 1"
+      }
+    ]
+  }
+}

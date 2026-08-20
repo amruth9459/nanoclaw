@@ -1,0 +1,49 @@
+{
+  "doc_id": "Building_Architecture",
+  "source": "/Users/amrut/Lexios/lexios/corpus/ifc/bsmart/Building-Architecture.ifc",
+  "doc_type": "architectural",
+  "gt_source": "ifc-only",
+  "ifc_elements": 9,
+  "elements": {
+    "rooms": [
+      {
+        "name": "living room",
+        "room_code": "living room",
+        "level": "Unknown"
+      },
+      {
+        "name": "entry hall",
+        "room_code": "entry hall",
+        "level": "Unknown"
+      }
+    ],
+    "wall_types": [
+      {
+        "type_id": "house - outer wall - house right front"
+      },
+      {
+        "type_id": "house - outer wall - house right back"
+      },
+      {
+        "type_id": "house - outer wall - house left"
+      },
+      {
+        "type_id": "plumbing wall"
+      }
+    ],
+    "slabs": [
+      {
+        "type": "house - groundfloor",
+        "location": "00 groundfloor"
+      },
+      {
+        "type": "house - roof - slab left",
+        "location": "Unknown"
+      },
+      {
+        "type": "house - roof - slab right",
+        "location": "Unknown"
+      }
+    ]
+  }
+}

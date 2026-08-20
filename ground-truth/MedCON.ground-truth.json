@@ -1,0 +1,4969 @@
+{
+  "doc_id": "NBU_MedicalClinic_Eng-CON",
+  "source": "lexios/corpus/ifc/medical_clinic/NBU_MedicalClinic_Eng-CON.ifc",
+  "doc_type": "mixed",
+  "difficulty": "medium",
+  "gt_source": "ifc+vision",
+  "ifc_elements": 976,
+  "vision_elements": 17,
+  "elements": {
+    "beams": [
+      {
+        "page": 1,
+        "tag": "190021",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "189738",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "181131",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "179075",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "179369",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "177809",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "178143",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "177817",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "179382",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "180695",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "180050",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "179684",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "179500",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "179671",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "177792",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "189060",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "178159",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "190133",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "180472",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "181182",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "186361",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "178810",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "178975",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "180074",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "178062",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "179698",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "179710",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "181365",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "177952",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "179475",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "177805",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "242096",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "242236",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "178999",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "187462",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "225399",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "177919",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "177907",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "177778",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "180062",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "180036",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "182190",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "179528",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "179487",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "186639",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "242235",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "180505",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "184107",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "187012",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "178516",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "184095",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "187002",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "241554",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "181016",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "242219",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "180494",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "178988",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "178598",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "178016",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "179461",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "182177",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "179953",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "177763",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "177272",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "186992",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "177965",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "183838",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "184082",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "187816",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "181753",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "180598",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "177747",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "186617",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "178202",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "179513",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "180750",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "187763",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "183849",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "180117",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "178824",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "178172",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "186628",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "179447",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "177840",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "182149",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "180483",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "187694",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "182215",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "180459",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "178588",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "178002",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "182203",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "183098",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "177874",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "187774",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "179722",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "186606",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "186981",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "178101",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "180933",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "183127",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "181029",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "225544",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "183141",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "187827",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "179747",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "181912",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "182109",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "216329",
+        "location": "Roof - Main"
+      },
+      {
+        "page": 1,
+        "tag": "178850",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "180320",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "187022",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "186459",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "178216",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "182083",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "241862",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "179406",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "180090",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "179429",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "187045",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "180975",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "183712",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "187056",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "177193",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "181861",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "179060",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "180520",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "218228",
+        "location": "Roof - Main"
+      },
+      {
+        "page": 1,
+        "tag": "180332",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "181798",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "177240",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "241450",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "179545",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "179735",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "183934",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "182315",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "178474",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "177405",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "184119",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "182785",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "177866",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "182771",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "182280",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "216322",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "179419",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "180920",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "177733",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "180342",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "183154",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "179937",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "218671",
+        "location": "Roof - Main"
+      },
+      {
+        "page": 1,
+        "tag": "179394",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "177307",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "187034",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "183764",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "178236",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "182742",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "183738",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "187794",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "183919",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "177687",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "202098",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "178835",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "178117",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "182136",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "178284",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "180946",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "184059",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "181117",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "216328",
+        "location": "Roof - Main"
+      },
+      {
+        "page": 1,
+        "tag": "180988",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "183823",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "182003",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "178076",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "181992",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "183751",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "183033",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "216318",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "182031",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "177894",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "183726",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "177826",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "183226",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "216319",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "183167",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "180824",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "178863",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "216327",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "178130",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "181900",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "187784",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "216923",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "218382",
+        "location": "Roof - Main"
+      },
+      {
+        "page": 1,
+        "tag": "177851",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "216324",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "186469",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "180279",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "178109",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "180352",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "182014",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "187805",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "183811",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "182267",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "181936",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "180103",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "183242",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "182796",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "182123",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "183020",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "187440",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "181981",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "216312",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "181835",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "182835",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "180309",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "184072",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "207088",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "180294",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "181886",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "181786",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "181811",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "216308",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "182304",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "216321",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "216325",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "183698",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "182992",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "181823",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "183211",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "177710",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "205745",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "201030",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "216295",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "207856",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "177343",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "178093",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "181923",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "218867",
+        "location": "Roof - Main"
+      },
+      {
+        "page": 1,
+        "tag": "182910",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "187451",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "178308",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "216297",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "205846",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "180168",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "182979",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "211118",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "216326",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "181873",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "216316",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "214899",
+        "location": "Roof - Main"
+      },
+      {
+        "page": 1,
+        "tag": "216296",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "216310",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "182822",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "181848",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "181968",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "208138",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "216309",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "180262",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "210563",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "216313",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "181773",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "216311",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "211625",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "208732",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "183395",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "182965",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "183487",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "202947",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "212755",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "216314",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "214391",
+        "location": "Roof - Main"
+      },
+      {
+        "page": 1,
+        "tag": "209372",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "213506",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "208533",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "214217",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "213000",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "208761",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "220116",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "220117",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "225612",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "220100",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "220081",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "189399",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "225467",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "189397",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "225611",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "185401",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "185451",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "220080",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "185266",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "185267",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "220027",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "189395",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "220118",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "189398",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "189623",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "185555",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "189620",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "228924",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "190259",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "220061",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "220060",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "225615",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "185400",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "185287",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "185450",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "189973",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "220097",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "185556",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "185269",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "185362",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "185557",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "190260",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "185553",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "231532",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "228926",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "185558",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "189657",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "220062",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "225471",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "190262",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "185740",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "185286",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "185268",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "225613",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "220112",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "189396",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "225473",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "189434",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "189433",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "189725",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "190338",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "220098",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "189970",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "231536",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "185492",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "189464",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "220101",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "220114",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "189400",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "228928",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "225616",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "220063",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "189411",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "189429",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "189968",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "220113",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "185399",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "185437",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "220045",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "189608",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "185772",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "189413",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "186278",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "231535",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "228920",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "185773",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "189637",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "220083",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "190339",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "220025",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "220082",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "186277",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "185538",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "185491",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "189853",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "220028",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "189727",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "220023",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "189707",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "185453",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "185435",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "225472",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "225468",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "228922",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "185739",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "190263",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "220099",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "231531",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "189622",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "220022",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "186279",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "225614",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "185534",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "190336",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "220043",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "220026",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "231533",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "188687",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "220049",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "189415",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "185554",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "186266",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "220007",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "189331",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "189955",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "189969",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "185285",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "189619",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "220065",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "189956",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "185736",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "225617",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "189462",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "185738",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "189636",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "185398",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "189414",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "185769",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "189671",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "225470",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "186263",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "189670",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "188689",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "189639",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "189972",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "189669",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "185288",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "190337",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "185668",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "220024",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "189705",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "185774",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "185490",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "189640",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "189854",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "188688",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "190261",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "185824",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "231534",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "185735",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "220047",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "185434",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "185669",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "189635",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "220096",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "189668",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "220001",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "189306",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "189431",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "188686",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "189412",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "189724",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "185539",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "220066",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "189654",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "186281",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "185752",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "185756",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "185632",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "189428",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "219950",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "225469",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "219990",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "189706",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "188723",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "185631",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "185537",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "189465",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "185535",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "186299",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "189730",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "190335",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "190341",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "185617",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "189430",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "189417",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "189702",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "189621",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "220079",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "189335",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "189652",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "188772",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "185718",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "190340",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "189726",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "185363",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "189690",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "185823",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "189691",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "220115",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "189416",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "189586",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "189463",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "189634",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "186265",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "189953",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "219946",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "189590",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "220064",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "186298",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "188690",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "188758",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "220006",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "189967",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "190265",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "185436",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "189651",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "185722",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "189606",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "219988",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "220044",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "185719",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "186294",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "186120",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "185452",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "189638",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "186250",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "185493",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "185958",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "189728",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "185737",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "185653",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "186295",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "186148",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "186283",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "189656",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "189467",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "189379",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "189687",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "219987",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "220048",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "185741",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "186262",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "185758",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "186132",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "185536",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "190264",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "185933",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "189688",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "186131",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "189952",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "189729",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "189333",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "185959",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "189382",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "188759",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "189672",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "185365",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "189466",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "189674",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "185636",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "189653",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "185771",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "189309",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "185667",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "186081",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "186282",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "186264",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "185670",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "188805",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "219951",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "188724",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "188806",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "188819",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "185630",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "220002",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "189332",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "186280",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "185606",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "185955",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "189971",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "185704",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "189704",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "185706",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "189432",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "189311",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "189604",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "189381",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "186245",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "189655",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "220046",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "185953",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "185603",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "185954",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "186297",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "188390",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "189336",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "189673",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "186134",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "188821",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "185935",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "219948",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "219989",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "186151",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "185754",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "186016",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "189310",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "188760",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "185574",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "186068",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "189380",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "189587",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "185650",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "186014",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "189689",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "185721",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "185956",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "185753",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "185671",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "189334",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "219947",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "188820",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "219945",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "186261",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "186154",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "186153",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "189686",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "186300",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "189685",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "189605",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "185572",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "185364",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "219949",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "186118",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "188807",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "185720",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "185701",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "189607",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "219986",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "186149",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "186116",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "186066",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "185703",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "185770",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "185684",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "185755",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "185651",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "189954",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "189052",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "186115",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "186296",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "186136",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "220005",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "185652",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "185901",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "186133",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "185723",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "189591",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "185569",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "185757",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "185932",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "185895",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "186152",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "185957",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "186150",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "185588",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "185656",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "186082",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "185605",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "186248",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "185687",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "186119",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "185635",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "185618",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "186063",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "185672",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "185934",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "185585",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "189307",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "185688",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "189703",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "185936",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "186137",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "185829",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "185724",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "186249",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "189589",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "189377",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "185602",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "185654",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "188822",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "185705",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "186018",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "186017",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "185633",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "185931",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "186052",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "186067",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "185707",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "185702",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "220004",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "189603",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "189592",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "186015",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "186247",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "185604",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "189259",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "186246",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "185573",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "186065",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "185601",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "185586",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "186086",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "186114",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "185655",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "186020",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "220003",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "186117",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "185589",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "185689",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "185634",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "185828",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "185900",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "185898",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "185587",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "185685",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "186064",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "186035",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "189588",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "185673",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "185826",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "186135",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "186036",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "185825",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "185897",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "185570",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "185686",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "189308",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "186034",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "186084",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "189378",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "186032",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "186083",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "185571",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "186048",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "186031",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "185896",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "186085",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "185590",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "186019",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "185899",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "186037",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "185827",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "186033",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "186051",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "186049",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "186050",
+        "location": "First Floor"
+      }
+    ],
+    "columns": [
+      {
+        "page": 1,
+        "tag": "229647",
+        "location": "TOF Footing"
+      },
+      {
+        "page": 1,
+        "tag": "229646",
+        "location": "TOF Footing"
+      },
+      {
+        "page": 1,
+        "tag": "229668",
+        "location": "TOF Footing"
+      },
+      {
+        "page": 1,
+        "tag": "229656",
+        "location": "TOF Footing"
+      },
+      {
+        "page": 1,
+        "tag": "217178",
+        "location": "Roof - Main"
+      },
+      {
+        "page": 1,
+        "tag": "229655",
+        "location": "TOF Footing"
+      },
+      {
+        "page": 1,
+        "tag": "229672",
+        "location": "TOF Footing"
+      },
+      {
+        "page": 1,
+        "tag": "208357",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "229650",
+        "location": "TOF Footing"
+      },
+      {
+        "page": 1,
+        "tag": "229677",
+        "location": "TOF Footing"
+      },
+      {
+        "page": 1,
+        "tag": "211624",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "199175",
+        "location": "Roof - Main"
+      },
+      {
+        "page": 1,
+        "tag": "241102",
+        "location": "TOF Footing"
+      },
+      {
+        "page": 1,
+        "tag": "229653",
+        "location": "TOF Footing"
+      },
+      {
+        "page": 1,
+        "tag": "229649",
+        "location": "TOF Footing"
+      },
+      {
+        "page": 1,
+        "tag": "229660",
+        "location": "TOF Footing"
+      },
+      {
+        "page": 1,
+        "tag": "241863",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "216303",
+        "location": "Roof - Main"
+      },
+      {
+        "page": 1,
+        "tag": "216503",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "216289",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "229670",
+        "location": "TOF Footing"
+      },
+      {
+        "page": 1,
+        "tag": "229652",
+        "location": "TOF Footing"
+      },
+      {
+        "page": 1,
+        "tag": "198898",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "198790",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "229669",
+        "location": "TOF Footing"
+      },
+      {
+        "page": 1,
+        "tag": "229678",
+        "location": "TOF Footing"
+      },
+      {
+        "page": 1,
+        "tag": "229673",
+        "location": "TOF Footing"
+      },
+      {
+        "page": 1,
+        "tag": "229671",
+        "location": "TOF Footing"
+      },
+      {
+        "page": 1,
+        "tag": "229667",
+        "location": "TOF Footing"
+      },
+      {
+        "page": 1,
+        "tag": "167608",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "229657",
+        "location": "TOF Footing"
+      },
+      {
+        "page": 1,
+        "tag": "159592",
+        "location": "TOF Footing"
+      },
+      {
+        "page": 1,
+        "tag": "169962",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "166957",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "229666",
+        "location": "TOF Footing"
+      },
+      {
+        "page": 1,
+        "tag": "229654",
+        "location": "TOF Footing"
+      },
+      {
+        "page": 1,
+        "tag": "210562",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "198643",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "216305",
+        "location": "Roof - Main"
+      },
+      {
+        "page": 1,
+        "tag": "159810",
+        "location": "TOF Footing"
+      },
+      {
+        "page": 1,
+        "tag": "229681",
+        "location": "TOF Footing"
+      },
+      {
+        "page": 1,
+        "tag": "229679",
+        "location": "TOF Footing"
+      },
+      {
+        "page": 1,
+        "tag": "229680",
+        "location": "TOF Footing"
+      },
+      {
+        "page": 1,
+        "tag": "169605",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "216293",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "217263",
+        "location": "Roof - Main"
+      },
+      {
+        "page": 1,
+        "tag": "216299",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "197968",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "171014",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "229648",
+        "location": "TOF Footing"
+      },
+      {
+        "page": 1,
+        "tag": "171109",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "166872",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "159455",
+        "location": "TOF Footing"
+      },
+      {
+        "page": 1,
+        "tag": "229658",
+        "location": "TOF Footing"
+      },
+      {
+        "page": 1,
+        "tag": "159352",
+        "location": "TOF Footing"
+      },
+      {
+        "page": 1,
+        "tag": "171631",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "229674",
+        "location": "TOF Footing"
+      },
+      {
+        "page": 1,
+        "tag": "199219",
+        "location": "Roof - Main"
+      },
+      {
+        "page": 1,
+        "tag": "242340",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "167051",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "199097",
+        "location": "Roof - Main"
+      },
+      {
+        "page": 1,
+        "tag": "171242",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "229661",
+        "location": "TOF Footing"
+      },
+      {
+        "page": 1,
+        "tag": "229665",
+        "location": "TOF Footing"
+      },
+      {
+        "page": 1,
+        "tag": "229675",
+        "location": "TOF Footing"
+      },
+      {
+        "page": 1,
+        "tag": "216300",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "198943",
+        "location": "Roof - Main"
+      },
+      {
+        "page": 1,
+        "tag": "167367",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "216290",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "166095",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "166386",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "171428",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "229651",
+        "location": "TOF Footing"
+      },
+      {
+        "page": 1,
+        "tag": "158920",
+        "location": "TOF Footing"
+      },
+      {
+        "page": 1,
+        "tag": "229662",
+        "location": "TOF Footing"
+      },
+      {
+        "page": 1,
+        "tag": "162066",
+        "location": "TOF Footing"
+      },
+      {
+        "page": 1,
+        "tag": "229659",
+        "location": "TOF Footing"
+      },
+      {
+        "page": 1,
+        "tag": "158795",
+        "location": "TOF Footing"
+      },
+      {
+        "page": 1,
+        "tag": "159643",
+        "location": "TOF Footing"
+      },
+      {
+        "page": 1,
+        "tag": "229676",
+        "location": "TOF Footing"
+      },
+      {
+        "page": 1,
+        "tag": "170269",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "216320",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "157918",
+        "location": "TOF Footing"
+      },
+      {
+        "page": 1,
+        "tag": "241653",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "157847",
+        "location": "TOF Footing"
+      },
+      {
+        "page": 1,
+        "tag": "216323",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "169789",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "216291",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "216307",
+        "location": "Roof - Main"
+      },
+      {
+        "page": 1,
+        "tag": "169135",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "198729",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "tag": "160813",
+        "location": "TOF Footing"
+      },
+      {
+        "page": 1,
+        "tag": "163272",
+        "location": "TOF Footing"
+      },
+      {
+        "page": 1,
+        "tag": "216298",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "169491",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "229664",
+        "location": "TOF Footing"
+      },
+      {
+        "page": 1,
+        "tag": "170124",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "161120",
+        "location": "TOF Footing"
+      },
+      {
+        "page": 1,
+        "tag": "162227",
+        "location": "TOF Footing"
+      },
+      {
+        "page": 1,
+        "tag": "173159",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "160006",
+        "location": "TOF Footing"
+      },
+      {
+        "page": 1,
+        "tag": "160958",
+        "location": "TOF Footing"
+      },
+      {
+        "page": 1,
+        "tag": "161177",
+        "location": "TOF Footing"
+      },
+      {
+        "page": 1,
+        "tag": "166226",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "167152",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "160075",
+        "location": "TOF Footing"
+      },
+      {
+        "page": 1,
+        "tag": "216315",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "161606",
+        "location": "TOF Footing"
+      },
+      {
+        "page": 1,
+        "tag": "170461",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "159201",
+        "location": "TOF Footing"
+      },
+      {
+        "page": 1,
+        "tag": "161965",
+        "location": "TOF Footing"
+      },
+      {
+        "page": 1,
+        "tag": "170357",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "158077",
+        "location": "TOF Footing"
+      },
+      {
+        "page": 1,
+        "tag": "157534",
+        "location": "TOF Footing"
+      },
+      {
+        "page": 1,
+        "tag": "168906",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "169377",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "161246",
+        "location": "TOF Footing"
+      },
+      {
+        "page": 1,
+        "tag": "158023",
+        "location": "TOF Footing"
+      },
+      {
+        "page": 1,
+        "tag": "157587",
+        "location": "TOF Footing"
+      },
+      {
+        "page": 1,
+        "tag": "158054",
+        "location": "TOF Footing"
+      },
+      {
+        "page": 1,
+        "tag": "163027",
+        "location": "TOF Footing"
+      },
+      {
+        "page": 1,
+        "tag": "158232",
+        "location": "TOF Footing"
+      },
+      {
+        "page": 1,
+        "tag": "168605",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "171331",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "159009",
+        "location": "TOF Footing"
+      },
+      {
+        "page": 1,
+        "tag": "161926",
+        "location": "TOF Footing"
+      },
+      {
+        "page": 1,
+        "tag": "173046",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "159865",
+        "location": "TOF Footing"
+      },
+      {
+        "page": 1,
+        "tag": "157109",
+        "location": "TOF Footing"
+      },
+      {
+        "page": 1,
+        "tag": "158877",
+        "location": "TOF Footing"
+      },
+      {
+        "page": 1,
+        "tag": "157415",
+        "location": "TOF Footing"
+      },
+      {
+        "page": 1,
+        "tag": "159066",
+        "location": "TOF Footing"
+      },
+      {
+        "page": 1,
+        "tag": "172622",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "216301",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "216292",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "168813",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "166660",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "172365",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "160298",
+        "location": "TOF Footing"
+      },
+      {
+        "page": 1,
+        "tag": "168487",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "161758",
+        "location": "TOF Footing"
+      },
+      {
+        "page": 1,
+        "tag": "216306",
+        "location": "Roof - Main"
+      },
+      {
+        "page": 1,
+        "tag": "168391",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "165983",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "157738",
+        "location": "TOF Footing"
+      },
+      {
+        "page": 1,
+        "tag": "162781",
+        "location": "TOF Footing"
+      },
+      {
+        "page": 1,
+        "tag": "162822",
+        "location": "TOF Footing"
+      },
+      {
+        "page": 1,
+        "tag": "160152",
+        "location": "TOF Footing"
+      },
+      {
+        "page": 1,
+        "tag": "166554",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "169298",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "158631",
+        "location": "TOF Footing"
+      },
+      {
+        "page": 1,
+        "tag": "172855",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "163400",
+        "location": "TOF Footing"
+      },
+      {
+        "page": 1,
+        "tag": "161861",
+        "location": "TOF Footing"
+      },
+      {
+        "page": 1,
+        "tag": "157707",
+        "location": "TOF Footing"
+      },
+      {
+        "page": 1,
+        "tag": "161683",
+        "location": "TOF Footing"
+      },
+      {
+        "page": 1,
+        "tag": "160576",
+        "location": "TOF Footing"
+      },
+      {
+        "page": 1,
+        "tag": "161057",
+        "location": "TOF Footing"
+      },
+      {
+        "page": 1,
+        "tag": "171946",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "161553",
+        "location": "TOF Footing"
+      },
+      {
+        "page": 1,
+        "tag": "163329",
+        "location": "TOF Footing"
+      },
+      {
+        "page": 1,
+        "tag": "229663",
+        "location": "TOF Footing"
+      },
+      {
+        "page": 1,
+        "tag": "162306",
+        "location": "TOF Footing"
+      },
+      {
+        "page": 1,
+        "tag": "161465",
+        "location": "TOF Footing"
+      },
+      {
+        "page": 1,
+        "tag": "168091",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "158572",
+        "location": "TOF Footing"
+      },
+      {
+        "page": 1,
+        "tag": "158329",
+        "location": "TOF Footing"
+      },
+      {
+        "page": 1,
+        "tag": "168724",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "169068",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "166780",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "162861",
+        "location": "TOF Footing"
+      },
+      {
+        "page": 1,
+        "tag": "216302",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "166499",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "162343",
+        "location": "TOF Footing"
+      },
+      {
+        "page": 1,
+        "tag": "157646",
+        "location": "TOF Footing"
+      },
+      {
+        "page": 1,
+        "tag": "158826",
+        "location": "TOF Footing"
+      },
+      {
+        "page": 1,
+        "tag": "163453",
+        "location": "TOF Footing"
+      },
+      {
+        "page": 1,
+        "tag": "160369",
+        "location": "TOF Footing"
+      },
+      {
+        "page": 1,
+        "tag": "161510",
+        "location": "TOF Footing"
+      },
+      {
+        "page": 1,
+        "tag": "163524",
+        "location": "TOF Footing"
+      },
+      {
+        "page": 1,
+        "tag": "162708",
+        "location": "TOF Footing"
+      },
+      {
+        "page": 1,
+        "tag": "160213",
+        "location": "TOF Footing"
+      },
+      {
+        "page": 1,
+        "tag": "158696",
+        "location": "TOF Footing"
+      },
+      {
+        "page": 1,
+        "tag": "172756",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "160541",
+        "location": "TOF Footing"
+      },
+      {
+        "page": 1,
+        "tag": "169229",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "167932",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "160623",
+        "location": "TOF Footing"
+      },
+      {
+        "page": 1,
+        "tag": "158491",
+        "location": "TOF Footing"
+      },
+      {
+        "page": 1,
+        "tag": "162673",
+        "location": "TOF Footing"
+      },
+      {
+        "page": 1,
+        "tag": "160700",
+        "location": "TOF Footing"
+      },
+      {
+        "page": 1,
+        "tag": "160446",
+        "location": "TOF Footing"
+      },
+      {
+        "page": 1,
+        "tag": "172691",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "tag": "162396",
+        "location": "TOF Footing"
+      },
+      {
+        "page": 1,
+        "tag": "158408",
+        "location": "TOF Footing"
+      }
+    ],
+    "foundations": [
+      {
+        "type": "spread footing",
+        "location": "perimeter foundation - north wall",
+        "page": 3
+      },
+      {
+        "type": "spread footing",
+        "location": "perimeter foundation - south wall",
+        "page": 3
+      },
+      {
+        "type": "spread footing",
+        "location": "perimeter foundation - east wall",
+        "page": 3
+      },
+      {
+        "type": "spread footing",
+        "location": "perimeter foundation - west wall",
+        "page": 3
+      },
+      {
+        "type": "spread footing",
+        "location": "interior footing - center support",
+        "page": 3
+      }
+    ],
+    "plumbing_fixtures": [],
+    "railings_guards": [
+      {
+        "page": 1,
+        "type": "Railing:900mm Pipe Guard Rail:222620",
+        "location": "TOF Footing"
+      },
+      {
+        "page": 1,
+        "type": "Railing:900mm Pipe Guard Rail:221723",
+        "location": "TOF Footing"
+      },
+      {
+        "page": 1,
+        "type": "Railing:900mm Pipe Guard Rail:222624",
+        "location": "TOF Footing"
+      }
+    ],
+    "roof_plan": [
+      {
+        "material": "roofing",
+        "location": "Main roof",
+        "page": 1
+      }
+    ],
+    "rooms": [],
+    "slabs": [
+      {
+        "page": 1,
+        "type": "Floor:64mm Concrete With 38mm Metal Deck:164823",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "type": "Floor:150mm Slab on Grade:164090",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "type": "Floor:150mm Slab on Grade:235000",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "type": "Floor:150mm Exterior Slab on Grade:240432",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "type": "Floor:150mm Slab on Grade:221475",
+        "location": "First Floor"
+      },
+      {
+        "page": 1,
+        "type": "Floor:64mm Concrete With 38mm Metal Deck:235649",
+        "location": "Roof - Main"
+      },
+      {
+        "page": 1,
+        "type": "Basic Roof:EPDM Membrane on Rigid Insul on Metal Deck:192693",
+        "location": "Second Floor"
+      },
+      {
+        "page": 1,
+        "type": "Basic Roof:EPDM Membrane on Rigid Insul on Metal Deck:234334",
+        "location": "Roof - Main"
+      },
+      {
+        "page": 1,
+        "type": "Basic Roof:EPDM Membrane on Rigid Insul on Metal Deck:190761",
+        "location": "Roof - Main"
+      },
+      {
+        "page": 1,
+        "type": "Basic Roof:EPDM Membrane on Rigid Insul on Metal Deck:234248",
+        "location": "Roof - Main"
+      },
+      {
+        "page": 1,
+        "type": "Basic Roof:EPDM Membrane on Rigid Insul on Metal Deck:234050",
+        "location": "Roof - Main"
+      },
+      {
+        "page": 1,
+        "type": "Basic Roof:EPDM Membrane on Rigid Insul on Metal Deck:234228",
+        "location": "Roof - Main"
+      },
+      {
+        "page": 1,
+        "type": "Basic Roof:EPDM Membrane on Rigid Insul on Metal Deck:192254",
+        "location": "Second Floor"
+      }
+    ],
+    "stairs_elevators": [
+      {
+        "page": 1,
+        "type": "Stair:Monolithic Concrete Stair:222487",
+        "location": "TOF Footing"
+      }
+    ],
+    "title_block": [
+      {
+        "project_name": "Floor Plan \u2014 Roof - Main",
+        "page": 1
+      },
+      {
+        "project_name": "Floor Plan \u2014 Second Floor",
+        "page": 2
+      },
+      {
+        "project_name": "Floor Plan \u2014 TOF Footing",
+        "page": 3
+      },
+      {
+        "project_name": "Floor Plan \u2014 First Floor",
+        "page": 4
+      }
+    ],
+    "wall_types": [
+      {
+        "page": 1,
+        "type_id": "Basic Wall:Foundation - Concrete (264mm):224397",
+        "location": "TOF Footing"
+      },
+      {
+        "page": 1,
+        "type_id": "Basic Wall:Foundation - Concrete (264mm):221372",
+        "location": "TOF Footing"
+      },
+      {
+        "page": 1,
+        "type_id": "Basic Wall:Foundation - Concrete (264mm):146569",
+        "location": "TOF Footing"
+      },
+      {
+        "page": 1,
+        "type_id": "Basic Wall:Foundation - Concrete (264mm):221320",
+        "location": "TOF Footing"
+      },
+      {
+        "page": 1,
+        "type_id": "Basic Wall:Foundation - Concrete (300mm):234820",
+        "location": "TOF Footing"
+      },
+      {
+        "page": 1,
+        "type_id": "Basic Wall:Foundation - Concrete (300mm):234726",
+        "location": "TOF Footing"
+      },
+      {
+        "page": 1,
+        "type_id": "Basic Wall:Foundation - Concrete (300mm):234869",
+        "location": "TOF Footing"
+      },
+      {
+        "page": 1,
+        "type_id": "Basic Wall:Foundation - Concrete (264mm):224496",
+        "location": "TOF Footing"
+      },
+      {
+        "page": 1,
+        "type_id": "Basic Wall:Foundation - Concrete (264mm):233503",
+        "location": "TOF Footing"
+      },
+      {
+        "page": 1,
+        "type_id": "Basic Wall:Foundation - Concrete (264mm):146481",
+        "location": "TOF Footing"
+      },
+      {
+        "page": 1,
+        "type_id": "Basic Wall:Foundation - Concrete (264mm):221232",
+        "location": "TOF Footing"
+      },
+      {
+        "page": 1,
+        "type_id": "Basic Wall:Foundation - Concrete (264mm):220785",
+        "location": "TOF Footing"
+      },
+      {
+        "page": 1,
+        "type_id": "Basic Wall:Foundation - Concrete (264mm):145934",
+        "location": "TOF Footing"
+      },
+      {
+        "page": 1,
+        "type_id": "Basic Wall:Foundation - Concrete (300mm):234676",
+        "location": "TOF Footing"
+      },
+      {
+        "page": 1,
+        "type_id": "Basic Wall:Foundation - Concrete (264mm):233007",
+        "location": "TOF Footing"
+      },
+      {
+        "page": 1,
+        "type_id": "Basic Wall:Foundation - Concrete (264mm):221174",
+        "location": "TOF Footing"
+      },
+      {
+        "page": 1,
+        "type_id": "Basic Wall:Foundation - Concrete (264mm):146642",
+        "location": "TOF Footing"
+      },
+      {
+        "page": 1,
+        "type_id": "Basic Wall:Foundation - Concrete (264mm):220841",
+        "location": "TOF Footing"
+      },
+      {
+        "page": 1,
+        "type_id": "Basic Wall:Foundation - Concrete (264mm):232959",
+        "location": "TOF Footing"
+      },
+      {
+        "page": 1,
+        "type_id": "Basic Wall:Foundation - Concrete (264mm):146312",
+        "location": "TOF Footing"
+      },
+      {
+        "page": 1,
+        "type_id": "Basic Wall:Foundation - Concrete (264mm):223568",
+        "location": "TOF Footing"
+      },
+      {
+        "page": 1,
+        "type_id": "Basic Wall:Foundation - Concrete (264mm):146239",
+        "location": "TOF Footing"
+      },
+      {
+        "page": 1,
+        "type_id": "Basic Wall:Foundation - Concrete (264mm):223413",
+        "location": "TOF Footing"
+      },
+      {
+        "page": 1,
+        "type_id": "Basic Wall:Foundation - Concrete (264mm):146143",
+        "location": "TOF Footing"
+      },
+      {
+        "page": 1,
+        "type_id": "Basic Wall:Foundation - Concrete (264mm):146607",
+        "location": "TOF Footing"
+      },
+      {
+        "page": 1,
+        "type_id": "Basic Wall:Foundation - Concrete (264mm):221623",
+        "location": "TOF Footing"
+      }
+    ],
+    "wood_framing": [
+      {
+        "framing_method": "platform",
+        "location": "first floor",
+        "page": 4
+      },
+      {
+        "framing_method": "platform",
+        "location": "second floor",
+        "page": 2
+      }
+    ]
+  }
+}

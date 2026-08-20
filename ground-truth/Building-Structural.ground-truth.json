@@ -1,0 +1,73 @@
+{
+  "doc_id": "Building-Structural",
+  "source": "lexios/corpus/ifc/bsmart/Building-Structural.ifc",
+  "doc_type": "mixed",
+  "difficulty": "medium",
+  "gt_source": "ifc_only",
+  "elements": {
+    "wall_types": [
+      {
+        "page": 1,
+        "type_id": "house - outer wall - house back",
+        "thickness": "200.0000000000794",
+        "location": "00 groundfloor"
+      },
+      {
+        "page": 1,
+        "type_id": "house - outer wall - house front",
+        "thickness": "200.00000000009933",
+        "location": "00 groundfloor"
+      },
+      {
+        "page": 1,
+        "type_id": "house - outer wall - house front right",
+        "thickness": "200.0000000000498",
+        "location": "00 groundfloor"
+      },
+      {
+        "page": 1,
+        "type_id": "house - inner wall",
+        "thickness": "200.00000000007506",
+        "location": "00 groundfloor"
+      }
+    ],
+    "beams": [
+      {
+        "page": 1,
+        "tag": "454425.1027891.979946.932084.902513",
+        "span": "2700.0",
+        "location": "Single-family house"
+      },
+      {
+        "page": 1,
+        "tag": "454425.1027891.979946.932084.902515",
+        "span": "5800.0",
+        "location": "Single-family house"
+      },
+      {
+        "page": 1,
+        "tag": "454425.1027891.979946.932084.902519",
+        "span": "600.0",
+        "location": "Single-family house"
+      },
+      {
+        "page": 1,
+        "tag": "454425.1027891.979946.932084.902516",
+        "span": "4000.0",
+        "location": "Single-family house"
+      },
+      {
+        "page": 1,
+        "tag": "454425.1027891.979946.932084.902517",
+        "span": "5800.0",
+        "location": "Single-family house"
+      },
+      {
+        "page": 1,
+        "tag": "454425.1027891.979946.932084.902512",
+        "span": "5800.0",
+        "location": "Single-family house"
+      }
+    ]
+  }
+}

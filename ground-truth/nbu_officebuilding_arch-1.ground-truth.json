@@ -1,0 +1,2115 @@
+{
+  "doc_id": "nbu_officebuilding_arch-1",
+  "pdf": "NBU_OfficeBuilding_Arch-1.ifc",
+  "doc_type": "commercial",
+  "difficulty": "medium",
+  "elements": {
+    "doors": [
+      {
+        "page": 1,
+        "tag": "117",
+        "size": "36.0x84.0",
+        "type": "Single-Flush",
+        "location": "Level 1",
+        "fire_rating": "Fire Rating"
+      },
+      {
+        "page": 1,
+        "tag": "224",
+        "size": "36.0x84.0",
+        "type": "Single-Flush",
+        "location": "Level 2",
+        "fire_rating": "Fire Rating"
+      },
+      {
+        "page": 1,
+        "tag": "207",
+        "size": "36.0x84.0",
+        "type": "Single-Flush",
+        "location": "Level 2",
+        "fire_rating": "Fire Rating"
+      },
+      {
+        "page": 1,
+        "tag": "115",
+        "size": "36.0x84.0",
+        "type": "Single-Flush",
+        "location": "Level 1",
+        "fire_rating": "Fire Rating"
+      },
+      {
+        "page": 1,
+        "tag": "116",
+        "size": "36.0x84.0",
+        "type": "Single-Flush",
+        "location": "Level 1",
+        "fire_rating": "Fire Rating"
+      },
+      {
+        "page": 1,
+        "tag": "103",
+        "size": "36.0x84.0",
+        "type": "Single-Flush",
+        "location": "Level 1",
+        "fire_rating": "Fire Rating"
+      },
+      {
+        "page": 1,
+        "tag": "138",
+        "size": "36.0x84.0",
+        "type": "Single-Flush",
+        "location": "Level 1",
+        "fire_rating": "Fire Rating"
+      },
+      {
+        "page": 1,
+        "tag": "218",
+        "size": "36.0x84.0",
+        "type": "Single-Flush",
+        "location": "Level 2",
+        "fire_rating": "Fire Rating"
+      },
+      {
+        "page": 1,
+        "tag": "S102B",
+        "size": "36.0x84.0",
+        "type": "Single-Flush",
+        "location": "Level 1",
+        "fire_rating": "Fire Rating"
+      },
+      {
+        "page": 1,
+        "tag": "143AB",
+        "size": "36.0x84.0",
+        "type": "Single-Flush",
+        "location": "Level 1",
+        "fire_rating": "Fire Rating"
+      },
+      {
+        "page": 1,
+        "tag": "137",
+        "size": "36.0x84.0",
+        "type": "Single-Flush",
+        "location": "Level 1",
+        "fire_rating": "Fire Rating"
+      },
+      {
+        "page": 1,
+        "tag": "123",
+        "size": "36.0x84.0",
+        "type": "Single-Flush",
+        "location": "Level 1",
+        "fire_rating": "Fire Rating"
+      },
+      {
+        "page": 1,
+        "tag": "104",
+        "size": "36.0x84.0",
+        "type": "Single-Flush",
+        "location": "Level 1",
+        "fire_rating": "Fire Rating"
+      },
+      {
+        "page": 1,
+        "tag": "119",
+        "size": "36.0x84.0",
+        "type": "Single-Flush",
+        "location": "Level 1",
+        "fire_rating": "Fire Rating"
+      },
+      {
+        "page": 1,
+        "tag": "102",
+        "size": "36.0x84.0",
+        "type": "Single-Flush",
+        "location": "Level 1",
+        "fire_rating": "Fire Rating"
+      },
+      {
+        "page": 1,
+        "tag": "217",
+        "size": "36.0x84.0",
+        "type": "Single-Flush",
+        "location": "Level 2",
+        "fire_rating": "Fire Rating"
+      },
+      {
+        "page": 1,
+        "tag": "114",
+        "size": "36.0x84.0",
+        "type": "Single-Flush",
+        "location": "Level 1",
+        "fire_rating": "Fire Rating"
+      },
+      {
+        "page": 1,
+        "tag": "226",
+        "size": "36.0x84.0",
+        "type": "Single-Flush",
+        "location": "Level 2",
+        "fire_rating": "Fire Rating"
+      },
+      {
+        "page": 1,
+        "tag": "231",
+        "size": "36.0x84.0",
+        "type": "Single-Flush",
+        "location": "Level 2",
+        "fire_rating": "Fire Rating"
+      },
+      {
+        "page": 1,
+        "tag": "227",
+        "size": "36.0x84.0",
+        "type": "Single-Flush",
+        "location": "Level 2",
+        "fire_rating": "Fire Rating"
+      },
+      {
+        "page": 1,
+        "tag": "209",
+        "size": "36.0x84.0",
+        "type": "Single-Flush",
+        "location": "Level 2",
+        "fire_rating": "Fire Rating"
+      },
+      {
+        "page": 1,
+        "tag": "150",
+        "size": "36.0x84.0",
+        "type": "Single-Flush",
+        "location": "Level 1",
+        "fire_rating": "Fire Rating"
+      },
+      {
+        "page": 1,
+        "tag": "235",
+        "size": "36.0x84.0",
+        "type": "Single-Flush",
+        "location": "Level 2",
+        "fire_rating": "Fire Rating"
+      },
+      {
+        "page": 1,
+        "tag": "230",
+        "size": "36.0x84.0",
+        "type": "Single-Flush",
+        "location": "Level 2",
+        "fire_rating": "Fire Rating"
+      },
+      {
+        "page": 1,
+        "tag": "225",
+        "size": "36.0x84.0",
+        "type": "Single-Flush",
+        "location": "Level 2",
+        "fire_rating": "Fire Rating"
+      },
+      {
+        "page": 1,
+        "tag": "215",
+        "size": "36.0x84.0",
+        "type": "Single-Flush",
+        "location": "Level 2",
+        "fire_rating": "Fire Rating"
+      },
+      {
+        "page": 1,
+        "tag": "130",
+        "size": "36.0x84.0",
+        "type": "Single-Flush",
+        "location": "Level 1",
+        "fire_rating": "Fire Rating"
+      },
+      {
+        "page": 1,
+        "tag": "219",
+        "size": "36.0x84.0",
+        "type": "Single-Flush",
+        "location": "Level 2",
+        "fire_rating": "Fire Rating"
+      },
+      {
+        "page": 1,
+        "tag": "135",
+        "size": "36.0x84.0",
+        "type": "Single-Flush",
+        "location": "Level 1",
+        "fire_rating": "Fire Rating"
+      },
+      {
+        "page": 1,
+        "tag": "152A",
+        "size": "36.0x84.0",
+        "type": "Single-Flush",
+        "location": "Level 1",
+        "fire_rating": "Fire Rating"
+      },
+      {
+        "page": 1,
+        "tag": "113",
+        "size": "36.0x84.0",
+        "type": "Single-Flush",
+        "location": "Level 1",
+        "fire_rating": "Fire Rating"
+      },
+      {
+        "page": 1,
+        "tag": "220",
+        "size": "36.0x84.0",
+        "type": "Single-Flush",
+        "location": "Level 2",
+        "fire_rating": "Fire Rating"
+      },
+      {
+        "page": 1,
+        "tag": "155",
+        "size": "36.0x84.0",
+        "type": "Single-Flush",
+        "location": "Level 1",
+        "fire_rating": "Fire Rating"
+      },
+      {
+        "page": 1,
+        "tag": "107",
+        "size": "36.0x84.0",
+        "type": "Single-Flush",
+        "location": "Level 1",
+        "fire_rating": "Fire Rating"
+      },
+      {
+        "page": 1,
+        "tag": "157",
+        "size": "72.0x82.0",
+        "type": "Double-Flush",
+        "location": "Level 1",
+        "fire_rating": "Fire Rating"
+      },
+      {
+        "page": 1,
+        "tag": "222",
+        "size": "36.0x84.0",
+        "type": "Single-Flush",
+        "location": "Level 2",
+        "fire_rating": "Fire Rating"
+      },
+      {
+        "page": 1,
+        "tag": "216",
+        "size": "36.0x84.0",
+        "type": "Single-Flush",
+        "location": "Level 2",
+        "fire_rating": "Fire Rating"
+      },
+      {
+        "page": 1,
+        "tag": "106",
+        "size": "36.0x84.0",
+        "type": "Single-Flush",
+        "location": "Level 1",
+        "fire_rating": "Fire Rating"
+      },
+      {
+        "page": 1,
+        "tag": "139",
+        "size": "36.0x84.0",
+        "type": "Single-Flush",
+        "location": "Level 1",
+        "fire_rating": "Fire Rating"
+      },
+      {
+        "page": 1,
+        "tag": "111",
+        "size": "36.0x84.0",
+        "type": "Single-Flush",
+        "location": "Level 1",
+        "fire_rating": "Fire Rating"
+      },
+      {
+        "page": 1,
+        "tag": "143AA",
+        "size": "36.0x84.0",
+        "type": "Single-Flush",
+        "location": "Level 1",
+        "fire_rating": "Fire Rating"
+      },
+      {
+        "page": 1,
+        "tag": "S201",
+        "size": "36.0x84.0",
+        "type": "Single-Flush",
+        "location": "Level 2",
+        "fire_rating": "Fire Rating"
+      },
+      {
+        "page": 1,
+        "tag": "205",
+        "size": "36.0x84.0",
+        "type": "Single-Flush",
+        "location": "Level 2",
+        "fire_rating": "Fire Rating"
+      },
+      {
+        "page": 1,
+        "tag": "228",
+        "size": "36.0x84.0",
+        "type": "Single-Flush",
+        "location": "Level 2",
+        "fire_rating": "Fire Rating"
+      },
+      {
+        "page": 1,
+        "tag": "236",
+        "size": "36.0x84.0",
+        "type": "Single-Flush",
+        "location": "Level 2",
+        "fire_rating": "Fire Rating"
+      },
+      {
+        "page": 1,
+        "tag": "212",
+        "size": "36.0x84.0",
+        "type": "Single-Flush",
+        "location": "Level 2",
+        "fire_rating": "Fire Rating"
+      },
+      {
+        "page": 1,
+        "tag": "136",
+        "size": "36.0x84.0",
+        "type": "Single-Flush",
+        "location": "Level 1",
+        "fire_rating": "Fire Rating"
+      },
+      {
+        "page": 1,
+        "tag": "101B",
+        "size": "72.0x82.0",
+        "type": "Double-Flush",
+        "location": "Level 1",
+        "fire_rating": "Fire Rating"
+      },
+      {
+        "page": 1,
+        "tag": "210",
+        "size": "36.0x84.0",
+        "type": "Single-Flush",
+        "location": "Level 2",
+        "fire_rating": "Fire Rating"
+      },
+      {
+        "page": 1,
+        "tag": "143",
+        "size": "72.0x82.0",
+        "type": "Double-Flush",
+        "location": "Level 1",
+        "fire_rating": "Fire Rating"
+      },
+      {
+        "page": 1,
+        "tag": "109",
+        "size": "36.0x84.0",
+        "type": "Single-Flush",
+        "location": "Level 1",
+        "fire_rating": "Fire Rating"
+      },
+      {
+        "page": 1,
+        "tag": "125",
+        "size": "36.0x84.0",
+        "type": "Single-Flush",
+        "location": "Level 1",
+        "fire_rating": "Fire Rating"
+      },
+      {
+        "page": 1,
+        "tag": "128",
+        "size": "36.0x84.0",
+        "type": "Single-Flush",
+        "location": "Level 1",
+        "fire_rating": "Fire Rating"
+      },
+      {
+        "page": 1,
+        "tag": "232",
+        "size": "36.0x84.0",
+        "type": "Single-Flush",
+        "location": "Level 2",
+        "fire_rating": "Fire Rating"
+      },
+      {
+        "page": 1,
+        "tag": "126",
+        "size": "36.0x84.0",
+        "type": "Single-Flush",
+        "location": "Level 1",
+        "fire_rating": "Fire Rating"
+      },
+      {
+        "page": 1,
+        "tag": "131",
+        "size": "36.0x84.0",
+        "type": "Single-Flush",
+        "location": "Level 1",
+        "fire_rating": "Fire Rating"
+      },
+      {
+        "page": 1,
+        "tag": "156",
+        "size": "36.0x84.0",
+        "type": "Single-Flush",
+        "location": "Level 1",
+        "fire_rating": "Fire Rating"
+      },
+      {
+        "page": 1,
+        "tag": "110",
+        "size": "36.0x84.0",
+        "type": "Single-Flush",
+        "location": "Level 1",
+        "fire_rating": "Fire Rating"
+      },
+      {
+        "page": 1,
+        "tag": "153A",
+        "size": "36.0x84.0",
+        "type": "Single-Flush",
+        "location": "Level 1",
+        "fire_rating": "Fire Rating"
+      },
+      {
+        "page": 1,
+        "tag": "S202",
+        "size": "36.0x84.0",
+        "type": "Single-Flush",
+        "location": "Level 2",
+        "fire_rating": "Fire Rating"
+      },
+      {
+        "page": 1,
+        "tag": "129",
+        "size": "36.0x84.0",
+        "type": "Single-Flush",
+        "location": "Level 1",
+        "fire_rating": "Fire Rating"
+      },
+      {
+        "page": 1,
+        "tag": "112",
+        "size": "36.0x84.0",
+        "type": "Single-Flush",
+        "location": "Level 1",
+        "fire_rating": "Fire Rating"
+      },
+      {
+        "page": 1,
+        "tag": "134",
+        "size": "36.0x84.0",
+        "type": "Single-Flush",
+        "location": "Level 1",
+        "fire_rating": "Fire Rating"
+      },
+      {
+        "page": 1,
+        "tag": "151",
+        "size": "36.0x84.0",
+        "type": "Single-Flush",
+        "location": "Level 1",
+        "fire_rating": "Fire Rating"
+      },
+      {
+        "page": 1,
+        "tag": "152B",
+        "size": "36.0x84.0",
+        "type": "Single-Flush",
+        "location": "Level 1",
+        "fire_rating": "Fire Rating"
+      },
+      {
+        "page": 1,
+        "tag": "122",
+        "size": "36.0x84.0",
+        "type": "Single-Flush",
+        "location": "Level 1",
+        "fire_rating": "Fire Rating"
+      },
+      {
+        "page": 1,
+        "tag": "211",
+        "size": "36.0x84.0",
+        "type": "Single-Flush",
+        "location": "Level 2",
+        "fire_rating": "Fire Rating"
+      },
+      {
+        "page": 1,
+        "tag": "153B",
+        "size": "36.0x84.0",
+        "type": "Single-Flush",
+        "location": "Level 1",
+        "fire_rating": "Fire Rating"
+      },
+      {
+        "page": 1,
+        "tag": "105",
+        "size": "36.0x84.0",
+        "type": "Single-Flush",
+        "location": "Level 1",
+        "fire_rating": "Fire Rating"
+      },
+      {
+        "page": 1,
+        "tag": "145",
+        "size": "36.0x84.0",
+        "type": "Single-Flush",
+        "location": "Level 1",
+        "fire_rating": "Fire Rating"
+      },
+      {
+        "page": 1,
+        "tag": "234",
+        "size": "36.0x84.0",
+        "type": "Single-Flush",
+        "location": "Level 2",
+        "fire_rating": "Fire Rating"
+      },
+      {
+        "page": 1,
+        "tag": "233",
+        "size": "36.0x84.0",
+        "type": "Single-Flush",
+        "location": "Level 2",
+        "fire_rating": "Fire Rating"
+      },
+      {
+        "page": 1,
+        "tag": "214",
+        "size": "36.0x84.0",
+        "type": "Single-Flush",
+        "location": "Level 2",
+        "fire_rating": "Fire Rating"
+      },
+      {
+        "page": 1,
+        "tag": "204",
+        "size": "36.0x84.0",
+        "type": "Single-Flush",
+        "location": "Level 2",
+        "fire_rating": "Fire Rating"
+      },
+      {
+        "page": 1,
+        "tag": "146",
+        "size": "36.0x84.0",
+        "type": "Single-Flush",
+        "location": "Level 1",
+        "fire_rating": "Fire Rating"
+      },
+      {
+        "page": 1,
+        "tag": "148",
+        "size": "36.0x84.0",
+        "type": "Single-Flush",
+        "location": "Level 1",
+        "fire_rating": "Fire Rating"
+      },
+      {
+        "page": 1,
+        "tag": "127",
+        "size": "36.0x84.0",
+        "type": "Single-Flush",
+        "location": "Level 1",
+        "fire_rating": "Fire Rating"
+      },
+      {
+        "page": 1,
+        "tag": "213",
+        "size": "36.0x84.0",
+        "type": "Single-Flush",
+        "location": "Level 2",
+        "fire_rating": "Fire Rating"
+      },
+      {
+        "page": 1,
+        "tag": "133",
+        "size": "36.0x84.0",
+        "type": "Single-Flush",
+        "location": "Level 1",
+        "fire_rating": "Fire Rating"
+      },
+      {
+        "page": 1,
+        "tag": "154",
+        "size": "36.0x84.0",
+        "type": "Single-Flush",
+        "location": "Level 1",
+        "fire_rating": "Fire Rating"
+      },
+      {
+        "page": 1,
+        "tag": "144",
+        "size": "36.0x84.0",
+        "type": "Single-Flush",
+        "location": "Level 1",
+        "fire_rating": "Fire Rating"
+      },
+      {
+        "page": 1,
+        "tag": "132A",
+        "size": "36.0x84.0",
+        "type": "Single-Flush",
+        "location": "Level 1",
+        "fire_rating": "Fire Rating"
+      },
+      {
+        "page": 1,
+        "tag": "208",
+        "size": "36.0x84.0",
+        "type": "Single-Flush",
+        "location": "Level 2",
+        "fire_rating": "Fire Rating"
+      },
+      {
+        "page": 1,
+        "tag": "147",
+        "size": "36.0x84.0",
+        "type": "Single-Flush",
+        "location": "Level 1",
+        "fire_rating": "Fire Rating"
+      },
+      {
+        "page": 1,
+        "tag": "S101B",
+        "size": "36.0x84.0",
+        "type": "Single-Flush",
+        "location": "Level 1",
+        "fire_rating": "Fire Rating"
+      },
+      {
+        "page": 1,
+        "tag": "149",
+        "size": "36.0x84.0",
+        "type": "Single-Flush",
+        "location": "Level 1",
+        "fire_rating": "Fire Rating"
+      },
+      {
+        "page": 1,
+        "tag": "206",
+        "size": "36.0x84.0",
+        "type": "Single-Flush",
+        "location": "Level 2",
+        "fire_rating": "Fire Rating"
+      },
+      {
+        "page": 1,
+        "tag": "108",
+        "size": "72.0x84.0",
+        "type": "Double-Flush",
+        "location": "Level 1",
+        "fire_rating": "Fire Rating"
+      },
+      {
+        "page": 1,
+        "tag": "140",
+        "size": "36.0x84.0",
+        "type": "Single-Flush",
+        "location": "Level 1",
+        "fire_rating": "Fire Rating"
+      },
+      {
+        "page": 1,
+        "tag": "101A",
+        "size": "72.0x82.0",
+        "type": "Double-Flush",
+        "location": "Level 1",
+        "fire_rating": "Fire Rating"
+      },
+      {
+        "page": 1,
+        "tag": "118",
+        "size": "72.0x84.0",
+        "type": "Double-Flush",
+        "location": "Level 1",
+        "fire_rating": "Fire Rating"
+      },
+      {
+        "page": 1,
+        "tag": "S101A",
+        "size": "36.0x84.0",
+        "type": "Single-Flush",
+        "location": "Level 1",
+        "fire_rating": "Fire Rating"
+      },
+      {
+        "page": 1,
+        "tag": "S102A",
+        "size": "36.0x84.0",
+        "type": "Single-Flush",
+        "location": "Level 1",
+        "fire_rating": "Fire Rating"
+      },
+      {
+        "page": 1,
+        "tag": "T-135F",
+        "size": "36.0x60.0",
+        "type": "Toilet Partition",
+        "location": "Level 2",
+        "fire_rating": "Fire Rating"
+      },
+      {
+        "page": 1,
+        "tag": "T-135E",
+        "size": "32.0x60.0",
+        "type": "Toilet Partition",
+        "location": "Level 2",
+        "fire_rating": "Fire Rating"
+      },
+      {
+        "page": 1,
+        "tag": "T-135A",
+        "size": "32.0x60.0",
+        "type": "Toilet Partition",
+        "location": "Level 1",
+        "fire_rating": "Fire Rating"
+      },
+      {
+        "page": 1,
+        "tag": "T-135D",
+        "size": "36.0x60.0",
+        "type": "Toilet Partition",
+        "location": "Level 2",
+        "fire_rating": "Fire Rating"
+      },
+      {
+        "page": 1,
+        "tag": "T-135G",
+        "size": "32.0x60.0",
+        "type": "Toilet Partition",
+        "location": "Level 2",
+        "fire_rating": "Fire Rating"
+      },
+      {
+        "page": 1,
+        "tag": "T-136B",
+        "size": "36.0x60.0",
+        "type": "Toilet Partition",
+        "location": "Level 1",
+        "fire_rating": "Fire Rating"
+      },
+      {
+        "page": 1,
+        "tag": "T-135C",
+        "size": "36.0x60.0",
+        "type": "Toilet Partition",
+        "location": "Level 1",
+        "fire_rating": "Fire Rating"
+      },
+      {
+        "page": 1,
+        "tag": "T-135B",
+        "size": "32.0x60.0",
+        "type": "Toilet Partition",
+        "location": "Level 1",
+        "fire_rating": "Fire Rating"
+      },
+      {
+        "page": 1,
+        "tag": "T-136A",
+        "size": "32.0x60.0",
+        "type": "Toilet Partition",
+        "location": "Level 1",
+        "fire_rating": "Fire Rating"
+      }
+    ],
+    "plumbing_fixtures": [
+      {
+        "page": 1,
+        "type": "M_Toilet Paper Holder:9184:9184:247606",
+        "location": "107"
+      },
+      {
+        "page": 1,
+        "type": "M_Toilet Paper Holder:9184:9184:248120",
+        "location": "207"
+      },
+      {
+        "page": 1,
+        "type": "M_Toilet Paper Holder:9184:9184:248321",
+        "location": "209"
+      },
+      {
+        "page": 1,
+        "type": "M_Toilet Paper Holder:9184:9184:250097",
+        "location": "135"
+      },
+      {
+        "page": 1,
+        "type": "M_Toilet Paper Holder:9184:9184:244870",
+        "location": "136"
+      },
+      {
+        "page": 1,
+        "type": "M_Toilet Paper Holder:9184:9184:248170",
+        "location": "207"
+      },
+      {
+        "page": 1,
+        "type": "M_Toilet Paper Holder:9184:9184:248242",
+        "location": "209"
+      },
+      {
+        "page": 1,
+        "type": "M_Toilet Paper Holder:9184:9184:245765",
+        "location": "135"
+      },
+      {
+        "page": 1,
+        "type": "M_Toilet Paper Holder:9184:9184:244794",
+        "location": "136"
+      },
+      {
+        "page": 1,
+        "type": "M_Toilet Paper Holder:9184:9184:245996",
+        "location": "135"
+      }
+    ],
+    "railings_guards": [
+      {
+        "page": 1,
+        "type": "Railing:900mm Handrail Only:236634",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Railing:900mm Handrail Only:235515",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Railing:900mm Handrail Only:235499",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Railing:900mm Handrail Only:237445",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Railing:1100mm Guard Rail:235782",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Railing:900mm Pipe Guard Rail:233676",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Railing:1100mm Guard Rail:236356",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Railing:1100mm Guard Rail:236235",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Railing:900mm Handrail Only:235786",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Railing:900mm Handrail Only:235838",
+        "location": "Level 1"
+      }
+    ],
+    "rooms": [
+      {
+        "name": "OPEN OFFICE",
+        "page": 1,
+        "room_code": "203",
+        "level": "Level 2"
+      },
+      {
+        "name": "CORRIDOR",
+        "page": 1,
+        "room_code": "121",
+        "level": "Level 1"
+      },
+      {
+        "name": "OPEN OFFICE",
+        "page": 1,
+        "room_code": "140",
+        "level": "Level 1"
+      },
+      {
+        "name": "CORRIDOR",
+        "page": 1,
+        "room_code": "201",
+        "level": "Level 2"
+      },
+      {
+        "name": "OPEN OFFICE",
+        "page": 1,
+        "room_code": "237",
+        "level": "Level 2"
+      },
+      {
+        "name": "SCIF OPEN OFFICE",
+        "page": 1,
+        "room_code": "143",
+        "level": "Level 1"
+      },
+      {
+        "name": "OPEN OFFICE",
+        "page": 1,
+        "room_code": "113",
+        "level": "Level 1"
+      },
+      {
+        "name": "OPEN OFFICE",
+        "page": 1,
+        "room_code": "221",
+        "level": "Level 2"
+      },
+      {
+        "name": "MENS RR",
+        "page": 1,
+        "room_code": "135",
+        "level": "Level 1"
+      },
+      {
+        "name": "CORRIDOR",
+        "page": 1,
+        "room_code": "141",
+        "level": "Level 1"
+      },
+      {
+        "name": "CORRIDOR",
+        "page": 1,
+        "room_code": "202",
+        "level": "Level 2"
+      },
+      {
+        "name": "OPEN OFFICE",
+        "page": 1,
+        "room_code": "229",
+        "level": "Level 2"
+      },
+      {
+        "name": "WOMENS RR",
+        "page": 1,
+        "room_code": "136",
+        "level": "Level 1"
+      },
+      {
+        "name": "MECH RM",
+        "page": 1,
+        "room_code": "118",
+        "level": "Level 1"
+      },
+      {
+        "name": "NOC",
+        "page": 1,
+        "room_code": "158",
+        "level": "Level 1"
+      },
+      {
+        "name": "CORRIDOR",
+        "page": 1,
+        "room_code": "142",
+        "level": "Level 1"
+      },
+      {
+        "name": "BOC",
+        "page": 1,
+        "room_code": "151",
+        "level": "Level 1"
+      },
+      {
+        "name": "MENS RR",
+        "page": 1,
+        "room_code": "209",
+        "level": "Level 2"
+      },
+      {
+        "name": "SECURE DOC ROOM",
+        "page": 1,
+        "room_code": "205",
+        "level": "Level 2"
+      },
+      {
+        "name": "BREAK RM",
+        "page": 1,
+        "room_code": "125",
+        "level": "Level 1"
+      },
+      {
+        "name": "MECH RM",
+        "page": 1,
+        "room_code": "219",
+        "level": "Level 2"
+      },
+      {
+        "name": "CMD CONFERENCE RM",
+        "page": 1,
+        "room_code": "110",
+        "level": "Level 1"
+      },
+      {
+        "name": "WOMENS RR",
+        "page": 1,
+        "room_code": "207",
+        "level": "Level 2"
+      },
+      {
+        "name": "BREAK RM",
+        "page": 1,
+        "room_code": "231",
+        "level": "Level 2"
+      },
+      {
+        "name": "S-4 CNTL FILES",
+        "page": 1,
+        "room_code": "137",
+        "level": "Level 1"
+      },
+      {
+        "name": "CORRIDOR",
+        "page": 1,
+        "room_code": "223",
+        "level": "Level 2"
+      },
+      {
+        "name": "CMDR OFFICE",
+        "page": 1,
+        "room_code": "106",
+        "level": "Level 1"
+      },
+      {
+        "name": "ELEC RM",
+        "page": 1,
+        "room_code": "108",
+        "level": "Level 1"
+      },
+      {
+        "name": "CONFERENCE RM",
+        "page": 1,
+        "room_code": "150",
+        "level": "Level 1"
+      },
+      {
+        "name": "CONFERENCE RM",
+        "page": 1,
+        "room_code": "149",
+        "level": "Level 1"
+      },
+      {
+        "name": "FIELD SURGEON",
+        "page": 1,
+        "room_code": "127",
+        "level": "Level 1"
+      },
+      {
+        "name": "CMD RR",
+        "page": 1,
+        "room_code": "107",
+        "level": "Level 1"
+      },
+      {
+        "name": "OPEN OFFICE",
+        "page": 1,
+        "room_code": "114",
+        "level": "Level 1"
+      },
+      {
+        "name": "REENLST OFF",
+        "page": 1,
+        "room_code": "126",
+        "level": "Level 1"
+      },
+      {
+        "name": "SIGINT",
+        "page": 1,
+        "room_code": "148",
+        "level": "Level 1"
+      },
+      {
+        "name": "ELEV EQ RM",
+        "page": 1,
+        "room_code": "123",
+        "level": "Level 1"
+      },
+      {
+        "name": "S-4 CONFERENCE",
+        "page": 1,
+        "room_code": "226",
+        "level": "Level 2"
+      },
+      {
+        "name": "S-1/S-4 STOR",
+        "page": 1,
+        "room_code": "117",
+        "level": "Level 1"
+      },
+      {
+        "name": "RECYCL",
+        "page": 1,
+        "room_code": "212",
+        "level": "Level 2"
+      },
+      {
+        "name": "TEAM RM",
+        "page": 1,
+        "room_code": "139",
+        "level": "Level 1"
+      },
+      {
+        "name": "VEST/ENTRY",
+        "page": 1,
+        "room_code": "153",
+        "level": "Level 1"
+      },
+      {
+        "name": "TELE/COMM RM",
+        "page": 1,
+        "room_code": "115",
+        "level": "Level 1"
+      },
+      {
+        "name": "SERVER RM",
+        "page": 1,
+        "room_code": "144",
+        "level": "Level 1"
+      },
+      {
+        "name": "S-7 STORAGE",
+        "page": 1,
+        "room_code": "222",
+        "level": "Level 2"
+      },
+      {
+        "name": "SERVER RM",
+        "page": 1,
+        "room_code": "157",
+        "level": "Level 1"
+      },
+      {
+        "name": "S-3 STORAGE",
+        "page": 1,
+        "room_code": "220",
+        "level": "Level 2"
+      },
+      {
+        "name": "STAIR",
+        "page": 1,
+        "room_code": "S102",
+        "level": "Level 1"
+      },
+      {
+        "name": "S-1",
+        "page": 1,
+        "room_code": "132",
+        "level": "Level 1"
+      },
+      {
+        "name": "STAIR",
+        "page": 1,
+        "room_code": "S101",
+        "level": "Level 1"
+      },
+      {
+        "name": "A/V SERVER RM",
+        "page": 1,
+        "room_code": "156",
+        "level": "Level 1"
+      },
+      {
+        "name": "OPS SGT",
+        "page": 1,
+        "room_code": "206",
+        "level": "Level 2"
+      },
+      {
+        "name": "CMD STORAGE",
+        "page": 1,
+        "room_code": "109",
+        "level": "Level 1"
+      },
+      {
+        "name": "GEOINT",
+        "page": 1,
+        "room_code": "147",
+        "level": "Level 1"
+      },
+      {
+        "name": "S-1 CONFERENCE",
+        "page": 1,
+        "room_code": "230",
+        "level": "Level 2"
+      },
+      {
+        "name": "S-2",
+        "page": 1,
+        "room_code": "233",
+        "level": "Level 2"
+      },
+      {
+        "name": "TEAM RM",
+        "page": 1,
+        "room_code": "216",
+        "level": "Level 2"
+      },
+      {
+        "name": "S-7 CONFERENCE",
+        "page": 1,
+        "room_code": "228",
+        "level": "Level 2"
+      },
+      {
+        "name": "MESSAGE CENTER",
+        "page": 1,
+        "room_code": "131",
+        "level": "Level 1"
+      },
+      {
+        "name": "S-1/S-4 CONFERENCE RM",
+        "page": 1,
+        "room_code": "134",
+        "level": "Level 1"
+      },
+      {
+        "name": "JAN",
+        "page": 1,
+        "room_code": "232",
+        "level": "Level 2"
+      },
+      {
+        "name": "S-6",
+        "page": 1,
+        "room_code": "234",
+        "level": "Level 2"
+      },
+      {
+        "name": "S-1 CNTL FILES",
+        "page": 1,
+        "room_code": "138",
+        "level": "Level 1"
+      },
+      {
+        "name": "CENTRAL FILES",
+        "page": 1,
+        "room_code": "204",
+        "level": "Level 2"
+      },
+      {
+        "name": "TEAM RM",
+        "page": 1,
+        "room_code": "214",
+        "level": "Level 2"
+      },
+      {
+        "name": "STAIR",
+        "page": 1,
+        "room_code": "S201",
+        "level": "Level 2"
+      },
+      {
+        "name": "RECYC",
+        "page": 1,
+        "room_code": "122",
+        "level": "Level 1"
+      },
+      {
+        "name": "S-3 CONFERENCE",
+        "page": 1,
+        "room_code": "224",
+        "level": "Level 2"
+      },
+      {
+        "name": "CHAPLAIN ASST NCO",
+        "page": 1,
+        "room_code": "128",
+        "level": "Level 1"
+      },
+      {
+        "name": "TEAM RM",
+        "page": 1,
+        "room_code": "211",
+        "level": "Level 2"
+      },
+      {
+        "name": "CMD SGT MAJ",
+        "page": 1,
+        "room_code": "105",
+        "level": "Level 1"
+      },
+      {
+        "name": "SIPR",
+        "page": 1,
+        "room_code": "218",
+        "level": "Level 2"
+      },
+      {
+        "name": "EXEC OFCR",
+        "page": 1,
+        "room_code": "103",
+        "level": "Level 1"
+      },
+      {
+        "name": "ENTRY",
+        "page": 1,
+        "room_code": "101",
+        "level": "Level 1"
+      },
+      {
+        "name": "DUTY OFCR",
+        "page": 1,
+        "room_code": "102",
+        "level": "Level 1"
+      },
+      {
+        "name": "S-2 CONFERENCE",
+        "page": 1,
+        "room_code": "235",
+        "level": "Level 2"
+      },
+      {
+        "name": "STAIR",
+        "page": 1,
+        "room_code": "S202",
+        "level": "Level 2"
+      },
+      {
+        "name": "TELE/COMM RM",
+        "page": 1,
+        "room_code": "217",
+        "level": "Level 2"
+      },
+      {
+        "name": "EXTERIOR VESTIBULE TO TSVA",
+        "page": 1,
+        "room_code": "146",
+        "level": "Level 1"
+      },
+      {
+        "name": "S-3",
+        "page": 1,
+        "room_code": "210",
+        "level": "Level 2"
+      },
+      {
+        "name": "VEST/ENTRY",
+        "page": 1,
+        "room_code": "143A",
+        "level": "Level 1"
+      },
+      {
+        "name": "TEAM RM",
+        "page": 1,
+        "room_code": "155",
+        "level": "Level 1"
+      },
+      {
+        "name": "CHAPLAIN",
+        "page": 1,
+        "room_code": "129",
+        "level": "Level 1"
+      },
+      {
+        "name": "VEST/ENTRY",
+        "page": 1,
+        "room_code": "152",
+        "level": "Level 1"
+      },
+      {
+        "name": "TEAM RM",
+        "page": 1,
+        "room_code": "213",
+        "level": "Level 2"
+      },
+      {
+        "name": "S-4",
+        "page": 1,
+        "room_code": "133",
+        "level": "Level 1"
+      },
+      {
+        "name": "ELEC RM",
+        "page": 1,
+        "room_code": "215",
+        "level": "Level 2"
+      },
+      {
+        "name": "DEPUTY CMDR",
+        "page": 1,
+        "room_code": "104",
+        "level": "Level 1"
+      },
+      {
+        "name": "BRID JUDGE ADV",
+        "page": 1,
+        "room_code": "111",
+        "level": "Level 1"
+      },
+      {
+        "name": "SIPR",
+        "page": 1,
+        "room_code": "119",
+        "level": "Level 1"
+      },
+      {
+        "name": "S-6 STORAGE",
+        "page": 1,
+        "room_code": "227",
+        "level": "Level 2"
+      },
+      {
+        "name": "TEAM RM",
+        "page": 1,
+        "room_code": "236",
+        "level": "Level 2"
+      },
+      {
+        "name": "OP LAW JUDGE ADV",
+        "page": 1,
+        "room_code": "112",
+        "level": "Level 1"
+      },
+      {
+        "name": "S-3 STORAGE",
+        "page": 1,
+        "room_code": "208",
+        "level": "Level 2"
+      },
+      {
+        "name": "SR HR SGT",
+        "page": 1,
+        "room_code": "130",
+        "level": "Level 1"
+      },
+      {
+        "name": "ISM OFF",
+        "page": 1,
+        "room_code": "154",
+        "level": "Level 1"
+      },
+      {
+        "name": "S-2 STORAGE",
+        "page": 1,
+        "room_code": "225",
+        "level": "Level 2"
+      },
+      {
+        "name": "STOR.",
+        "page": 1,
+        "room_code": "145",
+        "level": "Level 1"
+      },
+      {
+        "name": "UPS/BATT RM",
+        "page": 1,
+        "room_code": "116",
+        "level": "Level 1"
+      },
+      {
+        "name": "ELEV",
+        "page": 1,
+        "room_code": "124",
+        "level": "Level 1"
+      }
+    ],
+    "slabs": [
+      {
+        "page": 1,
+        "type": "Stair:Concrete Pan - 180mm Max Riser 280mm Tread:233637:1",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Stair:Concrete Pan - 180mm Max Riser 280mm Tread:235743:1",
+        "location": "Level 1"
+      }
+    ],
+    "stairs_elevators": [
+      {
+        "page": 1,
+        "type": "Stair:Concrete Pan - 180mm Max Riser 280mm Tread:233637",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Stair:Concrete Pan - 180mm Max Riser 280mm Tread:235743",
+        "location": "Level 1"
+      }
+    ],
+    "title_block": [
+      {
+        "project_name": "nbu-office-ifc",
+        "drawing_number": "IFC Plan View",
+        "page": 1
+      }
+    ],
+    "wall_types": [
+      {
+        "page": 1,
+        "type_id": "Interior - Partition (92mm Stud)"
+      },
+      {
+        "page": 1,
+        "type_id": "Exterior - Brick on Mtl. Stud"
+      },
+      {
+        "page": 1,
+        "type_id": "Interior - Rated 1-HR (92mm Stud)",
+        "fire_rating": "1 HR"
+      },
+      {
+        "page": 1,
+        "type_id": "Interior - Plumbing (152mm Stud)"
+      },
+      {
+        "page": 1,
+        "type_id": "Interior - Furring (38 mm Stud)"
+      },
+      {
+        "page": 1,
+        "type_id": "Exterior - Insul Panel on Mtl. Stud"
+      },
+      {
+        "page": 1,
+        "type_id": "Interior - Toilet Partition (25mm)",
+        "fire_rating": "2 HR"
+      }
+    ],
+    "windows": [
+      {
+        "page": 1,
+        "tag": "75",
+        "type_mark": "1",
+        "size": "47.2x59.1",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "77",
+        "type_mark": "1",
+        "size": "47.2x59.1",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "76",
+        "type_mark": "1",
+        "size": "47.2x59.1",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "9",
+        "type_mark": "1",
+        "size": "47.2x59.1",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "66",
+        "type_mark": "23",
+        "size": "39.4x39.4",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "18",
+        "type_mark": "1",
+        "size": "47.2x59.1",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "10",
+        "type_mark": "1",
+        "size": "47.2x59.1",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "72",
+        "type_mark": "1",
+        "size": "47.2x59.1",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "68",
+        "type_mark": "1",
+        "size": "47.2x59.1",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "8",
+        "type_mark": "1",
+        "size": "47.2x59.1",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "48",
+        "type_mark": "1",
+        "size": "47.2x59.1",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "19",
+        "type_mark": "1",
+        "size": "47.2x59.1",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "67",
+        "type_mark": "23",
+        "size": "39.4x39.4",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "28",
+        "type_mark": "1",
+        "size": "47.2x59.1",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "15",
+        "type_mark": "1",
+        "size": "47.2x59.1",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "20",
+        "type_mark": "1",
+        "size": "47.2x59.1",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "25",
+        "type_mark": "1",
+        "size": "47.2x59.1",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "65",
+        "type_mark": "22",
+        "size": "137.8x39.4",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "12",
+        "type_mark": "1",
+        "size": "47.2x59.1",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "54",
+        "type_mark": "1",
+        "size": "47.2x59.1",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "73",
+        "type_mark": "1",
+        "size": "47.2x59.1",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "29",
+        "type_mark": "1",
+        "size": "47.2x59.1",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "11",
+        "type_mark": "1",
+        "size": "47.2x59.1",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "70",
+        "type_mark": "1",
+        "size": "47.2x59.1",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "32",
+        "type_mark": "1",
+        "size": "47.2x59.1",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "51",
+        "type_mark": "1",
+        "size": "47.2x59.1",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "26",
+        "type_mark": "1",
+        "size": "47.2x59.1",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "55",
+        "type_mark": "1",
+        "size": "47.2x59.1",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "63",
+        "type_mark": "1",
+        "size": "47.2x59.1",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "46",
+        "type_mark": "1",
+        "size": "47.2x59.1",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "47",
+        "type_mark": "1",
+        "size": "47.2x59.1",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "49",
+        "type_mark": "1",
+        "size": "47.2x59.1",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "24",
+        "type_mark": "1",
+        "size": "47.2x59.1",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "17",
+        "type_mark": "1",
+        "size": "47.2x59.1",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "52",
+        "type_mark": "1",
+        "size": "47.2x59.1",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "45",
+        "type_mark": "1",
+        "size": "47.2x59.1",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "71",
+        "type_mark": "1",
+        "size": "47.2x59.1",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "61",
+        "type_mark": "1",
+        "size": "47.2x59.1",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "22",
+        "type_mark": "1",
+        "size": "47.2x59.1",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "21",
+        "type_mark": "1",
+        "size": "47.2x59.1",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "64",
+        "type_mark": "1",
+        "size": "47.2x59.1",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "53",
+        "type_mark": "1",
+        "size": "47.2x59.1",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "14",
+        "type_mark": "1",
+        "size": "47.2x59.1",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "13",
+        "type_mark": "1",
+        "size": "47.2x59.1",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "38",
+        "type_mark": "1",
+        "size": "47.2x59.1",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "60",
+        "type_mark": "1",
+        "size": "47.2x59.1",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "62",
+        "type_mark": "1",
+        "size": "47.2x59.1",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "30",
+        "type_mark": "1",
+        "size": "47.2x59.1",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "74",
+        "type_mark": "1",
+        "size": "47.2x59.1",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "69",
+        "type_mark": "1",
+        "size": "47.2x59.1",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "43",
+        "type_mark": "1",
+        "size": "47.2x59.1",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "34",
+        "type_mark": "1",
+        "size": "47.2x59.1",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "16",
+        "type_mark": "1",
+        "size": "47.2x59.1",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "39",
+        "type_mark": "1",
+        "size": "47.2x59.1",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "33",
+        "type_mark": "1",
+        "size": "47.2x59.1",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "41",
+        "type_mark": "20",
+        "size": "39.4x78.7",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "27",
+        "type_mark": "1",
+        "size": "47.2x59.1",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "40",
+        "type_mark": "1",
+        "size": "47.2x59.1",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "31",
+        "type_mark": "1",
+        "size": "47.2x59.1",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "23",
+        "type_mark": "1",
+        "size": "47.2x59.1",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "44",
+        "type_mark": "1",
+        "size": "47.2x59.1",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "56",
+        "type_mark": "1",
+        "size": "47.2x59.1",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "42",
+        "type_mark": "1",
+        "size": "47.2x59.1",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "35",
+        "type_mark": "1",
+        "size": "47.2x59.1",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "36",
+        "type_mark": "1",
+        "size": "47.2x59.1",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "57",
+        "type_mark": "1",
+        "size": "47.2x59.1",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "58",
+        "type_mark": "1",
+        "size": "47.2x59.1",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "37",
+        "type_mark": "1",
+        "size": "47.2x59.1",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "59",
+        "type_mark": "1",
+        "size": "47.2x59.1",
+        "location": "Level 1"
+      }
+    ]
+  },
+  "gt_is_minimum": true,
+  "consensus_stats": {
+    "models": 4,
+    "auto_included": 302,
+    "flagged": 2
+  },
+  "flagged": [
+    {
+      "category": "egress_paths",
+      "element": {
+        "location": "Main East-West corridor along North side of building",
+        "width": "Approx. 2.5m",
+        "page": 1
+      },
+      "reason": "single_model_only",
+      "models": [
+        "gemini"
+      ]
+    },
+    {
+      "category": "rooms",
+      "element": {
+        "name": "OFFICE 1",
+        "level": "1",
+        "function": "office",
+        "page": 1
+      },
+      "reason": "vision_consensus_not_in_programmatic",
+      "models": [
+        "claude",
+        "gemini"
+      ]
+    }
+  ],
+  "built_at": "2026-03-13T19:39:31.360105",
+  "models_used": [
+    "ifc_programmatic",
+    "gpt4.1",
+    "claude",
+    "gemini"
+  ]
+}

@@ -1,0 +1,29 @@
+{
+  "doc_id": "infra-railway-rss",
+  "doc_type": "infrastructure",
+  "difficulty": "hard",
+  "gt_source": "ifc_step_parse",
+  "gt_is_minimum": true,
+  "built_at": "2026-03-15T18:12:23.445979",
+  "ifc_schema": "IFC4X3_RC4",
+  "total_ifc_entities": 55,
+  "elements": {
+    "project_info": [
+      {
+        "page": 1,
+        "type": "IFCSITE",
+        "count": 1
+      },
+      {
+        "page": 1,
+        "type": "IFCPROJECT",
+        "count": 1
+      },
+      {
+        "page": 1,
+        "type": "IFCFACILITYPART",
+        "count": 6
+      }
+    ]
+  }
+}

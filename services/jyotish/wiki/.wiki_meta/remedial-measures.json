@@ -1,0 +1,40 @@
+{
+  "id": "remedial-measures",
+  "category": "general",
+  "sources": [
+    "remedial-measures.md"
+  ],
+  "created": "2026-04-21T12:13:46.750618",
+  "last_updated": "2026-04-25T14:05:29.698895",
+  "last_confirmed": "2026-04-25T14:05:29.698896",
+  "confidence": 0.4,
+  "version": 2,
+  "status": "active",
+  "claims": [],
+  "entities": [
+    "Sun",
+    "Moon",
+    "Mars",
+    "Mercury",
+    "Jupiter",
+    "Venus",
+    "Saturn",
+    "Rahu",
+    "Ketu",
+    "Surya",
+    "Chandra",
+    "Mangal",
+    "Budha",
+    "Guru",
+    "Brihaspati",
+    "Shukra",
+    "Shani",
+    "Lagna",
+    "9th house",
+    "Manglik",
+    "Sade Sati"
+  ],
+  "entity_count": 21,
+  "relationship_count": 2,
+  "tier": "semantic"
+}

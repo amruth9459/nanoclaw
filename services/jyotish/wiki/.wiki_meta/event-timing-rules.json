@@ -1,0 +1,66 @@
+{
+  "id": "event-timing-rules",
+  "category": "general",
+  "sources": [
+    "event-timing-rules.md"
+  ],
+  "created": "2026-04-21T12:40:01.624859",
+  "last_updated": "2026-04-25T14:05:29.666593",
+  "last_confirmed": "2026-04-25T14:05:29.666594",
+  "confidence": 0.4,
+  "version": 2,
+  "status": "active",
+  "claims": [
+    {
+      "raw": "house\n2",
+      "pattern": "(?:houses?|bhava)\\s+(\\d+(?:\\s*"
+    },
+    {
+      "raw": "house\n2",
+      "pattern": "(?:houses?|bhava)\\s+(\\d+(?:\\s*"
+    },
+    {
+      "raw": "house\n4",
+      "pattern": "(?:houses?|bhava)\\s+(\\d+(?:\\s*"
+    }
+  ],
+  "entities": [
+    "Sun",
+    "Moon",
+    "Mars",
+    "Mercury",
+    "Jupiter",
+    "Venus",
+    "Saturn",
+    "Rahu",
+    "Ketu",
+    "Lagna",
+    "1st house",
+    "2nd house",
+    "5th house",
+    "7th house",
+    "8th house",
+    "9th house",
+    "10th house",
+    "11th house",
+    "Kendra",
+    "Trikona",
+    "Dusthana",
+    "Maraka",
+    "Dhana Yoga",
+    "Manglik",
+    "Narayana",
+    "Chara Dasha",
+    "Sade Sati",
+    "Antardasha",
+    "Ashtakavarga",
+    "SAV",
+    "Double Transit",
+    "KN Rao",
+    "Sanjay Rath",
+    "Jaimini"
+  ],
+  "entity_count": 34,
+  "relationship_count": 11,
+  "tier": "semantic"
+}

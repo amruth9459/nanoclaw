@@ -1,0 +1,37 @@
+{
+  "doc_id": "infra-borehole-1",
+  "source": "IFC4.3 (IFC4X3_RC3)",
+  "doc_type": "infrastructure",
+  "difficulty": "medium",
+  "gt_source": "ifc_step_parse",
+  "gt_is_minimum": true,
+  "built_at": "2026-03-15T18:11:41.867792",
+  "ifc_schema": "IFC4X3_RC3",
+  "total_ifc_entities": 99,
+  "elements": {
+    "site_elements": [
+      {
+        "page": 1,
+        "type": "IFCBOREHOLE",
+        "count": 1
+      },
+      {
+        "page": 1,
+        "type": "IFCSOLIDSTRATUM",
+        "count": 5
+      }
+    ],
+    "project_info": [
+      {
+        "page": 1,
+        "type": "IFCSITE",
+        "count": 1
+      },
+      {
+        "page": 1,
+        "type": "IFCPROJECT",
+        "count": 1
+      }
+    ]
+  }
+}

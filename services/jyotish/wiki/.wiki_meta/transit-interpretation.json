@@ -1,0 +1,42 @@
+{
+  "id": "transit-interpretation",
+  "category": "transits",
+  "sources": [
+    "transit-interpretation.md"
+  ],
+  "created": "2026-04-21T12:13:46.753851",
+  "last_updated": "2026-04-25T14:05:29.706288",
+  "last_confirmed": "2026-04-25T14:05:29.706289",
+  "confidence": 0.4,
+  "version": 2,
+  "status": "active",
+  "claims": [],
+  "entities": [
+    "Sun",
+    "Moon",
+    "Mars",
+    "Mercury",
+    "Jupiter",
+    "Venus",
+    "Saturn",
+    "Rahu",
+    "Ketu",
+    "Shani",
+    "Lagna",
+    "4th house",
+    "5th house",
+    "7th house",
+    "10th house",
+    "Kendra",
+    "Upachaya",
+    "Sade Sati",
+    "Ashtakavarga",
+    "BAV",
+    "SAV",
+    "Double Transit",
+    "KN Rao"
+  ],
+  "entity_count": 23,
+  "relationship_count": 9,
+  "tier": "semantic"
+}

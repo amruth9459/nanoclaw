@@ -1,0 +1,6801 @@
+{
+  "doc_id": "NBU_MedicalClinic_Eng-ELE",
+  "source": "lexios/corpus/ifc/medical_clinic/NBU_MedicalClinic_Eng-ELE.ifc",
+  "doc_type": "mixed",
+  "difficulty": "medium",
+  "gt_source": "ifc+vision",
+  "ifc_elements": 1346,
+  "vision_elements": 20,
+  "elements": {
+    "columns": [],
+    "diffusers_registers": [
+      {
+        "type": "supply_diffuser",
+        "location": "(-18, 36.7)",
+        "page": "Page 2"
+      },
+      {
+        "type": "supply_diffuser",
+        "location": "(-17.5, 36.7)",
+        "page": "Page 2"
+      },
+      {
+        "type": "supply_diffuser",
+        "location": "(-15.5, 36.7)",
+        "page": "Page 2"
+      },
+      {
+        "type": "supply_diffuser",
+        "location": "(-18.5, 35.5)",
+        "page": "Page 2"
+      },
+      {
+        "type": "supply_diffuser",
+        "location": "(-15.5, 35.5)",
+        "page": "Page 2"
+      },
+      {
+        "type": "supply_diffuser",
+        "location": "(-17.5, 35)",
+        "page": "Page 2"
+      },
+      {
+        "type": "supply_diffuser",
+        "location": "(-17.5, 28.2)",
+        "page": "Page 2"
+      },
+      {
+        "type": "supply_diffuser",
+        "location": "(-19, 27.8)",
+        "page": "Page 2"
+      }
+    ],
+    "hvac_equipment": [
+      {
+        "page": 1,
+        "type": "M_Transformer Switchboard:914mmx673mm:MS1:860947",
+        "location": "1B23"
+      },
+      {
+        "page": 1,
+        "type": "M_Transformer Switchboard:914mmx673mm:MS2:861040",
+        "location": "1B23"
+      },
+      {
+        "page": 1,
+        "type": "M_Screw Chiller - Air Cooled - 281-1231 kW:633-703 kW:633-703 kW:1066741",
+        "location": "Level 1"
+      }
+    ],
+    "lighting_fixtures": [
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:737660",
+        "location": "1B06"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:737678",
+        "location": "1B06"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:738197",
+        "location": "1B08"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:738199",
+        "location": "1B08"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:738238",
+        "location": "1B10"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:738239",
+        "location": "1B10"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:738254",
+        "location": "1B04"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:738255",
+        "location": "1B04"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1B - 0610x1219mm:B1B - 0610x1219mm:738264",
+        "location": "1B04"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:738265",
+        "location": "1B04"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:738276",
+        "location": "1B04"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:738277",
+        "location": "1B04"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:738286",
+        "location": "1B04"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1B - 0610x1219mm:B1B - 0610x1219mm:738287",
+        "location": "1B04"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:738383",
+        "location": "1B04"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:C18 - 0610x1219mm:C18 - 0610x1219mm:738399",
+        "location": "1D38"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:C18B - 0610x1219mm:C18B - 0610x1219mm:738409",
+        "location": "1D38"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:738419",
+        "location": "1E05"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:738483",
+        "location": "1E05"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:738491",
+        "location": "1E06"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:738499",
+        "location": "1E06"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:738507",
+        "location": "1E06"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:738515",
+        "location": "1E06"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:738523",
+        "location": "1E06"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1B - 0610x1219mm:B1B - 0610x1219mm:738531",
+        "location": "1E06"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:F1 - 0610x1219mm:F1 - 0610x1219mm:738539",
+        "location": "1E08"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:738547",
+        "location": "1E08"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:C18 - 0610x1219mm:C18 - 0610x1219mm:738555",
+        "location": "1D36"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:C18 - 0610x1219mm:C18 - 0610x1219mm:738567",
+        "location": "1D36"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:C18 - 0610x1219mm:C18 - 0610x1219mm:738575",
+        "location": "1D34"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:C18 - 0610x1219mm:C18 - 0610x1219mm:738583",
+        "location": "1D34"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:C18 - 0610x1219mm:C18 - 0610x1219mm:738615",
+        "location": "1D32"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:C18 - 0610x1219mm:C18 - 0610x1219mm:738625",
+        "location": "1D32"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:C18 - 0610x1219mm:C18 - 0610x1219mm:738635",
+        "location": "1D28"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:C18 - 0610x1219mm:C18 - 0610x1219mm:738643",
+        "location": "1D28"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:738653",
+        "location": "1E11"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:738661",
+        "location": "1E11"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:738675",
+        "location": "1E33"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:738685",
+        "location": "1E33"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:738695",
+        "location": "1E14"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:738703",
+        "location": "1E14"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:738713",
+        "location": "1E14"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:738729",
+        "location": "1D25"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:738776",
+        "location": "1D25"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:738788",
+        "location": "1D25"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:738800",
+        "location": "1D25"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:738810",
+        "location": "1D25"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:738820",
+        "location": "1D25"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:738828",
+        "location": "1D25"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1B - 0610x1219mm:B1B - 0610x1219mm:738838",
+        "location": "1D25"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:738877",
+        "location": "1D35"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:738885",
+        "location": "1D35"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:738895",
+        "location": "1D33"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:738903",
+        "location": "1D33"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:738913",
+        "location": "1D31"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:738921",
+        "location": "1D31"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:738931",
+        "location": "1D30"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:738939",
+        "location": "1D30"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:738965",
+        "location": "1D27"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:738973",
+        "location": "1D27"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:738981",
+        "location": "1D24"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:738991",
+        "location": "1D24"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:738999",
+        "location": "1D23"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:739007",
+        "location": "1D23"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:739015",
+        "location": "1D23"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:739023",
+        "location": "1D23"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:739033",
+        "location": "1D25"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:739041",
+        "location": "1D25"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:739076",
+        "location": "1D25"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:739090",
+        "location": "1D22"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1B - 0610x1219mm:B1B - 0610x1219mm:739098",
+        "location": "1D22"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:739108",
+        "location": "1D22"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:739116",
+        "location": "1D21"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:739124",
+        "location": "1D21"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:739132",
+        "location": "1D21"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:739140",
+        "location": "1D21"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:739150",
+        "location": "1D20"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:739158",
+        "location": "1D20"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:739174",
+        "location": "1D19"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:739182",
+        "location": "1D18"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:739192",
+        "location": "1D15"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B18 - 0610x1219mm:B18 - 0610x1219mm:739202",
+        "location": "1D12"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B18 - 0610x1219mm:B18 - 0610x1219mm:739210",
+        "location": "1D12"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:C18 - 0610x1219mm:C18 - 0610x1219mm:739220",
+        "location": "1D10"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:C18 - 0610x1219mm:C18 - 0610x1219mm:739228",
+        "location": "1D10"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:C18 - 0610x1219mm:C18 - 0610x1219mm:739236",
+        "location": "1D08"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:C18 - 0610x1219mm:C18 - 0610x1219mm:739244",
+        "location": "1D08"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:C18 - 0610x1219mm:C18 - 0610x1219mm:739254",
+        "location": "1D05"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:C18 - 0610x1219mm:C18 - 0610x1219mm:739262",
+        "location": "1D06"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:C18 - 0610x1219mm:C18 - 0610x1219mm:739270",
+        "location": "1D06"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:C18 - 0610x1219mm:C18 - 0610x1219mm:739280",
+        "location": "1D07"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:C18 - 0610x1219mm:C18 - 0610x1219mm:739294",
+        "location": "1D07"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:C18 - 0610x1219mm:C18 - 0610x1219mm:739304",
+        "location": "1D09"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:C18 - 0610x1219mm:C18 - 0610x1219mm:739312",
+        "location": "1D09"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:C18 - 0610x1219mm:C18 - 0610x1219mm:739332",
+        "location": "1D11"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:C18 - 0610x1219mm:C18 - 0610x1219mm:739342",
+        "location": "1D11"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:C18 - 0610x1219mm:C18 - 0610x1219mm:739352",
+        "location": "1D13"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:C18 - 0610x1219mm:C18 - 0610x1219mm:739360",
+        "location": "1D13"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:739372",
+        "location": "1D16"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:739380",
+        "location": "1D16"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1B - 0610x1219mm:B1B - 0610x1219mm:739388",
+        "location": "1D16"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:739400",
+        "location": "1D16"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:739408",
+        "location": "1D16"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1B - 0610x1219mm:B1B - 0610x1219mm:739420",
+        "location": "1D16"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:739428",
+        "location": "1D16"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:739434",
+        "location": "1D16"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:739442",
+        "location": "1D16"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:739460",
+        "location": "1D16"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:739468",
+        "location": "1D16"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:C1 - 0610x1219mm:C1 - 0610x1219mm:739480",
+        "location": "1C15"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:C1 - 0610x1219mm:C1 - 0610x1219mm:739488",
+        "location": "1C15"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:C1 - 0610x1219mm:C1 - 0610x1219mm:739496",
+        "location": "1C15"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:C18 - 0610x1219mm:C18 - 0610x1219mm:739506",
+        "location": "1C18"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:C18 - 0610x1219mm:C18 - 0610x1219mm:739514",
+        "location": "1C18"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:C18 - 0610x1219mm:C18 - 0610x1219mm:739522",
+        "location": "1C18"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:C18B - 0610x1219mm:C18B - 0610x1219mm:739530",
+        "location": "1C18"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:C18 - 0610x1219mm:C18 - 0610x1219mm:739542",
+        "location": "1C18"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:C18 - 0610x1219mm:C18 - 0610x1219mm:739550",
+        "location": "1C18"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:C18 - 0610x1219mm:C18 - 0610x1219mm:739558",
+        "location": "1C18"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:C18 - 0610x1219mm:C18 - 0610x1219mm:739566",
+        "location": "1C18"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:C18 - 0610x1219mm:C18 - 0610x1219mm:739574",
+        "location": "1C18"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:C18B - 0610x1219mm:C18B - 0610x1219mm:739629",
+        "location": "1C18"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:739639",
+        "location": "1C14"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:739647",
+        "location": "1C14"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B18 - 0610x1219mm:B18 - 0610x1219mm:739655",
+        "location": "1C16"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B18 - 0610x1219mm:B18 - 0610x1219mm:739663",
+        "location": "1C16"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B18 - 0610x1219mm:B18 - 0610x1219mm:739671",
+        "location": "1C19"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:739691",
+        "location": "1C06"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:C1D - 0610x1219mm:C1D - 0610x1219mm:739699",
+        "location": "1C05"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:C1D - 0610x1219mm:C1D - 0610x1219mm:739707",
+        "location": "1C05"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:739715",
+        "location": "1A10"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:739725",
+        "location": "1A10"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:A2 - 0610x1219mm:A2 - 0610x1219mm:739735",
+        "location": "1A16"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:A2B - 0610x1219mm:A2B - 0610x1219mm:739743",
+        "location": "1A16"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:A2 - 0610x1219mm:A2 - 0610x1219mm:739751",
+        "location": "1A16"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:A2B - 0610x1219mm:A2B - 0610x1219mm:739761",
+        "location": "1A16"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:A2 - 0610x1219mm:A2 - 0610x1219mm:739769",
+        "location": "1AC4"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:A2 - 0610x1219mm:A2 - 0610x1219mm:739777",
+        "location": "1A16"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:A2 - 0610x1219mm:A2 - 0610x1219mm:739783",
+        "location": "1A16"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:A2 - 0610x1219mm:A2 - 0610x1219mm:739791",
+        "location": "1A16"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:A2 - 0610x1219mm:A2 - 0610x1219mm:739797",
+        "location": "1A16"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:A2B - 0610x1219mm:A2B - 0610x1219mm:739805",
+        "location": "1A16"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:A2 - 0610x1219mm:A2 - 0610x1219mm:739813",
+        "location": "1A16"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:A2 - 0610x1219mm:A2 - 0610x1219mm:739823",
+        "location": "1A16"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:A2 - 0610x1219mm:A2 - 0610x1219mm:739831",
+        "location": "1A16"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:A2 - 0610x1219mm:A2 - 0610x1219mm:739841",
+        "location": "1A14"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:739849",
+        "location": "1A15"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:739861",
+        "location": "1A15"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:739871",
+        "location": "1A03"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:739879",
+        "location": "1A03"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:739891",
+        "location": "1A05"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:739901",
+        "location": "1A05"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:739911",
+        "location": "1A04"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:739919",
+        "location": "1A04"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:740028",
+        "location": "1A06"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:740036",
+        "location": "1A06"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:740044",
+        "location": "1A07"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:740052",
+        "location": "1A07"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:A2 - 0610x1219mm:A2 - 0610x1219mm:740062",
+        "location": "1A16"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:740074",
+        "location": "1E16"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1B - 0610x1219mm:B1B - 0610x1219mm:740082",
+        "location": "1E16"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:740090",
+        "location": "1E16"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:740102",
+        "location": "1E16"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:740112",
+        "location": "1E16"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:740120",
+        "location": "1E16"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:740128",
+        "location": "1E16"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1B - 0610x1219mm:B1B - 0610x1219mm:740134",
+        "location": "1E16"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:740142",
+        "location": "1E16"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:740152",
+        "location": "1E16"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:740164",
+        "location": "1E18"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:740172",
+        "location": "1E18"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:740180",
+        "location": "1E18"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:740188",
+        "location": "1E30"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:740198",
+        "location": "1E24"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:740206",
+        "location": "1E24"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1B - 0610x1219mm:B1B - 0610x1219mm:740214",
+        "location": "1E24"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:740222",
+        "location": "1E24"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:740236",
+        "location": "1E24"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:740244",
+        "location": "1E24"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:740252",
+        "location": "1E24"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:740264",
+        "location": "1E24"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:740274",
+        "location": "1E24"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:740282",
+        "location": "1E24"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:740292",
+        "location": "1E24"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:740300",
+        "location": "1E24"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:740310",
+        "location": "1E24"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:740318",
+        "location": "1E24"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:740326",
+        "location": "1E24"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1B - 0610x1219mm:B1B - 0610x1219mm:740334",
+        "location": "1E24"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:C1 - 0610x1219mm:C1 - 0610x1219mm:740360",
+        "location": "1E25"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:C1 - 0610x1219mm:C1 - 0610x1219mm:740368",
+        "location": "1E25"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:740439",
+        "location": "1E29"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:740440",
+        "location": "1E29"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1B - 0610x1219mm:B1B - 0610x1219mm:740467",
+        "location": "1E26"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:740475",
+        "location": "1E26"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:740485",
+        "location": "1E26"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:740497",
+        "location": "1E26"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:740505",
+        "location": "1E27"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:740515",
+        "location": "1E28"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:740523",
+        "location": "1E28"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:A2 - 0610x1219mm:A2 - 0610x1219mm:740572",
+        "location": "1A02"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:A2 - 0610x1219mm:A2 - 0610x1219mm:740696",
+        "location": "1AC5"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:A2 - 0610x1219mm:A2 - 0610x1219mm:740706",
+        "location": "1A02"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:A2 - 0610x1219mm:A2 - 0610x1219mm:740714",
+        "location": "1AC5"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:A2 - 0610x1219mm:A2 - 0610x1219mm:740724",
+        "location": "1A02"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:A2B - 0610x1219mm:A2B - 0610x1219mm:740732",
+        "location": "1AC5"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:A2 - 0610x1219mm:A2 - 0610x1219mm:740742",
+        "location": "1A01"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:A2 - 0610x1219mm:A2 - 0610x1219mm:740750",
+        "location": "1A01"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:740762",
+        "location": "1A08"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:740770",
+        "location": "1A08"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:740780",
+        "location": "1A09"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:740788",
+        "location": "1A12"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B18 - 0610x1219mm:B18 - 0610x1219mm:740798",
+        "location": "1C07"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B18 - 0610x1219mm:B18 - 0610x1219mm:740806",
+        "location": "1C07"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B18 - 0610x1219mm:B18 - 0610x1219mm:740814",
+        "location": "1C10"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B18 - 0610x1219mm:B18 - 0610x1219mm:740824",
+        "location": "1C10"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:740834",
+        "location": "1C02"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:A2B - 0610x1219mm:A2B - 0610x1219mm:740844",
+        "location": "1D40"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:A2B - 0610x1219mm:A2B - 0610x1219mm:740852",
+        "location": "1D40"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:A2B - 0610x1219mm:A2B - 0610x1219mm:740860",
+        "location": "1D40"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:C18 - 0610x1219mm:C18 - 0610x1219mm:740868",
+        "location": "1D38"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:C18 - 0610x1219mm:C18 - 0610x1219mm:740874",
+        "location": "1D38"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:740882",
+        "location": "1E01"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:740922",
+        "location": "1E04"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:740932",
+        "location": "1E22"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:740944",
+        "location": "1E23"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:740952",
+        "location": "1E23"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:740966",
+        "location": "1B17"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1B - 0610x1219mm:B1B - 0610x1219mm:740974",
+        "location": "1B17"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:740982",
+        "location": "1B17"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:740992",
+        "location": "1B13"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:741000",
+        "location": "1B13"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:741008",
+        "location": "1B13"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:741014",
+        "location": "1B13"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:741034",
+        "location": "1B13"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:C1D - 0610x1219mm:C1D - 0610x1219mm:741042",
+        "location": "1B15"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:C1 - 0610x1219mm:C1 - 0610x1219mm:741052",
+        "location": "1B03"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:C1B - 0610x1219mm:C1B - 0610x1219mm:741060",
+        "location": "1B03"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:741068",
+        "location": "1B01"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:741074",
+        "location": "1B01"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1D - 0610x1219mm:B1D - 0610x1219mm:741084",
+        "location": "1C09"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1D - 0610x1219mm:B1D - 0610x1219mm:741090",
+        "location": "1C09"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1D - 0610x1219mm:B1D - 0610x1219mm:741098",
+        "location": "1C08"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1D - 0610x1219mm:B1D - 0610x1219mm:741104",
+        "location": "1C08"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:C1 - 0610x1219mm:C1 - 0610x1219mm:741118",
+        "location": "1C04"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:C1 - 0610x1219mm:C1 - 0610x1219mm:741128",
+        "location": "1C04"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:C18 - 0610x1219mm:C18 - 0610x1219mm:741172",
+        "location": "1D02"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:C18 - 0610x1219mm:C18 - 0610x1219mm:741278",
+        "location": "1D02"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:C18B - 0610x1219mm:C18B - 0610x1219mm:741344",
+        "location": "1D05"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:C18 - 0610x1219mm:C18 - 0610x1219mm:741352",
+        "location": "1D05"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3 - 610x610mm:B3 - 610x610mm:742765",
+        "location": "1AC2"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3B - 610x610mm:B3B - 610x610mm:743001",
+        "location": "1AC2"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3 - 610x610mm:B3 - 610x610mm:743013",
+        "location": "1AC3"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3 - 610x610mm:B3 - 610x610mm:743021",
+        "location": "1AC3"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3B - 610x610mm:B3B - 610x610mm:743029",
+        "location": "1AC3"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3B - 610x610mm:B3B - 610x610mm:743039",
+        "location": "1CC1"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3 - 610x610mm:B3 - 610x610mm:743047",
+        "location": "1CC1"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3 - 610x610mm:B3 - 610x610mm:743053",
+        "location": "1CC1"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3B - 610x610mm:B3B - 610x610mm:743061",
+        "location": "1CC1"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3 - 610x610mm:B3 - 610x610mm:743069",
+        "location": "1CC1"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3 - 610x610mm:B3 - 610x610mm:743077",
+        "location": "1CC1"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3B - 610x610mm:B3B - 610x610mm:743085",
+        "location": "1CC1"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3 - 610x610mm:B3 - 610x610mm:743093",
+        "location": "1CC3"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3B - 610x610mm:B3B - 610x610mm:743101",
+        "location": "1CC3"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3 - 610x610mm:B3 - 610x610mm:743109",
+        "location": "1C12"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B18 - 0610x1219mm:B18 - 0610x1219mm:743160",
+        "location": "1C19"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3 - 610x610mm:B3 - 610x610mm:743206",
+        "location": "1CC1"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3 - 610x610mm:B3 - 610x610mm:743218",
+        "location": "1DC4"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3 - 610x610mm:B3 - 610x610mm:743226",
+        "location": "1DC3"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3B - 610x610mm:B3B - 610x610mm:743234",
+        "location": "1DC3"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3 - 610x610mm:B3 - 610x610mm:743242",
+        "location": "1DC3"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3B - 610x610mm:B3B - 610x610mm:743250",
+        "location": "1DC3"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3 - 610x610mm:B3 - 610x610mm:743258",
+        "location": "1DC3"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3 - 610x610mm:B3 - 610x610mm:743268",
+        "location": "1DC3"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3 - 610x610mm:B3 - 610x610mm:743276",
+        "location": "1D04"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3B - 610x610mm:B3B - 610x610mm:743284",
+        "location": "1DC2"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3 - 610x610mm:B3 - 610x610mm:743292",
+        "location": "1D01"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3B - 610x610mm:B3B - 610x610mm:743312",
+        "location": "1DC4"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3B - 610x610mm:B3B - 610x610mm:743354",
+        "location": "1DC1"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3 - 610x610mm:B3 - 610x610mm:743364",
+        "location": "1DC1"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3 - 610x610mm:B3 - 610x610mm:743372",
+        "location": "1DC1"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3B - 610x610mm:B3B - 610x610mm:743382",
+        "location": "1DC5"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3 - 610x610mm:B3 - 610x610mm:743390",
+        "location": "1D26"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3 - 610x610mm:B3 - 610x610mm:743400",
+        "location": "1DC6"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3B - 610x610mm:B3B - 610x610mm:743408",
+        "location": "1DC7"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3 - 610x610mm:B3 - 610x610mm:743418",
+        "location": "1DC7"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3 - 610x610mm:B3 - 610x610mm:743426",
+        "location": "1DC7"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3B - 610x610mm:B3B - 610x610mm:743434",
+        "location": "1DC7"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3 - 610x610mm:B3 - 610x610mm:743442",
+        "location": "1DC7"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3 - 610x610mm:B3 - 610x610mm:743450",
+        "location": "1DC7"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3 - 610x610mm:B3 - 610x610mm:743460",
+        "location": "1DC6"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3B - 610x610mm:B3B - 610x610mm:743468",
+        "location": "1DC6"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3 - 610x610mm:B3 - 610x610mm:743476",
+        "location": "1EC3"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3 - 610x610mm:B3 - 610x610mm:743484",
+        "location": "1E10"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3 - 610x610mm:B3 - 610x610mm:743492",
+        "location": "1E09"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3B - 610x610mm:B3B - 610x610mm:743500",
+        "location": "1EC1"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3 - 610x610mm:B3 - 610x610mm:743508",
+        "location": "1EC1"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3 - 610x610mm:B3 - 610x610mm:743516",
+        "location": "1EC1"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3B - 610x610mm:B3B - 610x610mm:743526",
+        "location": "1EC1"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3 - 610x610mm:B3 - 610x610mm:743534",
+        "location": "1EC1"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3 - 610x610mm:B3 - 610x610mm:743544",
+        "location": "1EC1"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3B - 610x610mm:B3B - 610x610mm:743552",
+        "location": "1EC1"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3 - 610x610mm:B3 - 610x610mm:743562",
+        "location": "1EC1"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3 - 610x610mm:B3 - 610x610mm:743570",
+        "location": "1EC1"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3B - 610x610mm:B3B - 610x610mm:743582",
+        "location": "1EC1"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3 - 610x610mm:B3 - 610x610mm:743594",
+        "location": "1BC4"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3B - 610x610mm:B3B - 610x610mm:743602",
+        "location": "1BC4"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3 - 610x610mm:B3 - 610x610mm:743612",
+        "location": "1BC4"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3 - 610x610mm:B3 - 610x610mm:743620",
+        "location": "1BC4"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3B - 610x610mm:B3B - 610x610mm:743628",
+        "location": "1BC4"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3 - 610x610mm:B3 - 610x610mm:743642",
+        "location": "1BC4"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3 - 610x610mm:B3 - 610x610mm:743650",
+        "location": "1BC3"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3B - 610x610mm:B3B - 610x610mm:743658",
+        "location": "1BC3"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3 - 610x610mm:B3 - 610x610mm:743666",
+        "location": "1BC3"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3 - 610x610mm:B3 - 610x610mm:743678",
+        "location": "1BC2"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3B - 610x610mm:B3B - 610x610mm:743688",
+        "location": "1BC2"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3 - 610x610mm:B3 - 610x610mm:743698",
+        "location": "1B11"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3 - 610x610mm:B3 - 610x610mm:743708",
+        "location": "1B05"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3 - 610x610mm:B3 - 610x610mm:743718",
+        "location": "1BC2"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3 - 610x610mm:B3 - 610x610mm:743726",
+        "location": "1BC2"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3B - 610x610mm:B3B - 610x610mm:743736",
+        "location": "1BC2"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3B - 610x610mm:B3B - 610x610mm:743744",
+        "location": "1BC1"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3 - 610x610mm:B3 - 610x610mm:743756",
+        "location": "1B02"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3D - 610x610mm:B3D - 610x610mm:743764",
+        "location": "1B19"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3D - 610x610mm:B3D - 610x610mm:743772",
+        "location": "1B19"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3DB - 610x610mm:B3DB - 610x610mm:743782",
+        "location": "1B19"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3D - 610x610mm:B3D - 610x610mm:743800",
+        "location": "1B19"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3DB - 610x610mm:B3DB - 610x610mm:743810",
+        "location": "1B19"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3D - 610x610mm:B3D - 610x610mm:743859",
+        "location": "1B19"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3B - 610x610mm:B3B - 610x610mm:743875",
+        "location": "1AC5"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3 - 610x610mm:B3 - 610x610mm:743885",
+        "location": "1AC5"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3B - 610x610mm:B3B - 610x610mm:743895",
+        "location": "1EC2"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3 - 610x610mm:B3 - 610x610mm:743903",
+        "location": "1EC2"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3B - 610x610mm:B3B - 610x610mm:743911",
+        "location": "1EC4"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3 - 610x610mm:B3 - 610x610mm:743919",
+        "location": "1EC4"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:743971",
+        "location": "1C17"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:744063",
+        "location": "1C17"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:744088",
+        "location": "1C18"
+      },
+      {
+        "page": 1,
+        "type": "M_Pendant Light - Linear:Q4 - 1219mm - 1m Drop:Q4 - 1219mm - 1m Drop:744180",
+        "location": "1C13"
+      },
+      {
+        "page": 1,
+        "type": "M_Pendant Light - Linear:Q4 - 1219mm - 1m Drop:Q4 - 1219mm - 1m Drop:744273",
+        "location": "1C13"
+      },
+      {
+        "page": 1,
+        "type": "M_Pendant Light - Linear:Q4 - 1219mm - 1m Drop:Q4 - 1219mm - 1m Drop:744703",
+        "location": "1E15"
+      },
+      {
+        "page": 1,
+        "type": "M_Pendant Light - Linear:Q4B - 1219mm - 1m Drop:Q4B - 1219mm - 1m Drop:744837",
+        "location": "1E15"
+      },
+      {
+        "page": 1,
+        "type": "M_Pendant Light - Linear:Q4 - 1219mm - 1m Drop:Q4 - 1219mm - 1m Drop:744869",
+        "location": "1E15"
+      },
+      {
+        "page": 1,
+        "type": "M_Pendant Light - Linear:Q4 - 1219mm - 1m Drop:Q4 - 1219mm - 1m Drop:744933",
+        "location": "1E15"
+      },
+      {
+        "page": 1,
+        "type": "M_Surface Mounted Light:E1 - 1219mm:E1 - 1219mm:745139",
+        "location": "1ES2"
+      },
+      {
+        "page": 1,
+        "type": "M_Pendant Light - Linear:Q1 - 1219mm:Q1 - 1219mm:745294",
+        "location": "1B16"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:R1 - 305x1219mm:R1 - 305x1219mm:745356",
+        "location": "1B14"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:R1 - 305x1219mm:R1 - 305x1219mm:745370",
+        "location": "1B12"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:R1 - 305x1219mm:R1 - 305x1219mm:745477",
+        "location": "1B09"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:R1 - 305x1219mm:R1 - 305x1219mm:745555",
+        "location": "1B07"
+      },
+      {
+        "page": 1,
+        "type": "M_Pendant Light - Linear:Q4 - 1219mm - 1m Drop:Q4 - 1219mm - 1m Drop:745757",
+        "location": "1E20"
+      },
+      {
+        "page": 1,
+        "type": "M_Pendant Light - Linear:Q4B - 1219mm - 1m Drop:Q4B - 1219mm - 1m Drop:745835",
+        "location": "1E20"
+      },
+      {
+        "page": 1,
+        "type": "M_Pendant Light - Linear:Q4 - 1219mm - 1m Drop:Q4 - 1219mm - 1m Drop:745874",
+        "location": "1E21"
+      },
+      {
+        "page": 1,
+        "type": "M_Pendant Light - Linear:Q4 - 1219mm - 1m Drop:Q4 - 1219mm - 1m Drop:745992",
+        "location": "1E19"
+      },
+      {
+        "page": 1,
+        "type": "M_Pendant Light - Linear:Q4B - 1219mm - 1m Drop:Q4B - 1219mm - 1m Drop:746053",
+        "location": "1E19"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3 - 610x610mm:B3 - 610x610mm:746231",
+        "location": "1E12"
+      },
+      {
+        "page": 1,
+        "type": "M_Pendant Light - Linear:P1 - Length as Shown:P1 - Length as Shown:746278",
+        "location": "1DC1"
+      },
+      {
+        "page": 1,
+        "type": "M_Pendant Light - Linear:P1 - Length as Shown:P1 - Length as Shown:746342",
+        "location": "1DC1"
+      },
+      {
+        "page": 1,
+        "type": "M_Pendant Light - Linear:P1 - Length as Shown:P1 - Length as Shown:746382",
+        "location": "1DC1"
+      },
+      {
+        "page": 1,
+        "type": "M_Pendant Light - Linear:P1 - Length as Shown:P1 - Length as Shown:746439",
+        "location": "1DC1"
+      },
+      {
+        "page": 1,
+        "type": "M_Pendant Light - Linear:P1 - Length as Shown:P1 - Length as Shown:746494",
+        "location": "1DC1"
+      },
+      {
+        "page": 1,
+        "type": "M_Pendant Light - Linear:P1 - Length as Shown:P1 - Length as Shown:746528",
+        "location": "1DC1"
+      },
+      {
+        "page": 1,
+        "type": "M_Pendant Light - Linear:P1 - Length as Shown:P1 - Length as Shown:746576",
+        "location": "1DC1"
+      },
+      {
+        "page": 1,
+        "type": "M_Downlight - Recessed Can:SB - 102mm Diameter:SB - 102mm Diameter:746741",
+        "location": "1DC1"
+      },
+      {
+        "page": 1,
+        "type": "M_Downlight - Recessed Can:SB - 102mm Diameter:SB - 102mm Diameter:746836",
+        "location": "1DC1"
+      },
+      {
+        "page": 1,
+        "type": "M_Downlight - Recessed Can:SB - 102mm Diameter:SB - 102mm Diameter:746870",
+        "location": "1DC1"
+      },
+      {
+        "page": 1,
+        "type": "M_Downlight - Recessed Can:SB - 102mm Diameter:SB - 102mm Diameter:746910",
+        "location": "1DC1"
+      },
+      {
+        "page": 1,
+        "type": "M_Downlight - Recessed Can:SB - 102mm Diameter:SB - 102mm Diameter:746973",
+        "location": "1DC1"
+      },
+      {
+        "page": 1,
+        "type": "M_Downlight - Recessed Can:SB - 102mm Diameter:SB - 102mm Diameter:747095",
+        "location": "1DC1"
+      },
+      {
+        "page": 1,
+        "type": "M_Downlight - Recessed Can:SB - 102mm Diameter:SB - 102mm Diameter:747203",
+        "location": "1DC1"
+      },
+      {
+        "page": 1,
+        "type": "M_Downlight - Recessed Can:SB - 102mm Diameter:SB - 102mm Diameter:747243",
+        "location": "1DC1"
+      },
+      {
+        "page": 1,
+        "type": "M_Downlight - Recessed Can:SB - 102mm Diameter:SB - 102mm Diameter:747315",
+        "location": "1DC1"
+      },
+      {
+        "page": 1,
+        "type": "M_Downlight - Recessed Can:SB - 102mm Diameter:SB - 102mm Diameter:747370",
+        "location": "1DC1"
+      },
+      {
+        "page": 1,
+        "type": "M_Downlight - Recessed Can:SB - 102mm Diameter:SB - 102mm Diameter:747461",
+        "location": "1DC1"
+      },
+      {
+        "page": 1,
+        "type": "M_Downlight - Recessed Can:SB - 102mm Diameter:SB - 102mm Diameter:747509",
+        "location": "1D22"
+      },
+      {
+        "page": 1,
+        "type": "M_Downlight - Recessed Can:SB - 102mm Diameter:SB - 102mm Diameter:747543",
+        "location": "1D22"
+      },
+      {
+        "page": 1,
+        "type": "M_Downlight - Recessed Can:SB - 102mm Diameter:SB - 102mm Diameter:747680",
+        "location": "1DC1"
+      },
+      {
+        "page": 1,
+        "type": "M_Downlight - Recessed Can:SB - 102mm Diameter:SB - 102mm Diameter:747745",
+        "location": "1DC1"
+      },
+      {
+        "page": 1,
+        "type": "M_Downlight - Recessed Can:SB - 102mm Diameter:SB - 102mm Diameter:747783",
+        "location": "1DC1"
+      },
+      {
+        "page": 1,
+        "type": "M_Downlight - Recessed Can:SB - 102mm Diameter:SB - 102mm Diameter:747831",
+        "location": "1DC1"
+      },
+      {
+        "page": 1,
+        "type": "M_Downlight - Recessed Can:SB - 102mm Diameter:SB - 102mm Diameter:747929",
+        "location": "1DC1"
+      },
+      {
+        "page": 1,
+        "type": "M_Downlight - Recessed Can:SBB - 102 Diameter:SBB - 102 Diameter:747965",
+        "location": "1DC1"
+      },
+      {
+        "page": 1,
+        "type": "M_Downlight - Recessed Can:SB - 102mm Diameter:SB - 102mm Diameter:748022",
+        "location": "1DC1"
+      },
+      {
+        "page": 1,
+        "type": "M_Downlight - Recessed Can:SB - 102mm Diameter:SB - 102mm Diameter:748080",
+        "location": "1DC1"
+      },
+      {
+        "page": 1,
+        "type": "M_Downlight - Recessed Can:SB - 102mm Diameter:SB - 102mm Diameter:748138",
+        "location": "1DC1"
+      },
+      {
+        "page": 1,
+        "type": "M_Downlight - Recessed Can:SD - 213mm Diameter:SD - 213mm Diameter:748450",
+        "location": "1C01"
+      },
+      {
+        "page": 1,
+        "type": "M_Downlight - Recessed Can:SD - 213mm Diameter:SD - 213mm Diameter:748516",
+        "location": "1C01"
+      },
+      {
+        "page": 1,
+        "type": "M_Downlight - Recessed Can:SD - 213mm Diameter:SD - 213mm Diameter:748538",
+        "location": "1C01"
+      },
+      {
+        "page": 1,
+        "type": "M_Downlight - Recessed Can:SD - 213mm Diameter:SD - 213mm Diameter:748571",
+        "location": "1C01"
+      },
+      {
+        "page": 1,
+        "type": "M_Downlight - Recessed Can:SB - 102mm Diameter:SB - 102mm Diameter:748595",
+        "location": "1C02"
+      },
+      {
+        "page": 1,
+        "type": "M_Downlight - Recessed Can:SB - 102mm Diameter:SB - 102mm Diameter:748650",
+        "location": "1C02"
+      },
+      {
+        "page": 1,
+        "type": "M_Downlight - Recessed Can:SB - 102mm Diameter:SB - 102mm Diameter:748712",
+        "location": "1C02"
+      },
+      {
+        "page": 1,
+        "type": "M_Downlight - Recessed Can:SB - 102mm Diameter:SB - 102mm Diameter:748764",
+        "location": "1C10"
+      },
+      {
+        "page": 1,
+        "type": "M_Downlight - Recessed Can:SB - 102mm Diameter:SB - 102mm Diameter:748855",
+        "location": "1C10"
+      },
+      {
+        "page": 1,
+        "type": "M_Downlight - Recessed Can:SB - 102mm Diameter:SB - 102mm Diameter:748879",
+        "location": "1C10"
+      },
+      {
+        "page": 1,
+        "type": "M_Downlight - Recessed Can:SB - 102mm Diameter:SB - 102mm Diameter:748906",
+        "location": "1C10"
+      },
+      {
+        "page": 1,
+        "type": "M_Downlight - Recessed Can:SB - 102mm Diameter:SB - 102mm Diameter:748928",
+        "location": "1C10"
+      },
+      {
+        "page": 1,
+        "type": "M_Downlight - Recessed Can:SB - 102mm Diameter:SB - 102mm Diameter:748970",
+        "location": "1C07"
+      },
+      {
+        "page": 1,
+        "type": "M_Downlight - Recessed Can:SB - 102mm Diameter:SB - 102mm Diameter:749027",
+        "location": "1C07"
+      },
+      {
+        "page": 1,
+        "type": "M_Downlight - Recessed Can:SB - 102mm Diameter:SB - 102mm Diameter:749067",
+        "location": "1C07"
+      },
+      {
+        "page": 1,
+        "type": "M_Downlight - Recessed Can:SB - 102mm Diameter:SB - 102mm Diameter:749099",
+        "location": "1C07"
+      },
+      {
+        "page": 1,
+        "type": "M_Downlight - Recessed Can:SB - 102mm Diameter:SB - 102mm Diameter:749133",
+        "location": "1C07"
+      },
+      {
+        "page": 1,
+        "type": "M_Downlight - Recessed Can:SD - 213mm Diameter:SD - 213mm Diameter:749379",
+        "location": "1AC2"
+      },
+      {
+        "page": 1,
+        "type": "M_Downlight - Recessed Can:SDB - 213mm Diameter:SDB - 213mm Diameter:749482",
+        "location": "1AC2"
+      },
+      {
+        "page": 1,
+        "type": "M_Downlight - Recessed Can:SD - 213mm Diameter:SD - 213mm Diameter:749526",
+        "location": "1AC2"
+      },
+      {
+        "page": 1,
+        "type": "M_Downlight - Recessed Can:SD - 213mm Diameter:SD - 213mm Diameter:749576",
+        "location": "1AC2"
+      },
+      {
+        "page": 1,
+        "type": "M_Downlight - Recessed Can:SD - 213mm Diameter:SD - 213mm Diameter:749654",
+        "location": "1AC1"
+      },
+      {
+        "page": 1,
+        "type": "M_Downlight - Recessed Can:SDB - 213mm Diameter:SDB - 213mm Diameter:749727",
+        "location": "1AC1"
+      },
+      {
+        "page": 1,
+        "type": "M_Downlight - Recessed Can:SD - 213mm Diameter:SD - 213mm Diameter:749761",
+        "location": "1AC1"
+      },
+      {
+        "page": 1,
+        "type": "M_Downlight - Recessed Can:SD - 213mm Diameter:SD - 213mm Diameter:749805",
+        "location": "1AC1"
+      },
+      {
+        "page": 1,
+        "type": "M_Downlight - Recessed Can:SDB - 213mm Diameter:SDB - 213mm Diameter:749843",
+        "location": "1AC1"
+      },
+      {
+        "page": 1,
+        "type": "M_Downlight - Recessed Can:SD - 213mm Diameter:SD - 213mm Diameter:749876",
+        "location": "1AC1"
+      },
+      {
+        "page": 1,
+        "type": "M_Downlight - Recessed Can:SD - 213mm Diameter:SD - 213mm Diameter:749899",
+        "location": "1AC1"
+      },
+      {
+        "page": 1,
+        "type": "M_Downlight - Recessed Can:SD - 213mm Diameter:SD - 213mm Diameter:749926",
+        "location": "1AC1"
+      },
+      {
+        "page": 1,
+        "type": "M_Downlight - Recessed Can:SDB - 213mm Diameter:SDB - 213mm Diameter:749954",
+        "location": "1AC1"
+      },
+      {
+        "page": 1,
+        "type": "M_Downlight - Recessed Can:SD - 213mm Diameter:SD - 213mm Diameter:749997",
+        "location": "1AC1"
+      },
+      {
+        "page": 1,
+        "type": "M_Downlight - Recessed Can:SDB - 213mm Diameter:SDB - 213mm Diameter:750055",
+        "location": "1AC1"
+      },
+      {
+        "page": 1,
+        "type": "M_Downlight - Recessed Can:SD - 213mm Diameter:SD - 213mm Diameter:750152",
+        "location": "1AC1"
+      },
+      {
+        "page": 1,
+        "type": "M_Pendant Light - Linear:Q4B - 1219mm - 1m Drop:Q4B - 1219mm - 1m Drop:750581",
+        "location": "1B21"
+      },
+      {
+        "page": 1,
+        "type": "M_Pendant Light - Linear:Q4 - 1219mm - 1m Drop:Q4 - 1219mm - 1m Drop:750622",
+        "location": "1B21"
+      },
+      {
+        "page": 1,
+        "type": "M_Pendant Light - Linear:Q4 - 1219mm - 1m Drop:Q4 - 1219mm - 1m Drop:750727",
+        "location": "1B23"
+      },
+      {
+        "page": 1,
+        "type": "M_Pendant Light - Linear:Q4B - 1219mm - 1m Drop:Q4B - 1219mm - 1m Drop:750780",
+        "location": "1B23"
+      },
+      {
+        "page": 1,
+        "type": "M_Downlight - Recessed Can:LV - 203mm Diameter:LV - 203mm Diameter:751529",
+        "location": "1DC1"
+      },
+      {
+        "page": 1,
+        "type": "M_Downlight - Recessed Can:LV - 203mm Diameter:LV - 203mm Diameter:751607",
+        "location": "1AC1"
+      },
+      {
+        "page": 1,
+        "type": "M_Downlight - Recessed Can:LV - 203mm Diameter:LV - 203mm Diameter:751662",
+        "location": "1AC1"
+      },
+      {
+        "page": 1,
+        "type": "M_Downlight - Recessed Can:LV - 203mm Diameter:LV - 203mm Diameter:751761",
+        "location": "1AC1"
+      },
+      {
+        "page": 1,
+        "type": "M_Downlight - Recessed Can:LV - 203mm Diameter:LV - 203mm Diameter:751813",
+        "location": "1AC1"
+      },
+      {
+        "page": 1,
+        "type": "M_Downlight - Recessed Can:LV - 203mm Diameter:LV - 203mm Diameter:751885",
+        "location": "1AC1"
+      },
+      {
+        "page": 1,
+        "type": "M_Downlight - Recessed Can:LV - 203mm Diameter:LV - 203mm Diameter:751943",
+        "location": "1AC1"
+      },
+      {
+        "page": 1,
+        "type": "M_Downlight - Recessed Can:LV - 203mm Diameter:LV - 203mm Diameter:752026",
+        "location": "1AC1"
+      },
+      {
+        "page": 1,
+        "type": "M_Downlight - Recessed Can:LV - 203mm Diameter:LV - 203mm Diameter:752081",
+        "location": "1AC1"
+      },
+      {
+        "page": 1,
+        "type": "M_Downlight - Recessed Can:LV - 203mm Diameter:LV - 203mm Diameter:752303",
+        "location": "1AC1"
+      },
+      {
+        "page": 1,
+        "type": "M_Downlight - Recessed Can:LV - 203mm Diameter:LV - 203mm Diameter:752368",
+        "location": "1AC1"
+      },
+      {
+        "page": 1,
+        "type": "M_Downlight - Recessed Can:LV - 203mm Diameter:LV - 203mm Diameter:752424",
+        "location": "1AC1"
+      },
+      {
+        "page": 1,
+        "type": "M_Sconce Light - Sphere:T1:T1:752725",
+        "location": "1AC1"
+      },
+      {
+        "page": 1,
+        "type": "M_Sconce Light - Sphere:T1:T1:752761",
+        "location": "1AC1"
+      },
+      {
+        "page": 1,
+        "type": "M_Sconce Light - Sphere:T1:T1:753021",
+        "location": "1AC1"
+      },
+      {
+        "page": 1,
+        "type": "M_Sconce Light - Sphere:T1:T1:753296",
+        "location": "1AC1"
+      },
+      {
+        "page": 1,
+        "type": "M_Downlight - Recessed Can:LV - 203mm Diameter:LV - 203mm Diameter:753990",
+        "location": "1AC1"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3 - 610x610mm:B3 - 610x610mm:756022",
+        "location": "2A01"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3 - 610x610mm:B3 - 610x610mm:756270",
+        "location": "2A01"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3 - 610x610mm:B3 - 610x610mm:756279",
+        "location": "2A01"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3 - 610x610mm:B3 - 610x610mm:756287",
+        "location": "2A01"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3B - 610x610mm:B3B - 610x610mm:756354",
+        "location": "2A01"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3 - 610x610mm:B3 - 610x610mm:756355",
+        "location": "2A01"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3 - 610x610mm:B3 - 610x610mm:756391",
+        "location": "2AC4"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3B - 610x610mm:B3B - 610x610mm:756401",
+        "location": "2AC4"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3 - 610x610mm:B3 - 610x610mm:756409",
+        "location": "2AC4"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3B - 610x610mm:B3B - 610x610mm:756423",
+        "location": "2AC3"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3 - 610x610mm:B3 - 610x610mm:756437",
+        "location": "2AC3"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3 - 610x610mm:B3 - 610x610mm:756447",
+        "location": "2AC3"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3B - 610x610mm:B3B - 610x610mm:756457",
+        "location": "2AC3"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3 - 610x610mm:B3 - 610x610mm:756467",
+        "location": "2CC2"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3 - 610x610mm:B3 - 610x610mm:756475",
+        "location": "2CC2"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3B - 610x610mm:B3B - 610x610mm:756483",
+        "location": "2CC2"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3B - 610x610mm:B3B - 610x610mm:756493",
+        "location": "2CC3"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3 - 610x610mm:B3 - 610x610mm:756501",
+        "location": "2CC3"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3 - 610x610mm:B3 - 610x610mm:756511",
+        "location": "2CC3"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3B - 610x610mm:B3B - 610x610mm:756519",
+        "location": "2CC4"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3 - 610x610mm:B3 - 610x610mm:756529",
+        "location": "2CC5"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3B - 610x610mm:B3B - 610x610mm:756541",
+        "location": "2CC5"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3 - 610x610mm:B3 - 610x610mm:756551",
+        "location": "2CC1"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3B - 610x610mm:B3B - 610x610mm:756563",
+        "location": "2CC1"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3 - 610x610mm:B3 - 610x610mm:756573",
+        "location": "2CC1"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3B - 610x610mm:B3B - 610x610mm:756581",
+        "location": "2DC2"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3 - 610x610mm:B3 - 610x610mm:756589",
+        "location": "2DC2"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3 - 610x610mm:B3 - 610x610mm:756597",
+        "location": "2DC2"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3B - 610x610mm:B3B - 610x610mm:756605",
+        "location": "2DC2"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3 - 610x610mm:B3 - 610x610mm:756613",
+        "location": "2DC2"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3 - 610x610mm:B3 - 610x610mm:756621",
+        "location": "2DC2"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3B - 610x610mm:B3B - 610x610mm:756629",
+        "location": "2DC2"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3 - 610x610mm:B3 - 610x610mm:756639",
+        "location": "2DC1"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3 - 610x610mm:B3 - 610x610mm:756647",
+        "location": "2DC1"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3B - 610x610mm:B3B - 610x610mm:756655",
+        "location": "2DC1"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3 - 610x610mm:B3 - 610x610mm:756663",
+        "location": "2DC1"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3B - 610x610mm:B3B - 610x610mm:756671",
+        "location": "2BC2"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3 - 610x610mm:B3 - 610x610mm:756679",
+        "location": "2BC2"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3 - 610x610mm:B3 - 610x610mm:756687",
+        "location": "2BC2"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3B - 610x610mm:B3B - 610x610mm:756697",
+        "location": "2BC2"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3B - 610x610mm:B3B - 610x610mm:756709",
+        "location": "2BC3"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3 - 610x610mm:B3 - 610x610mm:756717",
+        "location": "2BC3"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3B - 610x610mm:B3B - 610x610mm:756727",
+        "location": "2BC3"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3 - 610x610mm:B3 - 610x610mm:756735",
+        "location": "2BC3"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3 - 610x610mm:B3 - 610x610mm:756747",
+        "location": "2B22"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3 - 610x610mm:B3 - 610x610mm:756757",
+        "location": "2BC4"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3B - 610x610mm:B3B - 610x610mm:756769",
+        "location": "2BC4"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3 - 610x610mm:B3 - 610x610mm:756777",
+        "location": "2BC5"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3B - 610x610mm:B3B - 610x610mm:756787",
+        "location": "2BC5"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3 - 610x610mm:B3 - 610x610mm:756795",
+        "location": "2BC5"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3 - 610x610mm:B3 - 610x610mm:756805",
+        "location": "2BC5"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3B - 610x610mm:B3B - 610x610mm:756813",
+        "location": "2BC5"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3 - 610x610mm:B3 - 610x610mm:756823",
+        "location": "2BC6"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3B - 610x610mm:B3B - 610x610mm:756831",
+        "location": "2BC6"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:A2B - 0610x1219mm:A2B - 0610x1219mm:756865",
+        "location": "2C16"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:A2B - 0610x1219mm:A2B - 0610x1219mm:756954",
+        "location": "2C16"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:A28 - 0610x1219mm:A28 - 0610x1219mm:757047",
+        "location": "2C14"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:A28 - 0610x1219mm:A28 - 0610x1219mm:757176",
+        "location": "2C14"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:A28 - 0610x1219mm:A28 - 0610x1219mm:757212",
+        "location": "2C14"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:A28 - 0610x1219mm:A28 - 0610x1219mm:757290",
+        "location": "2C14"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:757334",
+        "location": "2C13"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:C1 - 0610x1219mm:C1 - 0610x1219mm:757603",
+        "location": "2C11"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3 - 610x610mm:B3 - 610x610mm:757715",
+        "location": "2CC4"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:A28 - 0610x1219mm:A28 - 0610x1219mm:757939",
+        "location": "2C09"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:A28 - 0610x1219mm:A28 - 0610x1219mm:758020",
+        "location": "2C09"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:A28 - 0610x1219mm:A28 - 0610x1219mm:758065",
+        "location": "2C09"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:A28 - 0610x1219mm:A28 - 0610x1219mm:758137",
+        "location": "2C09"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:A28 - 0610x1219mm:A28 - 0610x1219mm:758214",
+        "location": "2C06"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:A28 - 0610x1219mm:A28 - 0610x1219mm:758349",
+        "location": "2C06"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:A28 - 0610x1219mm:A28 - 0610x1219mm:758406",
+        "location": "2C06"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:A28 - 0610x1219mm:A28 - 0610x1219mm:758485",
+        "location": "2C06"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:A28 - 0610x1219mm:A28 - 0610x1219mm:758524",
+        "location": "2C04"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:A28 - 0610x1219mm:A28 - 0610x1219mm:758566",
+        "location": "2C04"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:A28 - 0610x1219mm:A28 - 0610x1219mm:758595",
+        "location": "2C04"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:A28 - 0610x1219mm:A28 - 0610x1219mm:758632",
+        "location": "2C04"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:A28 - 0610x1219mm:A28 - 0610x1219mm:758668",
+        "location": "2C02"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:A28 - 0610x1219mm:A28 - 0610x1219mm:758695",
+        "location": "2C02"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:A28 - 0610x1219mm:A28 - 0610x1219mm:758706",
+        "location": "2C02"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:A28 - 0610x1219mm:A28 - 0610x1219mm:758716",
+        "location": "2C02"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:A28 - 0610x1219mm:A28 - 0610x1219mm:758733",
+        "location": "2A09"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:A28 - 0610x1219mm:A28 - 0610x1219mm:758776",
+        "location": "2A09"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:A28 - 0610x1219mm:A28 - 0610x1219mm:758823",
+        "location": "2A09"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:A28 - 0610x1219mm:A28 - 0610x1219mm:758854",
+        "location": "2A09"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:A28 - 0610x1219mm:A28 - 0610x1219mm:758896",
+        "location": "2A08"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:A28 - 0610x1219mm:A28 - 0610x1219mm:758959",
+        "location": "2A08"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:A28 - 0610x1219mm:A28 - 0610x1219mm:759007",
+        "location": "2A08"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:A28 - 0610x1219mm:A28 - 0610x1219mm:759055",
+        "location": "2A08"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:A28 - 0610x1219mm:A28 - 0610x1219mm:759156",
+        "location": "2A07"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:A28 - 0610x1219mm:A28 - 0610x1219mm:759199",
+        "location": "2A07"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:A28 - 0610x1219mm:A28 - 0610x1219mm:759249",
+        "location": "2A07"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:A28 - 0610x1219mm:A28 - 0610x1219mm:759301",
+        "location": "2A07"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:A28 - 0610x1219mm:A28 - 0610x1219mm:759356",
+        "location": "2A06"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:A28 - 0610x1219mm:A28 - 0610x1219mm:759447",
+        "location": "2A06"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:A28 - 0610x1219mm:A28 - 0610x1219mm:759535",
+        "location": "2A06"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:A28 - 0610x1219mm:A28 - 0610x1219mm:759607",
+        "location": "2A06"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:A28 - 0610x1219mm:A28 - 0610x1219mm:759666",
+        "location": "2A05"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:A28 - 0610x1219mm:A28 - 0610x1219mm:759747",
+        "location": "2A05"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:A28 - 0610x1219mm:A28 - 0610x1219mm:759797",
+        "location": "2A05"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:A28 - 0610x1219mm:A28 - 0610x1219mm:759855",
+        "location": "2A05"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:759928",
+        "location": "2A04"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:760014",
+        "location": "2A04"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:760132",
+        "location": "2A03"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:760217",
+        "location": "2A03"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:760486",
+        "location": "2A02"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:760579",
+        "location": "2A02"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:760806",
+        "location": "2A13"
+      },
+      {
+        "page": 1,
+        "type": "M_Surface Mounted Light:Y2:Y2:760903",
+        "location": "2A13"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:A2 - 0610x1219mm:A2 - 0610x1219mm:760938",
+        "location": "2A12"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:A2B - 0610x1219mm:A2B - 0610x1219mm:761042",
+        "location": "2A12"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:A2 - 0610x1219mm:A2 - 0610x1219mm:761127",
+        "location": "2A12"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1B - 0610x1219mm:B1B - 0610x1219mm:761434",
+        "location": "2A11"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:761518",
+        "location": "2A11"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:761620",
+        "location": "2A11"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1B - 0610x1219mm:B1B - 0610x1219mm:761751",
+        "location": "2A11"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:761838",
+        "location": "2A11"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:761900",
+        "location": "2A14"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:762032",
+        "location": "2A14"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:762088",
+        "location": "2A14"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:762164",
+        "location": "2A14"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:762237",
+        "location": "2A14"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1B - 0610x1219mm:B1B - 0610x1219mm:762334",
+        "location": "2A14"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3 - 610x610mm:B3 - 610x610mm:762463",
+        "location": "2AC5"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3B - 610x610mm:B3B - 610x610mm:762565",
+        "location": "2AC5"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3B - 610x610mm:B3B - 610x610mm:762673",
+        "location": "2AC2"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3 - 610x610mm:B3 - 610x610mm:762706",
+        "location": "2AC2"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3B - 610x610mm:B3B - 610x610mm:762838",
+        "location": "2AC2"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3 - 610x610mm:B3 - 610x610mm:762938",
+        "location": "2C03"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3B - 610x610mm:B3B - 610x610mm:763143",
+        "location": "2C07"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:A2 - 0610x1219mm:A2 - 0610x1219mm:763429",
+        "location": "2C10"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:A2 - 0610x1219mm:A2 - 0610x1219mm:763552",
+        "location": "2C10"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1B - 0610x1219mm:B1B - 0610x1219mm:763665",
+        "location": "2C08"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:763756",
+        "location": "2C08"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:763883",
+        "location": "2C07"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:763991",
+        "location": "2C07"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:D18 - 0610x1219mm:D18 - 0610x1219mm:764213",
+        "location": "2C17"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:D18 - 0610x1219mm:D18 - 0610x1219mm:764308",
+        "location": "2C17"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:D18 - 0610x1219mm:D18 - 0610x1219mm:764374",
+        "location": "2C17"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:D18 - 0610x1219mm:D18 - 0610x1219mm:764448",
+        "location": "2C17"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:D18 - 0610x1219mm:D18 - 0610x1219mm:764496",
+        "location": "2C17"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:D18 - 0610x1219mm:D18 - 0610x1219mm:764616",
+        "location": "2C17"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:A2 - 0610x1219mm:A2 - 0610x1219mm:764970",
+        "location": "2C12"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:A2 - 0610x1219mm:A2 - 0610x1219mm:765029",
+        "location": "2C12"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:A2 - 0610x1219mm:A2 - 0610x1219mm:765075",
+        "location": "2C12"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:765207",
+        "location": "2C19"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:765269",
+        "location": "2C19"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:765313",
+        "location": "2C19"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:765468",
+        "location": "2C08"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:C1 - 0610x1219mm:C1 - 0610x1219mm:765582",
+        "location": "2C03"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:C1 - 0610x1219mm:C1 - 0610x1219mm:765675",
+        "location": "2C03"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:C1 - 0610x1219mm:C1 - 0610x1219mm:765736",
+        "location": "2C01"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:C1 - 0610x1219mm:C1 - 0610x1219mm:765785",
+        "location": "2C01"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:C1 - 0610x1219mm:C1 - 0610x1219mm:765853",
+        "location": "2C03"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:C1 - 0610x1219mm:C1 - 0610x1219mm:765913",
+        "location": "2C03"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:766021",
+        "location": "2C22"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:766086",
+        "location": "2C22"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:766284",
+        "location": "2B3"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:766379",
+        "location": "2B3"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:766443",
+        "location": "2B3"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:766551",
+        "location": "2B3"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:C1 - 0610x1219mm:C1 - 0610x1219mm:766651",
+        "location": "2B4"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:C1 - 0610x1219mm:C1 - 0610x1219mm:766726",
+        "location": "2B4"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:766791",
+        "location": "2B7"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:766836",
+        "location": "2B7"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:766933",
+        "location": "2B9"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:767010",
+        "location": "2B9"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:767247",
+        "location": "2D03"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:767338",
+        "location": "2D03"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:767412",
+        "location": "2D04"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:767463",
+        "location": "2D04"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1B - 0610x1219mm:B1B - 0610x1219mm:767557",
+        "location": "2D04"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:767675",
+        "location": "2D01"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:767811",
+        "location": "2D02"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:767896",
+        "location": "2D04-A"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:767959",
+        "location": "2D04-A"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:767999",
+        "location": "2D04-A"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:768080",
+        "location": "2D04-A"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:768139",
+        "location": "2D04-A"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:768213",
+        "location": "2D04-A"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:768435",
+        "location": "2D09"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:768528",
+        "location": "2D09"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:768636",
+        "location": "2D08"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:768769",
+        "location": "2D08"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:768866",
+        "location": "2D07"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:768973",
+        "location": "2D07"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:769040",
+        "location": "2D06"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:769117",
+        "location": "2D06"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:C1 - 0610x1219mm:C1 - 0610x1219mm:769225",
+        "location": "2D10"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:C1B - 0610x1219mm:C1B - 0610x1219mm:769304",
+        "location": "2D10"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:C1 - 0610x1219mm:C1 - 0610x1219mm:769336",
+        "location": "2D10"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:769515",
+        "location": "2D11"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:769575",
+        "location": "2D11"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:769664",
+        "location": "2D16"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:769730",
+        "location": "2D16"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3 - 610x610mm:B3 - 610x610mm:769856",
+        "location": "2D13"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:770065",
+        "location": "2D14"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:770158",
+        "location": "2D14"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:770241",
+        "location": "2D15"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:770319",
+        "location": "2D15"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:770454",
+        "location": "2D17"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:770488",
+        "location": "2D17"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:770554",
+        "location": "2D19"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:770646",
+        "location": "2D19"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:770733",
+        "location": "2D20"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1B - 0610x1219mm:B1B - 0610x1219mm:770782",
+        "location": "2D20"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:770803",
+        "location": "2D20"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:770835",
+        "location": "2D20"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:770871",
+        "location": "2D20"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:770900",
+        "location": "2D20"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:770937",
+        "location": "2D21"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:771103",
+        "location": "2D21"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:771155",
+        "location": "2D21"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:771219",
+        "location": "2D21"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:771279",
+        "location": "2D21"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:771351",
+        "location": "2D21"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:771541",
+        "location": "2B16"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:771644",
+        "location": "2B16"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:771695",
+        "location": "2B18"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:771736",
+        "location": "2B18"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:771838",
+        "location": "2B21"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:771897",
+        "location": "2B21"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:771988",
+        "location": "2B23"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:772036",
+        "location": "2B23"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:772088",
+        "location": "2B24"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:772157",
+        "location": "2B24"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:772253",
+        "location": "2B01"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:772330",
+        "location": "2B01"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:772499",
+        "location": "2B25"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:772665",
+        "location": "2B19"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:772734",
+        "location": "2B19"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:C1 - 0610x1219mm:C1 - 0610x1219mm:772786",
+        "location": "2B17"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:C1 - 0610x1219mm:C1 - 0610x1219mm:772866",
+        "location": "2B15"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:C1 - 0610x1219mm:C1 - 0610x1219mm:772961",
+        "location": "2B15"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:773095",
+        "location": "2B14"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:773147",
+        "location": "2B14"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:773282",
+        "location": "2B10"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:773329",
+        "location": "2B10"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:773377",
+        "location": "2B10"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1B - 0610x1219mm:B1B - 0610x1219mm:773454",
+        "location": "2B10"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:773497",
+        "location": "2B8"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:773564",
+        "location": "2B8"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:773621",
+        "location": "2B8"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3 - 610x610mm:B3 - 610x610mm:773813",
+        "location": "2B6"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3 - 610x610mm:B3 - 610x610mm:773823",
+        "location": "2B5"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1B - 0610x1219mm:B1B - 0610x1219mm:773871",
+        "location": "2C24"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1B - 0610x1219mm:B1B - 0610x1219mm:773998",
+        "location": "2C23"
+      },
+      {
+        "page": 1,
+        "type": "M_Pendant Light - Linear:Q4 - 1219mm - 1m Drop:Q4 - 1219mm - 1m Drop:774134",
+        "location": "2D05"
+      },
+      {
+        "page": 1,
+        "type": "M_Pendant Light - Linear:Q4 - 1219mm - 1m Drop:Q4 - 1219mm - 1m Drop:774298",
+        "location": "2D05"
+      },
+      {
+        "page": 1,
+        "type": "M_Pendant Light - Linear:Q4B - 1219mm - 1m Drop:Q4B - 1219mm - 1m Drop:774387",
+        "location": "2D05"
+      },
+      {
+        "page": 1,
+        "type": "M_Pendant Light - Linear:Q4 - 1219mm - 1m Drop:Q4 - 1219mm - 1m Drop:774451",
+        "location": "2D05"
+      },
+      {
+        "page": 1,
+        "type": "M_Pendant Light - Linear:Q4 - 1219mm - 1m Drop:Q4 - 1219mm - 1m Drop:774522",
+        "location": "2D05"
+      },
+      {
+        "page": 1,
+        "type": "M_Pendant Light - Linear:Q4 - 1219mm - 1m Drop:Q4 - 1219mm - 1m Drop:774621",
+        "location": "2D05"
+      },
+      {
+        "page": 1,
+        "type": "M_Pendant Light - Linear:Q4 - 1219mm - 1m Drop:Q4 - 1219mm - 1m Drop:774680",
+        "location": "2D05"
+      },
+      {
+        "page": 1,
+        "type": "M_Pendant Light - Linear:Q4 - 1219mm - 1m Drop:Q4 - 1219mm - 1m Drop:774744",
+        "location": "2D05"
+      },
+      {
+        "page": 1,
+        "type": "M_Pendant Light - Linear:Q4B - 1219mm - 1m Drop:Q4B - 1219mm - 1m Drop:774861",
+        "location": "2D05"
+      },
+      {
+        "page": 1,
+        "type": "M_Pendant Light - Linear:Q4 - 1219mm - 1m Drop:Q4 - 1219mm - 1m Drop:774911",
+        "location": "2D05"
+      },
+      {
+        "page": 1,
+        "type": "M_Pendant Light - Linear:Q4 - 1219mm - 1m Drop:Q4 - 1219mm - 1m Drop:774993",
+        "location": "2D05"
+      },
+      {
+        "page": 1,
+        "type": "M_Pendant Light - Linear:Q4 - 1219mm - 1m Drop:Q4 - 1219mm - 1m Drop:775091",
+        "location": "2D05"
+      },
+      {
+        "page": 1,
+        "type": "M_Pendant Light - Linear:Q4 - 1219mm - 1m Drop:Q4 - 1219mm - 1m Drop:775170",
+        "location": "2D05"
+      },
+      {
+        "page": 1,
+        "type": "M_Pendant Light - Linear:Q4 - 1219mm - 1m Drop:Q4 - 1219mm - 1m Drop:775226",
+        "location": "2D05"
+      },
+      {
+        "page": 1,
+        "type": "M_Pendant Light - Linear:Q4 - 1219mm - 1m Drop:Q4 - 1219mm - 1m Drop:775261",
+        "location": "2D05"
+      },
+      {
+        "page": 1,
+        "type": "M_Pendant Light - Linear:Q4 - 1219mm - 1m Drop:Q4 - 1219mm - 1m Drop:775330",
+        "location": "2D05"
+      },
+      {
+        "page": 1,
+        "type": "M_Pendant Light - Linear:Q4 - 1219mm - 1m Drop:Q4 - 1219mm - 1m Drop:775447",
+        "location": "2D05"
+      },
+      {
+        "page": 1,
+        "type": "M_Pendant Light - Linear:Q4 - 1219mm - 1m Drop:Q4 - 1219mm - 1m Drop:775523",
+        "location": "2D05"
+      },
+      {
+        "page": 1,
+        "type": "M_Pendant Light - Linear:Q4 - 1219mm - 1m Drop:Q4 - 1219mm - 1m Drop:775602",
+        "location": "2D05"
+      },
+      {
+        "page": 1,
+        "type": "M_Pendant Light - Linear:Q4B - 1219mm - 1m Drop:Q4B - 1219mm - 1m Drop:775688",
+        "location": "2D05"
+      },
+      {
+        "page": 1,
+        "type": "M_Pendant Light - Linear:Q4 - 1219mm - 1m Drop:Q4 - 1219mm - 1m Drop:775734",
+        "location": "2D05"
+      },
+      {
+        "page": 1,
+        "type": "M_Pendant Light - Linear:Q4 - 1219mm - 1m Drop:Q4 - 1219mm - 1m Drop:775855",
+        "location": "2D05"
+      },
+      {
+        "page": 1,
+        "type": "M_Pendant Light - Linear:Q4 - 1219mm - 1m Drop:Q4 - 1219mm - 1m Drop:775907",
+        "location": "2D05"
+      },
+      {
+        "page": 1,
+        "type": "M_Pendant Light - Linear:Q4B - 1219mm - 1m Drop:Q4B - 1219mm - 1m Drop:776018",
+        "location": "2D05"
+      },
+      {
+        "page": 1,
+        "type": "M_Pendant Light - Linear:Q4B - 1219mm - 1m Drop:Q4B - 1219mm - 1m Drop:776471",
+        "location": "2B13"
+      },
+      {
+        "page": 1,
+        "type": "M_Pendant Light - Linear:Q4 - 1219mm - 1m Drop:Q4 - 1219mm - 1m Drop:776509",
+        "location": "2B13"
+      },
+      {
+        "page": 1,
+        "type": "M_Pendant Light - Linear:Q4B - 1219mm - 1m Drop:Q4B - 1219mm - 1m Drop:776596",
+        "location": "2B12"
+      },
+      {
+        "page": 1,
+        "type": "M_Pendant Light - Linear:Q4 - 1219mm - 1m Drop:Q4 - 1219mm - 1m Drop:776627",
+        "location": "2B12"
+      },
+      {
+        "page": 1,
+        "type": "M_Surface Mounted Light:E1 - 1219mm:E1 - 1219mm:776789",
+        "location": "2BS2"
+      },
+      {
+        "page": 1,
+        "type": "M_Pendant Light - Linear:P1 - Length as Shown:P1 - Length as Shown:777306",
+        "location": "2D18"
+      },
+      {
+        "page": 1,
+        "type": "M_Pendant Light - Linear:P1 - Length as Shown:P1 - Length as Shown:777413",
+        "location": "2D18"
+      },
+      {
+        "page": 1,
+        "type": "M_Pendant Light - Linear:P1 - Length as Shown:P1 - Length as Shown:777540",
+        "location": "2D18"
+      },
+      {
+        "page": 1,
+        "type": "M_Pendant Light - Linear:P1 - Length as Shown:P1 - Length as Shown:777566",
+        "location": "2D18"
+      },
+      {
+        "page": 1,
+        "type": "M_Pendant Light - Linear:P1 - Length as Shown:P1 - Length as Shown:777702",
+        "location": "2D18"
+      },
+      {
+        "page": 1,
+        "type": "M_Pendant Light - Linear:P1 - Length as Shown:P1 - Length as Shown:777758",
+        "location": "2D18"
+      },
+      {
+        "page": 1,
+        "type": "M_Downlight - Recessed Can:S - 203mm Diameter:S - 203mm Diameter:778151",
+        "location": "2A01"
+      },
+      {
+        "page": 1,
+        "type": "M_Downlight - Recessed Can:S - 203mm Diameter:S - 203mm Diameter:778229",
+        "location": "2A01"
+      },
+      {
+        "page": 1,
+        "type": "M_Downlight - Recessed Can:S - 203mm Diameter:S - 203mm Diameter:778312",
+        "location": "2A01"
+      },
+      {
+        "page": 1,
+        "type": "M_Downlight - Recessed Can:S - 203mm Diameter:S - 203mm Diameter:778364",
+        "location": "2A01"
+      },
+      {
+        "page": 1,
+        "type": "M_Downlight - Recessed Can:S - 203mm Diameter:S - 203mm Diameter:778414",
+        "location": "2A01"
+      },
+      {
+        "page": 1,
+        "type": "M_Downlight - Recessed Can:S - 203mm Diameter:S - 203mm Diameter:778608",
+        "location": "2A01"
+      },
+      {
+        "page": 1,
+        "type": "M_Downlight - Recessed Can:S - 203mm Diameter:S - 203mm Diameter:778668",
+        "location": "2A01"
+      },
+      {
+        "page": 1,
+        "type": "M_Downlight - Recessed Can:S - 203mm Diameter:S - 203mm Diameter:778744",
+        "location": "2A01"
+      },
+      {
+        "page": 1,
+        "type": "M_Downlight - Recessed Can:S - 203mm Diameter:S - 203mm Diameter:778810",
+        "location": "2A01"
+      },
+      {
+        "page": 1,
+        "type": "M_Surface Mounted Light:M175:M175:779006",
+        "location": "2A14"
+      },
+      {
+        "page": 1,
+        "type": "M_Downlight - Recessed Can:SCB - 213 Diameter:SCB - 213 Diameter:779113",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "M_Downlight - Recessed Can:SCB - 213 Diameter:SCB - 213 Diameter:779188",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "M_Downlight - Recessed Can:SC - 213mm Diameter:SC - 213mm Diameter:779322",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "M_Downlight - Recessed Can:SC - 213mm Diameter:SC - 213mm Diameter:779368",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "M_Downlight - Recessed Can:SC - 213mm Diameter:SC - 213mm Diameter:779408",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "M_Downlight - Recessed Can:SC - 213mm Diameter:SC - 213mm Diameter:779444",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "M_Downlight - Recessed Can:SC - 213mm Diameter:SC - 213mm Diameter:779480",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "M_Surface Mounted Light:E2 - 610mm:E2 - 610mm:779597",
+        "location": "2C23"
+      },
+      {
+        "page": 1,
+        "type": "M_Surface Mounted Light:E2 - 610mm:E2 - 610mm:779644",
+        "location": "2C03"
+      },
+      {
+        "page": 1,
+        "type": "M_Downlight - Recessed Can:SCB - 213 Diameter:SCB - 213 Diameter:779791",
+        "location": "2AS1"
+      },
+      {
+        "page": 1,
+        "type": "M_Downlight - Recessed Can:SC - 213mm Diameter:SC - 213mm Diameter:779853",
+        "location": "2AS1"
+      },
+      {
+        "page": 1,
+        "type": "M_Downlight - Recessed Can:SC - 213mm Diameter:SC - 213mm Diameter:779897",
+        "location": "2AS1"
+      },
+      {
+        "page": 1,
+        "type": "M_Downlight - Recessed Can:SCB - 213 Diameter:SCB - 213 Diameter:779939",
+        "location": "2AS1"
+      },
+      {
+        "page": 1,
+        "type": "M_Downlight - Recessed Can:SC - 213mm Diameter:SC - 213mm Diameter:779979",
+        "location": "2AS1"
+      },
+      {
+        "page": 1,
+        "type": "M_Downlight - Recessed Can:SCB - 213 Diameter:SCB - 213 Diameter:780013",
+        "location": "2AS1"
+      },
+      {
+        "page": 1,
+        "type": "M_Downlight - Recessed Can:SC - 213mm Diameter:SC - 213mm Diameter:780057",
+        "location": "2AS1"
+      },
+      {
+        "page": 1,
+        "type": "M_Downlight - Recessed Can:SC - 213mm Diameter:SC - 213mm Diameter:780097",
+        "location": "2AS1"
+      },
+      {
+        "page": 1,
+        "type": "M_Downlight - Recessed Can:SE - 213mm Diameter:SE - 213mm Diameter:780357",
+        "location": "2D11"
+      },
+      {
+        "page": 1,
+        "type": "M_Downlight - Recessed Can:SE - 213mm Diameter:SE - 213mm Diameter:780417",
+        "location": "2D11"
+      },
+      {
+        "page": 1,
+        "type": "M_Downlight - Recessed Can:SE - 213mm Diameter:SE - 213mm Diameter:780461",
+        "location": "2D11"
+      },
+      {
+        "page": 1,
+        "type": "M_Downlight - Recessed Can:SE - 213mm Diameter:SE - 213mm Diameter:780518",
+        "location": "2D11"
+      },
+      {
+        "page": 1,
+        "type": "M_Downlight - Recessed Can:SE - 213mm Diameter:SE - 213mm Diameter:780568",
+        "location": "2D13"
+      },
+      {
+        "page": 1,
+        "type": "M_Downlight - Recessed Can:SB - 102mm Diameter:SB - 102mm Diameter:780694",
+        "location": "2D18"
+      },
+      {
+        "page": 1,
+        "type": "M_Downlight - Recessed Can:SBB - 102 Diameter:SBB - 102 Diameter:780723",
+        "location": "2D18"
+      },
+      {
+        "page": 1,
+        "type": "M_Downlight - Recessed Can:SD - 213mm Diameter:SD - 213mm Diameter:780754",
+        "location": "2D10"
+      },
+      {
+        "page": 1,
+        "type": "M_Downlight - Recessed Can:SD - 213mm Diameter:SD - 213mm Diameter:780882",
+        "location": "2D10"
+      },
+      {
+        "page": 1,
+        "type": "M_Downlight - Recessed Can:SD - 213mm Diameter:SD - 213mm Diameter:780905",
+        "location": "2D10"
+      },
+      {
+        "page": 1,
+        "type": "M_Downlight - Recessed Can:SB - 102mm Diameter:SB - 102mm Diameter:780937",
+        "location": "2D18"
+      },
+      {
+        "page": 1,
+        "type": "M_Downlight - Recessed Can:SBB - 102 Diameter:SBB - 102 Diameter:780978",
+        "location": "2D18"
+      },
+      {
+        "page": 1,
+        "type": "M_Downlight - Recessed Can:SB - 102mm Diameter:SB - 102mm Diameter:781006",
+        "location": "2D18"
+      },
+      {
+        "page": 1,
+        "type": "M_Downlight - Recessed Can:SB - 102mm Diameter:SB - 102mm Diameter:781031",
+        "location": "2D18"
+      },
+      {
+        "page": 1,
+        "type": "M_Downlight - Recessed Can:SBB - 102 Diameter:SBB - 102 Diameter:781069",
+        "location": "2D18"
+      },
+      {
+        "page": 1,
+        "type": "M_Downlight - Recessed Can:SB - 102mm Diameter:SB - 102mm Diameter:781098",
+        "location": "2D18"
+      },
+      {
+        "page": 1,
+        "type": "M_Downlight - Recessed Can:SBB - 102 Diameter:SBB - 102 Diameter:781128",
+        "location": "2D18"
+      },
+      {
+        "page": 1,
+        "type": "M_Downlight - Recessed Can:SB - 102mm Diameter:SB - 102mm Diameter:781184",
+        "location": "2D18"
+      },
+      {
+        "page": 1,
+        "type": "M_Downlight - Recessed Can:SBB - 102 Diameter:SBB - 102 Diameter:781249",
+        "location": "2D18"
+      },
+      {
+        "page": 1,
+        "type": "M_Downlight - Recessed Can:SB - 102mm Diameter:SB - 102mm Diameter:781289",
+        "location": "2D18"
+      },
+      {
+        "page": 1,
+        "type": "M_Downlight - Recessed Can:SB - 102mm Diameter:SB - 102mm Diameter:781328",
+        "location": "2D18"
+      },
+      {
+        "page": 1,
+        "type": "M_Downlight - Recessed Can:SBB - 102 Diameter:SBB - 102 Diameter:781384",
+        "location": "2D18"
+      },
+      {
+        "page": 1,
+        "type": "M_Downlight - Recessed Can:SB - 102mm Diameter:SB - 102mm Diameter:781411",
+        "location": "2D18"
+      },
+      {
+        "page": 1,
+        "type": "M_Downlight - Recessed Can:SB - 102mm Diameter:SB - 102mm Diameter:781444",
+        "location": "2D18"
+      },
+      {
+        "page": 1,
+        "type": "M_Downlight - Recessed Can:SC - 213mm Diameter:SC - 213mm Diameter:781718",
+        "location": "2B11"
+      },
+      {
+        "page": 1,
+        "type": "M_Downlight - Recessed Can:SC - 213mm Diameter:SC - 213mm Diameter:781769",
+        "location": "2B11"
+      },
+      {
+        "page": 1,
+        "type": "M_Downlight - Recessed Can:SC - 213mm Diameter:SC - 213mm Diameter:781817",
+        "location": "2B11"
+      },
+      {
+        "page": 1,
+        "type": "Lighted Signage:Y - X-Ray:Y - X-Ray:1220125",
+        "location": "2AC3"
+      },
+      {
+        "page": 1,
+        "type": "M_Downlight - Recessed Can:SC - 213mm Diameter:SC - 213mm Diameter:781853",
+        "location": "2B11"
+      },
+      {
+        "page": 1,
+        "type": "M_Downlight - Recessed Can:SC - 213mm Diameter:SC - 213mm Diameter:781897",
+        "location": "2B11"
+      },
+      {
+        "page": 1,
+        "type": "M_Downlight - Recessed Can:SC - 213mm Diameter:SC - 213mm Diameter:781949",
+        "location": "2B11"
+      },
+      {
+        "page": 1,
+        "type": "M_Downlight - Recessed Can:SB - 102mm Diameter:SB - 102mm Diameter:782024",
+        "location": "2BC1"
+      },
+      {
+        "page": 1,
+        "type": "M_Downlight - Recessed Can:SB - 102mm Diameter:SB - 102mm Diameter:782088",
+        "location": "2BC1"
+      },
+      {
+        "page": 1,
+        "type": "M_Downlight - Recessed Can:SBB - 102 Diameter:SBB - 102 Diameter:782159",
+        "location": "2BC1"
+      },
+      {
+        "page": 1,
+        "type": "M_Downlight - Recessed Can:SBB - 102 Diameter:SBB - 102 Diameter:782187",
+        "location": "2BC1"
+      },
+      {
+        "page": 1,
+        "type": "M_Downlight - Recessed Can:SB - 102mm Diameter:SB - 102mm Diameter:782227",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "M_Downlight - Recessed Can:SB - 102mm Diameter:SB - 102mm Diameter:782263",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "M_Surface Mounted Light:M250:M250:782392",
+        "location": "2D03"
+      },
+      {
+        "page": 1,
+        "type": "M_Surface Mounted Light:M400:M400:782453",
+        "location": "2D03"
+      },
+      {
+        "page": 1,
+        "type": "M_Surface Mounted Light:M400:M400:782613",
+        "location": "2D04-A"
+      },
+      {
+        "page": 1,
+        "type": "M_Surface Mounted Light:M400:M400:782665",
+        "location": "2D04-A"
+      },
+      {
+        "page": 1,
+        "type": "M_Downlight - Recessed Can:SA - 152mm Diameter:SA - 152mm Diameter:783090",
+        "location": "2C08"
+      },
+      {
+        "page": 1,
+        "type": "M_Pendant Light - Linear:Q4B - 1219mm - 1m Drop:Q4B - 1219mm - 1m Drop:783301",
+        "location": "2C18"
+      },
+      {
+        "page": 1,
+        "type": "M_Pendant Light - Linear:Q4 - 1219mm - 1m Drop:Q4 - 1219mm - 1m Drop:783310",
+        "location": "2C18"
+      },
+      {
+        "page": 1,
+        "type": "M_Pendant Light - Linear:Q4 - 1219mm - 1m Drop:Q4 - 1219mm - 1m Drop:783320",
+        "location": "2C15"
+      },
+      {
+        "page": 1,
+        "type": "M_Pendant Light - Linear:Q4B - 1219mm - 1m Drop:Q4B - 1219mm - 1m Drop:783328",
+        "location": "2C15"
+      },
+      {
+        "page": 1,
+        "type": "M_Downlight - Recessed Can:SC - 213mm Diameter:SC - 213mm Diameter:783354",
+        "location": "2A04"
+      },
+      {
+        "page": 1,
+        "type": "M_Downlight - Recessed Can:SC - 213mm Diameter:SC - 213mm Diameter:783402",
+        "location": "2A04"
+      },
+      {
+        "page": 1,
+        "type": "M_Downlight - Recessed Can:SC - 213mm Diameter:SC - 213mm Diameter:783430",
+        "location": "2A04"
+      },
+      {
+        "page": 1,
+        "type": "M_Downlight - Recessed Can:SC - 213mm Diameter:SC - 213mm Diameter:783478",
+        "location": "2A03"
+      },
+      {
+        "page": 1,
+        "type": "M_Downlight - Recessed Can:SC - 213mm Diameter:SC - 213mm Diameter:783538",
+        "location": "2A03"
+      },
+      {
+        "page": 1,
+        "type": "M_Downlight - Recessed Can:SC - 213mm Diameter:SC - 213mm Diameter:783580",
+        "location": "2A03"
+      },
+      {
+        "page": 1,
+        "type": "M_Downlight - Recessed Can:SC - 213mm Diameter:SC - 213mm Diameter:783739",
+        "location": "2A13"
+      },
+      {
+        "page": 1,
+        "type": "M_Downlight - Recessed Can:SC - 213mm Diameter:SC - 213mm Diameter:783825",
+        "location": "2A12-A"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:783980",
+        "location": "2A10"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:783989",
+        "location": "2A10"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3 - 610x610mm:B3 - 610x610mm:784066",
+        "location": "2BC3"
+      },
+      {
+        "page": 1,
+        "type": "M_Downlight - Recessed Can:SA - 152mm Diameter:SA - 152mm Diameter:784102",
+        "location": "2C07"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:795878",
+        "location": "1C19"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:795927",
+        "location": "1C16"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:796348",
+        "location": "1C14"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:796984",
+        "location": "1C12"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:797783",
+        "location": "1C11"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Three Way:Three Way:798387",
+        "location": "1C18"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:798440",
+        "location": "1C15"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:798847",
+        "location": "1C17"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Three Way:Three Way:798953",
+        "location": "1C18"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:799439",
+        "location": "1C13"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:799512",
+        "location": "1D16"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:799568",
+        "location": "1D17"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:800165",
+        "location": "1D21"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:800467",
+        "location": "1D20"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:800541",
+        "location": "1D19"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:800786",
+        "location": "1D15"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:801082",
+        "location": "1D14"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:801247",
+        "location": "1D12"
+      },
+      {
+        "page": 1,
+        "type": "Lighted Signage:Y1 - Darkroom:Y1 - Darkroom:1220034",
+        "location": "2A12"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:801352",
+        "location": "1D10"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:801519",
+        "location": "1D08"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:801562",
+        "location": "1D01"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:801956",
+        "location": "1D02"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:802435",
+        "location": "1D04"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:802702",
+        "location": "1D05"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:802817",
+        "location": "1D06"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:802982",
+        "location": "1D07"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:803110",
+        "location": "1D09"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:803163",
+        "location": "1D11"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:803313",
+        "location": "1D13"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:803418",
+        "location": "1C02"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:803717",
+        "location": "1C03"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:803770",
+        "location": "1C10"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Three Way:Three Way:803977",
+        "location": "1C10"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:804030",
+        "location": "1C07"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:804075",
+        "location": "1C07"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:804129",
+        "location": "1C08"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:804666",
+        "location": "1C09"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:804855",
+        "location": "1C06"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:804939",
+        "location": "1C05"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:805044",
+        "location": "1C04"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:805222",
+        "location": "1CC1"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:805429",
+        "location": "1A09"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:805499",
+        "location": "1A12"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:805558",
+        "location": "1AC4"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:805694",
+        "location": "1A10"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:805799",
+        "location": "1A11"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:805904",
+        "location": "1A08"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:806115",
+        "location": "1A16"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:806189",
+        "location": "1A07"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:806381",
+        "location": "1AC5"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:806465",
+        "location": "1A05"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:806667",
+        "location": "1A03"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:807125",
+        "location": "1A06"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:807245",
+        "location": "1A04"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:807422",
+        "location": "1AC5"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:807734",
+        "location": "1A15"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:808165",
+        "location": "1A14"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:808334",
+        "location": "1A13"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:808853",
+        "location": "1DC4"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3 - 610x610mm:B3 - 610x610mm:809583",
+        "location": "1CC2"
+      },
+      {
+        "page": 1,
+        "type": "M_Downlight - Recessed Can:SA - 152mm Diameter:SA - 152mm Diameter:809668",
+        "location": "1D18"
+      },
+      {
+        "page": 1,
+        "type": "M_Surface Mounted Light:E2 - 610mm:E2 - 610mm:809705",
+        "location": "1D18"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:809790",
+        "location": "1D18"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3 - 610x610mm:B3 - 610x610mm:810474",
+        "location": "1D14"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:810587",
+        "location": "1D22"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:810640",
+        "location": "1D22"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Three Way:Three Way:811180",
+        "location": "1DC1"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:811985",
+        "location": "1D23"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:812075",
+        "location": "1D24"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:812252",
+        "location": "1D27"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:812430",
+        "location": "1D30"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:812618",
+        "location": "1DC6"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:812766",
+        "location": "1D26"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:812883",
+        "location": "1D25"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:813009",
+        "location": "1E14"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:813186",
+        "location": "1E12"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:813301",
+        "location": "1E33"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:813365",
+        "location": "1E15"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:813556",
+        "location": "1E11"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:813945",
+        "location": "1E09"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:814012",
+        "location": "1E10"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:814134",
+        "location": "1E07"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:814259",
+        "location": "1E07"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:814350",
+        "location": "1E06"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:814459",
+        "location": "1E04"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:814607",
+        "location": "1E01"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:814717",
+        "location": "1E02"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:814814",
+        "location": "1E03"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:814969",
+        "location": "1E05"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:815105",
+        "location": "1D38"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:815223",
+        "location": "1B21"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:815581",
+        "location": "1D40"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:816136",
+        "location": "1D35"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:816486",
+        "location": "1D36"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:816508",
+        "location": "1D34"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:816706",
+        "location": "1D32"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:816770",
+        "location": "1D28"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:816853",
+        "location": "1D31"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:817170",
+        "location": "1D33"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:817233",
+        "location": "1D39"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3B - 610x610mm:B3B - 610x610mm:817488",
+        "location": "1DC8"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3 - 610x610mm:B3 - 610x610mm:817515",
+        "location": "1D39"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:817531",
+        "location": "1DC1"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:817560",
+        "location": "1E26"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:817668",
+        "location": "1E27"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:817744",
+        "location": "1E28"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:817900",
+        "location": "1E24"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:818059",
+        "location": "1E24"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:818499",
+        "location": "1E20"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:818809",
+        "location": "1E21"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:818986",
+        "location": "1E22"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:819190",
+        "location": "1E30"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:819214",
+        "location": "1EC4"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:819278",
+        "location": "1E23"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:819445",
+        "location": "1E19"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:819572",
+        "location": "1E16"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:819825",
+        "location": "1E18"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:819880",
+        "location": "1E17"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:820075",
+        "location": "1BC3"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:820512",
+        "location": "1BC4"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:820830",
+        "location": "1B23"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:821134",
+        "location": "1B19"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:821262",
+        "location": "1B19"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:821628",
+        "location": "1B19"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:821969",
+        "location": "1B09"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:821991",
+        "location": "1B07"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:822076",
+        "location": "1B05"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:822180",
+        "location": "1B17"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:822413",
+        "location": "1B04"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:822650",
+        "location": "1B11"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:822735",
+        "location": "1B10"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:823003",
+        "location": "1B08"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:823066",
+        "location": "1B06"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:823139",
+        "location": "1B04"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:823724",
+        "location": "1B02"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:824211",
+        "location": "1BC1"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:824335",
+        "location": "1B01"
+      },
+      {
+        "page": 1,
+        "type": "M_Pendant Light - Linear:Q4 - 1219mm - 1m Drop:Q4 - 1219mm - 1m Drop:825760",
+        "location": "1C03"
+      },
+      {
+        "page": 1,
+        "type": "M_Pendant Light - Linear:Q1 - 1219mm:Q1 - 1219mm:825912",
+        "location": "1D17"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:826019",
+        "location": "1C02"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:826140",
+        "location": "1E07"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:826172",
+        "location": "1E07"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:826180",
+        "location": "1E07"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Rectangular:B1 - 0610x1219mm:B1 - 0610x1219mm:826190",
+        "location": "1E07"
+      },
+      {
+        "page": 1,
+        "type": "M_Pendant Light - Linear:Q4 - 1219mm - 1m Drop:Q4 - 1219mm - 1m Drop:826248",
+        "location": "1E02"
+      },
+      {
+        "page": 1,
+        "type": "M_Pendant Light - Linear:Q4 - 1219mm - 1m Drop:Q4 - 1219mm - 1m Drop:826374",
+        "location": "1E03"
+      },
+      {
+        "page": 1,
+        "type": "M_Pendant Light - Linear:Q1 - 1219mm:Q1 - 1219mm:826740",
+        "location": "1A11"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3D - 610x610mm:B3D - 610x610mm:827061",
+        "location": "1B19"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3D - 610x610mm:B3D - 610x610mm:827067",
+        "location": "1B19"
+      },
+      {
+        "page": 1,
+        "type": "M_Downlight - Recessed Can:SD - 213mm Diameter:SD - 213mm Diameter:827108",
+        "location": "1B19"
+      },
+      {
+        "page": 1,
+        "type": "M_Pendant Light - Linear:Q4 - 1219mm - 1m Drop:Q4 - 1219mm - 1m Drop:827331",
+        "location": "1E17"
+      },
+      {
+        "page": 1,
+        "type": "M_Downlight - Recessed Can:SD - 213mm Diameter:SD - 213mm Diameter:827428",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "M_Downlight - Recessed Can:SDB - 213mm Diameter:SDB - 213mm Diameter:827479",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "M_Downlight - Recessed Can:SD - 213mm Diameter:SD - 213mm Diameter:827488",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:827675",
+        "location": "2C16"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:827714",
+        "location": "2C14"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:827828",
+        "location": "2C13"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:828216",
+        "location": "2C17"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:828563",
+        "location": "2CC5"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:828798",
+        "location": "2C15"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:828923",
+        "location": "2CC5"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:829157",
+        "location": "2C11"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:829252",
+        "location": "2C12"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:829306",
+        "location": "2CC4"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:829485",
+        "location": "2C09"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:829579",
+        "location": "2C10"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:829725",
+        "location": "2C06"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:829849",
+        "location": "2C08"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:830041",
+        "location": "2C07"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:830178",
+        "location": "2C05"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:830345",
+        "location": "2C04"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:830500",
+        "location": "2C02"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:830604",
+        "location": "2C03"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:830657",
+        "location": "2C01"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:830720",
+        "location": "2A09"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:830949",
+        "location": "2AC2"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:830993",
+        "location": "2A10"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:831048",
+        "location": "2A11"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:831153",
+        "location": "2A08"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:831258",
+        "location": "2A07"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:831311",
+        "location": "2A06"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:831395",
+        "location": "2A05"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:831529",
+        "location": "2A13"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:831649",
+        "location": "2A03"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:831788",
+        "location": "2A12"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:832546",
+        "location": "2A04"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:832876",
+        "location": "2A02"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:833311",
+        "location": "2A14"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:833594",
+        "location": "2A01"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:833917",
+        "location": "2A11"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:834262",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:834510",
+        "location": "2AC2"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:834624",
+        "location": "2C24"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:834824",
+        "location": "2C23"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:834867",
+        "location": "2C22"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:835627",
+        "location": "2C08"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:835701",
+        "location": "2C07"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:835745",
+        "location": "2C19"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:836019",
+        "location": "2DC2"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:836895",
+        "location": "2CC1"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:837031",
+        "location": "2C18"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:837305",
+        "location": "2D05"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:838010",
+        "location": "2D09"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:838503",
+        "location": "2D08"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:838833",
+        "location": "2D07"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:839210",
+        "location": "2D06"
+      },
+      {
+        "page": 1,
+        "type": "Lighted Signage:Y - X-Ray:Y - X-Ray:1214966",
+        "location": "1BC2"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:839646",
+        "location": "2D06"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:839952",
+        "location": "2D18"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:840056",
+        "location": "2D04-A"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:840265",
+        "location": "2D04"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:840473",
+        "location": "2D02"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:840501",
+        "location": "2D01"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:840574",
+        "location": "2BC1"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:840967",
+        "location": "2BC6"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:841093",
+        "location": "2BC6"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:841296",
+        "location": "2BC5"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:841350",
+        "location": "2B7"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:841615",
+        "location": "2B9"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:841678",
+        "location": "2B4"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:841939",
+        "location": "2B3"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:842128",
+        "location": "2B2"
+      },
+      {
+        "page": 1,
+        "type": "M_Pendant Light - Linear:Q1 - 1219mm:Q1 - 1219mm:843057",
+        "location": "2B2"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:843118",
+        "location": "2B01"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:843150",
+        "location": "2BC5"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:843258",
+        "location": "2BC4"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:843352",
+        "location": "2B5"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:843519",
+        "location": "2B25"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:843727",
+        "location": "2B24"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:843801",
+        "location": "2B23"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:843886",
+        "location": "2B19"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:843939",
+        "location": "2B17"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:844003",
+        "location": "2B15"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:844160",
+        "location": "2B14"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:844253",
+        "location": "2B13"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:844413",
+        "location": "2B12"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:844548",
+        "location": "2B10"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:844674",
+        "location": "2B8"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:844781",
+        "location": "2B6"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:844874",
+        "location": "2B22"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:845255",
+        "location": "2B21"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:845507",
+        "location": "2B20"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:845612",
+        "location": "2B18"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:845761",
+        "location": "2B16"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:845878",
+        "location": "2BC3"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:846291",
+        "location": "2BC2"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:846331",
+        "location": "2D20"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:846589",
+        "location": "2D20"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:846652",
+        "location": "2D19"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:846829",
+        "location": "2D17"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:846902",
+        "location": "2D14"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:847049",
+        "location": "2D15"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:847471",
+        "location": "2D16"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:847584",
+        "location": "2D13"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:847690",
+        "location": "2D12"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:848624",
+        "location": "2D11"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:848806",
+        "location": "2D10"
+      },
+      {
+        "page": 1,
+        "type": "M_Pendant Light - Linear:Q1 - 1219mm:Q1 - 1219mm:849854",
+        "location": "2C05"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:850233",
+        "location": "2A01"
+      },
+      {
+        "page": 1,
+        "type": "Lighted Signage:Y - X-Ray:Y - X-Ray:1214885",
+        "location": "1B17"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:850240",
+        "location": "2A01"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:850424",
+        "location": "2D18"
+      },
+      {
+        "page": 1,
+        "type": "M_Downlight - Recessed Can:SE - 213mm Diameter:SE - 213mm Diameter:850647",
+        "location": "2D12"
+      },
+      {
+        "page": 1,
+        "type": "M_Pendant Light - Linear:Q1 - 1219mm:Q1 - 1219mm:850985",
+        "location": "2B20"
+      },
+      {
+        "page": 1,
+        "type": "M_Downlight - Recessed Can:LV - 203mm Diameter:LV - 203mm Diameter:927191",
+        "location": "1DC1"
+      },
+      {
+        "page": 1,
+        "type": "M_Downlight - Recessed Can:LV - 203mm Diameter:LV - 203mm Diameter:927219",
+        "location": "1DC1"
+      },
+      {
+        "page": 1,
+        "type": "M_Downlight - Recessed Can:LV - 203mm Diameter:LV - 203mm Diameter:927229",
+        "location": "1DC1"
+      },
+      {
+        "page": 1,
+        "type": "M_Sconce Light - Sphere:T1:T1:927298",
+        "location": "1DC1"
+      },
+      {
+        "page": 1,
+        "type": "M_Sconce Light - Sphere:T1:T1:927365",
+        "location": "1DC1"
+      },
+      {
+        "page": 1,
+        "type": "M_Sconce Light - Sphere:T1:T1:927616",
+        "location": "1DC1"
+      },
+      {
+        "page": 1,
+        "type": "M_Sconce Light - Sphere:T1:T1:927617",
+        "location": "1DC1"
+      },
+      {
+        "page": 1,
+        "type": "M_Troffer Light - Parabolic Square:B3 - 610x610mm:B3 - 610x610mm:990974",
+        "location": "1A13"
+      }
+    ],
+    "rooms": [
+      {
+        "name": "1AC1",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "1AC2",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "1AC3",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "1AC4",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "1AC5",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "1A01",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "1A02",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "1A03",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "1A04",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "1A05",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "1A06",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "1A07",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "1A08",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "1A09",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "1A10",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "1A11",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "1A12",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "1A13",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "1A14",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "1A15",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "1DC1",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "1DC2",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "1DC3",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "1DC4",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "1CC1",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "1CC2",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "1CC3",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "1C01",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "1C02",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "1C03",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "1C04",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "1C05",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "1C06",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "1C07",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "1C08",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "1C09",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "1C10",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "1D01",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "1D02",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "1D03",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "1D04",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "1D05",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "1D06",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "1D07",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "1D08",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "1D09",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "1D10",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "1D11",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "1D12",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "1D13",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "1D14",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "1D15",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "1D16",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "1D17",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "1D18",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "1D19",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "1D20",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "1D21",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "1D22",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "1D23",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "1D24",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "1D25",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "1D26",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "1D27",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "1D28",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "1D30",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "1D31",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "1D32",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "1D33",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "1D34",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "1D35",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "1D36",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "1D37",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "1D38",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "1D39",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "1D40",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "1DC5",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "1DC6",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "1DC7",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "1DC8",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "1C12",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "1C13",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "1C14",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "1C15",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "1C16",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "1C17",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "1C18",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "1C19",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "1C11",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "1CS3",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "1E01",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "1E02",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "1E03",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "1E04",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "1E05",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "1E06",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "1E07",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "1E08",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "1E09",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "1E10",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "1E11",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "1E12",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "1E14",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "1E15",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "1E16",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "1E17",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "1E18",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "1E19",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "1E20",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "1E21",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "1E22",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "1E23",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "1E24",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "1E25",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "1E26",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "1E27",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "1E28",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "1E29",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "1E30",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "1E33",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "1EC1",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "1EC2",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "1EC3",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "1EC4",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "1BC1",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "1BC2",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "1BC3",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "1BC4",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "1B01",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "1B02",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "1B03",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "1B04",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "1B05",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "1B06",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "1B07",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "1B08",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "1B09",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "1B10",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "1B11",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "1B12",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "1B13",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "1B14",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "1B15",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "1B16",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "1B17",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "1B19",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "1B21",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "1B23",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "1ES2",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "1A16",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "1AS1",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "1E15-A",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "E1",
+        "page": 1,
+        "level": "Level 1"
+      },
+      {
+        "name": "2AC1",
+        "page": 1,
+        "level": "Level 2"
+      },
+      {
+        "name": "2AC2",
+        "page": 1,
+        "level": "Level 2"
+      },
+      {
+        "name": "2AC3",
+        "page": 1,
+        "level": "Level 2"
+      },
+      {
+        "name": "2AC4",
+        "page": 1,
+        "level": "Level 2"
+      },
+      {
+        "name": "2AC5",
+        "page": 1,
+        "level": "Level 2"
+      },
+      {
+        "name": "2AS1",
+        "page": 1,
+        "level": "Level 2"
+      },
+      {
+        "name": "2A01",
+        "page": 1,
+        "level": "Level 2"
+      },
+      {
+        "name": "2A02",
+        "page": 1,
+        "level": "Level 2"
+      },
+      {
+        "name": "2A03",
+        "page": 1,
+        "level": "Level 2"
+      },
+      {
+        "name": "2A04",
+        "page": 1,
+        "level": "Level 2"
+      },
+      {
+        "name": "2A05",
+        "page": 1,
+        "level": "Level 2"
+      },
+      {
+        "name": "2A06",
+        "page": 1,
+        "level": "Level 2"
+      },
+      {
+        "name": "2A07",
+        "page": 1,
+        "level": "Level 2"
+      },
+      {
+        "name": "2A08",
+        "page": 1,
+        "level": "Level 2"
+      },
+      {
+        "name": "2A09",
+        "page": 1,
+        "level": "Level 2"
+      },
+      {
+        "name": "2A10",
+        "page": 1,
+        "level": "Level 2"
+      },
+      {
+        "name": "2A11",
+        "page": 1,
+        "level": "Level 2"
+      },
+      {
+        "name": "2A12",
+        "page": 1,
+        "level": "Level 2"
+      },
+      {
+        "name": "2A13",
+        "page": 1,
+        "level": "Level 2"
+      },
+      {
+        "name": "2A12-A",
+        "page": 1,
+        "level": "Level 2"
+      },
+      {
+        "name": "2A14",
+        "page": 1,
+        "level": "Level 2"
+      },
+      {
+        "name": "2C01",
+        "page": 1,
+        "level": "Level 2"
+      },
+      {
+        "name": "2C02",
+        "page": 1,
+        "level": "Level 2"
+      },
+      {
+        "name": "2C03",
+        "page": 1,
+        "level": "Level 2"
+      },
+      {
+        "name": "2C04",
+        "page": 1,
+        "level": "Level 2"
+      },
+      {
+        "name": "2C05",
+        "page": 1,
+        "level": "Level 2"
+      },
+      {
+        "name": "2C06",
+        "page": 1,
+        "level": "Level 2"
+      },
+      {
+        "name": "2C07",
+        "page": 1,
+        "level": "Level 2"
+      },
+      {
+        "name": "2C08",
+        "page": 1,
+        "level": "Level 2"
+      },
+      {
+        "name": "2C09",
+        "page": 1,
+        "level": "Level 2"
+      },
+      {
+        "name": "2C10",
+        "page": 1,
+        "level": "Level 2"
+      },
+      {
+        "name": "2C11",
+        "page": 1,
+        "level": "Level 2"
+      },
+      {
+        "name": "2C12",
+        "page": 1,
+        "level": "Level 2"
+      },
+      {
+        "name": "2C13",
+        "page": 1,
+        "level": "Level 2"
+      },
+      {
+        "name": "2C14",
+        "page": 1,
+        "level": "Level 2"
+      },
+      {
+        "name": "2C15",
+        "page": 1,
+        "level": "Level 2"
+      },
+      {
+        "name": "2C16",
+        "page": 1,
+        "level": "Level 2"
+      },
+      {
+        "name": "2C17",
+        "page": 1,
+        "level": "Level 2"
+      },
+      {
+        "name": "2C18",
+        "page": 1,
+        "level": "Level 2"
+      },
+      {
+        "name": "2C19",
+        "page": 1,
+        "level": "Level 2"
+      },
+      {
+        "name": "2C22",
+        "page": 1,
+        "level": "Level 2"
+      },
+      {
+        "name": "2C23",
+        "page": 1,
+        "level": "Level 2"
+      },
+      {
+        "name": "2C24",
+        "page": 1,
+        "level": "Level 2"
+      },
+      {
+        "name": "2CC1",
+        "page": 1,
+        "level": "Level 2"
+      },
+      {
+        "name": "2CC3",
+        "page": 1,
+        "level": "Level 2"
+      },
+      {
+        "name": "2CC4",
+        "page": 1,
+        "level": "Level 2"
+      },
+      {
+        "name": "2CC2",
+        "page": 1,
+        "level": "Level 2"
+      },
+      {
+        "name": "2D01",
+        "page": 1,
+        "level": "Level 2"
+      },
+      {
+        "name": "2D02",
+        "page": 1,
+        "level": "Level 2"
+      },
+      {
+        "name": "2D03",
+        "page": 1,
+        "level": "Level 2"
+      },
+      {
+        "name": "2D04",
+        "page": 1,
+        "level": "Level 2"
+      },
+      {
+        "name": "2D05",
+        "page": 1,
+        "level": "Level 2"
+      },
+      {
+        "name": "2D06",
+        "page": 1,
+        "level": "Level 2"
+      },
+      {
+        "name": "2D07",
+        "page": 1,
+        "level": "Level 2"
+      },
+      {
+        "name": "2D08",
+        "page": 1,
+        "level": "Level 2"
+      },
+      {
+        "name": "2D09",
+        "page": 1,
+        "level": "Level 2"
+      },
+      {
+        "name": "2D10",
+        "page": 1,
+        "level": "Level 2"
+      },
+      {
+        "name": "2D11",
+        "page": 1,
+        "level": "Level 2"
+      },
+      {
+        "name": "2D12",
+        "page": 1,
+        "level": "Level 2"
+      },
+      {
+        "name": "2D13",
+        "page": 1,
+        "level": "Level 2"
+      },
+      {
+        "name": "2D14",
+        "page": 1,
+        "level": "Level 2"
+      },
+      {
+        "name": "2D15",
+        "page": 1,
+        "level": "Level 2"
+      },
+      {
+        "name": "2D16",
+        "page": 1,
+        "level": "Level 2"
+      },
+      {
+        "name": "2D17",
+        "page": 1,
+        "level": "Level 2"
+      },
+      {
+        "name": "2D18",
+        "page": 1,
+        "level": "Level 2"
+      },
+      {
+        "name": "2D19",
+        "page": 1,
+        "level": "Level 2"
+      },
+      {
+        "name": "2D20",
+        "page": 1,
+        "level": "Level 2"
+      },
+      {
+        "name": "2D04-A",
+        "page": 1,
+        "level": "Level 2"
+      },
+      {
+        "name": "2DC1",
+        "page": 1,
+        "level": "Level 2"
+      },
+      {
+        "name": "2DC2",
+        "page": 1,
+        "level": "Level 2"
+      },
+      {
+        "name": "2BC1",
+        "page": 1,
+        "level": "Level 2"
+      },
+      {
+        "name": "2BC2",
+        "page": 1,
+        "level": "Level 2"
+      },
+      {
+        "name": "2BC3",
+        "page": 1,
+        "level": "Level 2"
+      },
+      {
+        "name": "2BC4",
+        "page": 1,
+        "level": "Level 2"
+      },
+      {
+        "name": "2BC5",
+        "page": 1,
+        "level": "Level 2"
+      },
+      {
+        "name": "2BC6",
+        "page": 1,
+        "level": "Level 2"
+      },
+      {
+        "name": "2B01",
+        "page": 1,
+        "level": "Level 2"
+      },
+      {
+        "name": "2B2",
+        "page": 1,
+        "level": "Level 2"
+      },
+      {
+        "name": "2B3",
+        "page": 1,
+        "level": "Level 2"
+      },
+      {
+        "name": "2B4",
+        "page": 1,
+        "level": "Level 2"
+      },
+      {
+        "name": "2B5",
+        "page": 1,
+        "level": "Level 2"
+      },
+      {
+        "name": "2B6",
+        "page": 1,
+        "level": "Level 2"
+      },
+      {
+        "name": "2B7",
+        "page": 1,
+        "level": "Level 2"
+      },
+      {
+        "name": "2B8",
+        "page": 1,
+        "level": "Level 2"
+      },
+      {
+        "name": "2B9",
+        "page": 1,
+        "level": "Level 2"
+      },
+      {
+        "name": "2B10",
+        "page": 1,
+        "level": "Level 2"
+      },
+      {
+        "name": "2B11",
+        "page": 1,
+        "level": "Level 2"
+      },
+      {
+        "name": "2B12",
+        "page": 1,
+        "level": "Level 2"
+      },
+      {
+        "name": "2B13",
+        "page": 1,
+        "level": "Level 2"
+      },
+      {
+        "name": "2B14",
+        "page": 1,
+        "level": "Level 2"
+      },
+      {
+        "name": "2B15",
+        "page": 1,
+        "level": "Level 2"
+      },
+      {
+        "name": "2B16",
+        "page": 1,
+        "level": "Level 2"
+      },
+      {
+        "name": "2B17",
+        "page": 1,
+        "level": "Level 2"
+      },
+      {
+        "name": "2B18",
+        "page": 1,
+        "level": "Level 2"
+      },
+      {
+        "name": "2B19",
+        "page": 1,
+        "level": "Level 2"
+      },
+      {
+        "name": "2B20",
+        "page": 1,
+        "level": "Level 2"
+      },
+      {
+        "name": "2B21",
+        "page": 1,
+        "level": "Level 2"
+      },
+      {
+        "name": "2B22",
+        "page": 1,
+        "level": "Level 2"
+      },
+      {
+        "name": "2B23",
+        "page": 1,
+        "level": "Level 2"
+      },
+      {
+        "name": "2B24",
+        "page": 1,
+        "level": "Level 2"
+      },
+      {
+        "name": "2B25",
+        "page": 1,
+        "level": "Level 2"
+      },
+      {
+        "name": "2BS2",
+        "page": 1,
+        "level": "Level 2"
+      },
+      {
+        "name": "2CS3",
+        "page": 1,
+        "level": "Level 2"
+      },
+      {
+        "name": "2AC1-A",
+        "page": 1,
+        "level": "Level 2"
+      },
+      {
+        "name": "2AC1-B",
+        "page": 1,
+        "level": "Level 2"
+      },
+      {
+        "name": "2CC5",
+        "page": 1,
+        "level": "Level 2"
+      },
+      {
+        "name": "2D21",
+        "page": 1,
+        "level": "Level 2"
+      },
+      {
+        "name": "2R02",
+        "page": 1,
+        "level": "Level 2"
+      },
+      {
+        "name": "2R01",
+        "page": 1,
+        "level": "Level 2"
+      },
+      {
+        "name": "3R01",
+        "page": 1,
+        "level": "Roof - Main"
+      },
+      {
+        "name": "3R02",
+        "page": 1,
+        "level": "Roof - Main"
+      },
+      {
+        "name": "3R04",
+        "page": 1,
+        "level": "Roof - Main"
+      },
+      {
+        "name": "3R03",
+        "page": 1,
+        "level": "Roof - Main"
+      }
+    ],
+    "stairs_elevators": [],
+    "title_block": [
+      {
+        "project_name": "Floor Plan \u2014 Level 1",
+        "page": 1
+      },
+      {
+        "project_name": "Floor Plan \u2014 Level 2",
+        "page": 2
+      }
+    ]
+  }
+}

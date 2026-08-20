@@ -1,0 +1,42 @@
+{
+  "id": "divisional-charts",
+  "category": "divisional",
+  "sources": [
+    "divisional-charts.md"
+  ],
+  "created": "2026-04-21T12:13:46.728342",
+  "last_updated": "2026-04-25T14:05:29.661455",
+  "last_confirmed": "2026-04-25T14:05:29.661456",
+  "confidence": 0.4,
+  "version": 2,
+  "status": "active",
+  "claims": [],
+  "entities": [
+    "Sun",
+    "Moon",
+    "Mercury",
+    "Jupiter",
+    "Ketu",
+    "Cancer",
+    "Leo",
+    "Lagna",
+    "3rd house",
+    "4th house",
+    "5th house",
+    "7th house",
+    "9th house",
+    "10th house",
+    "Hamsa",
+    "Vimsopaka",
+    "SAV",
+    "Navamsa",
+    "Dasamsa",
+    "Karakamsha",
+    "Amatya Karaka",
+    "PVR",
+    "Jaimini"
+  ],
+  "entity_count": 23,
+  "relationship_count": 2,
+  "tier": "semantic"
+}

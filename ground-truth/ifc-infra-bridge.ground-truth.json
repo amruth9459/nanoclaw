@@ -1,0 +1,145 @@
+{
+  "doc_id": "Infra-Bridge",
+  "source": "/Users/amrut/Lexios/lexios/corpus/ifc/bsmart/Infra-Bridge.ifc",
+  "doc_type": "infrastructure",
+  "difficulty": "medium",
+  "gt_source": "ifc_only",
+  "elements": {
+    "wall_types": [
+      {
+        "page": 1,
+        "type_id": "rail bridge - spandrel wall",
+        "location": "railbridge - superstructure"
+      },
+      {
+        "page": 1,
+        "type_id": "rail bridge - spandrel wall",
+        "location": "railbridge - superstructure"
+      },
+      {
+        "page": 1,
+        "type_id": "rail bridge - spandrel wall",
+        "location": "railbridge - superstructure"
+      },
+      {
+        "page": 1,
+        "type_id": "rail bridge - spandrel wall",
+        "location": "railbridge - superstructure"
+      }
+    ],
+    "columns": [
+      {
+        "page": 1,
+        "tag": "454425.1027893.955984.1885152.955018.1885214",
+        "location": "road river bridge - substructure"
+      },
+      {
+        "page": 1,
+        "tag": "454425.1027893.955984.1885152.955014.1885214",
+        "location": "road river bridge - substructure"
+      },
+      {
+        "page": 1,
+        "tag": "454425.1027893.955984.1885152.955022.1885214",
+        "location": "road river bridge - substructure"
+      },
+      {
+        "page": 1,
+        "tag": "454425.1027894.955995.1884272.1884264.1886323",
+        "location": "rail bridge - substructure"
+      },
+      {
+        "page": 1,
+        "tag": "454425.1027894.955995.1884272.1884267.1886323",
+        "location": "rail bridge - substructure"
+      },
+      {
+        "page": 1,
+        "tag": "454425.1027895.956001.1884272.1884264.1886323",
+        "location": "rail bridge - substructure"
+      },
+      {
+        "page": 1,
+        "tag": "454425.1027895.956001.1884272.1884267.1886323",
+        "location": "rail bridge - substructure"
+      }
+    ],
+    "beams": [
+      {
+        "page": 1,
+        "tag": "454425.1027893.955984.955026.940383.937728",
+        "location": "bridge road - abutment"
+      },
+      {
+        "page": 1,
+        "tag": "454425.1027893.955984.955027.940383.937728",
+        "location": "bridge road - abutment"
+      },
+      {
+        "page": 1,
+        "tag": "454425.1027893.955984.1885150.955006",
+        "location": "road rail bridge - superstructure"
+      },
+      {
+        "page": 1,
+        "tag": "454425.1027893.955984.1885150.955009",
+        "location": "road rail bridge - superstructure"
+      },
+      {
+        "page": 1,
+        "tag": "454425.1027893.955984.1885150.955007",
+        "location": "road rail bridge - superstructure"
+      },
+      {
+        "page": 1,
+        "tag": "454425.1027893.955984.1885152.955018.1886593",
+        "span": "4000.0",
+        "location": "road river bridge - substructure"
+      },
+      {
+        "page": 1,
+        "tag": "454425.1027893.955984.1885152.955014.1886593",
+        "span": "4000.0",
+        "location": "road river bridge - substructure"
+      },
+      {
+        "page": 1,
+        "tag": "454425.1027893.955984.1885152.955022.1886593",
+        "span": "4000.0",
+        "location": "road river bridge - substructure"
+      }
+    ],
+    "slabs": [
+      {
+        "page": 1,
+        "type": "bridge road - approach slab",
+        "thickness": "200.00000000000003",
+        "location": "road rail bridge - approach"
+      },
+      {
+        "page": 1,
+        "type": "bridge road - approach slab",
+        "thickness": "200.00000000000003",
+        "location": "road rail bridge - approach"
+      },
+      {
+        "page": 1,
+        "type": "road river bridge - bridge deck",
+        "thickness": "55.999999999999986",
+        "location": "road rail bridge - deck"
+      }
+    ],
+    "railings_guards": [
+      {
+        "page": 1,
+        "type": "bridge road railing",
+        "location": "road rail bridge - deck"
+      },
+      {
+        "page": 1,
+        "type": "bridge road railing",
+        "location": "road rail bridge - deck"
+      }
+    ]
+  }
+}

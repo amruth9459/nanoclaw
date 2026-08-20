@@ -1,0 +1,43 @@
+{
+  "id": "house-significations",
+  "category": "houses",
+  "sources": [
+    "house-significations.md"
+  ],
+  "created": "2026-04-21T12:13:46.733495",
+  "last_updated": "2026-04-25T14:05:29.671915",
+  "last_confirmed": "2026-04-25T14:05:29.671916",
+  "confidence": 0.4,
+  "version": 2,
+  "status": "active",
+  "claims": [],
+  "entities": [
+    "Sun",
+    "Moon",
+    "Mars",
+    "Mercury",
+    "Jupiter",
+    "Venus",
+    "Saturn",
+    "Rahu",
+    "Ketu",
+    "Guru",
+    "Lagna",
+    "3rd house",
+    "5th house",
+    "8th house",
+    "9th house",
+    "11th house",
+    "12th house",
+    "Kendra",
+    "Trikona",
+    "Dusthana",
+    "Upachaya",
+    "Maraka",
+    "Raja Yoga",
+    "Viparita Raja Yoga"
+  ],
+  "entity_count": 24,
+  "relationship_count": 15,
+  "tier": "semantic"
+}

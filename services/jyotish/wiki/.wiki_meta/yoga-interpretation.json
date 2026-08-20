@@ -1,0 +1,94 @@
+{
+  "id": "yoga-interpretation",
+  "category": "yogas",
+  "sources": [
+    "yoga-interpretation.md"
+  ],
+  "created": "2026-04-21T12:13:46.759267",
+  "last_updated": "2026-04-25T14:05:29.711308",
+  "last_confirmed": "2026-04-25T14:05:29.711309",
+  "confidence": 0.4,
+  "version": 2,
+  "status": "active",
+  "claims": [
+    {
+      "raw": "houses 1",
+      "pattern": "(?:houses?|bhava)\\s+(\\d+(?:\\s*"
+    },
+    {
+      "raw": "houses 1",
+      "pattern": "(?:houses?|bhava)\\s+(\\d+(?:\\s*"
+    },
+    {
+      "raw": "houses 1",
+      "pattern": "(?:houses?|bhava)\\s+(\\d+(?:\\s*"
+    },
+    {
+      "raw": "houses 1",
+      "pattern": "(?:houses?|bhava)\\s+(\\d+(?:\\s*"
+    },
+    {
+      "raw": "houses 1",
+      "pattern": "(?:houses?|bhava)\\s+(\\d+(?:\\s*"
+    },
+    {
+      "raw": "houses 1, 4, 7, 8",
+      "pattern": "(?:houses?|bhava)\\s+(\\d+(?:\\s*"
+    }
+  ],
+  "entities": [
+    "Sun",
+    "Moon",
+    "Mars",
+    "Mercury",
+    "Jupiter",
+    "Venus",
+    "Saturn",
+    "Rahu",
+    "Ketu",
+    "Surya",
+    "Kuja",
+    "Guru",
+    "Aries",
+    "Taurus",
+    "Gemini",
+    "Cancer",
+    "Leo",
+    "Virgo",
+    "Libra",
+    "Scorpio",
+    "Sagittarius",
+    "Capricorn",
+    "Aquarius",
+    "Pisces",
+    "Lagna",
+    "7th house",
+    "9th house",
+    "10th house",
+    "Kendra",
+    "Trikona",
+    "Dusthana",
+    "Gajakesari",
+    "Hamsa",
+    "Malavya",
+    "Ruchaka",
+    "Bhadra",
+    "Sasa",
+    "Raja Yoga",
+    "Dhana Yoga",
+    "Viparita Raja Yoga",
+    "Neecha Bhanga",
+    "Guru Chandala",
+    "Kala Sarpa",
+    "Manglik",
+    "Lakshmi Yoga",
+    "Dharma-Karmadhipati",
+    "Mahadasha",
+    "Antardasha",
+    "Shadbala",
+    "PVR"
+  ],
+  "entity_count": 50,
+  "relationship_count": 20,
+  "tier": "semantic"
+}

@@ -1,0 +1,39 @@
+{
+  "expo": {
+    "name": "Claw",
+    "slug": "claw-mobile",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#F4F3EE"
+    },
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.nanoclaw.claw",
+      "infoPlist": {
+        "NSFaceIDUsageDescription": "Authenticate to run commands and edit files on your Mac"
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#F4F3EE"
+      },
+      "package": "com.nanoclaw.claw"
+    },
+    "plugins": [
+      "expo-secure-store",
+      "expo-asset",
+      [
+        "expo-local-authentication",
+        {
+          "faceIDPermission": "Authenticate to run commands and edit files on your Mac"
+        }
+      ]
+    ]
+  }
+}

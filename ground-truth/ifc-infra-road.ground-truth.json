@@ -1,0 +1,197 @@
+{
+  "doc_id": "Infra-Road",
+  "source": "/Users/amrut/Lexios/lexios/corpus/ifc/bsmart/Infra-Road.ifc",
+  "doc_type": "infrastructure",
+  "difficulty": "medium",
+  "gt_source": "ifc_only",
+  "elements": {
+    "slabs": [
+      {
+        "page": 1,
+        "type": "asphalt binder course - road - parking",
+        "thickness": "80.00000000000136",
+        "location": "road - parking"
+      },
+      {
+        "page": 1,
+        "type": "road - parking - asphalt surface course",
+        "thickness": "40.00000000000019",
+        "location": "road - parking"
+      },
+      {
+        "page": 1,
+        "type": "road - parking - subgrade",
+        "thickness": "249.99999999999585",
+        "location": "road - parking"
+      },
+      {
+        "page": 1,
+        "type": "road parking - base course",
+        "thickness": "119.99999999975584",
+        "location": "road - parking"
+      },
+      {
+        "page": 1,
+        "type": "road - asphalt binder course",
+        "thickness": "80.00000000000128",
+        "location": "road  - carriageway"
+      },
+      {
+        "page": 1,
+        "type": "road - asphalt surface course",
+        "location": "road  - carriageway"
+      },
+      {
+        "page": 1,
+        "type": "road - subgrade",
+        "thickness": "249.99999999999656",
+        "location": "road  - carriageway"
+      },
+      {
+        "page": 1,
+        "type": "road - base course",
+        "thickness": "120.00000000000287",
+        "location": "road  - carriageway"
+      },
+      {
+        "page": 1,
+        "type": "asphalt binder course - road - parking",
+        "thickness": "80.00000000000136",
+        "location": "road - parking"
+      },
+      {
+        "page": 1,
+        "type": "road - parking - asphalt surface course",
+        "thickness": "40.00000000000019",
+        "location": "road - parking"
+      },
+      {
+        "page": 1,
+        "type": "road - parking - subgrade",
+        "thickness": "249.99999999999585",
+        "location": "road - parking"
+      },
+      {
+        "page": 1,
+        "type": "road parking - base course",
+        "thickness": "119.99999999975584",
+        "location": "road - parking"
+      },
+      {
+        "page": 1,
+        "type": "road - asphalt binder course",
+        "thickness": "80.00000000000128",
+        "location": "road  - carriageway"
+      },
+      {
+        "page": 1,
+        "type": "road - asphalt surface course",
+        "location": "road  - carriageway"
+      },
+      {
+        "page": 1,
+        "type": "road - subgrade",
+        "thickness": "249.99999999999656",
+        "location": "road  - carriageway"
+      },
+      {
+        "page": 1,
+        "type": "road - base course",
+        "thickness": "120.00000000000287",
+        "location": "road  - carriageway"
+      },
+      {
+        "page": 1,
+        "type": "road base course - bridge road",
+        "thickness": "120.00000000000298",
+        "location": "road carriageway - bridge road"
+      },
+      {
+        "page": 1,
+        "type": "bridge road - road asphalt binder course",
+        "thickness": "80.00000000000132",
+        "location": "road carriageway - bridge road"
+      },
+      {
+        "page": 1,
+        "type": "road subgrade - bridge road",
+        "thickness": "395.8136006661577",
+        "location": "road carriageway - bridge road"
+      },
+      {
+        "page": 1,
+        "type": "road asphalt surface course - bridge road",
+        "location": "road carriageway - bridge road"
+      },
+      {
+        "page": 1,
+        "type": "road base course - bridge road",
+        "thickness": "120.00000000000298",
+        "location": "road carriageway - bridge road"
+      },
+      {
+        "page": 1,
+        "type": "bridge road - road asphalt binder course",
+        "thickness": "80.00000000000132",
+        "location": "road carriageway - bridge road"
+      },
+      {
+        "page": 1,
+        "type": "road subgrade - bridge road",
+        "thickness": "395.8136006661577",
+        "location": "road carriageway - bridge road"
+      },
+      {
+        "page": 1,
+        "type": "road asphalt surface course - bridge road",
+        "location": "road carriageway - bridge road"
+      },
+      {
+        "page": 1,
+        "type": "road - asphalt binder course",
+        "thickness": "80.00000000000128",
+        "location": "road carriageway"
+      },
+      {
+        "page": 1,
+        "type": "road - asphalt surface course",
+        "location": "road carriageway"
+      },
+      {
+        "page": 1,
+        "type": "road - subgrade",
+        "thickness": "249.99999999999656",
+        "location": "road carriageway"
+      },
+      {
+        "page": 1,
+        "type": "road - base course",
+        "thickness": "120.00000000000287",
+        "location": "road carriageway"
+      },
+      {
+        "page": 1,
+        "type": "road - asphalt binder course",
+        "thickness": "80.00000000000128",
+        "location": "road carriageway"
+      },
+      {
+        "page": 1,
+        "type": "road - asphalt surface course",
+        "location": "road carriageway"
+      },
+      {
+        "page": 1,
+        "type": "road - subgrade",
+        "thickness": "249.99999999999656",
+        "location": "road carriageway"
+      },
+      {
+        "page": 1,
+        "type": "road - base course",
+        "thickness": "120.00000000000287",
+        "location": "road carriageway"
+      }
+    ]
+  }
+}

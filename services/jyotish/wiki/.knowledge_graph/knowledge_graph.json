@@ -1,0 +1,1845 @@
+{
+  "domain": "jyotish",
+  "entities": {
+    "Jupiter": {
+      "type": "planet",
+      "mentions": 14,
+      "sources": [
+        "sanjay-rath-jaimini-techniques.md",
+        "divisional-charts.md",
+        "yoga-interpretation.md",
+        "planet-significations.md",
+        "dasha-interpretation.md",
+        "prediction-hierarchy-rules.md",
+        "bv-raman-predictive-rules.md",
+        "event-timing-rules.md",
+        "transit-interpretation.md",
+        "kn-rao-prediction-techniques.md",
+        "remedial-measures.md",
+        "pvr-seven-stage-methodology.md",
+        "compatibility-rules.md",
+        "house-significations.md"
+      ]
+    },
+    "Saturn": {
+      "type": "planet",
+      "mentions": 11,
+      "sources": [
+        "yoga-interpretation.md",
+        "planet-significations.md",
+        "dasha-interpretation.md",
+        "prediction-hierarchy-rules.md",
+        "bv-raman-predictive-rules.md",
+        "event-timing-rules.md",
+        "transit-interpretation.md",
+        "kn-rao-prediction-techniques.md",
+        "remedial-measures.md",
+        "pvr-seven-stage-methodology.md",
+        "house-significations.md"
+      ]
+    },
+    "Simha": {
+      "type": "sign",
+      "mentions": 3,
+      "sources": [
+        "dasha-interpretation.md",
+        "prediction-hierarchy-rules.md",
+        "pvr-seven-stage-methodology.md"
+      ]
+    },
+    "Lagna": {
+      "type": "house",
+      "mentions": 13,
+      "sources": [
+        "sanjay-rath-jaimini-techniques.md",
+        "divisional-charts.md",
+        "yoga-interpretation.md",
+        "planet-significations.md",
+        "dasha-interpretation.md",
+        "prediction-hierarchy-rules.md",
+        "bv-raman-predictive-rules.md",
+        "event-timing-rules.md",
+        "transit-interpretation.md",
+        "kn-rao-prediction-techniques.md",
+        "remedial-measures.md",
+        "pvr-seven-stage-methodology.md",
+        "house-significations.md"
+      ]
+    },
+    "Kendra": {
+      "type": "house",
+      "mentions": 11,
+      "sources": [
+        "sanjay-rath-jaimini-techniques.md",
+        "yoga-interpretation.md",
+        "planet-significations.md",
+        "dasha-interpretation.md",
+        "prediction-hierarchy-rules.md",
+        "bv-raman-predictive-rules.md",
+        "event-timing-rules.md",
+        "transit-interpretation.md",
+        "kn-rao-prediction-techniques.md",
+        "pvr-seven-stage-methodology.md",
+        "house-significations.md"
+      ]
+    },
+    "Maraka": {
+      "type": "house",
+      "mentions": 7,
+      "sources": [
+        "sanjay-rath-jaimini-techniques.md",
+        "dasha-interpretation.md",
+        "prediction-hierarchy-rules.md",
+        "bv-raman-predictive-rules.md",
+        "event-timing-rules.md",
+        "kn-rao-prediction-techniques.md",
+        "house-significations.md"
+      ]
+    },
+    "Mahadasha": {
+      "type": "dasha",
+      "mentions": 5,
+      "sources": [
+        "yoga-interpretation.md",
+        "dasha-interpretation.md",
+        "prediction-hierarchy-rules.md",
+        "kn-rao-prediction-techniques.md",
+        "pvr-seven-stage-methodology.md"
+      ]
+    },
+    "Antardasha": {
+      "type": "dasha",
+      "mentions": 8,
+      "sources": [
+        "sanjay-rath-jaimini-techniques.md",
+        "yoga-interpretation.md",
+        "dasha-interpretation.md",
+        "prediction-hierarchy-rules.md",
+        "bv-raman-predictive-rules.md",
+        "event-timing-rules.md",
+        "kn-rao-prediction-techniques.md",
+        "pvr-seven-stage-methodology.md"
+      ]
+    },
+    "Ashtakavarga": {
+      "type": "concept",
+      "mentions": 6,
+      "sources": [
+        "dasha-interpretation.md",
+        "prediction-hierarchy-rules.md",
+        "bv-raman-predictive-rules.md",
+        "event-timing-rules.md",
+        "transit-interpretation.md",
+        "pvr-seven-stage-methodology.md"
+      ]
+    },
+    "Double Transit": {
+      "type": "concept",
+      "mentions": 7,
+      "sources": [
+        "dasha-interpretation.md",
+        "prediction-hierarchy-rules.md",
+        "bv-raman-predictive-rules.md",
+        "event-timing-rules.md",
+        "transit-interpretation.md",
+        "kn-rao-prediction-techniques.md",
+        "pvr-seven-stage-methodology.md"
+      ]
+    },
+    "PVR Narasimha Rao": {
+      "type": "person",
+      "mentions": 3,
+      "sources": [
+        "dasha-interpretation.md",
+        "prediction-hierarchy-rules.md",
+        "pvr-seven-stage-methodology.md"
+      ]
+    },
+    "PVR": {
+      "type": "person",
+      "mentions": 5,
+      "sources": [
+        "divisional-charts.md",
+        "yoga-interpretation.md",
+        "dasha-interpretation.md",
+        "prediction-hierarchy-rules.md",
+        "pvr-seven-stage-methodology.md"
+      ]
+    },
+    "KN Rao": {
+      "type": "person",
+      "mentions": 6,
+      "sources": [
+        "dasha-interpretation.md",
+        "prediction-hierarchy-rules.md",
+        "event-timing-rules.md",
+        "transit-interpretation.md",
+        "kn-rao-prediction-techniques.md",
+        "pvr-seven-stage-methodology.md"
+      ]
+    },
+    "Sanjay Rath": {
+      "type": "person",
+      "mentions": 4,
+      "sources": [
+        "dasha-interpretation.md",
+        "prediction-hierarchy-rules.md",
+        "event-timing-rules.md",
+        "sanjay-rath-jaimini-techniques.md"
+      ]
+    },
+    "Jaimini": {
+      "type": "person",
+      "mentions": 7,
+      "sources": [
+        "sanjay-rath-jaimini-techniques.md",
+        "divisional-charts.md",
+        "dasha-interpretation.md",
+        "prediction-hierarchy-rules.md",
+        "event-timing-rules.md",
+        "kn-rao-prediction-techniques.md",
+        "pvr-seven-stage-methodology.md"
+      ]
+    },
+    "Sun": {
+      "type": "planet",
+      "mentions": 12,
+      "sources": [
+        "sanjay-rath-jaimini-techniques.md",
+        "divisional-charts.md",
+        "yoga-interpretation.md",
+        "planet-significations.md",
+        "dasha-interpretation.md",
+        "bv-raman-predictive-rules.md",
+        "event-timing-rules.md",
+        "transit-interpretation.md",
+        "kn-rao-prediction-techniques.md",
+        "remedial-measures.md",
+        "pvr-seven-stage-methodology.md",
+        "house-significations.md"
+      ]
+    },
+    "Moon": {
+      "type": "planet",
+      "mentions": 12,
+      "sources": [
+        "divisional-charts.md",
+        "yoga-interpretation.md",
+        "planet-significations.md",
+        "dasha-interpretation.md",
+        "bv-raman-predictive-rules.md",
+        "event-timing-rules.md",
+        "transit-interpretation.md",
+        "kn-rao-prediction-techniques.md",
+        "remedial-measures.md",
+        "pvr-seven-stage-methodology.md",
+        "compatibility-rules.md",
+        "house-significations.md"
+      ]
+    },
+    "Mars": {
+      "type": "planet",
+      "mentions": 10,
+      "sources": [
+        "yoga-interpretation.md",
+        "planet-significations.md",
+        "dasha-interpretation.md",
+        "event-timing-rules.md",
+        "transit-interpretation.md",
+        "kn-rao-prediction-techniques.md",
+        "remedial-measures.md",
+        "pvr-seven-stage-methodology.md",
+        "compatibility-rules.md",
+        "house-significations.md"
+      ]
+    },
+    "Mercury": {
+      "type": "planet",
+      "mentions": 9,
+      "sources": [
+        "divisional-charts.md",
+        "yoga-interpretation.md",
+        "planet-significations.md",
+        "dasha-interpretation.md",
+        "event-timing-rules.md",
+        "transit-interpretation.md",
+        "remedial-measures.md",
+        "pvr-seven-stage-methodology.md",
+        "house-significations.md"
+      ]
+    },
+    "Venus": {
+      "type": "planet",
+      "mentions": 11,
+      "sources": [
+        "yoga-interpretation.md",
+        "planet-significations.md",
+        "dasha-interpretation.md",
+        "bv-raman-predictive-rules.md",
+        "event-timing-rules.md",
+        "transit-interpretation.md",
+        "kn-rao-prediction-techniques.md",
+        "remedial-measures.md",
+        "pvr-seven-stage-methodology.md",
+        "compatibility-rules.md",
+        "house-significations.md"
+      ]
+    },
+    "Rahu": {
+      "type": "planet",
+      "mentions": 9,
+      "sources": [
+        "sanjay-rath-jaimini-techniques.md",
+        "yoga-interpretation.md",
+        "planet-significations.md",
+        "dasha-interpretation.md",
+        "event-timing-rules.md",
+        "transit-interpretation.md",
+        "remedial-measures.md",
+        "pvr-seven-stage-methodology.md",
+        "house-significations.md"
+      ]
+    },
+    "Ketu": {
+      "type": "planet",
+      "mentions": 10,
+      "sources": [
+        "sanjay-rath-jaimini-techniques.md",
+        "divisional-charts.md",
+        "yoga-interpretation.md",
+        "planet-significations.md",
+        "dasha-interpretation.md",
+        "event-timing-rules.md",
+        "transit-interpretation.md",
+        "remedial-measures.md",
+        "pvr-seven-stage-methodology.md",
+        "house-significations.md"
+      ]
+    },
+    "Chandra": {
+      "type": "planet",
+      "mentions": 3,
+      "sources": [
+        "dasha-interpretation.md",
+        "planet-significations.md",
+        "remedial-measures.md"
+      ]
+    },
+    "Guru": {
+      "type": "planet",
+      "mentions": 5,
+      "sources": [
+        "yoga-interpretation.md",
+        "planet-significations.md",
+        "dasha-interpretation.md",
+        "remedial-measures.md",
+        "house-significations.md"
+      ]
+    },
+    "Taurus": {
+      "type": "sign",
+      "mentions": 3,
+      "sources": [
+        "dasha-interpretation.md",
+        "yoga-interpretation.md",
+        "planet-significations.md"
+      ]
+    },
+    "Cancer": {
+      "type": "sign",
+      "mentions": 4,
+      "sources": [
+        "dasha-interpretation.md",
+        "divisional-charts.md",
+        "yoga-interpretation.md",
+        "planet-significations.md"
+      ]
+    },
+    "Leo": {
+      "type": "sign",
+      "mentions": 5,
+      "sources": [
+        "sanjay-rath-jaimini-techniques.md",
+        "divisional-charts.md",
+        "yoga-interpretation.md",
+        "planet-significations.md",
+        "dasha-interpretation.md"
+      ]
+    },
+    "Libra": {
+      "type": "sign",
+      "mentions": 3,
+      "sources": [
+        "dasha-interpretation.md",
+        "yoga-interpretation.md",
+        "planet-significations.md"
+      ]
+    },
+    "1st house": {
+      "type": "house",
+      "mentions": 3,
+      "sources": [
+        "dasha-interpretation.md",
+        "event-timing-rules.md",
+        "planet-significations.md"
+      ]
+    },
+    "2nd house": {
+      "type": "house",
+      "mentions": 4,
+      "sources": [
+        "dasha-interpretation.md",
+        "bv-raman-predictive-rules.md",
+        "event-timing-rules.md",
+        "planet-significations.md"
+      ]
+    },
+    "3rd house": {
+      "type": "house",
+      "mentions": 3,
+      "sources": [
+        "dasha-interpretation.md",
+        "divisional-charts.md",
+        "house-significations.md"
+      ]
+    },
+    "4th house": {
+      "type": "house",
+      "mentions": 4,
+      "sources": [
+        "dasha-interpretation.md",
+        "divisional-charts.md",
+        "transit-interpretation.md",
+        "planet-significations.md"
+      ]
+    },
+    "5th house": {
+      "type": "house",
+      "mentions": 6,
+      "sources": [
+        "divisional-charts.md",
+        "dasha-interpretation.md",
+        "event-timing-rules.md",
+        "transit-interpretation.md",
+        "kn-rao-prediction-techniques.md",
+        "house-significations.md"
+      ]
+    },
+    "6th house": {
+      "type": "house",
+      "mentions": 1,
+      "sources": [
+        "dasha-interpretation.md"
+      ]
+    },
+    "7th house": {
+      "type": "house",
+      "mentions": 10,
+      "sources": [
+        "sanjay-rath-jaimini-techniques.md",
+        "divisional-charts.md",
+        "yoga-interpretation.md",
+        "planet-significations.md",
+        "dasha-interpretation.md",
+        "bv-raman-predictive-rules.md",
+        "event-timing-rules.md",
+        "transit-interpretation.md",
+        "pvr-seven-stage-methodology.md",
+        "compatibility-rules.md"
+      ]
+    },
+    "8th house": {
+      "type": "house",
+      "mentions": 5,
+      "sources": [
+        "dasha-interpretation.md",
+        "bv-raman-predictive-rules.md",
+        "event-timing-rules.md",
+        "compatibility-rules.md",
+        "house-significations.md"
+      ]
+    },
+    "9th house": {
+      "type": "house",
+      "mentions": 6,
+      "sources": [
+        "divisional-charts.md",
+        "yoga-interpretation.md",
+        "dasha-interpretation.md",
+        "event-timing-rules.md",
+        "remedial-measures.md",
+        "house-significations.md"
+      ]
+    },
+    "10th house": {
+      "type": "house",
+      "mentions": 7,
+      "sources": [
+        "sanjay-rath-jaimini-techniques.md",
+        "divisional-charts.md",
+        "yoga-interpretation.md",
+        "planet-significations.md",
+        "dasha-interpretation.md",
+        "event-timing-rules.md",
+        "transit-interpretation.md"
+      ]
+    },
+    "11th house": {
+      "type": "house",
+      "mentions": 3,
+      "sources": [
+        "dasha-interpretation.md",
+        "event-timing-rules.md",
+        "house-significations.md"
+      ]
+    },
+    "12th house": {
+      "type": "house",
+      "mentions": 3,
+      "sources": [
+        "dasha-interpretation.md",
+        "sanjay-rath-jaimini-techniques.md",
+        "house-significations.md"
+      ]
+    },
+    "Trikona": {
+      "type": "house",
+      "mentions": 7,
+      "sources": [
+        "yoga-interpretation.md",
+        "planet-significations.md",
+        "dasha-interpretation.md",
+        "bv-raman-predictive-rules.md",
+        "event-timing-rules.md",
+        "kn-rao-prediction-techniques.md",
+        "house-significations.md"
+      ]
+    },
+    "Dusthana": {
+      "type": "house",
+      "mentions": 7,
+      "sources": [
+        "sanjay-rath-jaimini-techniques.md",
+        "yoga-interpretation.md",
+        "dasha-interpretation.md",
+        "event-timing-rules.md",
+        "kn-rao-prediction-techniques.md",
+        "compatibility-rules.md",
+        "house-significations.md"
+      ]
+    },
+    "Raja Yoga": {
+      "type": "yoga",
+      "mentions": 6,
+      "sources": [
+        "yoga-interpretation.md",
+        "planet-significations.md",
+        "dasha-interpretation.md",
+        "bv-raman-predictive-rules.md",
+        "kn-rao-prediction-techniques.md",
+        "house-significations.md"
+      ]
+    },
+    "Viparita Raja Yoga": {
+      "type": "yoga",
+      "mentions": 3,
+      "sources": [
+        "dasha-interpretation.md",
+        "yoga-interpretation.md",
+        "house-significations.md"
+      ]
+    },
+    "Vimshottari": {
+      "type": "dasha",
+      "mentions": 5,
+      "sources": [
+        "sanjay-rath-jaimini-techniques.md",
+        "planet-significations.md",
+        "dasha-interpretation.md",
+        "kn-rao-prediction-techniques.md",
+        "pvr-seven-stage-methodology.md"
+      ]
+    },
+    "Narayana": {
+      "type": "dasha",
+      "mentions": 4,
+      "sources": [
+        "dasha-interpretation.md",
+        "sanjay-rath-jaimini-techniques.md",
+        "event-timing-rules.md",
+        "pvr-seven-stage-methodology.md"
+      ]
+    },
+    "Chara Dasha": {
+      "type": "dasha",
+      "mentions": 5,
+      "sources": [
+        "sanjay-rath-jaimini-techniques.md",
+        "dasha-interpretation.md",
+        "event-timing-rules.md",
+        "kn-rao-prediction-techniques.md",
+        "pvr-seven-stage-methodology.md"
+      ]
+    },
+    "Atma Karaka": {
+      "type": "concept",
+      "mentions": 4,
+      "sources": [
+        "dasha-interpretation.md",
+        "sanjay-rath-jaimini-techniques.md",
+        "pvr-seven-stage-methodology.md",
+        "planet-significations.md"
+      ]
+    },
+    "Amatya Karaka": {
+      "type": "concept",
+      "mentions": 4,
+      "sources": [
+        "dasha-interpretation.md",
+        "sanjay-rath-jaimini-techniques.md",
+        "divisional-charts.md",
+        "pvr-seven-stage-methodology.md"
+      ]
+    },
+    "Dara Karaka": {
+      "type": "concept",
+      "mentions": 3,
+      "sources": [
+        "dasha-interpretation.md",
+        "sanjay-rath-jaimini-techniques.md",
+        "pvr-seven-stage-methodology.md"
+      ]
+    },
+    "PACDARES": {
+      "type": "concept",
+      "mentions": 2,
+      "sources": [
+        "dasha-interpretation.md",
+        "kn-rao-prediction-techniques.md"
+      ]
+    },
+    "Karakamsha": {
+      "type": "concept",
+      "mentions": 4,
+      "sources": [
+        "sanjay-rath-jaimini-techniques.md",
+        "divisional-charts.md",
+        "pvr-seven-stage-methodology.md",
+        "kn-rao-prediction-techniques.md"
+      ]
+    },
+    "Arudha Pada": {
+      "type": "concept",
+      "mentions": 1,
+      "sources": [
+        "sanjay-rath-jaimini-techniques.md"
+      ]
+    },
+    "Dhana Yoga": {
+      "type": "yoga",
+      "mentions": 3,
+      "sources": [
+        "bv-raman-predictive-rules.md",
+        "event-timing-rules.md",
+        "yoga-interpretation.md"
+      ]
+    },
+    "Manglik": {
+      "type": "yoga",
+      "mentions": 5,
+      "sources": [
+        "yoga-interpretation.md",
+        "planet-significations.md",
+        "event-timing-rules.md",
+        "remedial-measures.md",
+        "compatibility-rules.md"
+      ]
+    },
+    "Sade Sati": {
+      "type": "dasha",
+      "mentions": 6,
+      "sources": [
+        "planet-significations.md",
+        "bv-raman-predictive-rules.md",
+        "event-timing-rules.md",
+        "transit-interpretation.md",
+        "remedial-measures.md",
+        "pvr-seven-stage-methodology.md"
+      ]
+    },
+    "SAV": {
+      "type": "concept",
+      "mentions": 5,
+      "sources": [
+        "divisional-charts.md",
+        "bv-raman-predictive-rules.md",
+        "event-timing-rules.md",
+        "transit-interpretation.md",
+        "pvr-seven-stage-methodology.md"
+      ]
+    },
+    "Surya": {
+      "type": "planet",
+      "mentions": 3,
+      "sources": [
+        "yoga-interpretation.md",
+        "planet-significations.md",
+        "remedial-measures.md"
+      ]
+    },
+    "Kuja": {
+      "type": "planet",
+      "mentions": 2,
+      "sources": [
+        "yoga-interpretation.md",
+        "planet-significations.md"
+      ]
+    },
+    "Aries": {
+      "type": "sign",
+      "mentions": 2,
+      "sources": [
+        "yoga-interpretation.md",
+        "planet-significations.md"
+      ]
+    },
+    "Gemini": {
+      "type": "sign",
+      "mentions": 2,
+      "sources": [
+        "yoga-interpretation.md",
+        "planet-significations.md"
+      ]
+    },
+    "Virgo": {
+      "type": "sign",
+      "mentions": 2,
+      "sources": [
+        "yoga-interpretation.md",
+        "planet-significations.md"
+      ]
+    },
+    "Scorpio": {
+      "type": "sign",
+      "mentions": 2,
+      "sources": [
+        "yoga-interpretation.md",
+        "planet-significations.md"
+      ]
+    },
+    "Sagittarius": {
+      "type": "sign",
+      "mentions": 2,
+      "sources": [
+        "yoga-interpretation.md",
+        "planet-significations.md"
+      ]
+    },
+    "Capricorn": {
+      "type": "sign",
+      "mentions": 2,
+      "sources": [
+        "yoga-interpretation.md",
+        "planet-significations.md"
+      ]
+    },
+    "Aquarius": {
+      "type": "sign",
+      "mentions": 2,
+      "sources": [
+        "yoga-interpretation.md",
+        "planet-significations.md"
+      ]
+    },
+    "Pisces": {
+      "type": "sign",
+      "mentions": 2,
+      "sources": [
+        "yoga-interpretation.md",
+        "planet-significations.md"
+      ]
+    },
+    "Gajakesari": {
+      "type": "yoga",
+      "mentions": 1,
+      "sources": [
+        "yoga-interpretation.md"
+      ]
+    },
+    "Hamsa": {
+      "type": "yoga",
+      "mentions": 4,
+      "sources": [
+        "divisional-charts.md",
+        "bv-raman-predictive-rules.md",
+        "yoga-interpretation.md",
+        "planet-significations.md"
+      ]
+    },
+    "Malavya": {
+      "type": "yoga",
+      "mentions": 3,
+      "sources": [
+        "bv-raman-predictive-rules.md",
+        "yoga-interpretation.md",
+        "planet-significations.md"
+      ]
+    },
+    "Ruchaka": {
+      "type": "yoga",
+      "mentions": 2,
+      "sources": [
+        "bv-raman-predictive-rules.md",
+        "yoga-interpretation.md"
+      ]
+    },
+    "Bhadra": {
+      "type": "yoga",
+      "mentions": 2,
+      "sources": [
+        "bv-raman-predictive-rules.md",
+        "yoga-interpretation.md"
+      ]
+    },
+    "Sasa": {
+      "type": "yoga",
+      "mentions": 3,
+      "sources": [
+        "bv-raman-predictive-rules.md",
+        "yoga-interpretation.md",
+        "planet-significations.md"
+      ]
+    },
+    "Neecha Bhanga": {
+      "type": "yoga",
+      "mentions": 2,
+      "sources": [
+        "bv-raman-predictive-rules.md",
+        "yoga-interpretation.md"
+      ]
+    },
+    "Guru Chandala": {
+      "type": "yoga",
+      "mentions": 2,
+      "sources": [
+        "yoga-interpretation.md",
+        "planet-significations.md"
+      ]
+    },
+    "Kala Sarpa": {
+      "type": "yoga",
+      "mentions": 1,
+      "sources": [
+        "yoga-interpretation.md"
+      ]
+    },
+    "Lakshmi Yoga": {
+      "type": "yoga",
+      "mentions": 1,
+      "sources": [
+        "yoga-interpretation.md"
+      ]
+    },
+    "Dharma-Karmadhipati": {
+      "type": "yoga",
+      "mentions": 1,
+      "sources": [
+        "yoga-interpretation.md"
+      ]
+    },
+    "Shadbala": {
+      "type": "concept",
+      "mentions": 2,
+      "sources": [
+        "yoga-interpretation.md",
+        "pvr-seven-stage-methodology.md"
+      ]
+    },
+    "Mangal": {
+      "type": "planet",
+      "mentions": 2,
+      "sources": [
+        "planet-significations.md",
+        "remedial-measures.md"
+      ]
+    },
+    "Budha": {
+      "type": "planet",
+      "mentions": 2,
+      "sources": [
+        "planet-significations.md",
+        "remedial-measures.md"
+      ]
+    },
+    "Brihaspati": {
+      "type": "planet",
+      "mentions": 2,
+      "sources": [
+        "planet-significations.md",
+        "remedial-measures.md"
+      ]
+    },
+    "Shukra": {
+      "type": "planet",
+      "mentions": 2,
+      "sources": [
+        "planet-significations.md",
+        "remedial-measures.md"
+      ]
+    },
+    "Shani": {
+      "type": "planet",
+      "mentions": 4,
+      "sources": [
+        "transit-interpretation.md",
+        "planet-significations.md",
+        "pvr-seven-stage-methodology.md",
+        "remedial-measures.md"
+      ]
+    },
+    "Grahan Yoga": {
+      "type": "yoga",
+      "mentions": 1,
+      "sources": [
+        "planet-significations.md"
+      ]
+    },
+    "Budh-Aditya": {
+      "type": "yoga",
+      "mentions": 1,
+      "sources": [
+        "planet-significations.md"
+      ]
+    },
+    "Upachaya": {
+      "type": "house",
+      "mentions": 2,
+      "sources": [
+        "transit-interpretation.md",
+        "house-significations.md"
+      ]
+    },
+    "BAV": {
+      "type": "concept",
+      "mentions": 3,
+      "sources": [
+        "bv-raman-predictive-rules.md",
+        "transit-interpretation.md",
+        "pvr-seven-stage-methodology.md"
+      ]
+    },
+    "Kalachakra": {
+      "type": "dasha",
+      "mentions": 1,
+      "sources": [
+        "pvr-seven-stage-methodology.md"
+      ]
+    },
+    "Yogini": {
+      "type": "dasha",
+      "mentions": 1,
+      "sources": [
+        "pvr-seven-stage-methodology.md"
+      ]
+    },
+    "Vimsopaka": {
+      "type": "concept",
+      "mentions": 2,
+      "sources": [
+        "divisional-charts.md",
+        "pvr-seven-stage-methodology.md"
+      ]
+    },
+    "Navamsa": {
+      "type": "concept",
+      "mentions": 1,
+      "sources": [
+        "divisional-charts.md"
+      ]
+    },
+    "Dasamsa": {
+      "type": "concept",
+      "mentions": 1,
+      "sources": [
+        "divisional-charts.md"
+      ]
+    }
+  },
+  "relationships": [
+    {
+      "type": "rules",
+      "source": "Lagna",
+      "target": "Sanjay Rath",
+      "confidence": 0.7
+    },
+    {
+      "type": "strengthens",
+      "source": "Double Transit",
+      "target": "Ashtakavarga",
+      "confidence": 0.7
+    },
+    {
+      "type": "rules",
+      "source": "10th house",
+      "target": "11th house",
+      "confidence": 0.7
+    },
+    {
+      "type": "rules",
+      "source": "12th house",
+      "target": "Trikona",
+      "confidence": 0.7
+    },
+    {
+      "type": "aspects",
+      "source": "KN Rao",
+      "target": "Saturn",
+      "confidence": 0.7
+    },
+    {
+      "type": "aspects",
+      "source": "Saturn",
+      "target": "Double Transit",
+      "confidence": 0.7
+    },
+    {
+      "type": "owns",
+      "source": "PVR",
+      "target": "Antardasha",
+      "confidence": 0.7
+    },
+    {
+      "type": "owns",
+      "source": "Venus",
+      "target": "Dusthana",
+      "confidence": 0.7
+    },
+    {
+      "type": "owns",
+      "source": "Dusthana",
+      "target": "Trikona",
+      "confidence": 0.7
+    },
+    {
+      "type": "owns",
+      "source": "12th house",
+      "target": "Trikona",
+      "confidence": 0.7
+    },
+    {
+      "type": "owns",
+      "source": "Trikona",
+      "target": "Kendra",
+      "confidence": 0.7
+    },
+    {
+      "type": "owns",
+      "source": "Kendra",
+      "target": "Dusthana",
+      "confidence": 0.7
+    },
+    {
+      "type": "owns",
+      "source": "Viparita Raja Yoga",
+      "target": "Maraka",
+      "confidence": 0.7
+    },
+    {
+      "type": "owns",
+      "source": "Maraka",
+      "target": "Trikona",
+      "confidence": 0.7
+    },
+    {
+      "type": "causes",
+      "source": "Venus",
+      "target": "Dusthana",
+      "confidence": 0.7
+    },
+    {
+      "type": "causes",
+      "source": "Dusthana",
+      "target": "Trikona",
+      "confidence": 0.7
+    },
+    {
+      "type": "causes",
+      "source": "Viparita Raja Yoga",
+      "target": "Antardasha",
+      "confidence": 0.7
+    },
+    {
+      "type": "strengthens",
+      "source": "Maraka",
+      "target": "Antardasha",
+      "confidence": 0.7
+    },
+    {
+      "type": "weakens",
+      "source": "9th house",
+      "target": "11th house",
+      "confidence": 0.7
+    },
+    {
+      "type": "rules",
+      "source": "Sun",
+      "target": "Ketu",
+      "confidence": 0.7
+    },
+    {
+      "type": "rules",
+      "source": "Kendra",
+      "target": "Dusthana",
+      "confidence": 0.7
+    },
+    {
+      "type": "aspects",
+      "source": "Dusthana",
+      "target": "10th house",
+      "confidence": 0.7
+    },
+    {
+      "type": "weakens",
+      "source": "Sun",
+      "target": "Ketu",
+      "confidence": 0.7
+    },
+    {
+      "type": "weakens",
+      "source": "Sun",
+      "target": "Ketu",
+      "confidence": 0.7
+    },
+    {
+      "type": "rules",
+      "source": "Antardasha",
+      "target": "Trikona",
+      "confidence": 0.7
+    },
+    {
+      "type": "rules",
+      "source": "Jaimini",
+      "target": "Lagna",
+      "confidence": 0.7
+    },
+    {
+      "type": "rules",
+      "source": "Sun",
+      "target": "Mars",
+      "confidence": 0.7
+    },
+    {
+      "type": "rules",
+      "source": "Maraka",
+      "target": "Sanjay Rath",
+      "confidence": 0.7
+    },
+    {
+      "type": "aspects",
+      "source": "Double Transit",
+      "target": "7th house",
+      "confidence": 0.7
+    },
+    {
+      "type": "aspects",
+      "source": "Kendra",
+      "target": "7th house",
+      "confidence": 0.7
+    },
+    {
+      "type": "aspects",
+      "source": "Dhana Yoga",
+      "target": "Antardasha",
+      "confidence": 0.7
+    },
+    {
+      "type": "aspects",
+      "source": "KN Rao",
+      "target": "5th house",
+      "confidence": 0.7
+    },
+    {
+      "type": "owns",
+      "source": "7th house",
+      "target": "Kendra",
+      "confidence": 0.7
+    },
+    {
+      "type": "causes",
+      "source": "Antardasha",
+      "target": "Jaimini",
+      "confidence": 0.7
+    },
+    {
+      "type": "weakens",
+      "source": "Dusthana",
+      "target": "Kendra",
+      "confidence": 0.7
+    },
+    {
+      "type": "rules",
+      "source": "Trikona",
+      "target": "Gajakesari",
+      "confidence": 0.7
+    },
+    {
+      "type": "aspects",
+      "source": "Shadbala",
+      "target": "Bhadra",
+      "confidence": 0.7
+    },
+    {
+      "type": "aspects",
+      "source": "Jupiter",
+      "target": "Malavya",
+      "confidence": 0.7
+    },
+    {
+      "type": "aspects",
+      "source": "Dhana Yoga",
+      "target": "Trikona",
+      "confidence": 0.7
+    },
+    {
+      "type": "aspects",
+      "source": "Raja Yoga",
+      "target": "Trikona",
+      "confidence": 0.7
+    },
+    {
+      "type": "aspects",
+      "source": "Capricorn",
+      "target": "Manglik",
+      "confidence": 0.7
+    },
+    {
+      "type": "aspects",
+      "source": "Jupiter",
+      "target": "9th house",
+      "confidence": 0.7
+    },
+    {
+      "type": "owns",
+      "source": "Saturn",
+      "target": "Ruchaka",
+      "confidence": 0.7
+    },
+    {
+      "type": "owns",
+      "source": "Shadbala",
+      "target": "Bhadra",
+      "confidence": 0.7
+    },
+    {
+      "type": "owns",
+      "source": "Raja Yoga",
+      "target": "Trikona",
+      "confidence": 0.7
+    },
+    {
+      "type": "owns",
+      "source": "Raja Yoga",
+      "target": "Trikona",
+      "confidence": 0.7
+    },
+    {
+      "type": "owns",
+      "source": "Raja Yoga",
+      "target": "Kendra",
+      "confidence": 0.7
+    },
+    {
+      "type": "owns",
+      "source": "Mars",
+      "target": "Capricorn",
+      "confidence": 0.7
+    },
+    {
+      "type": "owns",
+      "source": "Ketu",
+      "target": "Kala Sarpa",
+      "confidence": 0.7
+    },
+    {
+      "type": "owns",
+      "source": "Jupiter",
+      "target": "9th house",
+      "confidence": 0.7
+    },
+    {
+      "type": "cancels",
+      "source": "Neecha Bhanga",
+      "target": "Kendra",
+      "confidence": 0.7
+    },
+    {
+      "type": "cancels",
+      "source": "Venus",
+      "target": "Capricorn",
+      "confidence": 0.7
+    },
+    {
+      "type": "cancels",
+      "source": "Manglik",
+      "target": "Aquarius",
+      "confidence": 0.7
+    },
+    {
+      "type": "weakens",
+      "source": "Moon",
+      "target": "Raja Yoga",
+      "confidence": 0.7
+    },
+    {
+      "type": "weakens",
+      "source": "Dusthana",
+      "target": "Manglik",
+      "confidence": 0.7
+    },
+    {
+      "type": "rules",
+      "source": "Surya",
+      "target": "Atma Karaka",
+      "confidence": 0.7
+    },
+    {
+      "type": "rules",
+      "source": "10th house",
+      "target": "Kendra",
+      "confidence": 0.7
+    },
+    {
+      "type": "rules",
+      "source": "Trikona",
+      "target": "Sun",
+      "confidence": 0.7
+    },
+    {
+      "type": "rules",
+      "source": "10th house",
+      "target": "Chandra",
+      "confidence": 0.7
+    },
+    {
+      "type": "rules",
+      "source": "Vimshottari",
+      "target": "Kendra",
+      "confidence": 0.7
+    },
+    {
+      "type": "rules",
+      "source": "10th house",
+      "target": "Manglik",
+      "confidence": 0.7
+    },
+    {
+      "type": "rules",
+      "source": "1st house",
+      "target": "Budh-Aditya",
+      "confidence": 0.7
+    },
+    {
+      "type": "rules",
+      "source": "1st house",
+      "target": "Hamsa",
+      "confidence": 0.7
+    },
+    {
+      "type": "rules",
+      "source": "4th house",
+      "target": "Malavya",
+      "confidence": 0.7
+    },
+    {
+      "type": "rules",
+      "source": "7th house",
+      "target": "Sade Sati",
+      "confidence": 0.7
+    },
+    {
+      "type": "rules",
+      "source": "Aquarius",
+      "target": "Rahu",
+      "confidence": 0.7
+    },
+    {
+      "type": "rules",
+      "source": "Pisces",
+      "target": "Ketu",
+      "confidence": 0.7
+    },
+    {
+      "type": "aspects",
+      "source": "Kendra",
+      "target": "Jupiter",
+      "confidence": 0.7
+    },
+    {
+      "type": "aspects",
+      "source": "Saturn",
+      "target": "Budha",
+      "confidence": 0.7
+    },
+    {
+      "type": "aspects",
+      "source": "Hamsa",
+      "target": "Jupiter",
+      "confidence": 0.7
+    },
+    {
+      "type": "aspects",
+      "source": "Hamsa",
+      "target": "Jupiter",
+      "confidence": 0.7
+    },
+    {
+      "type": "aspects",
+      "source": "Sasa",
+      "target": "Saturn",
+      "confidence": 0.7
+    },
+    {
+      "type": "exalted_in",
+      "source": "Atma Karaka",
+      "target": "Libra",
+      "confidence": 0.7
+    },
+    {
+      "type": "debilitated_in",
+      "source": "Atma Karaka",
+      "target": "Libra",
+      "confidence": 0.7
+    },
+    {
+      "type": "debilitated_in",
+      "source": "Taurus",
+      "target": "Scorpio",
+      "confidence": 0.7
+    },
+    {
+      "type": "rules",
+      "source": "Ashtakavarga",
+      "target": "BAV",
+      "confidence": 0.7
+    },
+    {
+      "type": "rules",
+      "source": "Double Transit",
+      "target": "KN Rao",
+      "confidence": 0.7
+    },
+    {
+      "type": "rules",
+      "source": "KN Rao",
+      "target": "Saturn",
+      "confidence": 0.7
+    },
+    {
+      "type": "aspects",
+      "source": "KN Rao",
+      "target": "Jupiter",
+      "confidence": 0.7
+    },
+    {
+      "type": "aspects",
+      "source": "7th house",
+      "target": "10th house",
+      "confidence": 0.7
+    },
+    {
+      "type": "aspects",
+      "source": "10th house",
+      "target": "5th house",
+      "confidence": 0.7
+    },
+    {
+      "type": "aspects",
+      "source": "5th house",
+      "target": "Double Transit",
+      "confidence": 0.7
+    },
+    {
+      "type": "causes",
+      "source": "Upachaya",
+      "target": "Saturn",
+      "confidence": 0.7
+    },
+    {
+      "type": "weakens",
+      "source": "Lagna",
+      "target": "Saturn",
+      "confidence": 0.7
+    },
+    {
+      "type": "aspects",
+      "source": "Jupiter",
+      "target": "Lagna",
+      "confidence": 0.7
+    },
+    {
+      "type": "aspects",
+      "source": "Shadbala",
+      "target": "Lagna",
+      "confidence": 0.7
+    },
+    {
+      "type": "aspects",
+      "source": "KN Rao",
+      "target": "7th house",
+      "confidence": 0.7
+    },
+    {
+      "type": "aspects",
+      "source": "Saturn",
+      "target": "7th house",
+      "confidence": 0.7
+    },
+    {
+      "type": "aspects",
+      "source": "Double Transit",
+      "target": "Venus",
+      "confidence": 0.7
+    },
+    {
+      "type": "aspects",
+      "source": "Double Transit",
+      "target": "Jupiter",
+      "confidence": 0.7
+    },
+    {
+      "type": "aspects",
+      "source": "Lagna",
+      "target": "Rahu",
+      "confidence": 0.7
+    },
+    {
+      "type": "causes",
+      "source": "Shani",
+      "target": "Jupiter",
+      "confidence": 0.7
+    },
+    {
+      "type": "strengthens",
+      "source": "Jupiter",
+      "target": "Lagna",
+      "confidence": 0.7
+    },
+    {
+      "type": "rules",
+      "source": "Jaimini",
+      "target": "PACDARES",
+      "confidence": 0.7
+    },
+    {
+      "type": "rules",
+      "source": "KN Rao",
+      "target": "Saturn",
+      "confidence": 0.7
+    },
+    {
+      "type": "rules",
+      "source": "Vimshottari",
+      "target": "Mahadasha",
+      "confidence": 0.7
+    },
+    {
+      "type": "aspects",
+      "source": "Jaimini",
+      "target": "PACDARES",
+      "confidence": 0.7
+    },
+    {
+      "type": "aspects",
+      "source": "Dusthana",
+      "target": "KN Rao",
+      "confidence": 0.7
+    },
+    {
+      "type": "aspects",
+      "source": "Saturn",
+      "target": "Jupiter",
+      "confidence": 0.7
+    },
+    {
+      "type": "aspects",
+      "source": "Saturn",
+      "target": "Lagna",
+      "confidence": 0.7
+    },
+    {
+      "type": "aspects",
+      "source": "KN Rao",
+      "target": "5th house",
+      "confidence": 0.7
+    },
+    {
+      "type": "owns",
+      "source": "Mahadasha",
+      "target": "Antardasha",
+      "confidence": 0.7
+    },
+    {
+      "type": "owns",
+      "source": "Mahadasha",
+      "target": "Dusthana",
+      "confidence": 0.7
+    },
+    {
+      "type": "causes",
+      "source": "Antardasha",
+      "target": "Dusthana",
+      "confidence": 0.7
+    },
+    {
+      "type": "causes",
+      "source": "Antardasha",
+      "target": "Double Transit",
+      "confidence": 0.7
+    },
+    {
+      "type": "causes",
+      "source": "5th house",
+      "target": "Antardasha",
+      "confidence": 0.7
+    },
+    {
+      "type": "strengthens",
+      "source": "Double Transit",
+      "target": "Jaimini",
+      "confidence": 0.7
+    },
+    {
+      "type": "weakens",
+      "source": "Dusthana",
+      "target": "KN Rao",
+      "confidence": 0.7
+    },
+    {
+      "type": "owns",
+      "source": "Dasamsa",
+      "target": "4th house",
+      "confidence": 0.7
+    },
+    {
+      "type": "weakens",
+      "source": "Lagna",
+      "target": "Karakamsha",
+      "confidence": 0.7
+    },
+    {
+      "type": "rules",
+      "source": "Viparita Raja Yoga",
+      "target": "Maraka",
+      "confidence": 0.7
+    },
+    {
+      "type": "rules",
+      "source": "8th house",
+      "target": "Guru",
+      "confidence": 0.7
+    },
+    {
+      "type": "rules",
+      "source": "Guru",
+      "target": "Saturn",
+      "confidence": 0.7
+    },
+    {
+      "type": "rules",
+      "source": "Kendra",
+      "target": "Saturn",
+      "confidence": 0.7
+    },
+    {
+      "type": "aspects",
+      "source": "Trikona",
+      "target": "Ketu",
+      "confidence": 0.7
+    },
+    {
+      "type": "aspects",
+      "source": "Maraka",
+      "target": "Venus",
+      "confidence": 0.7
+    },
+    {
+      "type": "owns",
+      "source": "Sun",
+      "target": "Trikona",
+      "confidence": 0.7
+    },
+    {
+      "type": "causes",
+      "source": "Maraka",
+      "target": "Lagna",
+      "confidence": 0.7
+    },
+    {
+      "type": "causes",
+      "source": "Mars",
+      "target": "3rd house",
+      "confidence": 0.7
+    },
+    {
+      "type": "strengthens",
+      "source": "Dusthana",
+      "target": "8th house",
+      "confidence": 0.7
+    },
+    {
+      "type": "weakens",
+      "source": "Trikona",
+      "target": "Upachaya",
+      "confidence": 0.7
+    },
+    {
+      "type": "weakens",
+      "source": "8th house",
+      "target": "Guru",
+      "confidence": 0.7
+    },
+    {
+      "type": "weakens",
+      "source": "Guru",
+      "target": "Jupiter",
+      "confidence": 0.7
+    },
+    {
+      "type": "weakens",
+      "source": "Jupiter",
+      "target": "9th house",
+      "confidence": 0.7
+    },
+    {
+      "type": "weakens",
+      "source": "Jupiter",
+      "target": "9th house",
+      "confidence": 0.7
+    },
+    {
+      "type": "weakens",
+      "source": "Surya",
+      "target": "9th house",
+      "confidence": 0.7
+    },
+    {
+      "type": "weakens",
+      "source": "Moon",
+      "target": "Mercury",
+      "confidence": 0.7
+    },
+    {
+      "type": "rules",
+      "source": "Ashtakavarga",
+      "target": "BAV",
+      "confidence": 0.7
+    },
+    {
+      "type": "rules",
+      "source": "SAV",
+      "target": "Jupiter",
+      "confidence": 0.7
+    },
+    {
+      "type": "rules",
+      "source": "Jupiter",
+      "target": "Antardasha",
+      "confidence": 0.7
+    },
+    {
+      "type": "rules",
+      "source": "Moon",
+      "target": "Venus",
+      "confidence": 0.7
+    },
+    {
+      "type": "rules",
+      "source": "Trikona",
+      "target": "Kendra",
+      "confidence": 0.7
+    },
+    {
+      "type": "rules",
+      "source": "Lagna",
+      "target": "Sade Sati",
+      "confidence": 0.7
+    },
+    {
+      "type": "rules",
+      "source": "Saturn",
+      "target": "Jupiter",
+      "confidence": 0.7
+    },
+    {
+      "type": "aspects",
+      "source": "Venus",
+      "target": "Double Transit",
+      "confidence": 0.7
+    },
+    {
+      "type": "debilitated_in",
+      "source": "Neecha Bhanga",
+      "target": "Moon",
+      "confidence": 0.7
+    },
+    {
+      "type": "causes",
+      "source": "Ashtakavarga",
+      "target": "SAV",
+      "confidence": 0.7
+    },
+    {
+      "type": "causes",
+      "source": "Ashtakavarga",
+      "target": "SAV",
+      "confidence": 0.7
+    },
+    {
+      "type": "causes",
+      "source": "SAV",
+      "target": "Ashtakavarga",
+      "confidence": 0.7
+    },
+    {
+      "type": "causes",
+      "source": "Saturn",
+      "target": "SAV",
+      "confidence": 0.7
+    },
+    {
+      "type": "cancels",
+      "source": "Neecha Bhanga",
+      "target": "Moon",
+      "confidence": 0.7
+    },
+    {
+      "type": "weakens",
+      "source": "Ashtakavarga",
+      "target": "SAV",
+      "confidence": 0.7
+    },
+    {
+      "type": "weakens",
+      "source": "Venus",
+      "target": "Double Transit",
+      "confidence": 0.7
+    },
+    {
+      "type": "weakens",
+      "source": "Dhana Yoga",
+      "target": "8th house",
+      "confidence": 0.7
+    },
+    {
+      "type": "weakens",
+      "source": "8th house",
+      "target": "Kendra",
+      "confidence": 0.7
+    }
+  ],
+  "metadata": {
+    "created": "2026-04-25T14:05:29.766807",
+    "total_entities": 93,
+    "total_relationships": 145
+  }
+}

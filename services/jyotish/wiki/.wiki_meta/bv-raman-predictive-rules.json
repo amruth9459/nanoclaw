@@ -1,0 +1,50 @@
+{
+  "id": "bv-raman-predictive-rules",
+  "category": "general",
+  "sources": [
+    "bv-raman-predictive-rules.md"
+  ],
+  "created": "2026-04-21T12:40:01.619340",
+  "last_updated": "2026-04-25T14:05:29.648921",
+  "last_confirmed": "2026-04-25T14:05:29.648922",
+  "confidence": 0.4,
+  "version": 2,
+  "status": "active",
+  "claims": [
+    {
+      "raw": "5 year transit",
+      "pattern": "(\\d+)\\s+(?:years?|months?|days"
+    }
+  ],
+  "entities": [
+    "Sun",
+    "Moon",
+    "Jupiter",
+    "Venus",
+    "Saturn",
+    "Lagna",
+    "2nd house",
+    "7th house",
+    "8th house",
+    "Kendra",
+    "Trikona",
+    "Maraka",
+    "Hamsa",
+    "Malavya",
+    "Ruchaka",
+    "Bhadra",
+    "Sasa",
+    "Raja Yoga",
+    "Dhana Yoga",
+    "Neecha Bhanga",
+    "Sade Sati",
+    "Antardasha",
+    "Ashtakavarga",
+    "BAV",
+    "SAV",
+    "Double Transit"
+  ],
+  "entity_count": 26,
+  "relationship_count": 18,
+  "tier": "semantic"
+}

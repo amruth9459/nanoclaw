@@ -1,0 +1,2271 @@
+{
+  "doc_id": "nbu_officebuilding_eng-con",
+  "pdf": "NBU_OfficeBuilding_Eng-CON.ifc",
+  "doc_type": "commercial",
+  "difficulty": "medium",
+  "elements": {
+    "beams": [
+      {
+        "page": 1,
+        "tag": "166525",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "167534",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "166806",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "151645",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "167533",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "167532",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "167159",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "167182",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "150851",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "160090",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "152008",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "151765",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "151626",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "151600",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "150888",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "151905",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "159790",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "151199",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "150930",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "151179",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "151443",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "151735",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "151993",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "167219",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "151671",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "160077",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "151615",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "151215",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "159762",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "151922",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "151143",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "150752",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "152032",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "151820",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "160103",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "150998",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "152188",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "160116",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "151091",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "151976",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "159017",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "159963",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "151478",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "160047",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "151658",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "151304",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "151790",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "151413",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "159817",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "151159",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "159065",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "160062",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "151387",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "151841",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "150970",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "151229",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "159775",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "151858",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "151243",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "151752",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "159883",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "151493",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "152149",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "151430",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "151954",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "150827",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "160030",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "152162",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "152064",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "159868",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "159706",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "151127",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "159679",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "152175",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "159041",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "152136",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "151519",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "151370",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "159749",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "159526",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "159540",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "158921",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "158955",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "151807",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "159554",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "151506",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "159093",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "159941",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "152104",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "151400",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "159664",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "151257",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "158888",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "159651",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "159734",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "151109",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "159835",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "159176",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "152049",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "151873",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "150787",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "159978",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "159723",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "159236",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "151534",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "159909",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "159147",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "158980",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "159855",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "151272",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "159924",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "159202",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "159625",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "159514",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "151287",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "152121",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "159566",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "159486",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "159500",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "151549",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "159898",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "159612",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "159381",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "159278",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "159638",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "151583",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "159597",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "159352",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "159313",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "156101",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "156206",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "156551",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "160855",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "156552",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "156100",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "156966",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "155847",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "156967",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "155936",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "156646",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "156102",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "156151",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "156649",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "155993",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "160856",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "155938",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "155937",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "156204",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "156475",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "156474",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "156435",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "155991",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "162550",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "157137",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "155849",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "162549",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "157046",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "156150",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "156205",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "156317",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "156597",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "156479",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "156156",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "157176",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "156257",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "155935",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "156884",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "156473",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "155995",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "155939",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "156554",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "155940",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "156260",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "156209",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "156645",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "157006",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "156438",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "155851",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "156476",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "156647",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "156153",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "156154",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "156603",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "156322",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "163680",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "157177",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "156099",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "156436",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "156439",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "155988",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "155992",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "156208",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "156692",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "157138",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "155850",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "155989",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "156648",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "156694",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "156969",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "157135",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "156440",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "157136",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "156207",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "155990",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "163677",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "156928",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "162603",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "157173",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "156968",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "157045",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "156098",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "156478",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "155848",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "156047",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "156262",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "156553",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "156097",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "157008",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "156556",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "156693",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "156696",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "155994",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "156096",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "156043",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "157005",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "163681",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "156601",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "156886",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "156261",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "156155",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "156259",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "156359",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "156927",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "156400",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "156480",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "156695",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "156970",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "156965",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "156323",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "164955",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "157174",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "163662",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "156923",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "156555",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "156842",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "156691",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "157047",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "156883",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "157140",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "156926",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "162730",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "156362",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "162635",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "156361",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "156477",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "156360",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "156644",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "156844",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "157139",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "156321",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "157007",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "156887",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "156843",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "163678",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "156433",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "156437",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "157049",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "167787",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "156048",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "156152",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "157009",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "156599",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "156045",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "163675",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "162666",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "156399",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "156738",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "157048",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "156930",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "167789",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "157044",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "163674",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "156602",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "156929",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "156319",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "156739",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "163672",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "156046",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "156845",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "156848",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "162604",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "164956",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "162636",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "156358",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "156395",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "156846",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "165447",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "162665",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "156357",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "156600",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "156925",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "156847",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "163666",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "156885",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "156737",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "166703",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "164960",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "156258",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "162729",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "156044",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "156650",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "156434",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "157175",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "163663",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "167003",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "156888",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "156598",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "166701",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "156398",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "167004",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "163671",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "156356",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "162697",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "163669",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "164961",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "156396",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "165451",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "166700",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "167788",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "156320",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "156318",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "156740",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "163665",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "162698",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "165448",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "156924",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "156397",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "164959",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "156742",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "164957",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "163668",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "156741",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "164958",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "165450",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "166702",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "165452",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "166699",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "165453",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "156801",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "165449",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "156805",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "156802",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "156803",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "156804",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "156806",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "tag": "156807",
+        "location": "Level 1"
+      }
+    ],
+    "columns": [
+      {
+        "page": 1,
+        "tag": "149553",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "149579",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "149586",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "149582",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "149566",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "149568",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "149575",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "149587",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "149580",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "149552",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "149549",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "143837",
+        "location": "T/FDN"
+      },
+      {
+        "page": 1,
+        "tag": "149572",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "149567",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "149560",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "149551",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "149583",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "149578",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "149550",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "149577",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "149316",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "149570",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "149571",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "149569",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "144470",
+        "location": "T/FDN"
+      },
+      {
+        "page": 1,
+        "tag": "149564",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "149561",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "149573",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "149584",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "149581",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "149555",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "149574",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "149562",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "144477",
+        "location": "T/FDN"
+      },
+      {
+        "page": 1,
+        "tag": "149585",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "144469",
+        "location": "T/FDN"
+      },
+      {
+        "page": 1,
+        "tag": "144474",
+        "location": "T/FDN"
+      },
+      {
+        "page": 1,
+        "tag": "144447",
+        "location": "T/FDN"
+      },
+      {
+        "page": 1,
+        "tag": "149557",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "149554",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "149558",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "149576",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "144471",
+        "location": "T/FDN"
+      },
+      {
+        "page": 1,
+        "tag": "144476",
+        "location": "T/FDN"
+      },
+      {
+        "page": 1,
+        "tag": "144445",
+        "location": "T/FDN"
+      },
+      {
+        "page": 1,
+        "tag": "144462",
+        "location": "T/FDN"
+      },
+      {
+        "page": 1,
+        "tag": "149563",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "149556",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "144446",
+        "location": "T/FDN"
+      },
+      {
+        "page": 1,
+        "tag": "149565",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "144443",
+        "location": "T/FDN"
+      },
+      {
+        "page": 1,
+        "tag": "144459",
+        "location": "T/FDN"
+      },
+      {
+        "page": 1,
+        "tag": "144468",
+        "location": "T/FDN"
+      },
+      {
+        "page": 1,
+        "tag": "144448",
+        "location": "T/FDN"
+      },
+      {
+        "page": 1,
+        "tag": "144457",
+        "location": "T/FDN"
+      },
+      {
+        "page": 1,
+        "tag": "144450",
+        "location": "T/FDN"
+      },
+      {
+        "page": 1,
+        "tag": "144475",
+        "location": "T/FDN"
+      },
+      {
+        "page": 1,
+        "tag": "144463",
+        "location": "T/FDN"
+      },
+      {
+        "page": 1,
+        "tag": "144444",
+        "location": "T/FDN"
+      },
+      {
+        "page": 1,
+        "tag": "144449",
+        "location": "T/FDN"
+      },
+      {
+        "page": 1,
+        "tag": "149559",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "tag": "144464",
+        "location": "T/FDN"
+      },
+      {
+        "page": 1,
+        "tag": "144451",
+        "location": "T/FDN"
+      },
+      {
+        "page": 1,
+        "tag": "144472",
+        "location": "T/FDN"
+      },
+      {
+        "page": 1,
+        "tag": "144454",
+        "location": "T/FDN"
+      },
+      {
+        "page": 1,
+        "tag": "144467",
+        "location": "T/FDN"
+      },
+      {
+        "page": 1,
+        "tag": "144466",
+        "location": "T/FDN"
+      },
+      {
+        "page": 1,
+        "tag": "144473",
+        "location": "T/FDN"
+      },
+      {
+        "page": 1,
+        "tag": "144211",
+        "location": "T/FDN"
+      },
+      {
+        "page": 1,
+        "tag": "144465",
+        "location": "T/FDN"
+      },
+      {
+        "page": 1,
+        "tag": "144015",
+        "location": "T/FDN"
+      },
+      {
+        "page": 1,
+        "tag": "144460",
+        "location": "T/FDN"
+      },
+      {
+        "page": 1,
+        "tag": "144458",
+        "location": "T/FDN"
+      },
+      {
+        "page": 1,
+        "tag": "144455",
+        "location": "T/FDN"
+      },
+      {
+        "page": 1,
+        "tag": "144452",
+        "location": "T/FDN"
+      },
+      {
+        "page": 1,
+        "tag": "144453",
+        "location": "T/FDN"
+      },
+      {
+        "page": 1,
+        "tag": "144456",
+        "location": "T/FDN"
+      },
+      {
+        "page": 1,
+        "tag": "144318",
+        "location": "T/FDN"
+      },
+      {
+        "page": 1,
+        "tag": "144108",
+        "location": "T/FDN"
+      },
+      {
+        "page": 1,
+        "tag": "144461",
+        "location": "T/FDN"
+      }
+    ],
+    "slabs": [
+      {
+        "page": 1,
+        "type": "Floor:64mm Concrete With 38mm Metal Deck:153041",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Floor:127mm Slab on Grade:153025",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Basic Roof:Standing Seam Metal Roof:161560",
+        "location": "Roof"
+      },
+      {
+        "page": 1,
+        "type": "Basic Roof:Standing Seam Metal Roof:161560",
+        "location": "Roof"
+      },
+      {
+        "page": 1,
+        "type": "Basic Roof:EPDM Membrane on Rigid Insul on Metal Deck:161063",
+        "location": "Roof"
+      },
+      {
+        "page": 1,
+        "type": "Basic Roof:EPDM Membrane on Rigid Insul on Metal Deck:160924",
+        "location": "Roof"
+      }
+    ],
+    "wall_types": [
+      {
+        "page": 1,
+        "type_id": "Foundation - Concrete (300mm)"
+      }
+    ]
+  },
+  "gt_is_minimum": true,
+  "consensus_stats": {
+    "models": 2,
+    "auto_included": 443,
+    "flagged": 2
+  },
+  "flagged": [
+    {
+      "category": "rooms",
+      "element": {
+        "name": "Central Room",
+        "dimensions": "approximately 3' x 3'",
+        "location": "center of plan at coordinates approximately (20, -20)",
+        "level": "unknown",
+        "function": "unknown",
+        "page": 1
+      },
+      "reason": "single_model_only",
+      "models": [
+        "claude"
+      ]
+    },
+    {
+      "category": "title_block",
+      "element": {
+        "drawing_number": "nbu-office-structural",
+        "sheet_title": "IFC Plan View",
+        "scale": "unknown",
+        "page": 1
+      },
+      "reason": "single_model_only",
+      "models": [
+        "claude"
+      ]
+    }
+  ],
+  "built_at": "2026-03-13T10:12:48.716861",
+  "models_used": [
+    "ifc_programmatic",
+    "claude"
+  ]
+}

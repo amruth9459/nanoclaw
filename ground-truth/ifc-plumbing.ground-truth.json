@@ -1,0 +1,131 @@
+{
+  "doc_id": "Infra-Plumbing",
+  "source": "lexios/corpus/ifc/bsmart/Infra-Plumbing.ifc",
+  "doc_type": "mixed",
+  "difficulty": "medium",
+  "gt_source": "ifc_only",
+  "elements": {
+    "plumbing_piping": [
+      {
+        "page": 1,
+        "type": "sewer pipe",
+        "location": "road parking - site"
+      },
+      {
+        "page": 1,
+        "type": "sewer pipe",
+        "location": "road parking - site"
+      },
+      {
+        "page": 1,
+        "type": "sewer pipe",
+        "location": "road parking - site"
+      },
+      {
+        "page": 1,
+        "type": "sewer pipe",
+        "location": "road parking - site"
+      },
+      {
+        "page": 1,
+        "type": "sewer pipe",
+        "location": "road parking - site"
+      },
+      {
+        "page": 1,
+        "type": "sewer pipe",
+        "location": "road parking - site"
+      },
+      {
+        "page": 1,
+        "type": "sewer pipe",
+        "location": "road parking - site"
+      },
+      {
+        "page": 1,
+        "type": "sewer pipe",
+        "location": "road parking - site"
+      },
+      {
+        "page": 1,
+        "type": "sewer pipe",
+        "location": "road rail bridge - site"
+      },
+      {
+        "page": 1,
+        "type": "sewer pipe",
+        "location": "road rail bridge - site"
+      },
+      {
+        "page": 1,
+        "type": "sewer pipe",
+        "location": "road rail bridge - site"
+      },
+      {
+        "page": 1,
+        "type": "sewer pipe",
+        "location": "road rail bridge - site"
+      },
+      {
+        "page": 1,
+        "type": "sewer pipe",
+        "location": "road rail bridge - site"
+      },
+      {
+        "page": 1,
+        "type": "sewer pipe",
+        "location": "road rail bridge - site"
+      },
+      {
+        "page": 1,
+        "type": "sewer pipe",
+        "location": "road rail bridge - site"
+      },
+      {
+        "page": 1,
+        "type": "sewer pipe",
+        "location": "road rail bridge - site"
+      },
+      {
+        "page": 1,
+        "type": "sewer pipe",
+        "location": "road - site"
+      },
+      {
+        "page": 1,
+        "type": "sewer pipe",
+        "location": "road - site"
+      },
+      {
+        "page": 1,
+        "type": "sewer pipe",
+        "location": "road - site"
+      },
+      {
+        "page": 1,
+        "type": "sewer pipe",
+        "location": "road - site"
+      },
+      {
+        "page": 1,
+        "type": "sewer pipe",
+        "location": "road - site"
+      },
+      {
+        "page": 1,
+        "type": "sewer pipe",
+        "location": "road - site"
+      },
+      {
+        "page": 1,
+        "type": "sewer pipe",
+        "location": "road - site"
+      },
+      {
+        "page": 1,
+        "type": "sewer pipe",
+        "location": "road - site"
+      }
+    ]
+  }
+}

@@ -1,0 +1,194 @@
+{
+  "doc_id": "AC90R1_Jasmin_Sun",
+  "source": "lexios/corpus/ac90r1-jasmin-sun-105-2x3/AC90R1-Jasmin-Sun-105-2x3.ifc",
+  "doc_type": "residential_archicad",
+  "difficulty": "medium",
+  "gt_source": "ifc_programmatic",
+  "ifc_elements": 101,
+  "gt_is_minimum": true,
+  "built_at": "2026-04-15T00:00:00",
+  "elements": {
+    "rooms": [
+      {
+        "name": "Keller 2",
+        "room_code": "002",
+        "level": ""
+      },
+      {
+        "name": "Diele-Keller",
+        "room_code": "003",
+        "level": ""
+      },
+      {
+        "name": "Keller 1",
+        "room_code": "001",
+        "level": ""
+      },
+      {
+        "name": "Wohnen/Essen/Kochen",
+        "room_code": "101",
+        "level": ""
+      },
+      {
+        "name": "Abstellraum",
+        "room_code": "102",
+        "level": ""
+      },
+      {
+        "name": "WC",
+        "room_code": "103",
+        "level": ""
+      },
+      {
+        "name": "Diele-Erdgeschoss",
+        "room_code": "104",
+        "level": ""
+      },
+      {
+        "name": "Schlafzimmer",
+        "room_code": "201",
+        "level": ""
+      },
+      {
+        "name": "Bad",
+        "room_code": "202",
+        "level": ""
+      },
+      {
+        "name": "Diele-Dachgeschoss",
+        "room_code": "203",
+        "level": ""
+      }
+    ],
+    "doors": [
+      {
+        "tag": "Door-032",
+        "type": "Single-Flush",
+        "location": "Keller"
+      },
+      {
+        "tag": "Door-031",
+        "type": "Single-Flush",
+        "location": "Keller"
+      },
+      {
+        "tag": "Door-037",
+        "type": "Single-Flush",
+        "location": "Erdgeschoss"
+      },
+      {
+        "tag": "Door-033",
+        "type": "Single-Flush",
+        "location": "Erdgeschoss"
+      },
+      {
+        "tag": "Door-035",
+        "type": "Single-Flush",
+        "location": "Erdgeschoss"
+      },
+      {
+        "tag": "Door-036",
+        "type": "Single-Flush",
+        "location": "Erdgeschoss"
+      },
+      {
+        "tag": "Door-040",
+        "type": "Single-Flush",
+        "location": "Dachgeschoss"
+      },
+      {
+        "tag": "Door-039",
+        "type": "Single-Flush",
+        "location": "Dachgeschoss"
+      }
+    ],
+    "windows": [
+      {
+        "tag": "Wind-080",
+        "location": "Keller"
+      },
+      {
+        "tag": "Wind-080",
+        "location": "Keller"
+      },
+      {
+        "tag": "Wind-081",
+        "location": "Keller"
+      },
+      {
+        "tag": "Wind-083",
+        "location": "Erdgeschoss"
+      },
+      {
+        "tag": "Wind-084",
+        "location": "Erdgeschoss"
+      },
+      {
+        "tag": "Wind-084",
+        "location": "Erdgeschoss"
+      },
+      {
+        "tag": "Wind-082",
+        "location": "Erdgeschoss"
+      },
+      {
+        "tag": "Wind-083",
+        "location": "Erdgeschoss"
+      },
+      {
+        "tag": "Wind-082",
+        "location": "Erdgeschoss"
+      },
+      {
+        "tag": "Wind-084",
+        "location": "Dachgeschoss"
+      },
+      {
+        "tag": "Wind-086",
+        "location": "Dachgeschoss"
+      },
+      {
+        "tag": "Wind-087",
+        "location": "Dachgeschoss"
+      }
+    ],
+    "stairs_elevators": [
+      {
+        "type": "Stair",
+        "location": "Keller"
+      },
+      {
+        "type": "Stair",
+        "location": "Erdgeschoss"
+      }
+    ],
+    "railings_guards": [
+      {
+        "type": "Railing",
+        "location": "Dachgeschoss"
+      }
+    ],
+    "slabs": [
+      {
+        "type": "Slab-035",
+        "location": "Keller"
+      },
+      {
+        "type": "Slab-036",
+        "location": "Erdgeschoss"
+      },
+      {
+        "type": "Slab-037",
+        "location": "Dachgeschoss"
+      },
+      {
+        "type": "PRoof-24",
+        "location": "Dachgeschoss"
+      },
+      {
+        "type": "PRoof-25",
+        "location": "Dachgeschoss"
+      }
+    ]
+  }
+}

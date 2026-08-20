@@ -1,0 +1,72 @@
+{
+  "id": "pvr-seven-stage-methodology",
+  "category": "methodology",
+  "sources": [
+    "pvr-seven-stage-methodology.md"
+  ],
+  "created": "2026-04-21T12:13:46.746750",
+  "last_updated": "2026-04-25T14:05:29.695149",
+  "last_confirmed": "2026-04-25T14:05:29.695150",
+  "confidence": 0.4,
+  "version": 2,
+  "status": "active",
+  "claims": [
+    {
+      "raw": "5 year period",
+      "pattern": "(\\d+)\\s+(?:years?|months?|days"
+    },
+    {
+      "raw": "house\n2",
+      "pattern": "(?:houses?|bhava)\\s+(\\d+(?:\\s*"
+    },
+    {
+      "raw": "house\n3",
+      "pattern": "(?:houses?|bhava)\\s+(\\d+(?:\\s*"
+    },
+    {
+      "raw": "house\n4",
+      "pattern": "(?:houses?|bhava)\\s+(\\d+(?:\\s*"
+    }
+  ],
+  "entities": [
+    "Sun",
+    "Moon",
+    "Mars",
+    "Mercury",
+    "Jupiter",
+    "Venus",
+    "Saturn",
+    "Rahu",
+    "Ketu",
+    "Shani",
+    "Simha",
+    "Lagna",
+    "7th house",
+    "Kendra",
+    "Vimshottari",
+    "Narayana",
+    "Chara Dasha",
+    "Kalachakra",
+    "Yogini",
+    "Sade Sati",
+    "Mahadasha",
+    "Antardasha",
+    "Shadbala",
+    "Vimsopaka",
+    "Ashtakavarga",
+    "BAV",
+    "SAV",
+    "Karakamsha",
+    "Atma Karaka",
+    "Amatya Karaka",
+    "Dara Karaka",
+    "Double Transit",
+    "PVR Narasimha Rao",
+    "PVR",
+    "KN Rao",
+    "Jaimini"
+  ],
+  "entity_count": 36,
+  "relationship_count": 9,
+  "tier": "semantic"
+}

@@ -1,0 +1,41 @@
+{
+  "doc_id": "Infra-Bridge",
+  "source": "/Users/amrut/Lexios/lexios/corpus/ifc/bsmart/Infra-Bridge.ifc",
+  "doc_type": "infrastructure",
+  "gt_source": "ifc-only",
+  "ifc_elements": 24,
+  "gt_is_minimum": true,
+  "elements": {
+    "wall_types": [
+      {"type_id": "rail bridge - spandrel wall"}
+    ],
+    "beams": [
+      {"tag": "454425.1027893.955984.955026.940383.937728", "location": "bridge road - abutment"},
+      {"tag": "454425.1027893.955984.955027.940383.937728", "location": "bridge road - abutment"},
+      {"tag": "454425.1027893.955984.1885150.955006",       "location": "road rail bridge - superstructure"},
+      {"tag": "454425.1027893.955984.1885150.955009",       "location": "road rail bridge - superstructure"},
+      {"tag": "454425.1027893.955984.1885150.955007",       "location": "road rail bridge - superstructure"},
+      {"tag": "454425.1027893.955984.1885152.955018.1886593", "location": "road river bridge - substructure"},
+      {"tag": "454425.1027893.955984.1885152.955014.1886593", "location": "road river bridge - substructure"},
+      {"tag": "454425.1027893.955984.1885152.955022.1886593", "location": "road river bridge - substructure"}
+    ],
+    "columns": [
+      {"tag": "454425.1027893.955984.1885152.955018.1885214", "location": "road river bridge - substructure"},
+      {"tag": "454425.1027893.955984.1885152.955014.1885214", "location": "road river bridge - substructure"},
+      {"tag": "454425.1027893.955984.1885152.955022.1885214", "location": "road river bridge - substructure"},
+      {"tag": "454425.1027894.955995.1884272.1884264.1886323", "location": "rail bridge - substructure"},
+      {"tag": "454425.1027894.955995.1884272.1884267.1886323", "location": "rail bridge - substructure"},
+      {"tag": "454425.1027895.956001.1884272.1884264.1886323", "location": "rail bridge - substructure"},
+      {"tag": "454425.1027895.956001.1884272.1884267.1886323", "location": "rail bridge - substructure"}
+    ],
+    "slabs": [
+      {"type": "bridge road - approach slab", "location": "road rail bridge - approach"},
+      {"type": "bridge road - approach slab", "location": "road rail bridge - approach"},
+      {"type": "road river bridge - bridge deck", "location": "road rail bridge - deck"}
+    ],
+    "railings_guards": [
+      {"type": "bridge road railing", "location": "road rail bridge - deck"},
+      {"type": "bridge road railing", "location": "road rail bridge - deck"}
+    ]
+  }
+}

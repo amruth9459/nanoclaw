@@ -1,0 +1,140 @@
+{
+  "doc_id": "Infra-Road",
+  "source": "/Users/amrut/Lexios/lexios/corpus/ifc/bsmart/Infra-Road.ifc",
+  "doc_type": "infrastructure",
+  "gt_source": "ifc-only",
+  "ifc_elements": 32,
+  "gt_is_minimum": true,
+  "elements": {
+    "slabs": [
+      {
+        "type": "asphalt binder course - road - parking",
+        "location": "road - parking"
+      },
+      {
+        "type": "road - parking - asphalt surface course",
+        "location": "road - parking"
+      },
+      {
+        "type": "road - parking - subgrade",
+        "location": "road - parking"
+      },
+      {
+        "type": "road parking - base course",
+        "location": "road - parking"
+      },
+      {
+        "type": "road - asphalt binder course",
+        "location": "road  - carriageway"
+      },
+      {
+        "type": "road - asphalt surface course",
+        "location": "road  - carriageway"
+      },
+      {
+        "type": "road - subgrade",
+        "location": "road  - carriageway"
+      },
+      {
+        "type": "road - base course",
+        "location": "road  - carriageway"
+      },
+      {
+        "type": "asphalt binder course - road - parking",
+        "location": "road - parking"
+      },
+      {
+        "type": "road - parking - asphalt surface course",
+        "location": "road - parking"
+      },
+      {
+        "type": "road - parking - subgrade",
+        "location": "road - parking"
+      },
+      {
+        "type": "road parking - base course",
+        "location": "road - parking"
+      },
+      {
+        "type": "road - asphalt binder course",
+        "location": "road  - carriageway"
+      },
+      {
+        "type": "road - asphalt surface course",
+        "location": "road  - carriageway"
+      },
+      {
+        "type": "road - subgrade",
+        "location": "road  - carriageway"
+      },
+      {
+        "type": "road - base course",
+        "location": "road  - carriageway"
+      },
+      {
+        "type": "road base course - bridge road",
+        "location": "road carriageway - bridge road"
+      },
+      {
+        "type": "bridge road - road asphalt binder course",
+        "location": "road carriageway - bridge road"
+      },
+      {
+        "type": "road subgrade - bridge road",
+        "location": "road carriageway - bridge road"
+      },
+      {
+        "type": "road asphalt surface course - bridge road",
+        "location": "road carriageway - bridge road"
+      },
+      {
+        "type": "road base course - bridge road",
+        "location": "road carriageway - bridge road"
+      },
+      {
+        "type": "bridge road - road asphalt binder course",
+        "location": "road carriageway - bridge road"
+      },
+      {
+        "type": "road subgrade - bridge road",
+        "location": "road carriageway - bridge road"
+      },
+      {
+        "type": "road asphalt surface course - bridge road",
+        "location": "road carriageway - bridge road"
+      },
+      {
+        "type": "road - asphalt binder course",
+        "location": "road carriageway"
+      },
+      {
+        "type": "road - asphalt surface course",
+        "location": "road carriageway"
+      },
+      {
+        "type": "road - subgrade",
+        "location": "road carriageway"
+      },
+      {
+        "type": "road - base course",
+        "location": "road carriageway"
+      },
+      {
+        "type": "road - asphalt binder course",
+        "location": "road carriageway"
+      },
+      {
+        "type": "road - asphalt surface course",
+        "location": "road carriageway"
+      },
+      {
+        "type": "road - subgrade",
+        "location": "road carriageway"
+      },
+      {
+        "type": "road - base course",
+        "location": "road carriageway"
+      }
+    ]
+  }
+}

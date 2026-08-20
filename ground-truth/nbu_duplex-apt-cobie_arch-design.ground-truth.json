@@ -1,0 +1,83 @@
+{
+  "doc_id": "nbu_duplex-apt-cobie_arch-design",
+  "pdf": "NBU_Duplex-Apt-COBie_Arch-Design.ifc",
+  "doc_type": "residential",
+  "difficulty": "easy",
+  "elements": {
+    "plumbing_fixtures": [
+      {
+        "page": 1,
+        "type": "Toilet-3"
+      },
+      {
+        "page": 1,
+        "type": "Toilet-2"
+      },
+      {
+        "page": 1,
+        "type": "Toilet-1"
+      },
+      {
+        "page": 1,
+        "type": "Sink Type C-4"
+      },
+      {
+        "page": 1,
+        "type": "Sink Type C-3"
+      },
+      {
+        "page": 1,
+        "type": "Sink Type C-2"
+      },
+      {
+        "page": 1,
+        "type": "Sink Type C-1"
+      }
+    ],
+    "windows": [
+      {
+        "page": 1,
+        "tag": "Skylight-2"
+      },
+      {
+        "page": 1,
+        "tag": "Skylight-1"
+      },
+      {
+        "page": 1,
+        "tag": "Window Type D-9"
+      },
+      {
+        "page": 1,
+        "tag": "Window Type D-8"
+      }
+    ]
+  },
+  "gt_is_minimum": true,
+  "consensus_stats": {
+    "models": 2,
+    "auto_included": 11,
+    "flagged": 1
+  },
+  "flagged": [
+    {
+      "category": "title_block",
+      "element": {
+        "project_name": "IFC Plan View \u2014 nbu-duplex-ifc",
+        "drawing_number": "Page 1",
+        "page": 1
+      },
+      "reason": "single_model_only",
+      "models": [
+        "claude"
+      ]
+    }
+  ],
+  "built_at": "2026-03-13T19:38:21.053052",
+  "models_used": [
+    "ifc_programmatic",
+    "gpt4.1",
+    "claude",
+    "gemini"
+  ]
+}

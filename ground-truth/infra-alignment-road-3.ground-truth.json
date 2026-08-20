@@ -1,0 +1,62 @@
+{
+  "doc_id": "infra-alignment-road-3",
+  "source": "IFC4.3 (IFC4X3_RC3)",
+  "doc_type": "infrastructure",
+  "difficulty": "easy",
+  "gt_source": "ifc_step_parse",
+  "gt_is_minimum": true,
+  "built_at": "2026-03-15T18:11:41.863095",
+  "ifc_schema": "IFC4X3_RC3",
+  "total_ifc_entities": 46,
+  "elements": {
+    "site_elements": [
+      {
+        "page": 1,
+        "type": "IFCALIGNMENT",
+        "count": 1
+      },
+      {
+        "page": 1,
+        "type": "IFCALIGNMENTHORIZONTAL",
+        "count": 1
+      },
+      {
+        "page": 1,
+        "type": "IFCALIGNMENTHORIZONTALSEGMENT",
+        "count": 3
+      },
+      {
+        "page": 1,
+        "type": "IFCALIGNMENTSEGMENT",
+        "count": 6
+      },
+      {
+        "page": 1,
+        "type": "IFCALIGNMENTVERTICAL",
+        "count": 1
+      },
+      {
+        "page": 1,
+        "type": "IFCALIGNMENTVERTICALSEGMENT",
+        "count": 3
+      }
+    ],
+    "project_info": [
+      {
+        "page": 1,
+        "type": "IFCPROJECT",
+        "count": 1
+      },
+      {
+        "page": 1,
+        "type": "IFCSITE",
+        "count": 1
+      },
+      {
+        "page": 1,
+        "type": "IFCFACILITY",
+        "count": 1
+      }
+    ]
+  }
+}

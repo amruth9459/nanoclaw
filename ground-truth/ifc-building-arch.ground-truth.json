@@ -1,0 +1,67 @@
+{
+  "doc_id": "Building-Architecture",
+  "source": "/Users/amrut/Lexios/lexios/corpus/ifc/bsmart/Building-Architecture.ifc",
+  "doc_type": "mixed",
+  "difficulty": "medium",
+  "gt_source": "ifc_only",
+  "elements": {
+    "rooms": [
+      {
+        "name": "living room",
+        "page": 1,
+        "level": "00 groundfloor"
+      },
+      {
+        "name": "entry hall",
+        "page": 1,
+        "level": "00 groundfloor"
+      }
+    ],
+    "wall_types": [
+      {
+        "page": 1,
+        "type_id": "house - outer wall - house right front",
+        "thickness": "200.0000000000007",
+        "location": "00 groundfloor"
+      },
+      {
+        "page": 1,
+        "type_id": "house - outer wall - house right back",
+        "thickness": "200.00000000017903",
+        "location": "00 groundfloor"
+      },
+      {
+        "page": 1,
+        "type_id": "house - outer wall - house left",
+        "thickness": "200.00000000000975",
+        "location": "00 groundfloor"
+      },
+      {
+        "page": 1,
+        "type_id": "plumbing wall",
+        "thickness": "24.000000000082615",
+        "location": "00 groundfloor"
+      }
+    ],
+    "slabs": [
+      {
+        "page": 1,
+        "type": "floor",
+        "thickness": "250.00000000009484",
+        "location": "00 groundfloor"
+      },
+      {
+        "page": 1,
+        "type": "house - roof - slab left",
+        "thickness": "300.0000000001534",
+        "location": "Single-family house"
+      },
+      {
+        "page": 1,
+        "type": "house - roof - slab right",
+        "thickness": "300.0000000000386",
+        "location": "Single-family house"
+      }
+    ]
+  }
+}

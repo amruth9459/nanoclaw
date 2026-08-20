@@ -1,0 +1,568 @@
+{
+  "doc_id": "Infra-Landscaping",
+  "pdf": "Infra-Landscaping.ifc",
+  "doc_type": "infrastructure",
+  "difficulty": "easy",
+  "gt_source": "ifc_programmatic",
+  "ifc_elements": 92,
+  "elements": {
+    "landscaping": [
+      {
+        "type": "IFCGEOGRAPHICELEMENT",
+        "name": "park - site - underground",
+        "tag": "0kxkKDn4",
+        "location": ""
+      },
+      {
+        "type": "IFCGEOGRAPHICELEMENT",
+        "name": "park - site - grass",
+        "tag": "0M2sbzQN",
+        "location": ""
+      },
+      {
+        "type": "IFCGEOGRAPHICELEMENT",
+        "name": "apple tree",
+        "tag": "1QMfWcFQ",
+        "location": ""
+      },
+      {
+        "type": "IFCGEOGRAPHICELEMENT",
+        "name": "apple",
+        "tag": "3vx6_W1m",
+        "location": ""
+      },
+      {
+        "type": "IFCGEOGRAPHICELEMENT",
+        "name": "apple",
+        "tag": "0vL1f7P1",
+        "location": ""
+      },
+      {
+        "type": "IFCGEOGRAPHICELEMENT",
+        "name": "apple",
+        "tag": "0mvo1hri",
+        "location": ""
+      },
+      {
+        "type": "IFCGEOGRAPHICELEMENT",
+        "name": "apple",
+        "tag": "2JPl8039",
+        "location": ""
+      },
+      {
+        "type": "IFCGEOGRAPHICELEMENT",
+        "name": "apple",
+        "tag": "0xwgMcHY",
+        "location": ""
+      },
+      {
+        "type": "IFCGEOGRAPHICELEMENT",
+        "name": "apple",
+        "tag": "3cD4ZOuQ",
+        "location": ""
+      },
+      {
+        "type": "IFCGEOGRAPHICELEMENT",
+        "name": "apple",
+        "tag": "0xGEgLeb",
+        "location": ""
+      },
+      {
+        "type": "IFCGEOGRAPHICELEMENT",
+        "name": "apple",
+        "tag": "1xR2u7w4",
+        "location": ""
+      },
+      {
+        "type": "IFCGEOGRAPHICELEMENT",
+        "name": "apple tree",
+        "tag": "10Xnlx0y",
+        "location": ""
+      },
+      {
+        "type": "IFCGEOGRAPHICELEMENT",
+        "name": "apple",
+        "tag": "3BxsnesI",
+        "location": ""
+      },
+      {
+        "type": "IFCGEOGRAPHICELEMENT",
+        "name": "apple",
+        "tag": "3oJ823HY",
+        "location": ""
+      },
+      {
+        "type": "IFCGEOGRAPHICELEMENT",
+        "name": "apple",
+        "tag": "3NaKhZF_",
+        "location": ""
+      },
+      {
+        "type": "IFCGEOGRAPHICELEMENT",
+        "name": "apple",
+        "tag": "3ZCX_J58",
+        "location": ""
+      },
+      {
+        "type": "IFCGEOGRAPHICELEMENT",
+        "name": "apple",
+        "tag": "27YzHcsZ",
+        "location": ""
+      },
+      {
+        "type": "IFCGEOGRAPHICELEMENT",
+        "name": "apple",
+        "tag": "0o_EHtzH",
+        "location": ""
+      },
+      {
+        "type": "IFCGEOGRAPHICELEMENT",
+        "name": "apple",
+        "tag": "2Aqa5eVS",
+        "location": ""
+      },
+      {
+        "type": "IFCGEOGRAPHICELEMENT",
+        "name": "apple",
+        "tag": "1CibP_Kl",
+        "location": ""
+      },
+      {
+        "type": "IFCGEOGRAPHICELEMENT",
+        "name": "apple tree",
+        "tag": "3C2b0D8K",
+        "location": ""
+      },
+      {
+        "type": "IFCGEOGRAPHICELEMENT",
+        "name": "apple",
+        "tag": "3z6SQBV0",
+        "location": ""
+      },
+      {
+        "type": "IFCGEOGRAPHICELEMENT",
+        "name": "apple",
+        "tag": "1Yndm_y7",
+        "location": ""
+      },
+      {
+        "type": "IFCGEOGRAPHICELEMENT",
+        "name": "apple",
+        "tag": "0pkG5TJk",
+        "location": ""
+      },
+      {
+        "type": "IFCGEOGRAPHICELEMENT",
+        "name": "apple",
+        "tag": "0jQK5sMM",
+        "location": ""
+      },
+      {
+        "type": "IFCGEOGRAPHICELEMENT",
+        "name": "apple",
+        "tag": "3gOJz0hP",
+        "location": ""
+      },
+      {
+        "type": "IFCGEOGRAPHICELEMENT",
+        "name": "apple",
+        "tag": "2Lg6a_cu",
+        "location": ""
+      },
+      {
+        "type": "IFCGEOGRAPHICELEMENT",
+        "name": "apple",
+        "tag": "1M7UK0m3",
+        "location": ""
+      },
+      {
+        "type": "IFCGEOGRAPHICELEMENT",
+        "name": "apple",
+        "tag": "0p3IFiEr",
+        "location": ""
+      },
+      {
+        "type": "IFCGEOGRAPHICELEMENT",
+        "name": "apple tree",
+        "tag": "1kmsJIV8",
+        "location": ""
+      },
+      {
+        "type": "IFCGEOGRAPHICELEMENT",
+        "name": "apple",
+        "tag": "1g5NWJIz",
+        "location": ""
+      },
+      {
+        "type": "IFCGEOGRAPHICELEMENT",
+        "name": "apple",
+        "tag": "2B9m1Y8O",
+        "location": ""
+      },
+      {
+        "type": "IFCGEOGRAPHICELEMENT",
+        "name": "apple",
+        "tag": "1LrJS2N1",
+        "location": ""
+      },
+      {
+        "type": "IFCGEOGRAPHICELEMENT",
+        "name": "apple",
+        "tag": "1PmlOHhB",
+        "location": ""
+      },
+      {
+        "type": "IFCGEOGRAPHICELEMENT",
+        "name": "apple",
+        "tag": "3U7E5O1k",
+        "location": ""
+      },
+      {
+        "type": "IFCGEOGRAPHICELEMENT",
+        "name": "apple",
+        "tag": "0H2Fj8PH",
+        "location": ""
+      },
+      {
+        "type": "IFCGEOGRAPHICELEMENT",
+        "name": "apple",
+        "tag": "3WRI1iku",
+        "location": ""
+      },
+      {
+        "type": "IFCGEOGRAPHICELEMENT",
+        "name": "apple",
+        "tag": "3V$aG3qa",
+        "location": ""
+      },
+      {
+        "type": "IFCGEOGRAPHICELEMENT",
+        "name": "apple tree",
+        "tag": "3j0RbM_5",
+        "location": ""
+      },
+      {
+        "type": "IFCGEOGRAPHICELEMENT",
+        "name": "apple",
+        "tag": "0DFOuaLp",
+        "location": ""
+      },
+      {
+        "type": "IFCGEOGRAPHICELEMENT",
+        "name": "apple",
+        "tag": "1930YPue",
+        "location": ""
+      },
+      {
+        "type": "IFCGEOGRAPHICELEMENT",
+        "name": "apple",
+        "tag": "3hIzy9x$",
+        "location": ""
+      },
+      {
+        "type": "IFCGEOGRAPHICELEMENT",
+        "name": "apple",
+        "tag": "32iZ9$2O",
+        "location": ""
+      },
+      {
+        "type": "IFCGEOGRAPHICELEMENT",
+        "name": "apple",
+        "tag": "0WPf4sWN",
+        "location": ""
+      },
+      {
+        "type": "IFCGEOGRAPHICELEMENT",
+        "name": "apple",
+        "tag": "0ACwnN3C",
+        "location": ""
+      },
+      {
+        "type": "IFCGEOGRAPHICELEMENT",
+        "name": "apple",
+        "tag": "2xCCpcPI",
+        "location": ""
+      },
+      {
+        "type": "IFCGEOGRAPHICELEMENT",
+        "name": "apple",
+        "tag": "1DOk4dbj",
+        "location": ""
+      },
+      {
+        "type": "IFCGEOGRAPHICELEMENT",
+        "name": "apple tree",
+        "tag": "1Tobdrlg",
+        "location": ""
+      },
+      {
+        "type": "IFCGEOGRAPHICELEMENT",
+        "name": "apple",
+        "tag": "3NxIl_jy",
+        "location": ""
+      },
+      {
+        "type": "IFCGEOGRAPHICELEMENT",
+        "name": "apple",
+        "tag": "3NE787uK",
+        "location": ""
+      },
+      {
+        "type": "IFCGEOGRAPHICELEMENT",
+        "name": "apple",
+        "tag": "0HqE5ZK_",
+        "location": ""
+      },
+      {
+        "type": "IFCGEOGRAPHICELEMENT",
+        "name": "apple",
+        "tag": "2U7J29jK",
+        "location": ""
+      },
+      {
+        "type": "IFCGEOGRAPHICELEMENT",
+        "name": "apple",
+        "tag": "2MA8RLO7",
+        "location": ""
+      },
+      {
+        "type": "IFCGEOGRAPHICELEMENT",
+        "name": "apple",
+        "tag": "2ct40a7m",
+        "location": ""
+      },
+      {
+        "type": "IFCGEOGRAPHICELEMENT",
+        "name": "apple",
+        "tag": "17Udksht",
+        "location": ""
+      },
+      {
+        "type": "IFCGEOGRAPHICELEMENT",
+        "name": "apple",
+        "tag": "2MvD_$go",
+        "location": ""
+      },
+      {
+        "type": "IFCGEOGRAPHICELEMENT",
+        "name": "park - site - soil",
+        "tag": "0AvtbehU",
+        "location": ""
+      },
+      {
+        "type": "IFCGEOGRAPHICELEMENT",
+        "name": "road parking - roadside verge - soil",
+        "tag": "2eGMeS8J",
+        "location": ""
+      },
+      {
+        "type": "IFCGEOGRAPHICELEMENT",
+        "name": "road parking - roadside verge - grass",
+        "tag": "1wCkCBBY",
+        "location": ""
+      },
+      {
+        "type": "IFCGEOGRAPHICELEMENT",
+        "name": "river stream",
+        "tag": "0zGSqxrL",
+        "location": ""
+      },
+      {
+        "type": "IFCGEOGRAPHICELEMENT",
+        "name": "river bed",
+        "tag": "0yVWtUza",
+        "location": ""
+      },
+      {
+        "type": "IFCGEOGRAPHICELEMENT",
+        "name": "road river bridge - underground",
+        "tag": "3pUQsWUq",
+        "location": ""
+      },
+      {
+        "type": "IFCGEOGRAPHICELEMENT",
+        "name": "road river bridge - grass",
+        "tag": "3pzBWeie",
+        "location": ""
+      },
+      {
+        "type": "IFCGEOGRAPHICELEMENT",
+        "name": "road river bridge - soil",
+        "tag": "287A5dK8",
+        "location": ""
+      },
+      {
+        "type": "IFCGEOGRAPHICELEMENT",
+        "name": "tree",
+        "tag": "3q2pqb6g",
+        "location": ""
+      },
+      {
+        "type": "IFCGEOGRAPHICELEMENT",
+        "name": "river stream",
+        "tag": "2TzRIQ3T",
+        "location": ""
+      },
+      {
+        "type": "IFCGEOGRAPHICELEMENT",
+        "name": "river bed",
+        "tag": "0o2OoK8Y",
+        "location": ""
+      },
+      {
+        "type": "IFCGEOGRAPHICELEMENT",
+        "name": "riverside - grass",
+        "tag": "1$67KLp6",
+        "location": ""
+      },
+      {
+        "type": "IFCGEOGRAPHICELEMENT",
+        "name": "riverside - soil",
+        "tag": "0JNuUw_1",
+        "location": ""
+      },
+      {
+        "type": "IFCGEOGRAPHICELEMENT",
+        "name": "road - roadside verge - soil",
+        "tag": "3$Tc0Y2B",
+        "location": ""
+      },
+      {
+        "type": "IFCGEOGRAPHICELEMENT",
+        "name": "road - roadside verge - grass",
+        "tag": "2zsnPhHo",
+        "location": ""
+      },
+      {
+        "type": "IFCGEOGRAPHICELEMENT",
+        "name": "generic - site - underground",
+        "tag": "0_UEnkz4",
+        "location": ""
+      },
+      {
+        "type": "IFCGEOGRAPHICELEMENT",
+        "name": "grass - site - soil",
+        "tag": "1DqmYaok",
+        "location": ""
+      },
+      {
+        "type": "IFCGEOGRAPHICELEMENT",
+        "name": "grass - site - grass",
+        "tag": "2nns7UQn",
+        "location": ""
+      },
+      {
+        "type": "IFCGEOGRAPHICELEMENT",
+        "name": "road - roadside verge - soil",
+        "tag": "3$ZN4KG3",
+        "location": ""
+      },
+      {
+        "type": "IFCGEOGRAPHICELEMENT",
+        "name": "road - roadside verge - grass",
+        "tag": "0N_6HAKn",
+        "location": ""
+      }
+    ],
+    "site_elements": [
+      {
+        "type": "IFCBUILDINGELEMENTPROXY",
+        "name": "underground - road",
+        "tag": "2kltwih_",
+        "location": ""
+      },
+      {
+        "type": "IFCBUILDINGELEMENTPROXY",
+        "name": "highway location marker - sign",
+        "tag": "1UcPcFYF",
+        "location": ""
+      },
+      {
+        "type": "IFCBUILDINGELEMENTPROXY",
+        "name": "highway location marker - sign",
+        "tag": "024xXOLR",
+        "location": ""
+      },
+      {
+        "type": "IFCBUILDINGELEMENTPROXY",
+        "name": "highway location marker - sign",
+        "tag": "2ypUkw9o",
+        "location": ""
+      },
+      {
+        "type": "IFCBUILDINGELEMENTPROXY",
+        "name": "highway location marker - sign",
+        "tag": "18egTHa0",
+        "location": ""
+      },
+      {
+        "type": "IFCBUILDINGELEMENTPROXY",
+        "name": "group#16",
+        "tag": "0OzNRPe4",
+        "location": ""
+      },
+      {
+        "type": "IFCBUILDINGELEMENTPROXY",
+        "name": "underground - river",
+        "tag": "1FI54l9H",
+        "location": ""
+      },
+      {
+        "type": "IFCBUILDINGELEMENTPROXY",
+        "name": "underground - road",
+        "tag": "3Ch90OuJ",
+        "location": ""
+      },
+      {
+        "type": "IFCBUILDINGELEMENTPROXY",
+        "name": "highway location marker - sign",
+        "tag": "0bFvkZvP",
+        "location": ""
+      },
+      {
+        "type": "IFCBUILDINGELEMENTPROXY",
+        "name": "highway location marker - sign",
+        "tag": "1doAY7u3",
+        "location": ""
+      },
+      {
+        "type": "IFCBUILDINGELEMENTPROXY",
+        "name": "geo-reference",
+        "tag": "3Fit2Fad",
+        "location": ""
+      },
+      {
+        "type": "IFCBUILDINGELEMENTPROXY",
+        "name": "underground - road",
+        "tag": "3M9N4lty",
+        "location": ""
+      },
+      {
+        "type": "IFCBUILDINGELEMENTPROXY",
+        "name": "highway location marker - sign",
+        "tag": "1EgGZBqJ",
+        "location": ""
+      },
+      {
+        "type": "IFCBUILDINGELEMENTPROXY",
+        "name": "highway location marker - sign",
+        "tag": "1M3Vul38",
+        "location": ""
+      },
+      {
+        "type": "IFCBUILDINGELEMENTPROXY",
+        "name": "highway location marker - sign",
+        "tag": "2T95Xtq0",
+        "location": ""
+      },
+      {
+        "type": "IFCBUILDINGELEMENTPROXY",
+        "name": "highway location marker - sign",
+        "tag": "2k2lifnh",
+        "location": ""
+      }
+    ]
+  },
+  "gt_is_minimum": true,
+  "built_at": "2026-04-14T09:38:55.777732"
+}

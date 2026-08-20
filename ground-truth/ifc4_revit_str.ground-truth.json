@@ -1,0 +1,2722 @@
+{
+  "doc_id": "ifc4_revit_str",
+  "pdf": "Ifc4_Revit_STR.ifc",
+  "doc_type": "commercial",
+  "difficulty": "medium",
+  "elements": {
+    "beams": [
+      {
+        "page": 1,
+        "tag": "1046268",
+        "span": "4242.6",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1046278",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1046281",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1046284",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1046287",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1046290",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1046298",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1046300",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1046302",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1046304",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1046306",
+        "span": "4500.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1046308",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1046310",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1046312",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1046314",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1046316",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1046318",
+        "span": "4500.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1046320",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1046322",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1046324",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1046326",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1046328",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1046330",
+        "span": "4500.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1046332",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1046334",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1046336",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1046338",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1046340",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1046342",
+        "span": "4500.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1046344",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1046346",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1046348",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1046350",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1046352",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1046354",
+        "span": "4500.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1046356",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1046358",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1046360",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1046362",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1046364",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1046366",
+        "span": "4500.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1046368",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1046370",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1046372",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1046374",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1046376",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1046378",
+        "span": "4500.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1046380",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1046382",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1046384",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1046386",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1046388",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1046390",
+        "span": "4500.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1046392",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1046394",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1046396",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1046398",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1046400",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1046402",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1046404",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1046406",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1046408",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1046410",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1046412",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1046414",
+        "span": "4500.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1046416",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1046418",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1046420",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1046422",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1046424",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1046426",
+        "span": "4500.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1046428",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1046430",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1046432",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1046434",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1046436",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1046438",
+        "span": "4500.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1046440",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1046442",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1046444",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1046446",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1046448",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1046450",
+        "span": "4500.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1046452",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1046454",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1046456",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1046458",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1046460",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1046462",
+        "span": "4500.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1046464",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1046466",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1046468",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1046470",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1046472",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1046474",
+        "span": "4500.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1046476",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1046478",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1046480",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1046482",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1046484",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1046486",
+        "span": "4500.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1046488",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1046490",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1046492",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1046494",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1046496",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1046498",
+        "span": "4500.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1046503",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1046512",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1046542",
+        "span": "3422.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1046544",
+        "span": "3422.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1046546",
+        "span": "3718.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1046548",
+        "span": "3717.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1046550",
+        "span": "3422.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1046552",
+        "span": "3422.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1046554",
+        "span": "3717.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1046556",
+        "span": "3718.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1046558",
+        "span": "3422.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1046560",
+        "span": "3422.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1046562",
+        "span": "3718.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1046564",
+        "span": "3717.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1046566",
+        "span": "3422.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1046568",
+        "span": "3422.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1046570",
+        "span": "3717.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1046572",
+        "span": "3718.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1096387",
+        "span": "4242.6",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1096415",
+        "span": "4242.6",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1096421",
+        "span": "4242.6",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1098644",
+        "span": "4242.6",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1114997",
+        "span": "4242.6",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1116436",
+        "span": "13500.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1116461",
+        "span": "5867.2",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1116483",
+        "span": "13500.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1116502",
+        "span": "5797.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1116979",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1117017",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1117037",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1117066",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1117306",
+        "span": "5867.2",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1174038",
+        "span": "5867.2",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1175513",
+        "span": "5867.2",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1175555",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1175807",
+        "span": "1500.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1175809",
+        "span": "1500.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1175811",
+        "span": "1500.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1175813",
+        "span": "1500.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1175815",
+        "span": "1500.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1175817",
+        "span": "1500.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1175819",
+        "span": "1500.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1175821",
+        "span": "1500.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1175823",
+        "span": "1500.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1175871",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1175873",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1175875",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1175877",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1175879",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1175881",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1175883",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1175885",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1175887",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1175914",
+        "span": "1500.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1175916",
+        "span": "1500.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1175918",
+        "span": "1500.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1175920",
+        "span": "1500.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1175922",
+        "span": "1500.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1175953",
+        "span": "1500.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1175955",
+        "span": "1500.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1175957",
+        "span": "1500.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1175959",
+        "span": "1500.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1175961",
+        "span": "1500.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1175999",
+        "span": "5730.7",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1176035",
+        "span": "5695.5",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1176046",
+        "span": "5695.5",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1176054",
+        "span": "5797.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1176088",
+        "span": "1500.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1176090",
+        "span": "1500.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1176092",
+        "span": "1500.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1176094",
+        "span": "1500.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1176096",
+        "span": "1500.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1176129",
+        "span": "1500.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1176131",
+        "span": "1500.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1176133",
+        "span": "1500.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1176135",
+        "span": "1500.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1176137",
+        "span": "1500.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1176222",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1176224",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1176226",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1176228",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1176230",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1176232",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1176234",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1176236",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1176238",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1176627",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1176629",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1176631",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1176633",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1176635",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1176637",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1176639",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1176641",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1176643",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1176698",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1176700",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1176702",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1176704",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1176706",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1176708",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1176710",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1176712",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1176714",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1176734",
+        "span": "1500.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1176736",
+        "span": "1500.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1176738",
+        "span": "1500.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1176740",
+        "span": "1500.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1176742",
+        "span": "1500.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1176744",
+        "span": "1500.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1176746",
+        "span": "1500.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1176748",
+        "span": "1500.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1176750",
+        "span": "1500.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1196738",
+        "span": "1500.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1196740",
+        "span": "1500.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1196742",
+        "span": "1500.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1196744",
+        "span": "1500.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1196813",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1196815",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1196817",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1196819",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1196821",
+        "span": "1500.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1196823",
+        "span": "1500.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1196825",
+        "span": "1500.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1196827",
+        "span": "1500.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1196829",
+        "span": "1500.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1196831",
+        "span": "1500.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1196833",
+        "span": "1500.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1196835",
+        "span": "1500.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1196837",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1196839",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1196841",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1196843",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1196845",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1196847",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1196849",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1196851",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1196853",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1196855",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1196857",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1196859",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1196861",
+        "span": "1500.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1196863",
+        "span": "1500.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1196865",
+        "span": "1500.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1196867",
+        "span": "1500.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1315692",
+        "span": "6027.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1315694",
+        "span": "6027.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1315696",
+        "span": "6027.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1315698",
+        "span": "6027.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1315700",
+        "span": "6027.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1315702",
+        "span": "6027.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1315704",
+        "span": "6027.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1315706",
+        "span": "6027.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1315708",
+        "span": "6027.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1315710",
+        "span": "6027.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1315712",
+        "span": "6027.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1315714",
+        "span": "6027.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1315716",
+        "span": "6027.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1315718",
+        "span": "6027.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1315720",
+        "span": "6027.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1315722",
+        "span": "6027.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1315724",
+        "span": "6027.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1315726",
+        "span": "6027.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1315728",
+        "span": "6027.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1315730",
+        "span": "6027.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1315732",
+        "span": "6027.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1315734",
+        "span": "6027.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1315736",
+        "span": "6027.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1315738",
+        "span": "6027.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1315740",
+        "span": "6027.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1315742",
+        "span": "6027.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1315744",
+        "span": "6027.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1407777",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1417275",
+        "span": "6000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1417277",
+        "span": "6000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1417279",
+        "span": "6000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1417281",
+        "span": "6000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1417290",
+        "span": "2973.8",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1417292",
+        "span": "2973.8",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1417294",
+        "span": "2973.8",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1417296",
+        "span": "2973.8",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1417298",
+        "span": "2973.8",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1417300",
+        "span": "2973.8",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1417302",
+        "span": "2973.8",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1417304",
+        "span": "2973.8",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1417306",
+        "span": "2973.8",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1417308",
+        "span": "2973.8",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1417310",
+        "span": "2973.8",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1417312",
+        "span": "2973.8",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1417314",
+        "span": "2973.8",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1417323",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1417325",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1417327",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1417329",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1417331",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1417333",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1417335",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1417337",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1417339",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1417341",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1417343",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1417345",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1417347",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1417356",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1417358",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1417360",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1417362",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1417364",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1417366",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1417368",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1417370",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1417372",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1417374",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1417376",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1417378",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1417380",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1417389",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1417391",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1417393",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1417395",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1417397",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1417399",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1417401",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1417403",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1417405",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1417407",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1417409",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1417411",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1417413",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1417422",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1417424",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1417426",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1417428",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1417430",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1417432",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1417434",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1417436",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1417438",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1417440",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1417442",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1417444",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1417446",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1417462",
+        "span": "6000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1417464",
+        "span": "15000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1417466",
+        "span": "15000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1417469",
+        "span": "6000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1417471",
+        "span": "15000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1417473",
+        "span": "15000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1417487",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1436416",
+        "span": "4242.6",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1436420",
+        "span": "4242.6",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1436523",
+        "span": "4242.6",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1436528",
+        "span": "4242.6",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1436690",
+        "span": "4242.6",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1436728",
+        "span": "4242.6",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1436861",
+        "span": "4242.6",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1436903",
+        "span": "4242.6",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1437055",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1437083",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1437167",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1437215",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1437249",
+        "span": "3000.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1438725",
+        "span": "5867.2",
+        "location": "Default"
+      }
+    ],
+    "columns": [
+      {
+        "page": 1,
+        "tag": "1046264",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1096385",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1096413",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1096419",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1098642",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1114995",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1173925",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1417448",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1417450",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1417452",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1417454",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1417456",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1417459",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1417475",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1417477",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1417479",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1417481",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1417485",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1432709",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1436414",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1436418",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1436521",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1436526",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1436688",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1436726",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1436859",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1436866",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1436901",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1436907",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "tag": "1467946",
+        "location": "Default"
+      }
+    ],
+    "rooms": [
+      {
+        "name": "Area",
+        "page": 1,
+        "room_code": "1",
+        "area_sqft": 1299.4
+      }
+    ],
+    "slabs": [
+      {
+        "page": 1,
+        "type": "Floor:Insitu Concrete:495352",
+        "thickness": "550.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "type": "M_Pile Cap-600 Pile:600 x 600 x 900mm:512319",
+        "thickness": "600.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "type": "M_Pile-Steel Pipe:600mm Diameter:512321",
+        "thickness": "6002.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "type": "M_Pile Cap-600 Pile:600 x 600 x 900mm:512394",
+        "thickness": "600.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "type": "M_Pile-Steel Pipe:600mm Diameter:512396",
+        "thickness": "6002.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "type": "M_Pile Cap-600 Pile:600 x 600 x 900mm:512445",
+        "thickness": "600.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "type": "M_Pile-Steel Pipe:600mm Diameter:512447",
+        "thickness": "6002.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "type": "M_Pile Cap-600 Pile:600 x 600 x 900mm:512449",
+        "thickness": "600.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "type": "M_Pile-Steel Pipe:600mm Diameter:512451",
+        "thickness": "6002.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "type": "M_Pile Cap-600 Pile:600 x 600 x 900mm:512469",
+        "thickness": "600.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "type": "M_Pile-Steel Pipe:600mm Diameter:512471",
+        "thickness": "6002.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "type": "M_Pile Cap-600 Pile:600 x 600 x 900mm:512473",
+        "thickness": "600.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "type": "M_Pile-Steel Pipe:600mm Diameter:512475",
+        "thickness": "6002.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "type": "M_Pile Cap-600 Pile:600 x 600 x 900mm:512522",
+        "thickness": "600.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "type": "M_Pile-Steel Pipe:600mm Diameter:512524",
+        "thickness": "6002.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "type": "M_Pile Cap-600 Pile:600 x 600 x 900mm:512526",
+        "thickness": "600.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "type": "M_Pile-Steel Pipe:600mm Diameter:512528",
+        "thickness": "6002.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "type": "Floor:Insitu Concrete 250mm:647908",
+        "thickness": "450.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "type": "Pile Cap-9 Pile:3800 x 3800 x 600mm:1175183",
+        "thickness": "3800.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "type": "M_Pile-Steel Pipe:600mm Diameter:1175185",
+        "thickness": "6001.99999999999",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "type": "M_Pile-Steel Pipe:600mm Diameter:1175186",
+        "thickness": "6002.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "type": "M_Pile-Steel Pipe:600mm Diameter:1175187",
+        "thickness": "6002.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "type": "M_Pile-Steel Pipe:600mm Diameter:1175188",
+        "thickness": "6001.99999999999",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "type": "M_Pile-Steel Pipe:600mm Diameter:1175189",
+        "thickness": "6001.99999999999",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "type": "M_Pile-Steel Pipe:600mm Diameter:1175190",
+        "thickness": "6002.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "type": "M_Pile-Steel Pipe:600mm Diameter:1175191",
+        "thickness": "6002.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "type": "M_Pile-Steel Pipe:600mm Diameter:1175192",
+        "thickness": "6001.99999999999",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "type": "M_Pile-Steel Pipe:600mm Diameter:1175193",
+        "thickness": "6002.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "type": "Floor:Insitu Concrete:1206619",
+        "thickness": "550.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "type": "Floor:Plywood double brace:1210630",
+        "thickness": "44.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "type": "Floor:Rigid Insulation:1211070",
+        "thickness": "100.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "type": "Pile Cap-Rectangular:400 x 400 x 900mm:1381249",
+        "thickness": "400.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "type": "Pile Cap-Rectangular:400 x 400 x 900mm:1381270",
+        "thickness": "400.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "type": "Pile Cap-Rectangular:400 x 400 x 900mm:1381287",
+        "thickness": "400.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "type": "Pile Cap-Rectangular:400 x 400 x 900mm:1433369",
+        "thickness": "400.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "type": "Pile Cap-Rectangular:400 x 400 x 900mm:1436868",
+        "thickness": "400.0",
+        "location": "Default"
+      },
+      {
+        "page": 1,
+        "type": "Pile Cap-Rectangular:400 x 400 x 900mm:1436909",
+        "thickness": "400.0",
+        "location": "Default"
+      }
+    ],
+    "stairs_elevators": [
+      {
+        "page": 1,
+        "type": "Assembled Stair:Stair:513254",
+        "location": "Default"
+      }
+    ],
+    "title_block": [
+      {
+        "project_name": "ifc4-revit-structural",
+        "drawing_number": "IFC Plan View",
+        "page": 1
+      }
+    ],
+    "wall_types": [
+      {
+        "page": 1,
+        "type_id": "CL_W1",
+        "thickness": "280.0"
+      }
+    ]
+  },
+  "gt_is_minimum": true,
+  "consensus_stats": {
+    "models": 4,
+    "auto_included": 441,
+    "flagged": 5
+  },
+  "flagged": [
+    {
+      "category": "dimensions",
+      "element": {
+        "description": "Overall building width (approximate from plan layout, along X-axis)",
+        "value": "approx. 33 units",
+        "between": "leftmost to rightmost wall"
+      },
+      "reason": "single_model_only",
+      "models": [
+        "gpt4.1"
+      ]
+    },
+    {
+      "category": "doors",
+      "element": {
+        "tag": "",
+        "page": 1,
+        "size": "",
+        "type": "single",
+        "swing": "",
+        "location": "Upper left wall (main entry gap)"
+      },
+      "reason": "single_model_only",
+      "models": [
+        "gpt4.1"
+      ]
+    },
+    {
+      "category": "windows",
+      "element": {
+        "tag": "",
+        "page": 1,
+        "size": "",
+        "type": "",
+        "sill_height": "",
+        "location": "Upper left wall (short segment)"
+      },
+      "reason": "single_model_only",
+      "models": [
+        "gpt4.1"
+      ]
+    },
+    {
+      "category": "windows",
+      "element": {
+        "tag": "",
+        "page": 1,
+        "size": "",
+        "type": "",
+        "sill_height": "",
+        "location": "Upper middle wall (short segment)"
+      },
+      "reason": "single_model_only",
+      "models": [
+        "gpt4.1"
+      ]
+    },
+    {
+      "category": "windows",
+      "element": {
+        "tag": "",
+        "page": 1,
+        "size": "",
+        "type": "",
+        "sill_height": "",
+        "location": "Upper right wall (short segment)"
+      },
+      "reason": "single_model_only",
+      "models": [
+        "gpt4.1"
+      ]
+    }
+  ],
+  "built_at": "2026-03-13T19:48:55.165400",
+  "models_used": [
+    "ifc_programmatic",
+    "claude",
+    "gpt4.1",
+    "gemini"
+  ]
+}

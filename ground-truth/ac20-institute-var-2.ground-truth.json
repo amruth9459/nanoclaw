@@ -1,0 +1,2753 @@
+{
+  "doc_id": "ac20-institute-var-2",
+  "pdf": "AC20-Institute-Var-2.ifc",
+  "doc_type": "institutional",
+  "difficulty": "hard",
+  "elements": {
+    "columns": [
+      {
+        "page": 1,
+        "tag": "53B5EB23-BA26-414E-9A-6D-7A817ED7C186",
+        "location": "Erdgeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "0679A525-7AA6-45E7-BC-A2-A9D44C6C3E1B",
+        "location": "Erdgeschoss"
+      }
+    ],
+    "doors": [
+      {
+        "page": 1,
+        "tag": "1D1F256D-1AD5-42E5-82-9E-6EC603B6A7F1",
+        "size": "39.4x82.7",
+        "location": "Keller"
+      },
+      {
+        "page": 1,
+        "tag": "FD98DDBA-05C3-4658-AC-8B-AFD0AFC31921",
+        "size": "39.4x82.7",
+        "location": "Keller"
+      },
+      {
+        "page": 1,
+        "tag": "5D631F42-054E-4829-9F-A0-C44F828AE9AD",
+        "size": "39.4x82.7",
+        "location": "Keller"
+      },
+      {
+        "page": 1,
+        "tag": "66845E3B-FDA8-460F-9B-B1-65F8D59B4A31",
+        "size": "39.4x82.7",
+        "location": "Keller"
+      },
+      {
+        "page": 1,
+        "tag": "F10152C7-ADBD-41B7-B6-04-EDBDC719336D",
+        "size": "39.4x82.7",
+        "location": "Keller"
+      },
+      {
+        "page": 1,
+        "tag": "E77FE42B-847E-47E3-AC-E7-C8DBBB19BF8A",
+        "size": "39.4x82.7",
+        "location": "Keller"
+      },
+      {
+        "page": 1,
+        "tag": "17225CE6-9318-4E4E-85-E0-932A5D0F8B83",
+        "size": "39.4x82.7",
+        "location": "Keller"
+      },
+      {
+        "page": 1,
+        "tag": "9A29068B-2721-4E78-89-ED-442AFDB0A9BE",
+        "size": "39.4x82.7",
+        "location": "Keller"
+      },
+      {
+        "page": 1,
+        "tag": "9E621841-8171-482D-8F-40-0F1D00CFBA10",
+        "size": "39.4x82.7",
+        "location": "Keller"
+      },
+      {
+        "page": 1,
+        "tag": "EC54BFAC-6843-4631-BD-3D-CBC41FA5B805",
+        "size": "39.4x82.7",
+        "location": "Keller"
+      },
+      {
+        "page": 1,
+        "tag": "D38AA4F7-9A54-4892-A3-84-9985370C8A11",
+        "size": "39.4x82.7",
+        "location": "Keller"
+      },
+      {
+        "page": 1,
+        "tag": "1A4A3121-02CE-4700-87-73-112CCD1F1280",
+        "size": "39.4x82.7",
+        "location": "Keller"
+      },
+      {
+        "page": 1,
+        "tag": "F2669E0F-58A8-4DCE-82-67-58E18DC9BF20",
+        "size": "39.4x82.7",
+        "location": "Keller"
+      },
+      {
+        "page": 1,
+        "tag": "C3DFB109-64E6-4F78-B4-71-85C50819A9E3",
+        "size": "70.9x82.7",
+        "location": "Keller"
+      },
+      {
+        "page": 1,
+        "tag": "884BA54E-23BD-48A3-AB-7A-88D7BC93A52D",
+        "size": "70.9x82.7",
+        "location": "Keller"
+      },
+      {
+        "page": 1,
+        "tag": "50B872AF-C6DE-4987-90-B9-6565808B30A1",
+        "size": "70.9x82.7",
+        "location": "Keller"
+      },
+      {
+        "page": 1,
+        "tag": "93D2F51B-3F74-40E4-9A-18-436272E392C4",
+        "size": "78.7x82.7",
+        "location": "Erdgeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "DF8BF50C-B43D-4A2F-A4-37-0FD70EAD56EB",
+        "size": "39.4x82.7",
+        "location": "Erdgeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "6DDF2045-71C4-446D-85-A7-DC5307DB0064",
+        "size": "39.4x82.7",
+        "location": "Erdgeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "A85233F8-14AB-4C97-B2-77-5C1E168D93E7",
+        "size": "39.4x82.7",
+        "location": "Erdgeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "92CCFD97-5551-440C-BD-91-6F97264912B8",
+        "size": "39.4x82.7",
+        "location": "Erdgeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "57A33D25-A4C3-4AFD-95-D4-79411371074C",
+        "size": "39.4x82.7",
+        "location": "Erdgeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "067F5834-2764-4175-BE-C3-4A0EF7950792",
+        "size": "39.4x82.7",
+        "location": "Erdgeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "38A7A665-54C5-4126-9B-1F-185D100E9E3B",
+        "size": "39.4x82.7",
+        "location": "Erdgeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "AB5931B8-EB8E-45B8-B4-24-A92B9CAF8B29",
+        "size": "39.4x82.7",
+        "location": "Erdgeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "6A3985C9-9892-4E79-97-80-73D2EE26BF47",
+        "size": "39.4x82.7",
+        "location": "Erdgeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "852624FE-AF17-46B6-AD-56-42156E57BCEC",
+        "size": "39.4x82.7",
+        "location": "Erdgeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "297CEFB4-4FB8-4D8C-9A-40-E24F40FDF391",
+        "size": "39.4x82.7",
+        "location": "Erdgeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "8AE8D252-C269-4E54-BD-BC-60A4A8B38FA4",
+        "size": "39.4x82.7",
+        "location": "Erdgeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "3C03E9D8-4D9A-4F38-9B-D4-C987A32A686A",
+        "size": "39.4x82.7",
+        "location": "Erdgeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "93E5A575-59C3-4DA5-BC-3F-3F803A017E8F",
+        "size": "39.4x82.7",
+        "location": "Erdgeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "09D762E2-2E25-44DF-8C-A1-0FFFD5D9F896",
+        "size": "39.4x82.7",
+        "location": "Erdgeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "B18143BB-9474-4460-91-7B-969329E03597",
+        "size": "70.9x82.7",
+        "location": "Erdgeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "068D6B53-68C0-4E82-BD-81-0E0FB560897F",
+        "size": "70.9x82.7",
+        "location": "Erdgeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "9E8A6DA1-CA79-4558-88-FC-28D5960ADB51",
+        "size": "39.4x82.7",
+        "location": "1. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "43B64A3B-F124-4B76-9C-1D-2BC60703F4F1",
+        "size": "39.4x82.7",
+        "location": "1. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "FFAC6506-923F-49D2-9C-EC-4CA8CB9B7AD7",
+        "size": "39.4x82.7",
+        "location": "1. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "B7B5B042-23CD-42FC-BF-F4-ACF87A58C3CA",
+        "size": "39.4x82.7",
+        "location": "1. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "586FF88E-3825-41D8-BE-EA-637C3ED5CD23",
+        "size": "39.4x82.7",
+        "location": "1. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "64CE4AB6-4127-4313-8D-2B-976C14E0CAF4",
+        "size": "39.4x82.7",
+        "location": "1. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "9ABB768F-471A-42E1-96-16-9DED398502B7",
+        "size": "39.4x82.7",
+        "location": "1. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "DD27E0F7-7A4E-4664-B7-28-F41771979FDA",
+        "size": "39.4x82.7",
+        "location": "1. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "04603C1E-9509-4440-A2-61-73F310CF0B5D",
+        "size": "39.4x82.7",
+        "location": "1. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "BAC31ED9-108D-4638-8B-75-881617F4F5E3",
+        "size": "39.4x82.7",
+        "location": "1. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "B4968C20-0890-436C-B9-D6-6A83724785E6",
+        "size": "39.4x82.7",
+        "location": "1. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "15B6E9AD-45FD-470D-9B-DF-F7E8CBB0ED66",
+        "size": "39.4x82.7",
+        "location": "1. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "E46DCA9A-A7A7-4F27-A2-DB-11827B166E07",
+        "size": "39.4x82.7",
+        "location": "1. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "FFBD023A-8CE8-436C-B4-48-69AC9A1B50A9",
+        "size": "39.4x82.7",
+        "location": "1. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "E1C749A5-7F05-4476-8D-2C-A52BA94C4072",
+        "size": "39.4x82.7",
+        "location": "1. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "B600EC62-F514-49F5-A3-9C-FC45D6DF23EC",
+        "size": "39.4x82.7",
+        "location": "1. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "7FE07C1C-C150-4F5C-B4-EA-B374D37EA3ED",
+        "size": "39.4x82.7",
+        "location": "1. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "3C3FFF90-A4C5-48DA-A3-A7-FC704BE423A1",
+        "size": "39.4x82.7",
+        "location": "1. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "CE5D5BAE-7BFE-4AE1-B5-FC-8D4B4E9470B0",
+        "size": "39.4x82.7",
+        "location": "1. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "9C17C1A2-49A0-4C1F-AB-D8-0EA1ACF6418D",
+        "size": "39.4x82.7",
+        "location": "1. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "6C88BB3D-A7C8-4DD6-BE-A0-52F22223ED59",
+        "size": "70.9x82.7",
+        "location": "1. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "923BB1DD-66DD-4628-AD-92-492BAE340D33",
+        "size": "70.9x82.7",
+        "location": "1. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "2AD6C95D-9221-46C3-88-C1-9A2A58BC5429",
+        "size": "39.4x82.7",
+        "location": "2. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "BAEE47E0-C538-486B-B2-B1-EC4BE8DEC9DB",
+        "size": "39.4x82.7",
+        "location": "2. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "2DD1E002-EA7D-41C2-B6-EE-72ECEA9F70CB",
+        "size": "39.4x82.7",
+        "location": "2. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "F9B75F5A-8FCE-4B0F-A1-4E-C7B540379523",
+        "size": "39.4x82.7",
+        "location": "2. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "6B5DF89A-E90D-4340-9E-B4-584DCD6894C9",
+        "size": "39.4x82.7",
+        "location": "2. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "2B698AE9-E6A6-4DA2-8E-4A-CDA0CB713D73",
+        "size": "39.4x82.7",
+        "location": "2. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "317815BA-A29A-4DDD-B7-1E-CA81E8021DF7",
+        "size": "39.4x82.7",
+        "location": "2. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "0FAB79B0-E4B5-431B-9D-62-E5F8C493A181",
+        "size": "39.4x82.7",
+        "location": "2. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "FB377DAB-DD0C-44DE-B3-23-A8D027DE4BA5",
+        "size": "39.4x82.7",
+        "location": "2. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "941248AE-8AA8-4A2B-B5-AD-546D348FEF27",
+        "size": "39.4x82.7",
+        "location": "2. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "32A3D44F-DE69-480A-80-7F-0206542B132A",
+        "size": "39.4x82.7",
+        "location": "2. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "78CDD19E-9905-4EF8-90-A4-7BB2B7D4DBE9",
+        "size": "39.4x82.7",
+        "location": "2. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "F374E4B6-3F48-4B64-BE-2E-738F6B80DE50",
+        "size": "39.4x82.7",
+        "location": "2. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "547D72F0-24D5-4316-AE-E8-E536AE78262A",
+        "size": "39.4x82.7",
+        "location": "2. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "FBFE943A-954A-47F2-BE-8D-1B1DAA50EF7E",
+        "size": "39.4x82.7",
+        "location": "2. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "EE6F9783-9ECF-486F-88-A8-0D1C9FA8B21A",
+        "size": "39.4x82.7",
+        "location": "2. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "21606843-7195-4815-A5-DB-2C6B8204A244",
+        "size": "39.4x82.7",
+        "location": "2. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "3B3E0878-3E34-4B17-B9-B9-4011438D3DBD",
+        "size": "39.4x82.7",
+        "location": "2. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "BC98C5B8-D879-4567-9B-8A-1EA8DF85A94A",
+        "size": "39.4x82.7",
+        "location": "2. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "B12BD599-A209-45B6-8B-C3-B00BE16AE46C",
+        "size": "70.9x82.7",
+        "location": "2. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "162A1929-3C91-45DE-AB-EF-99516FE41D9F",
+        "size": "70.9x82.7",
+        "location": "2. Obergeschoss"
+      }
+    ],
+    "railings_guards": [
+      {
+        "page": 1,
+        "type": "Gelaender-1-1",
+        "location": "Erdgeschoss"
+      },
+      {
+        "page": 1,
+        "type": "Gelaender-1-2",
+        "location": "Erdgeschoss"
+      },
+      {
+        "page": 1,
+        "type": "Gelaender-1-3",
+        "location": "Erdgeschoss"
+      },
+      {
+        "page": 1,
+        "type": "Gelaender-2-1",
+        "location": "1. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "type": "Gelaender-2-2",
+        "location": "1. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "type": "Gelaender-2-3",
+        "location": "1. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "type": "Gelaender-3-1",
+        "location": "2. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "type": "Gelaender-3-3",
+        "location": "2. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "type": "Gelaender-3-2",
+        "location": "2. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "type": "Gelaender-4-1",
+        "location": "Dachgeschoss"
+      },
+      {
+        "page": 1,
+        "type": "Gelaender-4-2",
+        "location": "Dachgeschoss"
+      },
+      {
+        "page": 1,
+        "type": "Gelaender-4-3",
+        "location": "Dachgeschoss"
+      }
+    ],
+    "rooms": [
+      {
+        "name": "Besprechungsraum I",
+        "page": 1,
+        "room_code": "001",
+        "area_sqft": 257.3,
+        "level": "Keller"
+      },
+      {
+        "name": "Besprechungsraum II",
+        "page": 1,
+        "room_code": "002",
+        "area_sqft": 266.5,
+        "level": "Keller"
+      },
+      {
+        "name": "Technikraum I",
+        "page": 1,
+        "room_code": "003",
+        "area_sqft": 266.5,
+        "level": "Keller"
+      },
+      {
+        "name": "Technikraum II",
+        "page": 1,
+        "room_code": "004",
+        "area_sqft": 266.5,
+        "level": "Keller"
+      },
+      {
+        "name": "Technikraum III",
+        "page": 1,
+        "room_code": "005",
+        "area_sqft": 266.5,
+        "level": "Keller"
+      },
+      {
+        "name": "Seminarraum",
+        "page": 1,
+        "room_code": "006",
+        "area_sqft": 1380.7,
+        "level": "Keller"
+      },
+      {
+        "name": "Technikraum IV",
+        "page": 1,
+        "room_code": "007",
+        "area_sqft": 128.6,
+        "level": "Keller"
+      },
+      {
+        "name": "WC Herren",
+        "page": 1,
+        "room_code": "008",
+        "area_sqft": 133.2,
+        "level": "Keller"
+      },
+      {
+        "name": "Labor K1",
+        "page": 1,
+        "room_code": "010",
+        "area_sqft": 128.6,
+        "level": "Keller"
+      },
+      {
+        "name": "Labor K2",
+        "page": 1,
+        "room_code": "011",
+        "area_sqft": 128.6,
+        "level": "Keller"
+      },
+      {
+        "name": "Labor K3",
+        "page": 1,
+        "room_code": "012",
+        "area_sqft": 128.6,
+        "level": "Keller"
+      },
+      {
+        "name": "Labor K4",
+        "page": 1,
+        "room_code": "013",
+        "area_sqft": 128.6,
+        "level": "Keller"
+      },
+      {
+        "name": "Labor K5",
+        "page": 1,
+        "room_code": "014",
+        "area_sqft": 119.4,
+        "level": "Keller"
+      },
+      {
+        "name": "Flur Keller West",
+        "page": 1,
+        "room_code": "015",
+        "area_sqft": 369.6,
+        "level": "Keller"
+      },
+      {
+        "name": "Flur Keller Ost",
+        "page": 1,
+        "room_code": "017",
+        "area_sqft": 123.2,
+        "level": "Keller"
+      },
+      {
+        "name": "Flur Keller Treppe",
+        "page": 1,
+        "room_code": "016",
+        "area_sqft": 490.5,
+        "level": "Keller"
+      },
+      {
+        "name": "WC Damen",
+        "page": 1,
+        "room_code": "009",
+        "area_sqft": 133.2,
+        "level": "Keller"
+      },
+      {
+        "name": "Buero Meier",
+        "page": 1,
+        "room_code": "101",
+        "area_sqft": 119.4,
+        "level": "Erdgeschoss"
+      },
+      {
+        "name": "Labor I",
+        "page": 1,
+        "room_code": "102",
+        "area_sqft": 266.5,
+        "level": "Erdgeschoss"
+      },
+      {
+        "name": "Labor II",
+        "page": 1,
+        "room_code": "103",
+        "area_sqft": 266.5,
+        "level": "Erdgeschoss"
+      },
+      {
+        "name": "Flur EG West",
+        "page": 1,
+        "room_code": "116",
+        "area_sqft": 369.6,
+        "level": "Erdgeschoss"
+      },
+      {
+        "name": "Buero Obermeier",
+        "page": 1,
+        "room_code": "115",
+        "area_sqft": 257.3,
+        "level": "Erdgeschoss"
+      },
+      {
+        "name": "WC Damen",
+        "page": 1,
+        "room_code": "113",
+        "area_sqft": 133.2,
+        "level": "Erdgeschoss"
+      },
+      {
+        "name": "WC Herren",
+        "page": 1,
+        "room_code": "112",
+        "area_sqft": 133.2,
+        "level": "Erdgeschoss"
+      },
+      {
+        "name": "Buero Maier",
+        "page": 1,
+        "room_code": "111",
+        "area_sqft": 128.6,
+        "level": "Erdgeschoss"
+      },
+      {
+        "name": "Buero Studenten I",
+        "page": 1,
+        "room_code": "105",
+        "area_sqft": 408.9,
+        "level": "Erdgeschoss"
+      },
+      {
+        "name": "Buero Meyer",
+        "page": 1,
+        "room_code": "110",
+        "area_sqft": 128.6,
+        "level": "Erdgeschoss"
+      },
+      {
+        "name": "Buero Mayer",
+        "page": 1,
+        "room_code": "109",
+        "area_sqft": 128.6,
+        "level": "Erdgeschoss"
+      },
+      {
+        "name": "Buero Meyr",
+        "page": 1,
+        "room_code": "108",
+        "area_sqft": 128.6,
+        "level": "Erdgeschoss"
+      },
+      {
+        "name": "Buero Mayr",
+        "page": 1,
+        "room_code": "107",
+        "area_sqft": 119.4,
+        "level": "Erdgeschoss"
+      },
+      {
+        "name": "Buero Studenten II",
+        "page": 1,
+        "room_code": "106",
+        "area_sqft": 395.1,
+        "level": "Erdgeschoss"
+      },
+      {
+        "name": "Flur EG Ost",
+        "page": 1,
+        "room_code": "118",
+        "area_sqft": 369.6,
+        "level": "Erdgeschoss"
+      },
+      {
+        "name": "Buero Hausmeister",
+        "page": 1,
+        "room_code": "104",
+        "area_sqft": 133.2,
+        "level": "Erdgeschoss"
+      },
+      {
+        "name": "Buero Studenten III",
+        "page": 1,
+        "room_code": "114",
+        "area_sqft": 404.3,
+        "level": "Erdgeschoss"
+      },
+      {
+        "name": "Flur EG Eingang",
+        "page": 1,
+        "room_code": "117",
+        "area_sqft": 868.3,
+        "level": "Erdgeschoss"
+      },
+      {
+        "name": "Flur 1.OG West",
+        "page": 1,
+        "room_code": "220",
+        "area_sqft": 369.6,
+        "level": "1. Obergeschoss"
+      },
+      {
+        "name": "WC Damen",
+        "page": 1,
+        "room_code": "214",
+        "area_sqft": 133.2,
+        "level": "1. Obergeschoss"
+      },
+      {
+        "name": "WC Herren",
+        "page": 1,
+        "room_code": "213",
+        "area_sqft": 133.2,
+        "level": "1. Obergeschoss"
+      },
+      {
+        "name": "Flur 1.OG Ost",
+        "page": 1,
+        "room_code": "222",
+        "area_sqft": 369.6,
+        "level": "1. Obergeschoss"
+      },
+      {
+        "name": "Buero Schmidt",
+        "page": 1,
+        "room_code": "211",
+        "area_sqft": 128.6,
+        "level": "1. Obergeschoss"
+      },
+      {
+        "name": "Flur 1.OG Treppe",
+        "page": 1,
+        "room_code": "221",
+        "area_sqft": 490.5,
+        "level": "1. Obergeschoss"
+      },
+      {
+        "name": "Buero IL",
+        "page": 1,
+        "room_code": "207",
+        "area_sqft": 395.1,
+        "level": "1. Obergeschoss"
+      },
+      {
+        "name": "Buero IL Sekr.",
+        "page": 1,
+        "room_code": "206",
+        "area_sqft": 266.5,
+        "level": "1. Obergeschoss"
+      },
+      {
+        "name": "Buero Schmid",
+        "page": 1,
+        "room_code": "210",
+        "area_sqft": 128.6,
+        "level": "1. Obergeschoss"
+      },
+      {
+        "name": "Buero Mueller I",
+        "page": 1,
+        "room_code": "219",
+        "area_sqft": 119.4,
+        "level": "1. Obergeschoss"
+      },
+      {
+        "name": "Buero Mueller II",
+        "page": 1,
+        "room_code": "218",
+        "area_sqft": 128.6,
+        "level": "1. Obergeschoss"
+      },
+      {
+        "name": "Buero MuellerIII",
+        "page": 1,
+        "room_code": "217",
+        "area_sqft": 128.6,
+        "level": "1. Obergeschoss"
+      },
+      {
+        "name": "Buero Mueller V",
+        "page": 1,
+        "room_code": "215",
+        "area_sqft": 128.6,
+        "level": "1. Obergeschoss"
+      },
+      {
+        "name": "Buero Oberschmitt",
+        "page": 1,
+        "room_code": "204",
+        "area_sqft": 266.5,
+        "level": "1. Obergeschoss"
+      },
+      {
+        "name": "Buero Obermueller",
+        "page": 1,
+        "room_code": "201",
+        "area_sqft": 257.3,
+        "level": "1. Obergeschoss"
+      },
+      {
+        "name": "Buero Schmied II",
+        "page": 1,
+        "room_code": "208",
+        "area_sqft": 119.4,
+        "level": "1. Obergeschoss"
+      },
+      {
+        "name": "Buero Mueller VI + VII",
+        "page": 1,
+        "room_code": "202",
+        "area_sqft": 266.5,
+        "level": "1. Obergeschoss"
+      },
+      {
+        "name": "Buero Mueller VIII + IX",
+        "page": 1,
+        "room_code": "203",
+        "area_sqft": 266.5,
+        "level": "1. Obergeschoss"
+      },
+      {
+        "name": "Buero Schmied I",
+        "page": 1,
+        "room_code": "209",
+        "area_sqft": 128.6,
+        "level": "1. Obergeschoss"
+      },
+      {
+        "name": "Buero Schmitt I",
+        "page": 1,
+        "room_code": "212",
+        "area_sqft": 128.6,
+        "level": "1. Obergeschoss"
+      },
+      {
+        "name": "Buero Schmitt II",
+        "page": 1,
+        "room_code": "205",
+        "area_sqft": 128.6,
+        "level": "1. Obergeschoss"
+      },
+      {
+        "name": "Buero Mueller IV",
+        "page": 1,
+        "room_code": "216",
+        "area_sqft": 128.6,
+        "level": "1. Obergeschoss"
+      },
+      {
+        "name": "WC Herren",
+        "page": 1,
+        "room_code": "313",
+        "area_sqft": 133.2,
+        "level": "2. Obergeschoss"
+      },
+      {
+        "name": "Buero",
+        "page": 1,
+        "room_code": "302",
+        "area_sqft": 266.5,
+        "level": "2. Obergeschoss"
+      },
+      {
+        "name": "Buero",
+        "page": 1,
+        "room_code": "303",
+        "area_sqft": 266.5,
+        "level": "2. Obergeschoss"
+      },
+      {
+        "name": "Buero",
+        "page": 1,
+        "room_code": "304",
+        "area_sqft": 266.5,
+        "level": "2. Obergeschoss"
+      },
+      {
+        "name": "Buero",
+        "page": 1,
+        "room_code": "305",
+        "area_sqft": 266.5,
+        "level": "2. Obergeschoss"
+      },
+      {
+        "name": "Buero",
+        "page": 1,
+        "room_code": "318",
+        "area_sqft": 128.6,
+        "level": "2. Obergeschoss"
+      },
+      {
+        "name": "Buero",
+        "page": 1,
+        "room_code": "317",
+        "area_sqft": 128.6,
+        "level": "2. Obergeschoss"
+      },
+      {
+        "name": "Buero",
+        "page": 1,
+        "room_code": "316",
+        "area_sqft": 128.6,
+        "level": "2. Obergeschoss"
+      },
+      {
+        "name": "Buero",
+        "page": 1,
+        "room_code": "315",
+        "area_sqft": 128.6,
+        "level": "2. Obergeschoss"
+      },
+      {
+        "name": "Buero",
+        "page": 1,
+        "room_code": "306",
+        "area_sqft": 266.5,
+        "level": "2. Obergeschoss"
+      },
+      {
+        "name": "Buero",
+        "page": 1,
+        "room_code": "307",
+        "area_sqft": 257.3,
+        "level": "2. Obergeschoss"
+      },
+      {
+        "name": "Buero",
+        "page": 1,
+        "room_code": "312",
+        "area_sqft": 128.6,
+        "level": "2. Obergeschoss"
+      },
+      {
+        "name": "Buero",
+        "page": 1,
+        "room_code": "311",
+        "area_sqft": 128.6,
+        "level": "2. Obergeschoss"
+      },
+      {
+        "name": "Buero",
+        "page": 1,
+        "room_code": "310",
+        "area_sqft": 128.6,
+        "level": "2. Obergeschoss"
+      },
+      {
+        "name": "Buero",
+        "page": 1,
+        "room_code": "309",
+        "area_sqft": 128.6,
+        "level": "2. Obergeschoss"
+      },
+      {
+        "name": "Buero",
+        "page": 1,
+        "room_code": "308",
+        "area_sqft": 119.4,
+        "level": "2. Obergeschoss"
+      },
+      {
+        "name": "WC Damen",
+        "page": 1,
+        "room_code": "314",
+        "area_sqft": 133.2,
+        "level": "2. Obergeschoss"
+      },
+      {
+        "name": "Buero",
+        "page": 1,
+        "room_code": "301",
+        "area_sqft": 257.3,
+        "level": "2. Obergeschoss"
+      },
+      {
+        "name": "Buero",
+        "page": 1,
+        "room_code": "319",
+        "area_sqft": 119.4,
+        "level": "2. Obergeschoss"
+      },
+      {
+        "name": "Flur 2.OG West",
+        "page": 1,
+        "room_code": "320",
+        "area_sqft": 369.6,
+        "level": "2. Obergeschoss"
+      },
+      {
+        "name": "Flur 2.OG Treppe",
+        "page": 1,
+        "room_code": "321",
+        "area_sqft": 490.5,
+        "level": "2. Obergeschoss"
+      },
+      {
+        "name": "Flur 2.OG Ost",
+        "page": 1,
+        "room_code": "322",
+        "area_sqft": 369.6,
+        "level": "2. Obergeschoss"
+      },
+      {
+        "name": "Dachboden-2",
+        "page": 1,
+        "room_code": "403",
+        "area_sqft": 765.1,
+        "level": "Dachgeschoss"
+      },
+      {
+        "name": "Dachboden-1",
+        "page": 1,
+        "room_code": "402",
+        "area_sqft": 765.1,
+        "level": "Dachgeschoss"
+      },
+      {
+        "name": "Flur 3.OG Treppe",
+        "page": 1,
+        "room_code": "401",
+        "area_sqft": 648.1,
+        "level": "Dachgeschoss"
+      }
+    ],
+    "slabs": [
+      {
+        "page": 1,
+        "type": "Decke-002",
+        "thickness": "0.3",
+        "location": "Keller"
+      },
+      {
+        "page": 1,
+        "type": "Decke-001",
+        "thickness": "0.3",
+        "location": "Erdgeschoss"
+      },
+      {
+        "page": 1,
+        "type": "Decke-001",
+        "thickness": "0.3",
+        "location": "1. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "type": "Decke-002",
+        "thickness": "0.3",
+        "location": "2. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "type": "Decke-002",
+        "thickness": "0.3",
+        "location": "Dachgeschoss"
+      },
+      {
+        "page": 1,
+        "type": "Dach-001",
+        "thickness": "0.379999718433",
+        "location": "Dachgeschoss"
+      },
+      {
+        "page": 1,
+        "type": "Dach-001",
+        "thickness": "0.379999718433",
+        "location": "Dachgeschoss"
+      },
+      {
+        "page": 1,
+        "type": "Dach-001",
+        "thickness": "0.379999718433",
+        "location": "Dachgeschoss"
+      },
+      {
+        "page": 1,
+        "type": "Dach-001",
+        "thickness": "0.379999718433",
+        "location": "Dachgeschoss"
+      },
+      {
+        "page": 1,
+        "type": "Dach-001",
+        "thickness": "0.379999718433",
+        "location": "Dachgeschoss"
+      },
+      {
+        "page": 1,
+        "type": "Dach-001",
+        "thickness": "0.379999718433",
+        "location": "Dachgeschoss"
+      },
+      {
+        "page": 1,
+        "type": "Dach-001",
+        "thickness": "0.379999718433",
+        "location": "Dachgeschoss"
+      },
+      {
+        "page": 1,
+        "type": "Dach-001",
+        "thickness": "0.379999718433",
+        "location": "Dachgeschoss"
+      },
+      {
+        "page": 1,
+        "type": "Dach-001",
+        "thickness": "0.379999718433",
+        "location": "Dachgeschoss"
+      },
+      {
+        "page": 1,
+        "type": "Dach-001",
+        "thickness": "0.379999718433",
+        "location": "Dachgeschoss"
+      },
+      {
+        "page": 1,
+        "type": "Dach-001",
+        "thickness": "0.379999718433",
+        "location": "Dachgeschoss"
+      },
+      {
+        "page": 1,
+        "type": "Dach-001",
+        "thickness": "0.379999718433",
+        "location": "Dachgeschoss"
+      },
+      {
+        "page": 1,
+        "type": "Dach-001",
+        "thickness": "0.379999718433",
+        "location": "Dachgeschoss"
+      },
+      {
+        "page": 1,
+        "type": "Dach-001",
+        "thickness": "0.379999718433",
+        "location": "Dachgeschoss"
+      },
+      {
+        "page": 1,
+        "type": "Dach-001",
+        "thickness": "0.379999718433",
+        "location": "Dachgeschoss"
+      },
+      {
+        "page": 1,
+        "type": "Dach-001",
+        "thickness": "0.379999718433",
+        "location": "Dachgeschoss"
+      },
+      {
+        "page": 1,
+        "type": "Dach-001",
+        "thickness": "0.379999718433",
+        "location": "Dachgeschoss"
+      },
+      {
+        "page": 1,
+        "type": "Dach-001",
+        "thickness": "0.379999718433",
+        "location": "Dachgeschoss"
+      },
+      {
+        "page": 1,
+        "type": "Dach-001",
+        "thickness": "0.379999718433",
+        "location": "Dachgeschoss"
+      },
+      {
+        "page": 1,
+        "type": "Dach-001",
+        "thickness": "0.379999718433",
+        "location": "Dachgeschoss"
+      },
+      {
+        "page": 1,
+        "type": "Dach-001",
+        "thickness": "0.380000000745",
+        "location": "Dachgeschoss"
+      }
+    ],
+    "stairs_elevators": [
+      {
+        "page": 1,
+        "type": "Treppe-KG",
+        "location": "Keller"
+      },
+      {
+        "page": 1,
+        "type": "Treppe-EG",
+        "location": "Erdgeschoss"
+      },
+      {
+        "page": 1,
+        "type": "Treppe-1-OG",
+        "location": "1. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "type": "Treppe-2-OG",
+        "location": "2. Obergeschoss"
+      }
+    ],
+    "title_block": [
+      {
+        "project_name": "institute-var2-ifc4",
+        "drawing_number": "IFC Plan View",
+        "page": 1
+      }
+    ],
+    "wall_types": [
+      {
+        "page": 1,
+        "type_id": "Wand-002",
+        "thickness": "0.3"
+      },
+      {
+        "page": 1,
+        "type_id": "Wand-006",
+        "thickness": "0.3"
+      },
+      {
+        "page": 1,
+        "type_id": "Wand-007",
+        "thickness": "0.3"
+      },
+      {
+        "page": 1,
+        "type_id": "Wand-001",
+        "thickness": "0.3"
+      },
+      {
+        "page": 1,
+        "type_id": "Wand-010",
+        "thickness": "0.3"
+      },
+      {
+        "page": 1,
+        "type_id": "Wand-015",
+        "thickness": "0.3"
+      },
+      {
+        "page": 1,
+        "type_id": "Wand-014",
+        "thickness": "0.3"
+      },
+      {
+        "page": 1,
+        "type_id": "Wand-016",
+        "thickness": "0.3"
+      },
+      {
+        "page": 1,
+        "type_id": "Wand-018",
+        "thickness": "0.2"
+      },
+      {
+        "page": 1,
+        "type_id": "Wand-019",
+        "thickness": "0.2"
+      },
+      {
+        "page": 1,
+        "type_id": "Wand-021",
+        "thickness": "0.2"
+      },
+      {
+        "page": 1,
+        "type_id": "Wand-023",
+        "thickness": "0.2"
+      },
+      {
+        "page": 1,
+        "type_id": "Wand-022",
+        "thickness": "0.2"
+      },
+      {
+        "page": 1,
+        "type_id": "Wand-020",
+        "thickness": "0.2"
+      },
+      {
+        "page": 1,
+        "type_id": "Wand-024",
+        "thickness": "0.2"
+      },
+      {
+        "page": 1,
+        "type_id": "Wand-004",
+        "thickness": "0.3"
+      },
+      {
+        "page": 1,
+        "type_id": "Wand-003",
+        "thickness": "0.3"
+      },
+      {
+        "page": 1,
+        "type_id": "Wand-030",
+        "thickness": "0.3"
+      },
+      {
+        "page": 1,
+        "type_id": "Wand-031",
+        "thickness": "0.3"
+      },
+      {
+        "page": 1,
+        "type_id": "Wand-005",
+        "thickness": "0.3"
+      },
+      {
+        "page": 1,
+        "type_id": "Wand-029",
+        "thickness": "0.3"
+      },
+      {
+        "page": 1,
+        "type_id": "Wand-017",
+        "thickness": "0.3"
+      },
+      {
+        "page": 1,
+        "type_id": "Wand-025",
+        "thickness": "0.2"
+      },
+      {
+        "page": 1,
+        "type_id": "Wand-026",
+        "thickness": "0.2"
+      },
+      {
+        "page": 1,
+        "type_id": "Wand-027",
+        "thickness": "0.2"
+      },
+      {
+        "page": 1,
+        "type_id": "Wand-028",
+        "thickness": "0.2"
+      },
+      {
+        "page": 1,
+        "type_id": "Wand-008",
+        "thickness": "0.3"
+      },
+      {
+        "page": 1,
+        "type_id": "Wand-032",
+        "thickness": "0.3"
+      },
+      {
+        "page": 1,
+        "type_id": "Wand-033",
+        "thickness": "0.3"
+      },
+      {
+        "page": 1,
+        "type_id": "Wand-034",
+        "thickness": "0.3"
+      },
+      {
+        "page": 1,
+        "type_id": "Wand-035",
+        "thickness": "0.3"
+      },
+      {
+        "page": 1,
+        "type_id": "Wand-036",
+        "thickness": "0.3"
+      },
+      {
+        "page": 1,
+        "type_id": "Wand-037",
+        "thickness": "0.3"
+      }
+    ],
+    "windows": [
+      {
+        "page": 1,
+        "tag": "E2E8655F-6DD1-4336-A9-4B-13A89EA15E68",
+        "size": "39.4x59.1",
+        "location": "Keller"
+      },
+      {
+        "page": 1,
+        "tag": "02044060-E129-461A-BD-13-943E77B58A3C",
+        "size": "39.4x59.1",
+        "location": "Keller"
+      },
+      {
+        "page": 1,
+        "tag": "B5030A34-D83C-4622-B0-25-7D96540A60FF",
+        "size": "39.4x59.1",
+        "location": "Keller"
+      },
+      {
+        "page": 1,
+        "tag": "72C4263E-D21E-4506-A7-B4-D72EB78E4C04",
+        "size": "39.4x59.1",
+        "location": "Keller"
+      },
+      {
+        "page": 1,
+        "tag": "CDDA226C-5498-4185-99-98-F06CE5BA500A",
+        "size": "39.4x59.1",
+        "location": "Keller"
+      },
+      {
+        "page": 1,
+        "tag": "FF5C96D3-16A6-405E-A2-B4-1D76F163E701",
+        "size": "39.4x59.1",
+        "location": "Keller"
+      },
+      {
+        "page": 1,
+        "tag": "F537474D-DBC5-4BC0-A7-F2-21AB6EC869A1",
+        "size": "39.4x59.1",
+        "location": "Keller"
+      },
+      {
+        "page": 1,
+        "tag": "AC81B54D-194C-4EED-8A-0E-64CDE3E92A88",
+        "size": "39.4x59.1",
+        "location": "Keller"
+      },
+      {
+        "page": 1,
+        "tag": "DF1A3DB8-8590-431C-AB-8A-FDE1059B147C",
+        "size": "39.4x59.1",
+        "location": "Keller"
+      },
+      {
+        "page": 1,
+        "tag": "39141037-5450-41D8-A7-CC-0BB4767A2AB9",
+        "size": "39.4x59.1",
+        "location": "Keller"
+      },
+      {
+        "page": 1,
+        "tag": "B7C913F2-D9DC-4D09-8C-01-620D0A86CC15",
+        "size": "39.4x59.1",
+        "location": "Keller"
+      },
+      {
+        "page": 1,
+        "tag": "A9A30541-065B-42EB-8C-B5-0B1FF6B00EAF",
+        "size": "39.4x59.1",
+        "location": "Keller"
+      },
+      {
+        "page": 1,
+        "tag": "4F150241-4D60-4C97-B6-8A-9C1B4FBC5342",
+        "size": "39.4x59.1",
+        "location": "Keller"
+      },
+      {
+        "page": 1,
+        "tag": "B2293D27-3631-4118-8C-47-64C94E7BEF95",
+        "size": "39.4x59.1",
+        "location": "Keller"
+      },
+      {
+        "page": 1,
+        "tag": "769A5357-283D-4C1C-94-16-5B3A0064378B",
+        "size": "39.4x59.1",
+        "location": "Keller"
+      },
+      {
+        "page": 1,
+        "tag": "15C7AC38-2E4B-4C68-B2-F8-4282C2E23BA4",
+        "size": "39.4x59.1",
+        "location": "Keller"
+      },
+      {
+        "page": 1,
+        "tag": "4FB6850B-F538-4E1C-AD-19-E297D32A9F23",
+        "size": "39.4x59.1",
+        "location": "Keller"
+      },
+      {
+        "page": 1,
+        "tag": "84D80438-02CA-421F-A4-88-0922F755CF35",
+        "size": "39.4x59.1",
+        "location": "Keller"
+      },
+      {
+        "page": 1,
+        "tag": "62AABAA9-4D88-4516-B3-20-47AF3CA220F6",
+        "size": "39.4x59.1",
+        "location": "Keller"
+      },
+      {
+        "page": 1,
+        "tag": "DB07C8BF-776A-4E02-82-30-07B47B0B35F5",
+        "size": "39.4x59.1",
+        "location": "Keller"
+      },
+      {
+        "page": 1,
+        "tag": "C7C70F7B-B8F4-4318-A7-2C-903C910DE42C",
+        "size": "39.4x59.1",
+        "location": "Keller"
+      },
+      {
+        "page": 1,
+        "tag": "8E3F87C8-94B8-4D6B-92-ED-D56D70C34013",
+        "size": "39.4x59.1",
+        "location": "Keller"
+      },
+      {
+        "page": 1,
+        "tag": "8E31A3A8-C693-4FCA-92-C5-5E3590D6648C",
+        "size": "39.4x59.1",
+        "location": "Keller"
+      },
+      {
+        "page": 1,
+        "tag": "289DECB6-5936-4733-A2-94-D12D22532414",
+        "size": "39.4x59.1",
+        "location": "Keller"
+      },
+      {
+        "page": 1,
+        "tag": "02776479-D45B-4FDA-9A-8F-BAF43AC03FF6",
+        "size": "39.4x59.1",
+        "location": "Keller"
+      },
+      {
+        "page": 1,
+        "tag": "1E8F9F57-E822-4BFF-8D-8C-8C17BB5536A6",
+        "size": "39.4x59.1",
+        "location": "Keller"
+      },
+      {
+        "page": 1,
+        "tag": "8235DEE7-85CF-4795-9F-10-C61A6DAEDAD0",
+        "size": "39.4x59.1",
+        "location": "Keller"
+      },
+      {
+        "page": 1,
+        "tag": "6C71BE4C-83D6-49DA-B7-BE-505DD9A451F7",
+        "size": "39.4x59.1",
+        "location": "Keller"
+      },
+      {
+        "page": 1,
+        "tag": "40261B93-98D3-4F66-92-02-6EDDD0EFD066",
+        "size": "39.4x59.1",
+        "location": "Keller"
+      },
+      {
+        "page": 1,
+        "tag": "2311E9AA-9434-4D40-A5-A4-F173FEF2DA41",
+        "size": "39.4x59.1",
+        "location": "Keller"
+      },
+      {
+        "page": 1,
+        "tag": "BA44F7EA-9994-4C63-84-46-BC52C91BDA79",
+        "size": "39.4x59.1",
+        "location": "Keller"
+      },
+      {
+        "page": 1,
+        "tag": "3B990E3A-0690-4609-B6-71-4E49DAC55B03",
+        "size": "39.4x59.1",
+        "location": "Keller"
+      },
+      {
+        "page": 1,
+        "tag": "81AD8B60-0ADD-4256-BE-C5-3D894EDC47F1",
+        "size": "39.4x59.1",
+        "location": "Keller"
+      },
+      {
+        "page": 1,
+        "tag": "B00A09BB-8B93-4C35-91-C7-865D903A1CDA",
+        "size": "39.4x59.1",
+        "location": "Keller"
+      },
+      {
+        "page": 1,
+        "tag": "7CE7C6CD-CAD9-48CE-92-DC-8DF37562726A",
+        "size": "39.4x59.1",
+        "location": "Keller"
+      },
+      {
+        "page": 1,
+        "tag": "5184C307-9DC7-4671-92-1A-C9D21DEFC22B",
+        "size": "39.4x59.1",
+        "location": "Keller"
+      },
+      {
+        "page": 1,
+        "tag": "7B2592BB-67B2-4505-92-7F-38225F640836",
+        "size": "39.4x59.1",
+        "location": "Keller"
+      },
+      {
+        "page": 1,
+        "tag": "AB8F3712-1A34-4066-8F-DD-8FA5CB37A286",
+        "size": "39.4x59.1",
+        "location": "Keller"
+      },
+      {
+        "page": 1,
+        "tag": "ABACFA34-6F24-4258-8C-51-35C79B0F1155",
+        "size": "39.4x59.1",
+        "location": "Keller"
+      },
+      {
+        "page": 1,
+        "tag": "525A06FA-CA0C-4831-8F-DE-2F1AD439BBBE",
+        "size": "39.4x59.1",
+        "location": "Keller"
+      },
+      {
+        "page": 1,
+        "tag": "CCBE6A78-13F6-4A7B-AF-21-C55E9F6FE88B",
+        "size": "39.4x59.1",
+        "location": "Keller"
+      },
+      {
+        "page": 1,
+        "tag": "6A54A216-6177-495A-94-52-6CF7682B9943",
+        "size": "39.4x59.1",
+        "location": "Keller"
+      },
+      {
+        "page": 1,
+        "tag": "9461AABA-D49A-47BF-8A-1C-96A94031FB7B",
+        "size": "39.4x59.1",
+        "location": "Keller"
+      },
+      {
+        "page": 1,
+        "tag": "929F51FD-EC1B-4CF2-B5-39-5B2E5E5F295E",
+        "size": "39.4x59.1",
+        "location": "Keller"
+      },
+      {
+        "page": 1,
+        "tag": "7CA5378E-D615-429C-9C-74-721087A4F62F",
+        "size": "35.4x59.1",
+        "location": "Erdgeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "C32E4A86-2A33-44C6-B5-03-579DBE4F7A8F",
+        "size": "35.4x59.1",
+        "location": "Erdgeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "68C41B3A-3FAB-4144-AA-1E-734F917C0D26",
+        "size": "39.4x59.1",
+        "location": "Erdgeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "81CC25D3-F8F9-4C7B-92-80-AEAADBF63590",
+        "size": "39.4x59.1",
+        "location": "Erdgeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "B5BD2ECB-A30A-418C-90-81-F0BE9EF16D3D",
+        "size": "39.4x59.1",
+        "location": "Erdgeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "E8128A53-7CDA-4B2B-81-A0-8F95374AD67C",
+        "size": "39.4x59.1",
+        "location": "Erdgeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "BDF3376D-6DCD-4CB9-B3-F6-B23D35523E37",
+        "size": "39.4x59.1",
+        "location": "Erdgeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "3758910B-8BBC-4FCB-AD-54-89FF966FE520",
+        "size": "39.4x59.1",
+        "location": "Erdgeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "BF42B38D-335C-4620-80-93-9FFDAC5BDD4C",
+        "size": "39.4x59.1",
+        "location": "Erdgeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "0DE25DE9-30C4-408F-8A-5E-4A013DD59E1C",
+        "size": "39.4x59.1",
+        "location": "Erdgeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "5F456714-7687-4E79-B5-F9-59494A127F00",
+        "size": "39.4x59.1",
+        "location": "Erdgeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "B360EAE5-0F4D-4C52-92-ED-EE815507A2EA",
+        "size": "39.4x59.1",
+        "location": "Erdgeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "86D7C3B9-CD41-4BC6-BE-67-25B32285D91B",
+        "size": "39.4x59.1",
+        "location": "Erdgeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "182A2BC5-119D-4766-A9-54-B82051CB0791",
+        "size": "39.4x59.1",
+        "location": "Erdgeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "30647A22-16BE-4E8D-9F-D0-FCEE723CE085",
+        "size": "39.4x78.7",
+        "location": "Erdgeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "834BE8F4-1616-4527-B9-10-334F8D85C800",
+        "size": "35.4x78.7",
+        "location": "Erdgeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "0ECE49AE-8F76-4523-8D-79-AF647F2ECCE4",
+        "size": "39.4x59.1",
+        "location": "Erdgeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "DD3DB502-1C60-408B-A0-70-C203F23A5A12",
+        "size": "39.4x59.1",
+        "location": "Erdgeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "7BBC76E4-8422-4DC9-94-CB-A6E7596DFB8B",
+        "size": "39.4x59.1",
+        "location": "Erdgeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "C9B0C9D1-92DE-48F4-A5-0B-937C63F8F1F4",
+        "size": "39.4x59.1",
+        "location": "Erdgeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "7BF26464-C455-4BA7-A9-D5-02AAF9E54713",
+        "size": "39.4x59.1",
+        "location": "Erdgeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "04761D6D-6C6D-4019-87-2E-150333A6F43B",
+        "size": "39.4x59.1",
+        "location": "Erdgeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "7482D347-DFAB-4BF9-AF-EB-72132856BD38",
+        "size": "39.4x59.1",
+        "location": "Erdgeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "CF0856B7-4519-45C5-8F-48-2148517CA77E",
+        "size": "39.4x59.1",
+        "location": "Erdgeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "1C27278F-AD6C-45FB-84-EE-AA6816A5769A",
+        "size": "39.4x59.1",
+        "location": "Erdgeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "75DDDB13-8C0B-4B51-B6-44-B305BA3AF910",
+        "size": "39.4x59.1",
+        "location": "Erdgeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "094DB1FF-0678-4C48-A3-E0-FCB3FFFA7283",
+        "size": "39.4x59.1",
+        "location": "Erdgeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "7146BE9A-952B-4E79-BC-40-742D6CB2DD44",
+        "size": "39.4x59.1",
+        "location": "Erdgeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "C5009C6F-C2C2-45AF-8E-8E-E339A510CB1E",
+        "size": "39.4x59.1",
+        "location": "Erdgeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "9F3C2433-F73D-402A-B3-E8-16573BE451AD",
+        "size": "39.4x59.1",
+        "location": "Erdgeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "40D22EE2-4C74-476F-B7-E7-0113F138DEDD",
+        "size": "39.4x59.1",
+        "location": "Erdgeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "6FC54629-3999-4430-AF-71-E99339ECBE8D",
+        "size": "39.4x59.1",
+        "location": "Erdgeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "A4A6653D-C558-4C59-8A-9A-D575DB464703",
+        "size": "39.4x59.1",
+        "location": "Erdgeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "56003D9F-A85F-43B8-B1-29-85D50503249E",
+        "size": "39.4x59.1",
+        "location": "Erdgeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "322247E9-C7EC-4356-93-08-075332FAA7B3",
+        "size": "39.4x59.1",
+        "location": "Erdgeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "AB0B76BE-91B6-47F9-9B-D7-6C0DA481F90E",
+        "size": "39.4x59.1",
+        "location": "Erdgeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "FE692E82-4A34-4A40-96-34-910CFA43E244",
+        "size": "39.4x59.1",
+        "location": "Erdgeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "D57CB935-F3E5-4802-9C-DB-7BD975156E51",
+        "size": "39.4x59.1",
+        "location": "Erdgeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "473467F4-EA58-4B3D-91-7F-8D8F61A07CF4",
+        "size": "39.4x59.1",
+        "location": "Erdgeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "E84350E4-49A1-40BD-8F-A0-01F47E8BB352",
+        "size": "39.4x59.1",
+        "location": "Erdgeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "89AE5E8E-75F6-4CC7-95-5E-DE6343AD914D",
+        "size": "39.4x59.1",
+        "location": "Erdgeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "10CD07A3-FF94-4FF2-81-C8-DEF43F3BAC8F",
+        "size": "39.4x59.1",
+        "location": "Erdgeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "EB0EF241-3980-46BB-BA-DB-E92CD80663A3",
+        "size": "39.4x59.1",
+        "location": "Erdgeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "F5D2D9F7-7579-403D-A7-5F-CD19F4A43DAB",
+        "size": "39.4x59.1",
+        "location": "Erdgeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "17111B3D-D337-4392-B7-48-BF81E253AA6E",
+        "size": "39.4x59.1",
+        "location": "Erdgeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "5BB67728-275C-4643-92-0B-AE88953908E5",
+        "size": "39.4x59.1",
+        "location": "Erdgeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "7B2E5DCD-0C77-4378-82-37-63801E9DBBC0",
+        "size": "39.4x59.1",
+        "location": "Erdgeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "D511F1D1-48D9-4981-BC-99-F8EA7F4553F3",
+        "size": "39.4x59.1",
+        "location": "Erdgeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "1396212B-985C-4286-BE-51-5DD665A44FB1",
+        "size": "39.4x59.1",
+        "location": "Erdgeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "6FAD1198-BF5B-473B-A4-5C-8A10FFC26F08",
+        "size": "39.4x59.1",
+        "location": "Erdgeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "688DA5E8-EC9A-4239-83-67-260C2E71AD58",
+        "size": "39.4x59.1",
+        "location": "Erdgeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "B2EA18CE-6F5C-4765-B4-EF-50AAA5B7A933",
+        "size": "39.4x59.1",
+        "location": "Erdgeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "632FCF01-B53A-4134-B1-BB-8D3BA82FDAD3",
+        "size": "35.4x78.7",
+        "location": "Erdgeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "359441E7-F60C-4935-B1-2A-B2C6FF67252E",
+        "size": "35.4x78.7",
+        "location": "Erdgeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "A042B847-CDF9-4C7F-A3-A0-FF147E4D74B1",
+        "size": "39.4x59.1",
+        "location": "1. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "6E00D55F-3840-419A-B6-BD-ED0E4FA4F42D",
+        "size": "39.4x59.1",
+        "location": "1. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "1A75B1A3-704E-4D99-84-FC-276F99BD0E94",
+        "size": "39.4x59.1",
+        "location": "1. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "9888DD59-076B-47F2-94-3C-6248017410A1",
+        "size": "39.4x59.1",
+        "location": "1. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "57F8A04A-F199-483C-86-77-876D5D5B624A",
+        "size": "39.4x59.1",
+        "location": "1. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "85FE9EBC-1854-463C-84-2C-71C601FE3C53",
+        "size": "39.4x59.1",
+        "location": "1. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "E883F0DC-0E99-4182-98-3A-B77EF11BE48B",
+        "size": "39.4x59.1",
+        "location": "1. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "0A6AE50B-F6D8-4D0C-88-78-1AA03830B227",
+        "size": "39.4x59.1",
+        "location": "1. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "1959E6F2-867A-4801-92-89-C6017DCD5C8A",
+        "size": "39.4x59.1",
+        "location": "1. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "3425F5FE-6E2D-4402-83-A5-6D497BAD93B4",
+        "size": "39.4x59.1",
+        "location": "1. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "A9319BE6-D1C9-4C6D-98-C4-A5B87AB93DED",
+        "size": "39.4x59.1",
+        "location": "1. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "D6D18AE1-77FF-46A0-82-28-65A41CA73354",
+        "size": "39.4x59.1",
+        "location": "1. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "C2C73847-E602-4469-8B-3C-2D3F375610DE",
+        "size": "39.4x59.1",
+        "location": "1. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "E182A36D-53A3-433C-BC-45-4F8FF0930FB8",
+        "size": "39.4x59.1",
+        "location": "1. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "8EE46EA7-C883-4DFB-A2-AA-C7C8BF0B50D0",
+        "size": "39.4x59.1",
+        "location": "1. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "A539649F-87E1-4036-AB-38-8E90C98C6F6D",
+        "size": "39.4x59.1",
+        "location": "1. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "1F9707D7-496F-4EDF-91-D1-947A1FB9D61E",
+        "size": "39.4x59.1",
+        "location": "1. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "3949E613-A259-46B8-9A-64-4449700D3528",
+        "size": "39.4x59.1",
+        "location": "1. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "58DDC3F7-5128-448B-90-3F-5868F0B13976",
+        "size": "39.4x59.1",
+        "location": "1. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "C1C6E307-401F-40A9-95-E7-8D8D966C4D68",
+        "size": "39.4x59.1",
+        "location": "1. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "A4F64CCB-F87B-4813-8C-0D-03ECEEFBA052",
+        "size": "39.4x59.1",
+        "location": "1. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "92DE8EC6-7A4D-4E4E-AB-57-128E9F97F936",
+        "size": "39.4x59.1",
+        "location": "1. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "60070EF4-11C6-4479-9C-A4-ED101969304A",
+        "size": "39.4x59.1",
+        "location": "1. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "8266A9FF-2A43-4386-8C-7C-827BD3A83CC6",
+        "size": "39.4x59.1",
+        "location": "1. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "43017EE2-A770-4B38-B2-71-330C9732E63C",
+        "size": "35.4x59.1",
+        "location": "1. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "6453C312-09E0-43D1-BB-FA-3374064A9BFB",
+        "size": "35.4x59.1",
+        "location": "1. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "ABD4A9A5-047F-4868-9A-C4-3A8DE4B2212E",
+        "size": "39.4x59.1",
+        "location": "1. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "E9AACCE1-AE09-4E23-88-31-50AA6FBA26C1",
+        "size": "39.4x59.1",
+        "location": "1. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "A0F3E00F-E84C-450F-BA-5A-99EDA2540D9F",
+        "size": "39.4x59.1",
+        "location": "1. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "74929778-5BD1-4F3D-BB-43-2C286020343C",
+        "size": "39.4x59.1",
+        "location": "1. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "3936EE64-DE4A-45A6-B9-5B-97C463B48DA9",
+        "size": "39.4x59.1",
+        "location": "1. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "692D866F-D439-4C95-8D-BA-26BF8A6B5D10",
+        "size": "39.4x59.1",
+        "location": "1. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "09287F5A-4EF5-4618-A9-A6-77A8E88BE241",
+        "size": "39.4x59.1",
+        "location": "1. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "63815EF6-406B-489B-BA-87-574B400F081A",
+        "size": "39.4x59.1",
+        "location": "1. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "4DF575B2-7F8B-4630-89-82-8F34955D9A00",
+        "size": "39.4x59.1",
+        "location": "1. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "586FAA4D-7E36-4D27-94-E0-755DB48D5D44",
+        "size": "39.4x59.1",
+        "location": "1. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "5DBBE1A8-1223-496F-A7-BC-6A095350D35C",
+        "size": "39.4x59.1",
+        "location": "1. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "8C24522A-7E20-4CBE-B6-94-76A01145A066",
+        "size": "39.4x59.1",
+        "location": "1. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "5C3F4A5B-0D17-467D-BB-DD-159626FAD536",
+        "size": "39.4x59.1",
+        "location": "1. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "C02EBACC-E6D2-4E61-97-96-3C1789EE80FC",
+        "size": "39.4x59.1",
+        "location": "1. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "26E11B21-D22B-4BE5-BA-83-01ABEE3B2693",
+        "size": "39.4x59.1",
+        "location": "1. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "1BA0CBC6-D7E4-4D0F-AA-50-8FC78021DD3C",
+        "size": "39.4x59.1",
+        "location": "1. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "FA750FFE-7DC4-4C61-82-09-A411CEE152CC",
+        "size": "39.4x59.1",
+        "location": "1. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "F379CA2B-E116-481F-AD-67-7FFE321F48FF",
+        "size": "39.4x59.1",
+        "location": "1. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "F0409226-9AD3-40BC-9D-22-54D64B587244",
+        "size": "39.4x59.1",
+        "location": "1. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "48E94435-BFE5-4FEA-90-40-1221426F8F5F",
+        "size": "39.4x59.1",
+        "location": "1. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "3CA4304B-5F5B-4551-A6-38-590CAA9528B0",
+        "size": "39.4x59.1",
+        "location": "1. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "35AF00C0-184C-448A-9D-5C-4066F5E1B9C5",
+        "size": "39.4x59.1",
+        "location": "1. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "91A0B7C4-B945-4415-B1-45-883179E004DF",
+        "size": "39.4x59.1",
+        "location": "1. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "0D381D54-22C0-48A5-A3-53-B1AA0004A8DC",
+        "size": "39.4x59.1",
+        "location": "1. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "050F7924-9205-45E6-86-20-8D81DAC8D9AD",
+        "size": "39.4x59.1",
+        "location": "1. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "C911D4A5-BDF8-4AFB-A7-81-C78164C204CC",
+        "size": "39.4x59.1",
+        "location": "1. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "A1515AE9-BAB7-48A0-86-03-3133492CD378",
+        "size": "39.4x59.1",
+        "location": "1. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "74014FF2-8873-43B5-B8-35-708BEC0A0314",
+        "size": "39.4x59.1",
+        "location": "1. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "D79C3D32-A0DC-4BA1-A4-41-1926379B3457",
+        "size": "39.4x59.1",
+        "location": "2. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "29274761-D81D-4CBA-8E-F2-324F7CEC816D",
+        "size": "39.4x59.1",
+        "location": "2. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "5BB6D779-3FBF-492E-B8-EA-14EA3B231CF4",
+        "size": "39.4x59.1",
+        "location": "2. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "E8FC9611-1008-4309-8F-A1-12D959CB12E1",
+        "size": "39.4x59.1",
+        "location": "2. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "707EA035-9238-428B-AE-A8-5B8C86FC85BC",
+        "size": "39.4x59.1",
+        "location": "2. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "4B9D37F8-92DD-46FD-A8-A1-B6BFB240DC76",
+        "size": "39.4x59.1",
+        "location": "2. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "E667CDE0-D614-463E-BB-29-07E5BAC2CDDC",
+        "size": "39.4x59.1",
+        "location": "2. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "223EAA5C-845F-44FF-82-4A-CD93E3B0FFF4",
+        "size": "39.4x59.1",
+        "location": "2. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "D9A0DB55-2680-498A-80-AD-DD300DB3FD2D",
+        "size": "39.4x59.1",
+        "location": "2. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "949B5F39-E470-4405-A8-5A-1C04935A37D6",
+        "size": "39.4x59.1",
+        "location": "2. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "125A6F13-41D8-4243-99-C9-72C614A56B08",
+        "size": "39.4x59.1",
+        "location": "2. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "1F2D52DB-A076-4D7C-AA-85-CFD9643ABED7",
+        "size": "39.4x59.1",
+        "location": "2. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "9FEE131B-FE12-4478-BA-02-D0DA267CA0C2",
+        "size": "39.4x59.1",
+        "location": "2. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "A15E7CC6-5F74-4D6E-9E-73-6EC35E587B2C",
+        "size": "39.4x59.1",
+        "location": "2. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "D1288F0E-BBC4-4D52-9C-79-2EB66F0FDAA7",
+        "size": "39.4x59.1",
+        "location": "2. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "CA21CEA3-A356-4F5B-BD-19-178705EEB527",
+        "size": "39.4x59.1",
+        "location": "2. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "C7859476-8DD8-4CBF-B6-11-54EE82BCAC20",
+        "size": "39.4x59.1",
+        "location": "2. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "2528A14D-BE74-4F08-AB-CB-65D04436C9CA",
+        "size": "39.4x59.1",
+        "location": "2. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "2676E7B3-B653-414A-A5-35-B99738D9B08D",
+        "size": "39.4x59.1",
+        "location": "2. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "81432804-B94E-4606-9A-69-8147BA6AC2AF",
+        "size": "39.4x59.1",
+        "location": "2. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "7D829EC1-9ED8-4B4C-84-F8-B6838ED1F326",
+        "size": "39.4x59.1",
+        "location": "2. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "1D166FE8-47D4-44C7-A3-15-31E3083A07BA",
+        "size": "39.4x59.1",
+        "location": "2. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "F4F8015B-654E-400C-86-B1-2D0848A3C00E",
+        "size": "39.4x59.1",
+        "location": "2. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "4741CE34-D97C-4E76-8C-E2-8F763417943D",
+        "size": "39.4x59.1",
+        "location": "2. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "26AF4167-0372-4010-BB-44-4FA0BD38FD79",
+        "size": "35.4x59.1",
+        "location": "2. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "E63E6493-245F-42A7-9B-93-108121D5C1AB",
+        "size": "35.4x59.1",
+        "location": "2. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "5366A9BC-4B7A-43FD-8B-95-E253B288BBD3",
+        "size": "39.4x59.1",
+        "location": "2. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "0D1A807F-3A31-49B3-AB-67-5ACEB7D97C50",
+        "size": "39.4x59.1",
+        "location": "2. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "06182F64-0995-4FDB-A9-F0-9FDF6ABBD6C7",
+        "size": "39.4x59.1",
+        "location": "2. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "E0F7F5B5-4F66-4C2A-98-93-347C7C343C9F",
+        "size": "39.4x59.1",
+        "location": "2. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "5F38DB86-26B6-451D-8B-8C-DCF2C12EBCD3",
+        "size": "39.4x59.1",
+        "location": "2. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "D997CA70-0620-4371-A7-1C-8A0A4F1DADD3",
+        "size": "39.4x59.1",
+        "location": "2. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "C8D07775-5399-4FA6-8F-00-6943441CBBD4",
+        "size": "39.4x59.1",
+        "location": "2. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "7750C963-27FB-46B9-9F-56-D6E439E2F677",
+        "size": "39.4x59.1",
+        "location": "2. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "D9EC228F-A12D-44D5-BF-01-FB2A4CB61639",
+        "size": "39.4x59.1",
+        "location": "2. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "47D3FD3A-86FB-4A5B-AE-8F-EBD04484581D",
+        "size": "39.4x59.1",
+        "location": "2. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "9FDC42B3-2B6F-4741-A9-F4-65C1CD3DE3B4",
+        "size": "39.4x59.1",
+        "location": "2. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "48B067D1-99EA-498F-BD-36-6C1FC1E16D97",
+        "size": "39.4x59.1",
+        "location": "2. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "D3D9895D-BC06-4C75-BD-F9-8BC02B3D0A3B",
+        "size": "39.4x59.1",
+        "location": "2. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "2CE93B6C-C98C-4117-88-C8-0E42756E0237",
+        "size": "39.4x59.1",
+        "location": "2. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "A1A476C1-83E0-4560-BE-DC-1873C771D18E",
+        "size": "39.4x59.1",
+        "location": "2. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "8F884D69-4762-4AD9-A1-27-00989B38ADB8",
+        "size": "39.4x59.1",
+        "location": "2. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "95A1F9ED-105A-426E-9A-B6-8487339FCE1D",
+        "size": "39.4x59.1",
+        "location": "2. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "77805587-747E-4FAF-86-80-88C93DBFE277",
+        "size": "39.4x59.1",
+        "location": "2. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "FFF3108E-3931-4D1E-BA-58-A5A38706F96F",
+        "size": "39.4x59.1",
+        "location": "2. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "6F328EBA-EF5C-43D8-B2-A6-80B3341E4F66",
+        "size": "39.4x59.1",
+        "location": "2. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "4DE6E842-C9E5-44BA-83-77-8AAA688DC2AD",
+        "size": "39.4x59.1",
+        "location": "2. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "33C3999C-A186-49AC-A4-80-AEA57ECC9C36",
+        "size": "39.4x59.1",
+        "location": "2. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "742526D5-0DEF-460D-B0-9B-3F540E27085F",
+        "size": "39.4x59.1",
+        "location": "2. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "A340828D-74F8-4F40-A2-10-E41A06DE2C34",
+        "size": "39.4x59.1",
+        "location": "2. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "CD548437-BFA7-4432-AA-B3-E96FDB520991",
+        "size": "39.4x59.1",
+        "location": "2. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "C901B4DF-7708-47C0-BF-A7-C4DD0CDB4654",
+        "size": "39.4x59.1",
+        "location": "2. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "F3426C00-B15D-40F3-92-49-98917C84AA63",
+        "size": "39.4x59.1",
+        "location": "2. Obergeschoss"
+      },
+      {
+        "page": 1,
+        "tag": "3009ADB4-3A81-4643-B7-56-46A7B4C2F64D",
+        "size": "39.4x59.1",
+        "location": "2. Obergeschoss"
+      }
+    ]
+  },
+  "gt_is_minimum": true,
+  "consensus_stats": {
+    "models": 3,
+    "auto_included": 443,
+    "flagged": 2
+  },
+  "flagged": [
+    {
+      "category": "egress_paths",
+      "element": {
+        "location": "Corridor in west wing",
+        "exit_type": "Corridor",
+        "page": 1
+      },
+      "reason": "single_model_only",
+      "models": [
+        "gemini"
+      ]
+    },
+    {
+      "category": "egress_paths",
+      "element": {
+        "location": "Main entrance at south side of central lobby",
+        "exit_type": "Exit",
+        "page": 1
+      },
+      "reason": "single_model_only",
+      "models": [
+        "gemini"
+      ]
+    }
+  ],
+  "built_at": "2026-03-13T19:43:54.179338",
+  "models_used": [
+    "ifc_programmatic",
+    "claude",
+    "gpt4.1",
+    "gemini"
+  ]
+}

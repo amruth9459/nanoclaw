@@ -1,0 +1,16 @@
+{
+  "doc_id": "Building-Hvac",
+  "source": "/Users/amrut/Lexios/lexios/corpus/ifc/bsmart/Building-Hvac.ifc",
+  "doc_type": "mixed",
+  "difficulty": "medium",
+  "gt_source": "ifc_only",
+  "elements": {
+    "sprinklers": [
+      {
+        "page": 1,
+        "type": "house fireplace cap",
+        "location": "00 groundfloor"
+      }
+    ]
+  }
+}

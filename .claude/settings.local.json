@@ -13,7 +13,27 @@
       "WebFetch(domain:hub.docker.com)",
       "WebFetch(domain:www.npmjs.com)",
       "WebFetch(domain:pypi.org)",
-      "WebFetch(domain:lexios.ai)"
+      "WebFetch(domain:lexios.ai)",
+      "Bash(awk -F' \\\\\\\\| ' 'NR>1 && $1!~/^#/ && NF>=3 {print $3}' groups/chinnu-claw/state/considered.md)",
+      "Bash(awk -F' \\\\\\\\| ' 'NR>1 && $1!~/^#/ && NF>=3 {print $3}' groups/freelance/state/considered.md)",
+      "Bash(sqlite3 store/messages.db \"SELECT substr\\(content,7,90\\), COUNT\\(*\\) FROM messages m JOIN chats c ON m.chat_jid=c.jid WHERE c.name='EV Lease' AND m.is_bot_message=1 AND timestamp > '2026-06-26' GROUP BY substr\\(content,7,60\\) ORDER BY COUNT\\(*\\) DESC LIMIT 12;\")",
+      "Bash(sqlite3 store/messages.db \"SELECT content FROM messages m JOIN chats c ON m.chat_jid=c.jid WHERE c.name='Claw' AND m.is_bot_message=1 AND content LIKE '%Now acknowledging the safety%' ORDER BY timestamp DESC LIMIT 1;\")",
+      "Read(//Users/amrut/**)",
+      "Bash(npm ls *)",
+      "Bash(brew list *)",
+      "Bash(tmux ls *)",
+      "Bash(/Applications/cmux.app/Contents/Resources/bin/cmux --help)",
+      "Bash(/Applications/cmux.app/Contents/Resources/bin/cmux list-windows *)",
+      "Bash(awk -F' \\\\\\\\| ' 'NF>=3 && $1!~/^#/ && length\\($3\\)>60' groups/chinnu-claw/state/considered.md)",
+      "Bash(awk -F' \\\\\\\\| ' 'NF>=3 && $1!~/^#/ && \\($3==\"reported\"||$3==\"rejected\"||$3==\"closed\"||$3==\"inaccessible\"\\)' groups/chinnu-claw/state/considered.md)",
+      "Bash(awk -F' \\\\| ' 'NF>=3 && $1!~/^#/ && length\\($3\\)>60' groups/chinnu-claw/state/considered.md)",
+      "Bash(awk -F' \\\\| ' 'NF>=3 && $1!~/^#/ && \\($3==\"reported\"||$3==\"rejected\"||$3==\"closed\"||$3==\"inaccessible\"\\)' groups/chinnu-claw/state/considered.md)",
+      "Bash(ps eww *)",
+      "Bash(sqlite3 store/messages.db \"SELECT prompt FROM scheduled_tasks WHERE id='task-1777518732605-iz867r';\")",
+      "Bash(export CMUX_QUIET=1)",
+      "Bash(/Applications/cmux.app/Contents/Resources/bin/cmux list-status *)",
+      "Bash(/Applications/cmux.app/Contents/Resources/bin/cmux workspace *)",
+      "Bash(launchctl list *)"
     ]
   }
 }

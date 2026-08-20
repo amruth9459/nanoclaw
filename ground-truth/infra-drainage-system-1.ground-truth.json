@@ -1,0 +1,64 @@
+{
+  "doc_id": "infra-drainage-system-1",
+  "source": "IFC4.3 (IFC4X3_RC3)",
+  "doc_type": "infrastructure",
+  "difficulty": "hard",
+  "gt_source": "ifc_step_parse",
+  "gt_is_minimum": true,
+  "built_at": "2026-03-15T18:11:41.863904",
+  "ifc_schema": "IFC4X3_RC3",
+  "total_ifc_entities": 350,
+  "elements": {
+    "site_elements": [
+      {
+        "page": 1,
+        "type": "IFCPIPESEGMENTTYPE",
+        "count": 2
+      },
+      {
+        "page": 1,
+        "type": "IFCPIPESEGMENT",
+        "count": 6
+      }
+    ],
+    "plumbing_piping": [
+      {
+        "page": 1,
+        "type": "IFCDISTRIBUTIONSYSTEM",
+        "count": 1
+      },
+      {
+        "page": 1,
+        "type": "IFCDISTRIBUTIONCHAMBERELEMENT",
+        "count": 7
+      },
+      {
+        "page": 1,
+        "type": "IFCPIPESEGMENTTYPE",
+        "count": 2
+      },
+      {
+        "page": 1,
+        "type": "IFCPIPESEGMENT",
+        "count": 6
+      },
+      {
+        "page": 1,
+        "type": "IFCDISTRIBUTIONPORT",
+        "count": 24
+      }
+    ],
+    "project_info": [
+      {
+        "page": 1,
+        "type": "IFCPROJECT",
+        "count": 1
+      },
+      {
+        "page": 1,
+        "type": "IFCSITE",
+        "count": 1
+      }
+    ]
+  }
+}

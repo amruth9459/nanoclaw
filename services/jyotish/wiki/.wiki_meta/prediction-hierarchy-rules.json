@@ -1,0 +1,43 @@
+{
+  "id": "prediction-hierarchy-rules",
+  "category": "methodology",
+  "sources": [
+    "prediction-hierarchy-rules.md"
+  ],
+  "created": "2026-04-21T12:40:01.633874",
+  "last_updated": "2026-04-25T14:05:29.690241",
+  "last_confirmed": "2026-04-25T14:05:29.690242",
+  "confidence": 0.4,
+  "version": 2,
+  "status": "active",
+  "claims": [
+    {
+      "raw": "house\n3",
+      "pattern": "(?:houses?|bhava)\\s+(\\d+(?:\\s*"
+    },
+    {
+      "raw": "house\n5",
+      "pattern": "(?:houses?|bhava)\\s+(\\d+(?:\\s*"
+    }
+  ],
+  "entities": [
+    "Jupiter",
+    "Saturn",
+    "Simha",
+    "Lagna",
+    "Kendra",
+    "Maraka",
+    "Mahadasha",
+    "Antardasha",
+    "Ashtakavarga",
+    "Double Transit",
+    "PVR Narasimha Rao",
+    "PVR",
+    "KN Rao",
+    "Sanjay Rath",
+    "Jaimini"
+  ],
+  "entity_count": 15,
+  "relationship_count": 2,
+  "tier": "semantic"
+}

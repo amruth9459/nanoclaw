@@ -1,0 +1,98 @@
+{
+  "doc_id": "hhs-office-mep",
+  "doc_type": "industrial",
+  "difficulty": "hard",
+  "gt_source": "ifc_step_parse",
+  "gt_is_minimum": true,
+  "built_at": "2026-03-15T18:12:49.993030",
+  "ifc_schema": "IFC2X3",
+  "total_ifc_entities": 665224,
+  "elements": {
+    "project_info": [
+      {
+        "page": 1,
+        "type": "IFCBUILDING",
+        "count": 1
+      },
+      {
+        "page": 1,
+        "type": "IFCBUILDINGSTOREY",
+        "count": 4
+      },
+      {
+        "page": 1,
+        "type": "IFCBUILDINGELEMENTPROXY",
+        "count": 574
+      },
+      {
+        "page": 1,
+        "type": "IFCSITE",
+        "count": 1
+      },
+      {
+        "page": 1,
+        "type": "IFCPROJECT",
+        "count": 1
+      }
+    ],
+    "plumbing_piping": [
+      {
+        "page": 1,
+        "type": "IFCPRODUCTDEFINITIONSHAPE",
+        "count": 3964
+      },
+      {
+        "page": 1,
+        "type": "IFCFLOWTERMINAL",
+        "count": 725
+      },
+      {
+        "page": 1,
+        "type": "IFCFLOWFITTING",
+        "count": 1381
+      },
+      {
+        "page": 1,
+        "type": "IFCDUCTFITTINGTYPE",
+        "count": 201
+      },
+      {
+        "page": 1,
+        "type": "IFCPIPEFITTINGTYPE",
+        "count": 52
+      }
+    ],
+    "site_elements": [
+      {
+        "page": 1,
+        "type": "IFCDUCTSEGMENTTYPE",
+        "count": 834
+      },
+      {
+        "page": 1,
+        "type": "IFCFLOWSEGMENT",
+        "count": 1284
+      },
+      {
+        "page": 1,
+        "type": "IFCTRIMMEDCURVE",
+        "count": 28
+      },
+      {
+        "page": 1,
+        "type": "IFCCOMPOSITECURVESEGMENT",
+        "count": 148
+      },
+      {
+        "page": 1,
+        "type": "IFCCOMPOSITECURVE",
+        "count": 19
+      },
+      {
+        "page": 1,
+        "type": "IFCPIPESEGMENTTYPE",
+        "count": 450
+      }
+    ]
+  }
+}

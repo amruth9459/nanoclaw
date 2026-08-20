@@ -1,0 +1,88 @@
+{
+  "doc_id": "infra-mcon-marine-2",
+  "doc_type": "industrial",
+  "difficulty": "hard",
+  "gt_source": "ifc_step_parse",
+  "gt_is_minimum": true,
+  "built_at": "2026-03-15T18:12:50.223387",
+  "ifc_schema": "IFC4X3_RC3",
+  "total_ifc_entities": 1296,
+  "elements": {
+    "project_info": [
+      {
+        "page": 1,
+        "type": "IFCPROJECT",
+        "count": 1
+      },
+      {
+        "page": 1,
+        "type": "IFCSITE",
+        "count": 1
+      },
+      {
+        "page": 1,
+        "type": "IFCPROJECTEDCRS",
+        "count": 1
+      },
+      {
+        "page": 1,
+        "type": "IFCFACILITYPART",
+        "count": 39
+      }
+    ],
+    "site_elements": [
+      {
+        "page": 1,
+        "type": "IFCALIGNMENT",
+        "count": 2
+      },
+      {
+        "page": 1,
+        "type": "IFCALIGNMENTHORIZONTAL",
+        "count": 2
+      },
+      {
+        "page": 1,
+        "type": "IFCALIGNMENTHORIZONTALSEGMENT",
+        "count": 8
+      },
+      {
+        "page": 1,
+        "type": "IFCALIGNMENTSEGMENT",
+        "count": 22
+      },
+      {
+        "page": 1,
+        "type": "IFCCURVESEGMENT",
+        "count": 22
+      },
+      {
+        "page": 1,
+        "type": "IFCCOMPOSITECURVE",
+        "count": 2
+      },
+      {
+        "page": 1,
+        "type": "IFCALIGNMENTVERTICALSEGMENT",
+        "count": 14
+      },
+      {
+        "page": 1,
+        "type": "IFCALIGNMENTVERTICAL",
+        "count": 2
+      },
+      {
+        "page": 1,
+        "type": "IFCGRADIENTCURVE",
+        "count": 2
+      }
+    ],
+    "plumbing_piping": [
+      {
+        "page": 1,
+        "type": "IFCPRODUCTDEFINITIONSHAPE",
+        "count": 4
+      }
+    ]
+  }
+}

@@ -1,0 +1,2635 @@
+{
+  "doc_id": "nbu_duplex-apt_eng-mep",
+  "pdf": "NBU_Duplex-Apt_Eng-MEP.ifc",
+  "doc_type": "residential",
+  "difficulty": "medium",
+  "elements": {
+    "ductwork": [
+      {
+        "page": 1,
+        "type": "Round Duct:Taps:557534",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Round Duct:Taps:603399",
+        "location": "Roof"
+      }
+    ],
+    "hvac_equipment": [
+      {
+        "page": 1,
+        "type": "M_Hot Water Boiler - 59-440 kW:147 kW:147 kW:530072",
+        "location": "A205"
+      },
+      {
+        "page": 1,
+        "type": "M_Radiator - Hosted:Readiator - 25:Readiator - 25:535063",
+        "location": "A203"
+      },
+      {
+        "page": 1,
+        "type": "M_Radiator - Hosted:Readiator - 25:Readiator - 25:536357",
+        "location": "A201"
+      },
+      {
+        "page": 1,
+        "type": "M_Radiator - Hosted:Readiator - 25:Readiator - 25:536919",
+        "location": "A102"
+      },
+      {
+        "page": 1,
+        "type": "M_Radiator - Hosted:Readiator - 25:Readiator - 25:538562",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "M_Radiator - Hosted:Readiator - 25:Readiator - 25:538847",
+        "location": "A101"
+      },
+      {
+        "page": 1,
+        "type": "M_Radiator - Hosted:Readiator - 25:Readiator - 25:548240",
+        "location": "A104"
+      },
+      {
+        "page": 1,
+        "type": "M_Radiator - Hosted:Readiator - 25:Readiator - 25:549304",
+        "location": "A204"
+      },
+      {
+        "page": 1,
+        "type": "M_Hot Water Boiler - 59-440 kW:147 kW:147 kW:557516",
+        "location": "B205"
+      },
+      {
+        "page": 1,
+        "type": "M_Radiator - Hosted:Readiator - 25:Readiator - 25:557517",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "M_Radiator - Hosted:Readiator - 25:Readiator - 25:557519",
+        "location": "B201"
+      },
+      {
+        "page": 1,
+        "type": "M_Radiator - Hosted:Readiator - 25:Readiator - 25:557520",
+        "location": "B102"
+      },
+      {
+        "page": 1,
+        "type": "M_Radiator - Hosted:Readiator - 25:Readiator - 25:557522",
+        "location": "B202"
+      },
+      {
+        "page": 1,
+        "type": "M_Radiator - Hosted:Readiator - 25:Readiator - 25:557524",
+        "location": "B101"
+      },
+      {
+        "page": 1,
+        "type": "M_Radiator - Hosted:Readiator - 25:Readiator - 25:557620",
+        "location": "B104"
+      },
+      {
+        "page": 1,
+        "type": "M_Radiator - Hosted:Readiator - 25:Readiator - 25:557628",
+        "location": "B204"
+      }
+    ],
+    "lighting_fixtures": [
+      {
+        "page": 1,
+        "type": "M_Sconce Light - Sphere:100W - 120V:100W - 120V:575376",
+        "location": "A101"
+      },
+      {
+        "page": 1,
+        "type": "M_Sconce Light - Sphere:100W - 120V:100W - 120V:575378",
+        "location": "B101"
+      },
+      {
+        "page": 1,
+        "type": "M_Pendant Light - Hemisphere:150W - 120V:150W - 120V:575380",
+        "location": "A102"
+      },
+      {
+        "page": 1,
+        "type": "M_Pendant Light - Hemisphere:150W - 120V:150W - 120V:575382",
+        "location": "B102"
+      },
+      {
+        "page": 1,
+        "type": "M_Pendant Light - Hemisphere:150W - 120V:150W - 120V:575383",
+        "location": "B202"
+      },
+      {
+        "page": 1,
+        "type": "M_Pendant Light - Hemisphere:150W - 120V:150W - 120V:575385",
+        "location": "A203"
+      },
+      {
+        "page": 1,
+        "type": "M_Pendant Light - Hemisphere:150W - 120V:150W - 120V:575386",
+        "location": "A202"
+      },
+      {
+        "page": 1,
+        "type": "M_Pendant Light - Hemisphere:150W - 120V:150W - 120V:575387",
+        "location": "B203"
+      },
+      {
+        "page": 1,
+        "type": "M_Sconce Light - Sphere:100W - 120V:100W - 120V:575388",
+        "location": "A204"
+      },
+      {
+        "page": 1,
+        "type": "M_Sconce Light - Sphere:100W - 120V:100W - 120V:575390",
+        "location": "B204"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:575392",
+        "location": "A202"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:575394",
+        "location": "B203"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:575396",
+        "location": "B204"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:575398",
+        "location": "A204"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:575400",
+        "location": "B202"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:575402",
+        "location": "A203"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:575478",
+        "location": "A101"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting and Appliance Panelboard - 208V MLO:400 A:Unit A Panelboard:575479",
+        "location": "A101"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting and Appliance Panelboard - 208V MLO:400 A:Unit B Panelboard:575481",
+        "location": "B101"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:575483",
+        "location": "A102"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:575484",
+        "location": "A104"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:575485",
+        "location": "B104"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:575486",
+        "location": "B102"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:575487",
+        "location": "B101"
+      },
+      {
+        "page": 1,
+        "type": "M_Sconce Light - Sphere:100W - 120V:100W - 120V:575488",
+        "location": "A104"
+      },
+      {
+        "page": 1,
+        "type": "M_Sconce Light - Sphere:100W - 120V:100W - 120V:575490",
+        "location": "B104"
+      },
+      {
+        "page": 1,
+        "type": "M_Pendant Light - Hemisphere:150W - 120V:150W - 120V:575505",
+        "location": "A105"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:575507",
+        "location": "A201"
+      },
+      {
+        "page": 1,
+        "type": "M_Pendant Light - Hemisphere:150W - 120V:150W - 120V:575508",
+        "location": "B105"
+      },
+      {
+        "page": 1,
+        "type": "M_Lighting Switches:Single Pole:Single Pole:575510",
+        "location": "B201"
+      }
+    ],
+    "plumbing_fixtures": [
+      {
+        "page": 1,
+        "type": "M_Shower Stall - Rectangular:865 mmx815 mm - Private:865 mmx815 mm - Private:582914",
+        "location": "A104"
+      },
+      {
+        "page": 1,
+        "type": "M_Lavatory - Oval:535 mmx485 mm - Private:535 mmx485 mm - Private:582916",
+        "location": "A104"
+      },
+      {
+        "page": 1,
+        "type": "M_Shower Stall - Rectangular:865 mmx815 mm - Private:865 mmx815 mm - Private:582917",
+        "location": "B104"
+      },
+      {
+        "page": 1,
+        "type": "M_Lavatory - Oval:535 mmx485 mm - Private:535 mmx485 mm - Private:582919",
+        "location": "B104"
+      },
+      {
+        "page": 1,
+        "type": "M_Sink - Island - Single:455 mmx455 mm - Private:455 mmx455 mm - Private:582920",
+        "location": "A103"
+      },
+      {
+        "page": 1,
+        "type": "M_Sink - Island - Single:455 mmx455 mm - Private:455 mmx455 mm - Private:582922",
+        "location": "B103"
+      },
+      {
+        "page": 1,
+        "type": "M_Bath Tub:1525 mmx760 mm - Private:1525 mmx760 mm - Private:582924",
+        "location": "A204"
+      },
+      {
+        "page": 1,
+        "type": "M_Lavatory - Oval:650 mmx485 mm - Private:650 mmx485 mm - Private:582926",
+        "location": "A204"
+      },
+      {
+        "page": 1,
+        "type": "M_Lavatory - Oval:650 mmx485 mm - Private:650 mmx485 mm - Private:582927",
+        "location": "A204"
+      },
+      {
+        "page": 1,
+        "type": "M_Lavatory - Oval:650 mmx485 mm - Private:650 mmx485 mm - Private:582928",
+        "location": "B204"
+      },
+      {
+        "page": 1,
+        "type": "M_Lavatory - Oval:650 mmx485 mm - Private:650 mmx485 mm - Private:582929",
+        "location": "B204"
+      },
+      {
+        "page": 1,
+        "type": "M_Bath Tub:1525 mmx760 mm - Private:1525 mmx760 mm - Private:582931",
+        "location": "B204"
+      }
+    ],
+    "plumbing_piping": [
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:540160",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:540175",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:540182",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:540200",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:545888",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:546125",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:546131",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:546374",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:546381",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:546819",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:546826",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:546828",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:546906",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:546969",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:547114",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:547121",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:547146",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:547150",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:547183",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:547247",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:547266",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:547273",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:547286",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:547487",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:547595",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:547742",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:547784",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:547802",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:547856",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:547956",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:548047",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:548082",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:548089",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:548116",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:548123",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:548835",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:549038",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:549955",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:549960",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:550018",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:550028",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:550036",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:550041",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:550067",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:550077",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:554197",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:554437",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:554580",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:554945",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:555449",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:555856",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:557526",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:557527",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:557528",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:557530",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:557550",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:557552",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:557553",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:557555",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:557557",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:557563",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:557564",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:557567",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:557568",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:557569",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:557570",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:557571",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:557574",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:557576",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:557586",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:557587",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:557590",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:557596",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:557597",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:557599",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:557601",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:557603",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:557604",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:557605",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:557609",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:557611",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:557612",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:557614",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:557615",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:557617",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:557622",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:557623",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:557644",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:557646",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:557647",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:557648",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:557652",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:557654",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:557655",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:557656",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:557685",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:557689",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:557695",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:557700",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:557710",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:577748",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:577808",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:577813",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:577870",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:577872",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:577911",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:577920",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:577991",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:578143",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:578188",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:578228",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:578230",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:578268",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:578279",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:578403",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:578423",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:578435",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:578472",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:578485",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:578532",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:578609",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:578656",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:578706",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:578708",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:578742",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:578744",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:578775",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:578830",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:578872",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:579139",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:579140",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:579151",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:579262",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:579977",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:580418",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:581020",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:581037",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:581158",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:581159",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:581179",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Waste:582940",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Waste:582941",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Waste:582945",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Waste:582946",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Waste:582947",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Waste:582951",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Waste:582952",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Waste:582953",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Waste:582956",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Waste:582958",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Waste:582960",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Waste:582962",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Waste:582963",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Waste:582967",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Waste:582975",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Waste:582976",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Waste:582977",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Waste:582980",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Waste:582982",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Waste:582983",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Waste:582986",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Waste:582987",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Waste:582988",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Waste:582989",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Waste:582990",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Waste:582991",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Waste:582992",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Waste:582999",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Waste:583001",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Waste:583003",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Waste:583004",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Waste:583008",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Waste:583009",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Waste:583012",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Waste:583014",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Waste:583015",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Waste:583018",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Waste:583032",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Waste:583033",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Waste:583035",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Waste:583036",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Waste:583037",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Waste:583038",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Waste:583039",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Waste:583041",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Waste:583042",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Waste:583045",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Waste:583046",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Waste:583047",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Waste:583050",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Waste:583052",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Waste:583053",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Cold Water:583054",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Cold Water:583055",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Cold Water:583056",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Cold Water:583059",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Cold Water:583061",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Cold Water:583062",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Cold Water:583065",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Cold Water:583067",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Cold Water:583068",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Cold Water:583069",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Cold Water:583070",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Cold Water:583072",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Cold Water:583075",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Cold Water:583082",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Cold Water:583083",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Cold Water:583084",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Cold Water:583087",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Cold Water:583089",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Cold Water:583090",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Cold Water:583093",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Cold Water:583095",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Cold Water:583096",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Cold Water:583099",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Cold Water:583107",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Cold Water:583108",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Cold Water:583112",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Cold Water:583113",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Cold Water:583116",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Cold Water:583118",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Cold Water:583119",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Cold Water:583120",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Cold Water:583125",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Cold Water:583126",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Cold Water:583127",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Cold Water:583129",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Cold Water:583131",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Cold Water:583132",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Cold Water:583133",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Cold Water:583136",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Cold Water:583138",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Cold Water:583139",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Cold Water:583140",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Cold Water:583142",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Cold Water:583143",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Cold Water:583147",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Hot Water:583151",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Hot Water:583152",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Hot Water:583153",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Hot Water:583154",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Hot Water:583158",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Hot Water:583159",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Hot Water:583160",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Hot Water:583163",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Cold Water:583167",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Cold Water:583169",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Hot Water:583171",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Hot Water:583173",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Hot Water:583174",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Hot Water:583175",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Hot Water:583176",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Hot Water:583177",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Hot Water:583180",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Hot Water:583182",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Hot Water:583183",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Hot Water:583184",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Hot Water:583187",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Hot Water:583189",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Hot Water:583190",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Cold Water:583192",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Cold Water:583194",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Cold Water:583196",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Cold Water:583197",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Hot Water:583201",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Hot Water:583202",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Cold Water:583206",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Cold Water:583207",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Cold Water:583210",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Hot Water:583214",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Hot Water:583215",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Hot Water:583217",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Hot Water:583219",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Hot Water:583220",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Cold Water:583224",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Cold Water:583226",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Cold Water:583228",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Cold Water:583229",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Hot Water:583235",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Hot Water:583236",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Hot Water:583237",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Hot Water:583238",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Hot Water:583239",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Cold Water:583241",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Cold Water:583242",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Cold Water:583243",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Cold Water:583244",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Hot Water:583249",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Hot Water:583250",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Hot Water:583251",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Hot Water:583256",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Hot Water:583257",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Hot Water:583260",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Hot Water:583262",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Hot Water:583263",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Hot Water:583267",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Hot Water:583268",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Hot Water:583271",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Hot Water:583275",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Hot Water:583276",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Hot Water:583278",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Hot Water:583280",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Hot Water:583282",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Hot Water:583284",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Hot Water:583286",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Hot Water:583295",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Hot Water:583296",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Hot Water:583298",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Hot Water:583299",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Hot Water:583306",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Hot Water:583309",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Hot Water:583310",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Waste:583316",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Waste:583318",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Waste:583319",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Waste:583328",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Waste:583332",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Hot Water:583544",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Hot Water:583550",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Hot Water:583557",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Hot Water:583610",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:583745",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Hot Water:583768",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Cold Water:584025",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Cold Water:584048",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:584238",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:590599",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:593060",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:593062",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:593065",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Cold Water:593072",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Hot Water:593196",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:593349",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Cold Water:593581",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Cold Water:593588",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Hot Water:593619",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Hot Water:593630",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:593706",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:593822",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Cold Water:593893",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Hot Water:594105",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:594583",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:594590",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:594663",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:594853",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Waste:594985",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:595074",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:595083",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:595141",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:595154",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:595210",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:595217",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Waste:599698",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Waste:599705",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Hot Water:599791",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Hot Water:599795",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Cold Water:600106",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Cold Water:600107",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Hot Water:600129",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Hot Water:600130",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Waste:600257",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:600266",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Waste:600272",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:600279",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:600381",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Waste:600449",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Waste:600503",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Waste:600555",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Waste:600584",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Waste:600695",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Waste:600701",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:600783",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:600787",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Waste:600896",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:600911",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Waste:600913",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:600925",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:600952",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Waste:601015",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Waste:601031",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:601142",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:601282",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:601286",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:601371",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:601377",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:PVC:604332",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:PVC:604361",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:PVC:604556",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:PVC:604577",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Cold Water:604652",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Cold Water:604653",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Cold Water:604659",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Cold Water:604667",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:PVC:604739",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:PVC:605354",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:PVC:605366",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:PVC:605375",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:PVC:605397",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:PVC:605401",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:PVC:605583",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:PVC:605592",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:PVC:605599",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:PVC:605615",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Waste:612522",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Waste:612648",
+        "location": "Level 1"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:612977",
+        "location": "Level 2"
+      },
+      {
+        "page": 1,
+        "type": "Pipe Types:Mechanical Pipe:612986",
+        "location": "Level 2"
+      }
+    ],
+    "rooms": [
+      {
+        "name": "Foyer MEP Space",
+        "page": 1,
+        "room_code": "A101-M",
+        "level": "Level 1"
+      },
+      {
+        "name": "Living Room MEP Space",
+        "page": 1,
+        "room_code": "A102-M",
+        "level": "Level 1"
+      },
+      {
+        "name": "Kitchen MEP Space",
+        "page": 1,
+        "room_code": "A103-M",
+        "level": "Level 1"
+      },
+      {
+        "name": "Bathroom MEP Space",
+        "page": 1,
+        "room_code": "A104-M",
+        "level": "Level 1"
+      },
+      {
+        "name": "Stair MEP Space",
+        "page": 1,
+        "room_code": "A105-M",
+        "level": "Level 1"
+      },
+      {
+        "name": "Foyer MEP Space",
+        "page": 1,
+        "room_code": "B101-M",
+        "level": "Level 1"
+      },
+      {
+        "name": "Living Room MEP Space",
+        "page": 1,
+        "room_code": "B102-M",
+        "level": "Level 1"
+      },
+      {
+        "name": "Kitchen MEP Space",
+        "page": 1,
+        "room_code": "B103-M",
+        "level": "Level 1"
+      },
+      {
+        "name": "Bathroom MEP Space",
+        "page": 1,
+        "room_code": "B104-M",
+        "level": "Level 1"
+      },
+      {
+        "name": "Stair MEP Space",
+        "page": 1,
+        "room_code": "B105-M",
+        "level": "Level 1"
+      },
+      {
+        "name": "Hallway MEP Space",
+        "page": 1,
+        "room_code": "A201-M",
+        "level": "Level 2"
+      },
+      {
+        "name": "Bedroom 1 MEP Space",
+        "page": 1,
+        "room_code": "A202-M",
+        "level": "Level 2"
+      },
+      {
+        "name": "Bedroom 2 MEP Space",
+        "page": 1,
+        "room_code": "A203-M",
+        "level": "Level 2"
+      },
+      {
+        "name": "Bathroom 2 MEP Space",
+        "page": 1,
+        "room_code": "A204-M",
+        "level": "Level 2"
+      },
+      {
+        "name": "Utility MEP Space",
+        "page": 1,
+        "room_code": "A205-M",
+        "level": "Level 2"
+      },
+      {
+        "name": "Hallway MEP Space",
+        "page": 1,
+        "room_code": "B201-M",
+        "level": "Level 2"
+      },
+      {
+        "name": "Bedroom 1 MEP Space",
+        "page": 1,
+        "room_code": "B202-M",
+        "level": "Level 2"
+      },
+      {
+        "name": "Bedroom 2 MEP Space",
+        "page": 1,
+        "room_code": "B203-M",
+        "level": "Level 2"
+      },
+      {
+        "name": "Bathroom 2 MEP Space",
+        "page": 1,
+        "room_code": "B204-M",
+        "level": "Level 2"
+      },
+      {
+        "name": "Utility MEP Space",
+        "page": 1,
+        "room_code": "B205-M",
+        "level": "Level 2"
+      },
+      {
+        "name": "Roof MEP Space",
+        "page": 1,
+        "room_code": "R301-M",
+        "level": "Roof"
+      },
+      {
+        "name": "Stair",
+        "page": 1,
+        "room_code": "A105",
+        "level": "Level 1"
+      },
+      {
+        "name": "Hallway",
+        "page": 1,
+        "room_code": "A201",
+        "level": "Level 2"
+      },
+      {
+        "name": "Room",
+        "page": 1,
+        "room_code": "B105",
+        "level": "Level 1"
+      },
+      {
+        "name": "Hallway",
+        "page": 1,
+        "room_code": "B201",
+        "level": "Level 2"
+      },
+      {
+        "name": "Bathroom 2",
+        "page": 1,
+        "room_code": "A204",
+        "level": "Level 2"
+      },
+      {
+        "name": "Bathroom 2",
+        "page": 1,
+        "room_code": "B204",
+        "level": "Level 2"
+      },
+      {
+        "name": "Bathroom 1",
+        "page": 1,
+        "room_code": "B104",
+        "level": "Level 1"
+      },
+      {
+        "name": "Bathroom 1",
+        "page": 1,
+        "room_code": "A104",
+        "level": "Level 1"
+      },
+      {
+        "name": "Utility",
+        "page": 1,
+        "room_code": "B205",
+        "level": "Level 2"
+      },
+      {
+        "name": "Utility",
+        "page": 1,
+        "room_code": "A205",
+        "level": "Level 2"
+      },
+      {
+        "name": "Roof",
+        "page": 1,
+        "room_code": "R301",
+        "level": "Roof"
+      },
+      {
+        "name": "Foyer",
+        "page": 1,
+        "room_code": "A101",
+        "level": "Level 1"
+      },
+      {
+        "name": "Bedroom 2",
+        "page": 1,
+        "room_code": "A203",
+        "level": "Level 2"
+      },
+      {
+        "name": "Bedroom 2",
+        "page": 1,
+        "room_code": "B203",
+        "level": "Level 2"
+      },
+      {
+        "name": "Foyer",
+        "page": 1,
+        "room_code": "B101",
+        "level": "Level 1"
+      },
+      {
+        "name": "Living Room",
+        "page": 1,
+        "room_code": "B102",
+        "level": "Level 1"
+      },
+      {
+        "name": "Living Room",
+        "page": 1,
+        "room_code": "A102",
+        "level": "Level 1"
+      },
+      {
+        "name": "Bedroom 1",
+        "page": 1,
+        "room_code": "A202",
+        "level": "Level 2"
+      },
+      {
+        "name": "Bedroom 1",
+        "page": 1,
+        "room_code": "B202",
+        "level": "Level 2"
+      },
+      {
+        "name": "Kitchen",
+        "page": 1,
+        "room_code": "A103",
+        "level": "Level 1"
+      },
+      {
+        "name": "Kitchen",
+        "page": 1,
+        "room_code": "B103",
+        "level": "Level 1"
+      }
+    ],
+    "sprinklers": [
+      {
+        "page": 1,
+        "type": "M_Fire Alarm Control Panel:400x475:Fire Alarm Panel:617780",
+        "location": "Level 1"
+      }
+    ],
+    "title_block": [
+      {
+        "project_name": "corpus-builder",
+        "drawing_number": "IFC Plan View",
+        "page": 1
+      }
+    ]
+  },
+  "gt_is_minimum": true,
+  "consensus_stats": {
+    "models": 4,
+    "auto_included": 511,
+    "flagged": 0
+  },
+  "flagged": [],
+  "built_at": "2026-03-13T19:55:41.215614",
+  "models_used": [
+    "ifc_programmatic",
+    "claude",
+    "gpt4.1",
+    "gemini"
+  ]
+}
