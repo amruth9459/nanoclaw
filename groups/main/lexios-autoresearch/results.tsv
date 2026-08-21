@@ -147,3 +147,7 @@ exp83-fix-exp72-80-regressions-76-docs	2026-04-24	1.0000	76	0.00	Apply all missi
 2026-08-20T06:40:32Z	exp-20260820-022011	Tonight's 2nd slot (2026-08-20). Shrinking DESCRIPTION start	0.4839	0.5548	0.0	kept
 2026-08-20T06:56:18Z	exp-20260820-024032	Tonight's 3rd slot (2026-08-20). Baseline to beat: this file	0.5548	0.4513	0.0	discarded
 2026-08-20T07:08:44Z	exp-20260820-025618	Tonight's 4th slot (2026-08-20). Baseline to beat: this file	0.5548	0.5452	0.0	discarded
+2026-08-21T06:17:18Z	exp-20260821-020512	Tonight's 1st slot (2026-08-21). Baseline to beat: this file	0.5532	0.555	0.0	kept
+2026-08-21T06:35:15Z	exp-20260821-021718	Tonight's 2nd slot (2026-08-21). Baseline to beat: this file	0.555	0.6114	0.0	kept
+2026-08-21T06:51:13Z	exp-20260821-023515	Tonight's 3rd slot (2026-08-21). Baseline to beat: this file	0.6114	0.5287	0.0	discarded
+2026-08-21T07:04:29Z	exp-20260821-025113	Tonight's 4th slot (2026-08-21). Baseline to beat: this file	0.6114	0.6536	0.0	kept
