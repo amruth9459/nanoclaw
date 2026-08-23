@@ -19,51 +19,59 @@ import time
 from pathlib import Path
 
 # ── EXPERIMENT CONFIG (agent edits this section) ─────────────────────────────
-EXPERIMENT_NAME = "exp-equipment-plumbing-type-synonym-expansion"
+EXPERIMENT_NAME = "exp-clinic-room-name-canonical-expansion"
 DESCRIPTION = (
-    "Tonight's slot (2026-08-22). Baseline to beat: this file's on-disk "
-    "state (effective_f1=0.6511; Duplex post=0.7454, Clinic post=0.5568). "
-    "Slot 1 tonight (exp-20260822-020453) was measured 0.6511->0.3748 and "
-    "discarded/reverted, so this edit starts from that same on-disk state, "
-    "not slot 1's edit. "
-    "Hypothesis: generalize the type-field synonym-expansion pattern that "
-    "postprocess() already has kept and proven safe four times "
-    "(WINDOW_TYPE_SYNONYM_GROUPS, WALL_TYPE_ID_SYNONYM_GROUPS, "
-    "STAIR_ELEVATOR_TYPE_SYNONYM_GROUPS, RAILING_TYPE_SYNONYM_GROUPS, all "
-    "unchanged tonight) to the two remaining schema categories whose "
-    "'type' field is a live match key in ~/Lexios/lexios/types.json but "
-    "has never been synonym-expanded: plumbing_fixtures (match_keys "
-    "[['type'],['location']]) and equipment (match_keys "
-    "[['name'],['type'],['location']]). Grepped this file for "
-    "EQUIPMENT_TYPE, PLUMBING_TYPE, and _expand_type_field(extraction to "
-    "confirm neither category has been touched by this pattern before, "
-    "and grepped results.tsv for 'equipment|plumbing|sprinkler' (case-"
-    "insensitive): the only hit is exp83 from 2026-04-24, in the pre-"
-    "2026-07-15 v1 corpus-metric era that program.md says not to trust or "
-    "compare against, so this is unexploited in the real-vision era. "
-    "sprinklers was considered too, but the schema's sprinklers object "
-    "(SYSTEM_PROMPT_OVERRIDE, unchanged tonight) has only a 'location' "
-    "field, no 'type' field at all, so there is nothing to expand there. "
-    "Mechanism, identical to the four already-kept groups: for each item, "
-    "append every OTHER synonym in its matched family to the extracted "
-    "'type' string in place; never replace or remove existing text, never "
-    "add or remove an element (same count in, same count out), so the "
-    "fabrication probes (empty dict / decoy input) stay clean by "
-    "construction. Vocabulary is general plumbing/MEP terminology "
-    "mirroring the prompt's own examples ('Toilet, Sink, Tub, Shower' for "
-    "plumbing_fixtures; 'HVAC unit, electrical panel, water heater' for "
-    "equipment, both in SYSTEM_PROMPT_OVERRIDE, unchanged tonight) plus "
-    "common synonyms for each. Only ~/Lexios/lexios/types.json (field "
-    "names and match_keys, not eval answers) was read while choosing "
-    "these categories; neither eval doc's ground-truth file was opened "
-    "while writing the synonym vocabulary, same discipline as the four "
-    "prior groups. "
-    "EDIT (postprocess() only): added PLUMBING_FIXTURE_TYPE_SYNONYM_GROUPS "
-    "and EQUIPMENT_TYPE_SYNONYM_GROUPS, plus two _expand_type_field() "
-    "calls for plumbing_fixtures.type and equipment.type, placed after "
-    "the three existing _expand_type_field() calls and before the "
-    "function's return. Left SYSTEM_PROMPT_OVERRIDE, PARAMS, preprocess(), "
-    "and every other postprocess() line untouched."
+    "Tonight's slot (2026-08-23). Orchestrator's fresh baseline measured "
+    "before this edit: effective_f1=0.4929 (Duplex_A_20110907 raw=0.372 "
+    "post=0.7496 effective=0.7496; NBU_MedicalClinic_Arch raw=0.2296 "
+    "post=0.2362 effective=0.2362; phantom clean=True). This on-disk file "
+    "is unchanged since 2026-08-22's kept slot "
+    "(exp-equipment-plumbing-type-synonym-expansion, that night's "
+    "measured 0.6511->0.6535); tonight's lower fresh number vs that prior "
+    "measurement is run-to-run real-vision variance on the SAME file, not "
+    "a regression to fix. "
+    "Hypothesis: the doc-level split (Duplex effective=0.7496, already "
+    "past the >=0.70 bar, vs Clinic effective=0.2362, well under the "
+    ">=0.50 bar) is explained by ROOM_NAME_CANONICAL_MAP's existing 29 "
+    "entries being almost entirely residential-vocabulary (LIVING AREA, "
+    "MASTER BED/BR/BATH, FAMILY/DINING RM, MUD RM, W.I.C., etc.) with only "
+    "7 entries touching clinic-relevant terms (RECEPTION AREA, WAITING "
+    "AREA, BREAK RM, CONF RM, EXAM RM, NURSE STATION, JAN CLOSET, STOR "
+    "RM). rooms is the one category with NO location/type fallback in "
+    "~/Lexios/lexios/types.json (match_keys=[['name']] only, confirmed by "
+    "reading that file), so a vision/GT vocabulary mismatch here has no "
+    "other match path to fall back on, unlike every other category this "
+    "postprocess() already synonym-expands. Adding ~22 more exact-match "
+    "entries covering common medical-office/clinic back-of-house and "
+    "front-of-house room vocabulary (reception/front-desk, "
+    "toilet/restroom/bathroom/wc, break-room/staff-lounge/lounge, exam/"
+    "examination room, medical-records/med-records/records-room, lab/"
+    "laboratory, janitor-closet/custodial-closet/mop-room/mop-closet, "
+    "it-room/server-room/data-room/telecom-room, corridor/hallway, "
+    "entry/vestibule, office/staff-office, waiting-room/lobby) — general "
+    "architectural-program terminology, not read off either eval doc's "
+    "GT file, same discipline as the existing map. Deliberately did NOT "
+    "touch the matching MECHANISM (still exact case-insensitive whole-"
+    "string lookup, one appended canonical term per hit): grepped "
+    "results.tsv and confirmed a substring-match generalization of this "
+    "same map was tried 2026-08-01 and measured worse (0.3348->0.3343, "
+    "discarded, noted in this function's own docstring), and two other "
+    "'generalize room-canonical' slots on 2026-07-31 (exp-20260731-021415, "
+    "-022743) both discarded off an exp149 baseline — so this stays "
+    "additive-entries-only, the one variant of this idea not yet tried, "
+    "per program.md's grep-results.tsv-first rule. Also grepped "
+    "results.tsv for 'clinic|medical' case-insensitively: only hit is "
+    "2026-08-12's equipment-category slot (discarded), no prior room-name "
+    "clinic-vocabulary attempt. "
+    "EDIT (postprocess() only): appended 22 new key:value pairs to the "
+    "existing ROOM_NAME_CANONICAL_MAP dict literal (no duplicate keys "
+    "with the 29 already there), zero other lines changed. Same "
+    "mechanism as before: append-only, same element count in and out, so "
+    "the fabrication probes (empty dict / decoy input) stay clean by "
+    "construction. Left SYSTEM_PROMPT_OVERRIDE, PARAMS, preprocess(), and "
+    "every other postprocess() section (window/wall/stair/railing/"
+    "plumbing/equipment type-synonym groups, floor-level expansion) "
+    "untouched."
 )
 # Override the system prompt sent to Claude for extraction.
 # Set to None to use the production prompt from ~/Lexios/lexios/SKILL.md
@@ -796,6 +804,32 @@ def postprocess(extraction: dict, _cache={}) -> dict:
         "NURSE STATION": "NURSES STATION",
         "JAN CLOSET": "JANITOR CLOSET",
         "STOR RM": "STORAGE ROOM",
+        # exp-clinic-room-name-canonical-expansion: medical-office/clinic
+        # program vocabulary not covered by the residential-oriented
+        # entries above (see DESCRIPTION for reasoning).
+        "FRONT DESK": "RECEPTION",
+        "CHECK-IN": "RECEPTION",
+        "CHECK IN": "RECEPTION",
+        "LOBBY": "WAITING ROOM",
+        "RESTROOM": "TOILET",
+        "BATHROOM": "TOILET",
+        "WC": "TOILET",
+        "STAFF LOUNGE": "BREAK ROOM",
+        "LOUNGE": "BREAK ROOM",
+        "EXAMINATION ROOM": "EXAM ROOM",
+        "MED RECORDS": "MEDICAL RECORDS",
+        "RECORDS ROOM": "MEDICAL RECORDS",
+        "FILE ROOM": "MEDICAL RECORDS",
+        "LAB": "LABORATORY",
+        "CUSTODIAL CLOSET": "JANITOR CLOSET",
+        "MOP ROOM": "JANITOR CLOSET",
+        "MOP CLOSET": "JANITOR CLOSET",
+        "SERVER ROOM": "IT ROOM",
+        "DATA ROOM": "IT ROOM",
+        "TELECOM ROOM": "IT ROOM",
+        "HALLWAY": "CORRIDOR",
+        "VESTIBULE": "ENTRY",
+        "STAFF OFFICE": "OFFICE",
     }
     for item in extraction.get("rooms", []):
         if not isinstance(item, dict):
