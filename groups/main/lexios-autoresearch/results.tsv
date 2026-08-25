@@ -164,3 +164,6 @@ exp83-fix-exp72-80-regressions-76-docs	2026-04-24	1.0000	76	0.00	Apply all missi
 2026-08-24T06:07:03Z	exp-20260824-020651	no-edit	0.5906	0	0	no-edit
 2026-08-24T06:07:14Z	exp-20260824-020703	no-edit	0.5906	0	0	no-edit
 2026-08-25T06:19:55Z	exp-20260825-020447	Tonight's slot (2026-08-25). Baseline to beat: effective_f1=	0.6493	0.2582	0.0	discarded
+2026-08-25T06:29:04Z	exp-20260825-021955	Windows type field activates dead synonym path. Baseline to 	0.6493	0.4914	0.0	discarded
+2026-08-25T06:41:05Z	exp-20260825-022904	Tonight's 3rd slot (2026-08-25). Baseline to beat: this file	0.6493	0.6742	0.0	kept
+2026-08-25T06:58:06Z	exp-20260825-024105	Tonight's 4th slot (2026-08-25). Baseline to beat: this file	0.6742	0.6532	0.0	discarded
