@@ -5,6 +5,77 @@
 
 ---
 
+### 2026-08-26 14:53
+
+**Areas:** general
+**Files (20):** .buzz/.scratch/core-2026-08-23.txt, .buzz/.scratch/core-2026-08-25.txt, .buzz/.scratch/core-mem.txt, .buzz/.scratch/core-memory.md, .buzz/.scratch/standup-2026-08-14.md, .buzz/.scratch/standup-2026-08-15-post.md, .buzz/.scratch/standup-2026-08-15.md, .buzz/.scratch/standup-2026-08-22.md, .buzz/.scratch/standup-2026-08-23.md, .buzz/.scratch/standup-2026-08-25.md, .buzz/OUTBOX/2026-08-16-standup-correction.md, .buzz/OUTBOX/2026-08-16-standup.md, .buzz/OUTBOX/2026-08-21-standup.md, .buzz/OUTBOX/standup-2026-08-26.md, .buzz/RESEARCH/NN_SIGNAGE_TOPOLOGY.md, .buzz/RESEARCH/REPO_BACKUP_STATUS.md, .buzz/harness/debug/buzz-acp, .buzz/harness/ollama-coordinator, .buzz/harness/ollama-qwen, .buzz/harness/qwen-acp/buzz-acp
+**Diff:** +65 -0 across 1 files
+
+### 2026-08-26 14:18
+
+**Areas:** general
+**Files (20):** .buzz/.scratch/core-2026-08-23.txt, .buzz/.scratch/core-2026-08-25.txt, .buzz/.scratch/core-mem.txt, .buzz/.scratch/core-memory.md, .buzz/.scratch/standup-2026-08-14.md, .buzz/.scratch/standup-2026-08-15-post.md, .buzz/.scratch/standup-2026-08-15.md, .buzz/.scratch/standup-2026-08-22.md, .buzz/.scratch/standup-2026-08-23.md, .buzz/.scratch/standup-2026-08-25.md, .buzz/OUTBOX/2026-08-16-standup-correction.md, .buzz/OUTBOX/2026-08-16-standup.md, .buzz/OUTBOX/2026-08-21-standup.md, .buzz/OUTBOX/standup-2026-08-26.md, .buzz/RESEARCH/NN_SIGNAGE_TOPOLOGY.md, .buzz/RESEARCH/REPO_BACKUP_STATUS.md, .buzz/harness/debug/buzz-acp, .buzz/harness/ollama-coordinator, .buzz/harness/ollama-qwen, .buzz/harness/qwen-acp/buzz-acp
+**Diff:** +59 -0 across 1 files
+
+### 2026-08-26 14:15
+
+**Areas:** general
+**Files (20):** .buzz/.scratch/core-2026-08-23.txt, .buzz/.scratch/core-2026-08-25.txt, .buzz/.scratch/core-mem.txt, .buzz/.scratch/core-memory.md, .buzz/.scratch/standup-2026-08-14.md, .buzz/.scratch/standup-2026-08-15-post.md, .buzz/.scratch/standup-2026-08-15.md, .buzz/.scratch/standup-2026-08-22.md, .buzz/.scratch/standup-2026-08-23.md, .buzz/.scratch/standup-2026-08-25.md, .buzz/OUTBOX/2026-08-16-standup-correction.md, .buzz/OUTBOX/2026-08-16-standup.md, .buzz/OUTBOX/2026-08-21-standup.md, .buzz/OUTBOX/standup-2026-08-26.md, .buzz/RESEARCH/NN_SIGNAGE_TOPOLOGY.md, .buzz/RESEARCH/REPO_BACKUP_STATUS.md, .buzz/harness/debug/buzz-acp, .buzz/harness/ollama-coordinator, .buzz/harness/ollama-qwen, .buzz/harness/qwen-acp/buzz-acp
+**Diff:** +53 -0 across 1 files
+
+### 2026-08-26 14:15
+
+**Areas:** general
+**Files (20):** .buzz/.scratch/core-2026-08-23.txt, .buzz/.scratch/core-2026-08-25.txt, .buzz/.scratch/core-mem.txt, .buzz/.scratch/core-memory.md, .buzz/.scratch/standup-2026-08-14.md, .buzz/.scratch/standup-2026-08-15-post.md, .buzz/.scratch/standup-2026-08-15.md, .buzz/.scratch/standup-2026-08-22.md, .buzz/.scratch/standup-2026-08-23.md, .buzz/.scratch/standup-2026-08-25.md, .buzz/OUTBOX/2026-08-16-standup-correction.md, .buzz/OUTBOX/2026-08-16-standup.md, .buzz/OUTBOX/2026-08-21-standup.md, .buzz/OUTBOX/standup-2026-08-26.md, .buzz/RESEARCH/NN_SIGNAGE_TOPOLOGY.md, .buzz/RESEARCH/REPO_BACKUP_STATUS.md, .buzz/harness/debug/buzz-acp, .buzz/harness/ollama-coordinator, .buzz/harness/ollama-qwen, .buzz/harness/qwen-acp/buzz-acp
+**Diff:** +47 -0 across 1 files
+
+### 2026-08-26 14:14
+
+**Areas:** general
+**Files (20):** .buzz/.scratch/core-2026-08-23.txt, .buzz/.scratch/core-2026-08-25.txt, .buzz/.scratch/core-mem.txt, .buzz/.scratch/core-memory.md, .buzz/.scratch/standup-2026-08-14.md, .buzz/.scratch/standup-2026-08-15-post.md, .buzz/.scratch/standup-2026-08-15.md, .buzz/.scratch/standup-2026-08-22.md, .buzz/.scratch/standup-2026-08-23.md, .buzz/.scratch/standup-2026-08-25.md, .buzz/OUTBOX/2026-08-16-standup-correction.md, .buzz/OUTBOX/2026-08-16-standup.md, .buzz/OUTBOX/2026-08-21-standup.md, .buzz/OUTBOX/standup-2026-08-26.md, .buzz/RESEARCH/NN_SIGNAGE_TOPOLOGY.md, .buzz/RESEARCH/REPO_BACKUP_STATUS.md, .buzz/harness/debug/buzz-acp, .buzz/harness/ollama-coordinator, .buzz/harness/ollama-qwen, .buzz/harness/qwen-acp/buzz-acp
+**Diff:** +41 -0 across 1 files
+
+### 2026-08-26 13:57
+
+**Areas:** general
+**Files (20):** .buzz/.scratch/core-2026-08-23.txt, .buzz/.scratch/core-2026-08-25.txt, .buzz/.scratch/core-mem.txt, .buzz/.scratch/core-memory.md, .buzz/.scratch/standup-2026-08-14.md, .buzz/.scratch/standup-2026-08-15-post.md, .buzz/.scratch/standup-2026-08-15.md, .buzz/.scratch/standup-2026-08-22.md, .buzz/.scratch/standup-2026-08-23.md, .buzz/.scratch/standup-2026-08-25.md, .buzz/OUTBOX/2026-08-16-standup-correction.md, .buzz/OUTBOX/2026-08-16-standup.md, .buzz/OUTBOX/2026-08-21-standup.md, .buzz/OUTBOX/standup-2026-08-26.md, .buzz/RESEARCH/NN_SIGNAGE_TOPOLOGY.md, .buzz/RESEARCH/REPO_BACKUP_STATUS.md, .buzz/harness/debug/buzz-acp, .buzz/harness/ollama-coordinator, .buzz/harness/ollama-qwen, .buzz/harness/qwen-acp/buzz-acp
+**Diff:** +35 -0 across 1 files
+
+### 2026-08-26 13:26
+
+**Areas:** general
+**Files (20):** .buzz/.scratch/core-2026-08-23.txt, .buzz/.scratch/core-2026-08-25.txt, .buzz/.scratch/core-mem.txt, .buzz/.scratch/core-memory.md, .buzz/.scratch/standup-2026-08-14.md, .buzz/.scratch/standup-2026-08-15-post.md, .buzz/.scratch/standup-2026-08-15.md, .buzz/.scratch/standup-2026-08-22.md, .buzz/.scratch/standup-2026-08-23.md, .buzz/.scratch/standup-2026-08-25.md, .buzz/OUTBOX/2026-08-16-standup-correction.md, .buzz/OUTBOX/2026-08-16-standup.md, .buzz/OUTBOX/2026-08-21-standup.md, .buzz/OUTBOX/standup-2026-08-26.md, .buzz/RESEARCH/NN_SIGNAGE_TOPOLOGY.md, .buzz/RESEARCH/REPO_BACKUP_STATUS.md, .buzz/harness/debug/buzz-acp, .buzz/harness/ollama-coordinator, .buzz/harness/ollama-qwen, .buzz/harness/qwen-acp/buzz-acp
+**Diff:** +29 -0 across 1 files
+
+### 2026-08-26 13:26
+
+**Areas:** general
+**Files (20):** .buzz/.scratch/core-2026-08-23.txt, .buzz/.scratch/core-2026-08-25.txt, .buzz/.scratch/core-mem.txt, .buzz/.scratch/core-memory.md, .buzz/.scratch/standup-2026-08-14.md, .buzz/.scratch/standup-2026-08-15-post.md, .buzz/.scratch/standup-2026-08-15.md, .buzz/.scratch/standup-2026-08-22.md, .buzz/.scratch/standup-2026-08-23.md, .buzz/.scratch/standup-2026-08-25.md, .buzz/OUTBOX/2026-08-16-standup-correction.md, .buzz/OUTBOX/2026-08-16-standup.md, .buzz/OUTBOX/2026-08-21-standup.md, .buzz/OUTBOX/standup-2026-08-26.md, .buzz/RESEARCH/NN_SIGNAGE_TOPOLOGY.md, .buzz/RESEARCH/REPO_BACKUP_STATUS.md, .buzz/harness/debug/buzz-acp, .buzz/harness/ollama-coordinator, .buzz/harness/ollama-qwen, .buzz/harness/qwen-acp/buzz-acp
+**Diff:** +23 -0 across 1 files
+
+### 2026-08-26 13:23
+
+**Areas:** general
+**Files (20):** .buzz/.scratch/core-2026-08-23.txt, .buzz/.scratch/core-2026-08-25.txt, .buzz/.scratch/core-mem.txt, .buzz/.scratch/core-memory.md, .buzz/.scratch/standup-2026-08-14.md, .buzz/.scratch/standup-2026-08-15-post.md, .buzz/.scratch/standup-2026-08-15.md, .buzz/.scratch/standup-2026-08-22.md, .buzz/.scratch/standup-2026-08-23.md, .buzz/.scratch/standup-2026-08-25.md, .buzz/OUTBOX/2026-08-16-standup-correction.md, .buzz/OUTBOX/2026-08-16-standup.md, .buzz/OUTBOX/2026-08-21-standup.md, .buzz/OUTBOX/standup-2026-08-26.md, .buzz/RESEARCH/NN_SIGNAGE_TOPOLOGY.md, .buzz/RESEARCH/REPO_BACKUP_STATUS.md, .buzz/harness/debug/buzz-acp, .buzz/harness/ollama-coordinator, .buzz/harness/ollama-qwen, .buzz/harness/qwen-acp/buzz-acp
+**Diff:** +17 -0 across 1 files
+
+### 2026-08-26 13:20
+
+**Areas:** general
+**Files (20):** .buzz/.scratch/core-2026-08-23.txt, .buzz/.scratch/core-2026-08-25.txt, .buzz/.scratch/core-mem.txt, .buzz/.scratch/core-memory.md, .buzz/.scratch/standup-2026-08-14.md, .buzz/.scratch/standup-2026-08-15-post.md, .buzz/.scratch/standup-2026-08-15.md, .buzz/.scratch/standup-2026-08-22.md, .buzz/.scratch/standup-2026-08-23.md, .buzz/.scratch/standup-2026-08-25.md, .buzz/OUTBOX/2026-08-16-standup-correction.md, .buzz/OUTBOX/2026-08-16-standup.md, .buzz/OUTBOX/2026-08-21-standup.md, .buzz/OUTBOX/standup-2026-08-26.md, .buzz/RESEARCH/NN_SIGNAGE_TOPOLOGY.md, .buzz/RESEARCH/REPO_BACKUP_STATUS.md, .buzz/harness/debug/buzz-acp, .buzz/harness/ollama-coordinator, .buzz/harness/ollama-qwen, .buzz/harness/qwen-acp/buzz-acp
+**Diff:** +11 -0 across 1 files
+
+### 2026-08-26 12:36
+
+**Areas:** general
+**Files (20):** .buzz/.scratch/core-2026-08-23.txt, .buzz/.scratch/core-2026-08-25.txt, .buzz/.scratch/core-mem.txt, .buzz/.scratch/core-memory.md, .buzz/.scratch/standup-2026-08-14.md, .buzz/.scratch/standup-2026-08-15-post.md, .buzz/.scratch/standup-2026-08-15.md, .buzz/.scratch/standup-2026-08-22.md, .buzz/.scratch/standup-2026-08-23.md, .buzz/.scratch/standup-2026-08-25.md, .buzz/OUTBOX/2026-08-16-standup-correction.md, .buzz/OUTBOX/2026-08-16-standup.md, .buzz/OUTBOX/2026-08-21-standup.md, .buzz/OUTBOX/standup-2026-08-26.md, .buzz/RESEARCH/NN_SIGNAGE_TOPOLOGY.md, .buzz/RESEARCH/REPO_BACKUP_STATUS.md, .buzz/harness/debug/buzz-acp, .buzz/harness/ollama-coordinator, .buzz/harness/ollama-qwen, .buzz/harness/qwen-acp/buzz-acp
+**Diff:** +5 -0 across 1 files
+
+### 2026-08-26 12:26
+
+**Areas:** general
+**Files (20):** .buzz/.scratch/core-2026-08-23.txt, .buzz/.scratch/core-2026-08-25.txt, .buzz/.scratch/core-mem.txt, .buzz/.scratch/core-memory.md, .buzz/.scratch/standup-2026-08-14.md, .buzz/.scratch/standup-2026-08-15-post.md, .buzz/.scratch/standup-2026-08-15.md, .buzz/.scratch/standup-2026-08-22.md, .buzz/.scratch/standup-2026-08-23.md, .buzz/.scratch/standup-2026-08-25.md, .buzz/OUTBOX/2026-08-16-standup-correction.md, .buzz/OUTBOX/2026-08-16-standup.md, .buzz/OUTBOX/2026-08-21-standup.md, .buzz/OUTBOX/standup-2026-08-26.md, .buzz/RESEARCH/NN_SIGNAGE_TOPOLOGY.md, .buzz/RESEARCH/REPO_BACKUP_STATUS.md, .buzz/harness/debug/buzz-acp, .buzz/harness/ollama-coordinator, .buzz/harness/ollama-qwen, .buzz/harness/qwen-acp/buzz-acp
+
 ### 2026-08-26 12:18
 
 **Areas:** general
