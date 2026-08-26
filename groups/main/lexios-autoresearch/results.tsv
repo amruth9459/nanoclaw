@@ -167,3 +167,7 @@ exp83-fix-exp72-80-regressions-76-docs	2026-04-24	1.0000	76	0.00	Apply all missi
 2026-08-25T06:29:04Z	exp-20260825-021955	Windows type field activates dead synonym path. Baseline to 	0.6493	0.4914	0.0	discarded
 2026-08-25T06:41:05Z	exp-20260825-022904	Tonight's 3rd slot (2026-08-25). Baseline to beat: this file	0.6493	0.6742	0.0	kept
 2026-08-25T06:58:06Z	exp-20260825-024105	Tonight's 4th slot (2026-08-25). Baseline to beat: this file	0.6742	0.6532	0.0	discarded
+2026-08-26T06:14:35Z	exp-20260826-020432	Tonight's 1st slot (2026-08-26). Baseline to beat: orchestra	0.6512	0.3757	0.0	discarded
+2026-08-26T06:27:55Z	exp-20260826-021435	Tonight's 2nd slot (2026-08-26). Baseline to beat: orchestra	0.6512	0.65	0.0	discarded
+2026-08-26T06:45:44Z	exp-20260826-022755	Tonight's 3rd slot (2026-08-26). Baseline to beat: tonight's	0.6512	0.4912	0.0	discarded
+2026-08-26T06:55:25Z	exp-20260826-024544	Tonight's 4th slot (2026-08-26). Baseline to beat: orchestra	0.6512	0.6298	0.0	discarded
