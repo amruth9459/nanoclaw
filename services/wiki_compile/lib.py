@@ -9,13 +9,15 @@ runs the pipeline; domains stay declarative.
 """
 from __future__ import annotations
 
+import fnmatch
 import json
+import os
 import re
 from collections import defaultdict
 from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
-from typing import Callable
+from typing import Callable, Iterable
 
 
 @dataclass
@@ -61,6 +63,56 @@ class Domain:
         self.graph_dir.mkdir(parents=True, exist_ok=True)
 
 
+def iter_source_files(
+    roots: Iterable[Path],
+    file_glob: str = "*.md",
+    skip_path_parts: Iterable[str] = (),
+) -> list[Path]:
+    """Every matching source file under `roots`, descending through symlinked
+    directories.
+
+    `Path.rglob` never follows a symlinked directory, and this vault keeps whole
+    categories behind exactly one: `Brain/Zettelkasten` (493 notes),
+    `Brain/Products`, and most of `Hermes` and `Lexios` are directories in
+    nanoclaw that are linked into the vault. Every walk built on rglob read them
+    as empty, and read them as empty *quietly* — the compile reported success
+    and the category simply never appeared in `compiled/`.
+
+    Each real directory and each real file is visited once. That makes a
+    symlink pointing at an ancestor terminate instead of looping, and it means a
+    file reachable by two vault paths (`Lexios/Corpus` and `Groups/claw-lexios-3`
+    are the same directory on disk, 19 files) is ingested once rather than
+    compiled twice into two categories under one shared `.wiki_meta` slug.
+    Directory names are sorted before descending, so which of the two paths is
+    kept is stable across runs rather than dependent on inode order.
+    """
+    skip = set(skip_path_parts)
+    seen_dirs: set[str] = set()
+    seen_files: set[str] = set()
+    found: list[Path] = []
+    for root in roots:
+        if not root.exists():
+            continue
+        for dirpath, dirnames, filenames in os.walk(root, followlinks=True):
+            real_dir = os.path.realpath(dirpath)
+            if real_dir in seen_dirs:
+                dirnames[:] = []
+                continue
+            seen_dirs.add(real_dir)
+            dirnames[:] = sorted(d for d in dirnames if d not in skip)
+            here = Path(dirpath)
+            if skip.intersection(here.parts):
+                continue
+            for name in sorted(fnmatch.filter(filenames, file_glob)):
+                path = here / name
+                real = os.path.realpath(path)
+                if real in seen_files:
+                    continue
+                seen_files.add(real)
+                found.append(path)
+    return found
+
+
 def calculate_confidence(sources: list, last_confirmed: str, contradictions: int = 0) -> float:
     """Original Jyotish formula — kept verbatim so confidence values stay comparable."""
     source_score = min(len(sources) * 0.3, 0.9)
@@ -73,13 +125,32 @@ def calculate_confidence(sources: list, last_confirmed: str, contradictions: int
 
 
 def _load_state(domain: Domain) -> dict:
-    if domain.state_path.exists():
+    if not domain.state_path.exists():
+        return {}
+    try:
         return json.loads(domain.state_path.read_text())
-    return {}
+    except (json.JSONDecodeError, OSError) as exc:
+        # A state file written by an older non-atomic save, or truncated by a
+        # crash. Losing it costs one full recompile, so continue — but say so,
+        # because a run that silently starts from an empty state looks exactly
+        # like a run that had nothing to do.
+        print(f"  ! compile state unreadable ({exc}); recompiling from scratch")
+        return {}
 
 
 def _save_state(domain: Domain, state: dict) -> None:
-    domain.state_path.write_text(json.dumps(state, indent=2))
+    """Write via a temp file in the same directory, then rename.
+
+    `brain-watch.py` spawns its own compile, so two runs share this file
+    routinely. A plain write_text leaves it truncated for the length of the
+    write and the other process dies on a half-written JSON — which is how a
+    seven-minute run ended at file 900. os.replace is atomic on POSIX, so a
+    reader sees either the old state or the new one. Two runs still overwrite
+    each other's entries; the cost of that is a redundant recompile, not a
+    crash."""
+    tmp = domain.state_path.with_suffix(f".{os.getpid()}.tmp")
+    tmp.write_text(json.dumps(state, indent=2))
+    os.replace(tmp, domain.state_path)
 
 
 def _file_key(file_path: Path, raw_dirs: list[Path]) -> str:
@@ -166,25 +237,24 @@ def build_knowledge_graph(domain: Domain) -> dict:
     all_entities: dict[str, dict] = {}
     all_relationships: list[dict] = []
 
-    for raw_dir in domain.raw:
-        for raw_file in raw_dir.rglob(domain.file_glob):
-            if any(skip in raw_file.parts for skip in domain.skip_path_parts):
-                continue
-            try:
-                content = raw_file.read_text()
-            except Exception:
-                continue
-            entities = domain.extract_entities(content)
-            relationships = domain.extract_relationships(content, entities)
+    for raw_file in iter_source_files(
+        domain.raw, domain.file_glob, domain.skip_path_parts
+    ):
+        try:
+            content = raw_file.read_text()
+        except Exception:
+            continue
+        entities = domain.extract_entities(content)
+        relationships = domain.extract_relationships(content, entities)
 
-            for e in entities:
-                key = e["name"]
-                if key not in all_entities:
-                    all_entities[key] = {"type": e.get("type", "entity"), "mentions": 0, "sources": []}
-                all_entities[key]["mentions"] += 1
-                all_entities[key]["sources"].append(raw_file.name)
+        for e in entities:
+            key = e["name"]
+            if key not in all_entities:
+                all_entities[key] = {"type": e.get("type", "entity"), "mentions": 0, "sources": []}
+            all_entities[key]["mentions"] += 1
+            all_entities[key]["sources"].append(raw_file.name)
 
-            all_relationships.extend(relationships)
+        all_relationships.extend(relationships)
 
     for e in all_entities.values():
         e["sources"] = list(set(e["sources"]))
@@ -235,19 +305,14 @@ def compile_all(domain: Domain, force: bool = False) -> int:
     label = domain.title_label or domain.name.title()
     print(f"=== {label} Knowledge Base Compilation ===\n")
     compiled = 0
-    for raw_dir in domain.raw:
-        if not raw_dir.exists():
-            continue
-        for f in sorted(raw_dir.rglob(domain.file_glob)):
-            if any(skip in f.parts for skip in domain.skip_path_parts):
-                continue
-            result = compile_file(domain, f, force=force)
-            if result:
-                print(
-                    f"  {result['path']} ({result['category']}, "
-                    f"{result['entities']} entities, conf={result['confidence']})"
-                )
-                compiled += 1
+    for f in iter_source_files(domain.raw, domain.file_glob, domain.skip_path_parts):
+        result = compile_file(domain, f, force=force)
+        if result:
+            print(
+                f"  {result['path']} ({result['category']}, "
+                f"{result['entities']} entities, conf={result['confidence']})"
+            )
+            compiled += 1
 
     print(f"\n  Compiled {compiled} files")
     build_knowledge_graph(domain)

@@ -14,7 +14,7 @@ import re
 from collections import Counter
 from pathlib import Path
 
-from ..lib import Domain
+from ..lib import Domain, iter_source_files
 
 
 # ── Configuration ───────────────────────────────────────────────────────────
@@ -162,38 +162,35 @@ def _discover_entities(scan_roots: list[Path], min_mentions: int = 2) -> list[st
     Returns names sorted longest-first (so multi-word matches win over substrings).
     """
     counts: Counter[str] = Counter()
-    for root in scan_roots:
-        if not root.exists():
+    for p in iter_source_files(scan_roots, "*.md", skip_path_parts=["_claw-shared"]):
+        # _claw-shared is a real directory, not a link, so the walk's own
+        # realpath dedup does not cover it: entities there already appear
+        # via the source it mirrors.
+        try:
+            text = p.read_text()
+        except Exception:
             continue
-        for p in root.rglob("*.md"):
-            if "_claw-shared" in p.parts:
-                # Mirror — entities will already appear via the source.
-                continue
-            try:
-                text = p.read_text()
-            except Exception:
-                continue
-            stem = p.stem
-            if _is_linkable(stem):
-                counts[stem] += 1
-            for m in HEADING_RE.finditer(text):
-                h = re.sub(r"\s*\(.*\)$", "", m.group(1).strip().rstrip(":")).strip()
-                if _is_linkable(h):
-                    counts[h] += 1
-            for m in WIKILINK_RE.finditer(text):
-                target = m.group(1).strip()
-                if _is_linkable(target):
-                    counts[target] += 1
-            fm = FRONTMATTER_RE.match(text)
-            if fm:
-                for line in fm.group(1).splitlines():
-                    if line.startswith("aliases:"):
-                        # "aliases: [a, b]" or "aliases:\n  - a\n  - b"
-                        aliases = re.findall(r"[\w\-\s]+", line.split(":", 1)[1])
-                        for a in aliases:
-                            a = a.strip()
-                            if _is_linkable(a):
-                                counts[a] += 1
+        stem = p.stem
+        if _is_linkable(stem):
+            counts[stem] += 1
+        for m in HEADING_RE.finditer(text):
+            h = re.sub(r"\s*\(.*\)$", "", m.group(1).strip().rstrip(":")).strip()
+            if _is_linkable(h):
+                counts[h] += 1
+        for m in WIKILINK_RE.finditer(text):
+            target = m.group(1).strip()
+            if _is_linkable(target):
+                counts[target] += 1
+        fm = FRONTMATTER_RE.match(text)
+        if fm:
+            for line in fm.group(1).splitlines():
+                if line.startswith("aliases:"):
+                    # "aliases: [a, b]" or "aliases:\n  - a\n  - b"
+                    aliases = re.findall(r"[\w\-\s]+", line.split(":", 1)[1])
+                    for a in aliases:
+                        a = a.strip()
+                        if _is_linkable(a):
+                            counts[a] += 1
     # Drop low-frequency noise; keep first-appearance for ones above threshold.
     keep = [name for name, c in counts.items() if c >= min_mentions]
     keep.sort(key=lambda n: (-len(n), n))
