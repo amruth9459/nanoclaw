@@ -195,6 +195,21 @@ if [ -d "$HOME/Brain" ]; then
         && log "copied ~/Brain/"
 fi
 
+# ~/.claude — distilled knowledge ONLY. Session transcripts expire on
+# cleanupPeriodDays and history.jsonl holds every raw prompt; neither leaves this
+# machine. What ships is the curated memory and the weekly session extracts.
+if [ -d "$HOME/.claude/session-extracts" ]; then
+    r2_copy "$HOME/.claude/session-extracts/" "home/claude/session-extracts/" \
+        --include "*.md" \
+        && log "copied ~/.claude/session-extracts/"
+fi
+
+if [ -d "$HOME/.claude/projects" ]; then
+    r2_copy "$HOME/.claude/projects/" "home/claude/memory/" \
+        --include "*/memory/**" \
+        && log "copied ~/.claude memory/"
+fi
+
 # ~/.ssh — private keys, config, known_hosts (Tailscale, NN server, GitHub)
 if [ -d "$HOME/.ssh" ]; then
     r2_copy "$HOME/.ssh/" "home/ssh/" \
