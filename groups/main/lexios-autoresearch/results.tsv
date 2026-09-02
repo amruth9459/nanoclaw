@@ -195,3 +195,7 @@ exp83-fix-exp72-80-regressions-76-docs	2026-04-24	1.0000	76	0.00	Apply all missi
 2026-09-01T06:42:24Z	exp-20260901-022439	Tonight's baseline (logs/exp-20260901-020721.log) shows NBU_	0.6041	0.8044	0.0	kept
 2026-09-01T06:51:19Z	exp-20260901-024224	Read logs/exp-20260901-022439.log (tonight's kept baseline, 	0.8044	0.7927	0.0	discarded
 2026-09-01T07:08:28Z	exp-20260901-025119	Read the real scorer this session (~/Lexios/lexios/eval.py s	0.8044	0.7962	0.0	discarded
+2026-09-02T06:17:52Z	exp-20260902-020507	Tonight's baseline to beat: 0.6261 (this file's current stat	0.6261	0.8356	0.0	kept
+2026-09-02T06:30:30Z	exp-20260902-021752	Tonight's baseline to beat: 0.8356 (this file's current kept	0.8356	0.8039	0.0	discarded
+2026-09-02T06:44:57Z	exp-20260902-023030	Tonight's 3rd slot (2026-09-02). Baseline to beat: 0.8356 (t	0.8356	0.8296	0.0	discarded
+2026-09-02T06:59:39Z	exp-20260902-024457	Tonight's 4th and final slot (2026-09-02). Baseline to beat:	0.8356	0.474	0.0	discarded
