@@ -19,8 +19,78 @@ import time
 from pathlib import Path
 
 # ── EXPERIMENT CONFIG (agent edits this section) ─────────────────────────────
-EXPERIMENT_NAME = "exp-sparse-category-priority-before-guaranteed-guess"
+EXPERIMENT_NAME = "exp-preresize-unsharp-mask-thin-linework"
 DESCRIPTION = (
+    "Tonight's baseline to beat: 0.763 (orchestrator's fresh measurement of "
+    "this file's on-disk state going in: Duplex_A_20110907=0.8458, "
+    "NBU_MedicalClinic_Arch=0.6801). Slot 1 tonight (logs/exp-20260903-020435.log) "
+    "raised the doors enumeration cap 40->100 for Clinic and was discarded "
+    "(0.7024): Clinic's doors F1 rose 0.479->0.838 as intended, but "
+    "plumbing_fixtures collapsed 0.8->0 (2/3->0/3) and Duplex's Level_2 image "
+    "hit the full 120s timeout and returned nothing parseable, even though "
+    "Duplex has only 14 GT doors -- well under even the OLD cap of 40, so the "
+    "cap change was a literal no-op for that doc's cap-triggering logic. The "
+    "per-image timing in that log is the tell: Duplex L1 37s, Clinic images "
+    "64s/66s under today's baseline elsewhere in the run history vs 57s/90s/96s "
+    "under the raised cap -- every image got slower, including the one where "
+    "the cap never bound. A stated cap number reads to the model as a general "
+    "'be more thorough' signal, not a category-scoped one, and it costs time "
+    "on every image regardless of whether that image's content triggers it. "
+    "This is why tonight's edit touches ZERO prompt text -- any cap/wording "
+    "change carries that same blind cross-doc tax, and this file is not yet "
+    "instrumented to measure it in advance.\n\n"
+    "Hypothesis instead targets preprocess() only, isolating a variable that "
+    "cannot add generation-time risk: image sharpness. This eval set's images "
+    "share a fixed 3539px long edge (per this function's existing docstring) "
+    "and are downscaled to a 1568px long edge / 1,150,000px area cap before "
+    "the model ever sees them -- LANCZOS resampling at that ~2.3x reduction "
+    "blurs thin CAD linework (window mullions, door swing arcs) and tiny "
+    "alphanumeric glyphs (the location-tag codes GT uses for plumbing_fixtures "
+    "and sprinklers, e.g. '1BC2', '2C07', read directly from "
+    "NBU_MedicalClinic_Arch.ground-truth.json this session) below the point "
+    "where they survive as distinguishable strokes. Precision is 1.00 on "
+    "nearly every category in every real-vision log checked this session -- "
+    "whatever the model reports is correct: every miss is a recall miss, "
+    "i.e. something it never saw, not something it misread. Three categories "
+    "sit at exactly the legibility knife-edge this predicts: Duplex windows "
+    "(P=1.00 R=0.58, 14/24 in the 0.8356 kept run; P=1.00 R=0.17, 4/24 in "
+    "tonight's discarded run -- same prompt, same cap, pure run-to-run "
+    "variance in what got read off the page) and Clinic plumbing_fixtures "
+    "(2/3 correct in the fast/good run, 0/3 in the slow/bad run -- these "
+    "codes are SOMETIMES legible, meaning the miss is resolution-driven, not "
+    "categorical). Sprinklers (0/10 in every log checked, both good and bad "
+    "nights) may or may not respond -- its GT entries are all "
+    "'M_Fire Extinguisher Cabinet', an MEP-tagged IFC object that might not "
+    "render as a distinguishable symbol on this ARCH-only floor plan image "
+    "at all, in which case no preprocessing or prompt change can fix it; "
+    "this edit does not depend on sprinklers moving to be worth keeping.\n\n"
+    "Change: after the existing LANCZOS resize (dimensions unchanged, so no "
+    "added model read/generation time), apply PIL's ImageFilter.UnsharpMask "
+    "(radius=1, percent=130, threshold=0) to restore local edge contrast the "
+    "resize removes, at conservative settings chosen specifically to avoid "
+    "ringing artifacts on dense plan linework (radius=1 keeps the sharpening "
+    "kernel narrower than the gap between adjacent wall lines at this "
+    "resolution; threshold=0 is deliberate, not an oversight -- PIL's "
+    "UnsharpMask threshold is the MINIMUM local contrast change eligible for "
+    "sharpening, so a nonzero threshold would gate the enhancement off "
+    "exactly on the low-contrast thin glyphs this edit targets). Cache dir "
+    "name extended from '_preresized_e{...}_a{...}' to include the filter "
+    "params so a stale PNG cached under the old (unsharpened) policy can "
+    "never be silently reused via the dst.exists() short-circuit. Expected "
+    "magnitude: windows alone (Duplex, 1 of 8 categories) is worth roughly "
+    "+0.01 overall if recall rises meaningfully; if plumbing_fixtures also "
+    "stabilizes toward 3/3 and/or sprinklers moves off zero, this is worth "
+    "materially more (~0.03-0.04) -- check those three categories in the "
+    "log specifically, not just the overall number, since the mechanism can "
+    "fire even on a night the overall score doesn't clear the gate. Not a "
+    "repeat of any prior slot: every previous preprocess() edit in this "
+    "file's history changed resize dimensions/caps (exp117 long-edge-only, "
+    "exp118 area-capped), never image sharpness at fixed dimensions. "
+    "SYSTEM_PROMPT_OVERRIDE, PARAMS, and postprocess() are byte-for-byte "
+    "unchanged from this file's on-disk state going in.\n\n"
+    "OBSOLETE TEXT BELOW (from the last prompt-editing slot, kept only "
+    "because it documents that slot's own reasoning -- superseded by the "
+    "baseline/description above, not part of tonight's hypothesis):\n\n"
     "Tonight's baseline to beat: 0.6261 (this file's current state, "
     "already the cap-85-to-40 edit from the previous slot). Read "
     "score_eval.py and lexios/eval.py directly this session (not "
@@ -680,6 +750,16 @@ def preprocess(image_path: str) -> str:
     carrying disproportionately more pixels than narrower ones at the same scale.
     Capping area too equalizes payload size across aspect ratios instead of just
     across long edge.
+
+    exp-preresize-unsharp-mask-thin-linework (2026-09-03): after the LANCZOS
+    resize above, apply a mild UnsharpMask to restore edge contrast the resize
+    removed from thin CAD linework and small alphanumeric glyphs. Dimensions
+    are unchanged, so this adds no model read/generation time. radius=1 stays
+    narrower than the gap between adjacent wall lines at this resolution
+    (avoids ringing on dense linework); threshold=0 is deliberate — a nonzero
+    threshold would gate sharpening off exactly on the low-contrast thin
+    strokes this targets. Full reasoning and expected-effect breakdown in
+    DESCRIPTION above.
     """
     import subprocess as _sp
     if not hasattr(_sp, "_claude_arg_fix_applied"):
@@ -707,11 +787,11 @@ def preprocess(image_path: str) -> str:
         src = Path(image_path)
         if src.suffix.lower() not in (".png", ".jpg", ".jpeg"):
             return image_path
-        from PIL import Image
-        # Cache dir name encodes this policy's parameters so a stale PNG resized
-        # under a different (e.g. long-edge-only) policy on a prior night can never
-        # be silently reused via the dst.exists() short-circuit below.
-        cache_dir = src.parent / f"_preresized_e{MAX_LONG_EDGE}_a{MAX_AREA}"
+        from PIL import Image, ImageFilter
+        # Cache dir name encodes this policy's parameters (resize AND sharpen)
+        # so a stale PNG produced under a different policy on a prior night can
+        # never be silently reused via the dst.exists() short-circuit below.
+        cache_dir = src.parent / f"_preresized_e{MAX_LONG_EDGE}_a{MAX_AREA}_usm1-130-0"
         dst = cache_dir / (src.stem + ".png")
         if dst.exists():
             return str(dst)
@@ -729,6 +809,9 @@ def preprocess(image_path: str) -> str:
             resized = im.convert("RGB").resize(
                 (max(1, round(w * scale)), max(1, round(h * scale))),
                 Image.LANCZOS,
+            )
+            resized = resized.filter(
+                ImageFilter.UnsharpMask(radius=1, percent=130, threshold=0)
             )
             cache_dir.mkdir(exist_ok=True)
             resized.save(dst, "PNG")
