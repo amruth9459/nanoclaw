@@ -19,8 +19,70 @@ import time
 from pathlib import Path
 
 # ── EXPERIMENT CONFIG (agent edits this section) ─────────────────────────────
-EXPERIMENT_NAME = "exp-preresize-unsharp-mask-thin-linework"
+EXPERIMENT_NAME = "exp-autocrop-blank-margin-before-resize"
 DESCRIPTION = (
+    "Tonight's 4th slot (2026-09-03). Baseline to beat: 0.7784 (this file's "
+    "on-disk kept state going in: exp-preresize-unsharp-mask-thin-linework, "
+    "logs/exp-20260903-022020.log — Duplex_A_20110907 and "
+    "NBU_MedicalClinic_Arch effective F1 per the top-of-program.md baseline "
+    "block). Slot 3 tonight (logs/exp-20260903-023229.log) was discarded at "
+    "0.7635; its own diff and reasoning were reverted with the file, so it "
+    "is not re-examined here beyond not repeating whatever it changed.\n\n"
+    "Hypothesis: preprocess() already resizes every image to a fixed "
+    "MAX_LONG_EDGE=1568 / MAX_AREA=1,150,000 budget before the model sees "
+    "it, and (as of last slot) applies UnsharpMask after that resize. This "
+    "slot adds one more step BEFORE the resize: autocrop blank white margin "
+    "around the drawing content, so the fixed downstream pixel budget is "
+    "spent on real content (thin linework, small door/window tags, "
+    "dimension annotations) instead of empty border — raising effective "
+    "on-page DPI for exactly the categories research direction #2 (tags) "
+    "and #4 (dimensions) in program.md name as high/medium impact and still "
+    "unexploited. This eval set's images share a fixed 3539px long edge at "
+    "CONSTANT HEIGHT with WIDTH varying per building footprint (per "
+    "preprocess()'s own pre-existing docstring, confirmed by reading it "
+    "this session) — a renderer that sizes width to footprint but holds "
+    "height fixed across every doc is a strong signal any margin worth "
+    "trimming is mostly vertical (shorter buildings get padded top/bottom), "
+    "not horizontal. Entirely contained in preprocess(), which runs before "
+    "run()'s timed 120s window per the function's own pre-existing "
+    "docstring — so this adds zero generation-time risk regardless of "
+    "whether it fires on either eval doc, unlike every prompt-wording or "
+    "cap change tried in prior slots.\n\n"
+    "Implementation: content bbox found by diffing the RGB image against a "
+    "white background, converting that diff to a single L channel, and "
+    "thresholding at 12/255 (low enough to catch faint or colored CAD "
+    "linework, not just pure black) — Image.getbbox() on the thresholded "
+    "diff gives the tightest rectangle containing all non-background "
+    "content. 2% padding is added on every side as a safety margin against "
+    "clipping edge-adjacent annotation (no legend or title-block is "
+    "expected on these IFC renders, but this was not directly verifiable "
+    "without a shell to view the actual images, so the padding is the real "
+    "protection, not an assumption). The crop is gated fractionally — only "
+    "applied if it removes at least 8% of the original pixel area — rather "
+    "than gated on exact bbox-vs-full-image equality, because a single "
+    "stray antialiased pixel anywhere in the margin would make a naive bbox "
+    "span the full image and silently no-op on every doc even when real "
+    "margin exists; the fractional gate still no-ops cleanly when there is "
+    "truly no margin, but doesn't get fooled by noise. Cache dir suffix "
+    "extended to '_acrop-t12-p2' (from last slot's "
+    "'_preresized_e1568_a1150000_usm1-130-0') so a stale PNG cached under "
+    "the pre-autocrop policy can never be silently reused via the "
+    "dst.exists() short-circuit.\n\n"
+    "How to read next slot's log if this one is kept or discarded: if no "
+    "doc's preprocessed image dimensions differ from what the pre-crop "
+    "LANCZOS target would have produced, the mechanism never fired — these "
+    "renders simply have no material blank margin, a clean no-op at "
+    "expected F1≈0.7784, which is a DIFFERENT outcome from 'fired and "
+    "didn't help' and should not be read as evidence against the general "
+    "approach. If wall_types or rooms F1 drops specifically alongside a "
+    "confirmed crop, that's the signature of over-cropping into real "
+    "content — the fix is widening the 2% padding, not loosening the "
+    "threshold. SYSTEM_PROMPT_OVERRIDE, PARAMS, and postprocess() are "
+    "byte-for-byte unchanged from this file's on-disk state going in — "
+    "same discipline as last slot, isolating one variable.\n\n"
+    "OBSOLETE TEXT BELOW (from two slots ago, kept only because it "
+    "documents that slot's own reasoning — superseded by the baseline/"
+    "hypothesis above, not part of tonight's edit):\n\n"
     "Tonight's baseline to beat: 0.763 (orchestrator's fresh measurement of "
     "this file's on-disk state going in: Duplex_A_20110907=0.8458, "
     "NBU_MedicalClinic_Arch=0.6801). Slot 1 tonight (logs/exp-20260903-020435.log) "
@@ -751,15 +813,56 @@ def preprocess(image_path: str) -> str:
     Capping area too equalizes payload size across aspect ratios instead of just
     across long edge.
 
-    exp-preresize-unsharp-mask-thin-linework (2026-09-03): after the LANCZOS
-    resize above, apply a mild UnsharpMask to restore edge contrast the resize
-    removed from thin CAD linework and small alphanumeric glyphs. Dimensions
-    are unchanged, so this adds no model read/generation time. radius=1 stays
-    narrower than the gap between adjacent wall lines at this resolution
-    (avoids ringing on dense linework); threshold=0 is deliberate — a nonzero
-    threshold would gate sharpening off exactly on the low-contrast thin
-    strokes this targets. Full reasoning and expected-effect breakdown in
-    DESCRIPTION above.
+    exp-preresize-unsharp-mask-thin-linework (2026-09-03, kept 0.7784): after
+    the LANCZOS resize above, apply a mild UnsharpMask to restore edge
+    contrast the resize removed from thin CAD linework and small
+    alphanumeric glyphs. Dimensions are unchanged, so this adds no model
+    read/generation time. radius=1 stays narrower than the gap between
+    adjacent wall lines at this resolution (avoids ringing on dense
+    linework); threshold=0 is deliberate — a nonzero threshold would gate
+    sharpening off exactly on the low-contrast thin strokes this targets.
+
+    exp-autocrop-blank-margin-before-resize (2026-09-03, tonight's 4th slot):
+    before the LANCZOS resize, crop away blank white margin around the
+    drawing content. This eval set's images share a fixed 3539px long edge
+    at CONSTANT HEIGHT with WIDTH varying per building footprint (per the
+    docstring above) — a renderer that sizes width to content but holds
+    height fixed across every doc is a strong signal that shorter buildings
+    carry padded top/bottom margin, i.e. the trim this mechanism finds, if
+    any, is expected to be mostly vertical, not horizontal. Cropping that
+    margin before the existing fixed MAX_LONG_EDGE/MAX_AREA budget below
+    means more of that budget lands on real content (thin linework, small
+    tags) instead of empty border, raising effective on-page DPI for door
+    tags, window tags, and dimension annotations (the sharpening edit above
+    made existing pixels crisper; this edit makes more of the pixel budget
+    land on content in the first place — same lever family, orthogonal
+    mechanism). Runs entirely inside preprocess(), before run()'s timed
+    120s window, so it adds zero generation-time risk regardless of whether
+    it fires.
+
+    Crop is content-bbox-based (diff against white background, luminance
+    threshold 12/255 on the L-converted diff channel — low enough to catch
+    faint/colored CAD linework, not just pure black) with 2% padding on
+    every side as a safety margin against clipping edge-adjacent
+    annotation (no legend/title-block is expected on these IFC renders,
+    but this wasn't directly verifiable without a shell to view the
+    images). The crop only applies if it removes at least 8% of the
+    original pixel area (fractional gate, not an exact-bbox-equality
+    check) — a single stray antialiased pixel in the margin would
+    otherwise make the bbox span the full image and silently no-op every
+    time, which an equality check can't distinguish from "no margin
+    exists." Cache dir suffix encodes the new params (_acrop-t12-p2) so a
+    stale PNG cached under last slot's policy (resize+sharpen, no crop)
+    can never be silently reused.
+
+    How to read next slot's log: if the mechanism never fires (no doc's
+    preprocessed image dimensions differ from the pre-crop LANCZOS-target
+    dimensions the old code would have produced), that means these renders
+    simply have no material blank margin — a clean no-op, expected F1
+    ≈0.7784, distinct from "fired and didn't help." If wall_types or rooms
+    F1 drops specifically alongside a confirmed crop, that is the signature
+    of over-cropping and the 2% padding should be widened, not the
+    threshold loosened.
     """
     import subprocess as _sp
     if not hasattr(_sp, "_claude_arg_fix_applied"):
@@ -787,16 +890,41 @@ def preprocess(image_path: str) -> str:
         src = Path(image_path)
         if src.suffix.lower() not in (".png", ".jpg", ".jpeg"):
             return image_path
-        from PIL import Image, ImageFilter
-        # Cache dir name encodes this policy's parameters (resize AND sharpen)
-        # so a stale PNG produced under a different policy on a prior night can
-        # never be silently reused via the dst.exists() short-circuit below.
-        cache_dir = src.parent / f"_preresized_e{MAX_LONG_EDGE}_a{MAX_AREA}_usm1-130-0"
+        from PIL import Image, ImageFilter, ImageChops
+        # Cache dir name encodes this policy's parameters (resize, sharpen,
+        # AND autocrop threshold/padding) so a stale PNG produced under a
+        # different policy on a prior night can never be silently reused via
+        # the dst.exists() short-circuit below.
+        cache_dir = src.parent / f"_preresized_e{MAX_LONG_EDGE}_a{MAX_AREA}_usm1-130-0_acrop-t12-p2"
         dst = cache_dir / (src.stem + ".png")
         if dst.exists():
             return str(dst)
         with Image.open(src) as im:
-            w, h = im.size
+            rgb = im.convert("RGB")
+            w0, h0 = rgb.size
+
+            # Autocrop: trim blank white margin around the drawing content
+            # before the fixed resize budget below, so more of that budget
+            # lands on real content instead of empty border. Content bbox is
+            # found by diffing against a white background; a fractional
+            # area gate (not exact-bbox-equality) means a single stray
+            # antialiased pixel in the margin can't silently force a no-op.
+            bg = Image.new("RGB", rgb.size, (255, 255, 255))
+            diff = ImageChops.difference(rgb, bg).convert("L")
+            diff = diff.point(lambda p: 255 if p > 12 else 0)
+            bbox = diff.getbbox()
+            if bbox:
+                pad_x = max(4, round(w0 * 0.02))
+                pad_y = max(4, round(h0 * 0.02))
+                left = max(0, bbox[0] - pad_x)
+                top = max(0, bbox[1] - pad_y)
+                right = min(w0, bbox[2] + pad_x)
+                bottom = min(h0, bbox[3] + pad_y)
+                cropped_area = (right - left) * (bottom - top)
+                if cropped_area < 0.92 * (w0 * h0):
+                    rgb = rgb.crop((left, top, right, bottom))
+
+            w, h = rgb.size
             long_edge = max(w, h)
             area = w * h
             scale = 1.0
@@ -804,17 +932,18 @@ def preprocess(image_path: str) -> str:
                 scale = min(scale, MAX_LONG_EDGE / long_edge)
             if area * (scale ** 2) > MAX_AREA:
                 scale = min(scale, (MAX_AREA / area) ** 0.5)
-            if scale >= 1.0:
+            if scale >= 1.0 and (w, h) == (w0, h0):
                 return image_path
-            resized = im.convert("RGB").resize(
-                (max(1, round(w * scale)), max(1, round(h * scale))),
-                Image.LANCZOS,
-            )
-            resized = resized.filter(
+            if scale < 1.0:
+                rgb = rgb.resize(
+                    (max(1, round(w * scale)), max(1, round(h * scale))),
+                    Image.LANCZOS,
+                )
+            rgb = rgb.filter(
                 ImageFilter.UnsharpMask(radius=1, percent=130, threshold=0)
             )
             cache_dir.mkdir(exist_ok=True)
-            resized.save(dst, "PNG")
+            rgb.save(dst, "PNG")
         return str(dst)
     except Exception:
         return image_path
