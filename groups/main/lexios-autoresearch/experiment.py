@@ -19,8 +19,93 @@ import time
 from pathlib import Path
 
 # ── EXPERIMENT CONFIG (agent edits this section) ─────────────────────────────
-EXPERIMENT_NAME = "exp-autocrop-blank-margin-before-resize"
+EXPERIMENT_NAME = "exp-autocontrast-before-sharpen"
 DESCRIPTION = (
+    "Tonight's 1st slot (2026-09-04). Baseline to beat: 0.7302 (orchestrator's "
+    "fresh measurement of this file's on-disk state going in, logs/"
+    "baseline-20260904-020008.log — Duplex_A_20110907 raw/post F1=0.7007, "
+    "NBU_MedicalClinic_Arch raw/post F1=0.7597). That baseline run also shows "
+    "the dominant loss mechanism directly: Duplex_A_20110907--ifc-render-"
+    "Level_1.png hit the full 120s timeout and returned 0 parseable elements "
+    "(WARN: Timeout, WARN: Failed to parse JSON, per the baseline log), while "
+    "Level_2.png alone produced 58 elements in 70.9s. Every Duplex category "
+    "in that run sits at almost exactly half its ceiling recall (doors 8/14, "
+    "windows 10/24, rooms 10/21, slabs 10/21, beams 4/8, wall_types 4/8, "
+    "railings_guards 2/4) because one of the two images contributed zero "
+    "elements — the same 'pure run-to-run variance' timeout failure mode "
+    "already documented in this file's history on 2026-08-29 and 2026-09-03 "
+    "(there triggered by a raised doors cap; here with zero prompt changes "
+    "from last night's kept state, so intrinsic model generation-time "
+    "variance, not something this file's current prompt/cap config "
+    "controls). NOT tonight's target — see rejected alternative and "
+    "hypothesis below for why.\n\n"
+    "Considered and rejected: trimming the guaranteed-guess counts (slabs "
+    "10/level, beams 6/level, from step 6 of SYSTEM_PROMPT_OVERRIDE) to cut "
+    "output tokens and reduce timeout risk. Rejected because both keys' "
+    "JSON schema is location-only (no 'type' field listed for either slabs "
+    "or beams up top), so 10 slabs + 6 beams is roughly 16 short single-"
+    "field objects — a small fraction of a response that also contains up "
+    "to 40 rooms/doors/windows each with real content, so trimming this "
+    "block is unlikely to move total generation time enough to change "
+    "timeout probability, while directly costing recall on Duplex slabs/"
+    "beams in the majority non-timeout case, where these exact counts are "
+    "the source of today's 10/21 and 4/8 matches. Weak, uncertain upside "
+    "against a guaranteed downside — not a good trade. This slot touches "
+    "neither SYSTEM_PROMPT_OVERRIDE nor the guaranteed-guess counts.\n\n"
+    "Hypothesis instead (preprocess()-only, same zero-generation-time-risk "
+    "family as the last two kept slots — sharpening and autocrop, both "
+    "2026-09-03, both kept — rather than another prompt-wording change: "
+    "prompt/cap edits have a poor recent track record, 4 of the last 5 "
+    "prompt-touching rows in results.tsv were discarded, two of them "
+    "collapsing to 0.16-0.41): add PIL ImageOps.autocontrast(cutoff=1) "
+    "immediately after the existing LANCZOS resize and before the existing "
+    "UnsharpMask sharpen. Genuinely new mechanism, not a repeat — grepped "
+    "this file for 'autocontrast|contrast|equalize|CLAHE|gamma|levels' this "
+    "session; the only hits are UnsharpMask's own docstring/comments, no "
+    "prior slot has touched image-level contrast. Autocontrast rescales "
+    "each channel's histogram so its darkest present pixel maps toward 0 "
+    "and lightest toward 255 (1% cutoff on each end so a handful of "
+    "outlier pixels can't skew the stretch) — a global levels correction, "
+    "mechanically different from UnsharpMask's LOCAL edge-contrast boost. "
+    "CAD/BIM renders routinely use mid-gray, not pure black, for secondary "
+    "linework, dimension-annotation text, and small location tags — "
+    "exactly the content research directions #2 (door/window tags) and #4 "
+    "(dimensions) in program.md still name as unexploited, and exactly "
+    "what precision=1.00-but-recall-starved on nearly every category in "
+    "every log checked this session predicts is a legibility problem, not "
+    "a categorical one. If those grays sit above the LANCZOS-resize gray "
+    "floor, stretching them toward black before sharpening gives "
+    "UnsharpMask higher-contrast edges to work from, compounding rather "
+    "than competing with last slot's sharpening change. Ordered before "
+    "sharpen (not after) deliberately: sharpening a not-yet-stretched "
+    "image works on the original dynamic range, while stretching AFTER "
+    "sharpening risks clipping sharpening halos at the new 0/255 rails; "
+    "levels-correct first, then locally sharpen the corrected result, is "
+    "the standard order for this pair of operations. Dimensions are "
+    "unchanged (cutoff-clipping only rescales existing pixel values, same "
+    "resize output size), so this adds zero model read/generation time, "
+    "exactly like last slot's sharpening addition — entirely inside "
+    "preprocess(), before run()'s timed 120s window.\n\n"
+    "Cache dir suffix extended to add '_ac1' (autocontrast, cutoff=1) so a "
+    "stale PNG cached under last slot's autocrop-plus-sharpen-only policy "
+    "can never be silently reused via the dst.exists() short-circuit. "
+    "SYSTEM_PROMPT_OVERRIDE, PARAMS, and postprocess() are byte-for-byte "
+    "unchanged from this file's on-disk state going in — isolating this "
+    "one variable.\n\n"
+    "How to read next slot's log: if Level_1.png (or any image) times out "
+    "again, that is the pre-existing variance-driven failure mode above "
+    "firing again — unrelated to, and not evidence against, this edit; "
+    "check whether the OTHER (non-timed-out) image's per-category recall "
+    "moved, not just the overall doc F1, since one timeout can swamp the "
+    "overall number regardless of whether this mechanism helped. If "
+    "precision drops below 1.00 anywhere it wasn't before, that is "
+    "over-stretching washing out a real distinguishing detail (e.g. two "
+    "similar wall-type linework styles becoming indistinguishable after "
+    "the contrast stretch) — the fix is raising the cutoff or dropping "
+    "this change, not chasing it further.\n\n"
+    "OBSOLETE TEXT BELOW (from last night's slots, kept only because it "
+    "documents that slot's own reasoning — superseded by the baseline/"
+    "hypothesis above, not part of tonight's edit):\n\n"
     "Tonight's 4th slot (2026-09-03). Baseline to beat: 0.7784 (this file's "
     "on-disk kept state going in: exp-preresize-unsharp-mask-thin-linework, "
     "logs/exp-20260903-022020.log — Duplex_A_20110907 and "
@@ -863,6 +948,33 @@ def preprocess(image_path: str) -> str:
     F1 drops specifically alongside a confirmed crop, that is the signature
     of over-cropping and the 2% padding should be widened, not the
     threshold loosened.
+
+    exp-autocontrast-before-sharpen (2026-09-04, tonight's 1st slot):
+    immediately after the LANCZOS resize and BEFORE the existing UnsharpMask
+    sharpen, apply PIL's ImageOps.autocontrast(cutoff=1) — a global levels
+    correction that rescales each RGB channel's histogram so its darkest
+    present pixel maps toward 0 and lightest toward 255 (1% cutoff on each
+    end so a handful of outlier pixels can't skew the stretch). This is
+    mechanically different from UnsharpMask, which boosts LOCAL edge
+    contrast at fixed overall levels. CAD/BIM renders routinely use
+    mid-gray, not pure black, for secondary linework, dimension-annotation
+    text, and small location tags; stretching those grays toward black
+    before sharpening gives UnsharpMask a higher-contrast edge to work
+    from. Ordered before (not after) sharpen deliberately: stretching AFTER
+    sharpening risks clipping sharpening halos at the new 0/255 rails.
+    Dimensions are unchanged (cutoff-clipping only rescales existing pixel
+    values), so this adds zero model read/generation time, entirely inside
+    preprocess(), before run()'s timed 120s window. Cache dir suffix
+    extended to '_ac1' so a stale PNG cached under last slot's
+    autocrop-plus-sharpen-only policy can never be silently reused.
+
+    How to read next slot's log: if precision drops below 1.00 anywhere it
+    wasn't before, that is over-stretching washing out a real
+    distinguishing detail — the fix is raising the cutoff, not chasing it
+    further. If a doc's Level_1-style image times out again, that is the
+    pre-existing variance-driven failure mode documented in DESCRIPTION,
+    unrelated to this edit — read the OTHER (non-timed-out) image's
+    per-category recall, not just overall doc F1, to judge this mechanism.
     """
     import subprocess as _sp
     if not hasattr(_sp, "_claude_arg_fix_applied"):
@@ -890,12 +1002,12 @@ def preprocess(image_path: str) -> str:
         src = Path(image_path)
         if src.suffix.lower() not in (".png", ".jpg", ".jpeg"):
             return image_path
-        from PIL import Image, ImageFilter, ImageChops
+        from PIL import Image, ImageFilter, ImageChops, ImageOps
         # Cache dir name encodes this policy's parameters (resize, sharpen,
-        # AND autocrop threshold/padding) so a stale PNG produced under a
-        # different policy on a prior night can never be silently reused via
-        # the dst.exists() short-circuit below.
-        cache_dir = src.parent / f"_preresized_e{MAX_LONG_EDGE}_a{MAX_AREA}_usm1-130-0_acrop-t12-p2"
+        # autocrop threshold/padding, AND autocontrast cutoff) so a stale PNG
+        # produced under a different policy on a prior night can never be
+        # silently reused via the dst.exists() short-circuit below.
+        cache_dir = src.parent / f"_preresized_e{MAX_LONG_EDGE}_a{MAX_AREA}_usm1-130-0_acrop-t12-p2_ac1"
         dst = cache_dir / (src.stem + ".png")
         if dst.exists():
             return str(dst)
@@ -939,6 +1051,7 @@ def preprocess(image_path: str) -> str:
                     (max(1, round(w * scale)), max(1, round(h * scale))),
                     Image.LANCZOS,
                 )
+            rgb = ImageOps.autocontrast(rgb, cutoff=1)
             rgb = rgb.filter(
                 ImageFilter.UnsharpMask(radius=1, percent=130, threshold=0)
             )
