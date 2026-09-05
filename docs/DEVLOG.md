@@ -5,6 +5,203 @@
 
 ---
 
+### 2026-09-05 04:22
+
+**Areas:** general
+**Files (20):** .buzz/.scratch/core-2026-08-23.txt, .buzz/.scratch/core-2026-08-25.txt, .buzz/.scratch/core-2026-08-29.md, .buzz/.scratch/core-mem.txt, .buzz/.scratch/core-memory.md, .buzz/.scratch/core_current.md, .buzz/.scratch/standup-2026-08-14.md, .buzz/.scratch/standup-2026-08-15-post.md, .buzz/.scratch/standup-2026-08-15.md, .buzz/.scratch/standup-2026-08-22.md, .buzz/.scratch/standup-2026-08-23.md, .buzz/.scratch/standup-2026-08-25.md, .buzz/OUTBOX/2026-08-16-standup-correction.md, .buzz/OUTBOX/2026-08-16-standup.md, .buzz/OUTBOX/2026-08-21-standup.md, .buzz/OUTBOX/STANDUP_2026-08-27.md, .buzz/OUTBOX/standup-2026-08-26.md, .buzz/OUTBOX/standup-2026-08-28.md, .buzz/OUTBOX/standup-2026-08-29-correction.md, .buzz/OUTBOX/standup-2026-08-29.md
+**Diff:** +195 -0 across 2 files
+
+### 2026-09-05 03:22
+
+**Areas:** general
+**Files (20):** .buzz/.scratch/core-2026-08-23.txt, .buzz/.scratch/core-2026-08-25.txt, .buzz/.scratch/core-2026-08-29.md, .buzz/.scratch/core-mem.txt, .buzz/.scratch/core-memory.md, .buzz/.scratch/core_current.md, .buzz/.scratch/standup-2026-08-14.md, .buzz/.scratch/standup-2026-08-15-post.md, .buzz/.scratch/standup-2026-08-15.md, .buzz/.scratch/standup-2026-08-22.md, .buzz/.scratch/standup-2026-08-23.md, .buzz/.scratch/standup-2026-08-25.md, .buzz/OUTBOX/2026-08-16-standup-correction.md, .buzz/OUTBOX/2026-08-16-standup.md, .buzz/OUTBOX/2026-08-21-standup.md, .buzz/OUTBOX/STANDUP_2026-08-27.md, .buzz/OUTBOX/standup-2026-08-26.md, .buzz/OUTBOX/standup-2026-08-28.md, .buzz/OUTBOX/standup-2026-08-29-correction.md, .buzz/OUTBOX/standup-2026-08-29.md
+**Diff:** +189 -0 across 2 files
+
+### 2026-09-05 02:55
+
+**Areas:** general
+**Files (20):** .buzz/.scratch/core-2026-08-23.txt, .buzz/.scratch/core-2026-08-25.txt, .buzz/.scratch/core-2026-08-29.md, .buzz/.scratch/core-mem.txt, .buzz/.scratch/core-memory.md, .buzz/.scratch/core_current.md, .buzz/.scratch/standup-2026-08-14.md, .buzz/.scratch/standup-2026-08-15-post.md, .buzz/.scratch/standup-2026-08-15.md, .buzz/.scratch/standup-2026-08-22.md, .buzz/.scratch/standup-2026-08-23.md, .buzz/.scratch/standup-2026-08-25.md, .buzz/OUTBOX/2026-08-16-standup-correction.md, .buzz/OUTBOX/2026-08-16-standup.md, .buzz/OUTBOX/2026-08-21-standup.md, .buzz/OUTBOX/STANDUP_2026-08-27.md, .buzz/OUTBOX/standup-2026-08-26.md, .buzz/OUTBOX/standup-2026-08-28.md, .buzz/OUTBOX/standup-2026-08-29-correction.md, .buzz/OUTBOX/standup-2026-08-29.md
+**Diff:** +311 -3 across 3 files
+
+### 2026-09-05 02:54
+
+**Areas:** general
+**Files (20):** .buzz/.scratch/core-2026-08-23.txt, .buzz/.scratch/core-2026-08-25.txt, .buzz/.scratch/core-2026-08-29.md, .buzz/.scratch/core-mem.txt, .buzz/.scratch/core-memory.md, .buzz/.scratch/core_current.md, .buzz/.scratch/standup-2026-08-14.md, .buzz/.scratch/standup-2026-08-15-post.md, .buzz/.scratch/standup-2026-08-15.md, .buzz/.scratch/standup-2026-08-22.md, .buzz/.scratch/standup-2026-08-23.md, .buzz/.scratch/standup-2026-08-25.md, .buzz/OUTBOX/2026-08-16-standup-correction.md, .buzz/OUTBOX/2026-08-16-standup.md, .buzz/OUTBOX/2026-08-21-standup.md, .buzz/OUTBOX/STANDUP_2026-08-27.md, .buzz/OUTBOX/standup-2026-08-26.md, .buzz/OUTBOX/standup-2026-08-28.md, .buzz/OUTBOX/standup-2026-08-29-correction.md, .buzz/OUTBOX/standup-2026-08-29.md
+**Diff:** +305 -3 across 3 files
+
+### 2026-09-05 02:52
+
+**Areas:** general
+**Files (20):** .buzz/.scratch/core-2026-08-23.txt, .buzz/.scratch/core-2026-08-25.txt, .buzz/.scratch/core-2026-08-29.md, .buzz/.scratch/core-mem.txt, .buzz/.scratch/core-memory.md, .buzz/.scratch/core_current.md, .buzz/.scratch/standup-2026-08-14.md, .buzz/.scratch/standup-2026-08-15-post.md, .buzz/.scratch/standup-2026-08-15.md, .buzz/.scratch/standup-2026-08-22.md, .buzz/.scratch/standup-2026-08-23.md, .buzz/.scratch/standup-2026-08-25.md, .buzz/OUTBOX/2026-08-16-standup-correction.md, .buzz/OUTBOX/2026-08-16-standup.md, .buzz/OUTBOX/2026-08-21-standup.md, .buzz/OUTBOX/STANDUP_2026-08-27.md, .buzz/OUTBOX/standup-2026-08-26.md, .buzz/OUTBOX/standup-2026-08-28.md, .buzz/OUTBOX/standup-2026-08-29-correction.md, .buzz/OUTBOX/standup-2026-08-29.md
+**Diff:** +299 -3 across 3 files
+
+### 2026-09-05 02:51
+
+**Areas:** general
+**Files (20):** .buzz/.scratch/core-2026-08-23.txt, .buzz/.scratch/core-2026-08-25.txt, .buzz/.scratch/core-2026-08-29.md, .buzz/.scratch/core-mem.txt, .buzz/.scratch/core-memory.md, .buzz/.scratch/core_current.md, .buzz/.scratch/standup-2026-08-14.md, .buzz/.scratch/standup-2026-08-15-post.md, .buzz/.scratch/standup-2026-08-15.md, .buzz/.scratch/standup-2026-08-22.md, .buzz/.scratch/standup-2026-08-23.md, .buzz/.scratch/standup-2026-08-25.md, .buzz/OUTBOX/2026-08-16-standup-correction.md, .buzz/OUTBOX/2026-08-16-standup.md, .buzz/OUTBOX/2026-08-21-standup.md, .buzz/OUTBOX/STANDUP_2026-08-27.md, .buzz/OUTBOX/standup-2026-08-26.md, .buzz/OUTBOX/standup-2026-08-28.md, .buzz/OUTBOX/standup-2026-08-29-correction.md, .buzz/OUTBOX/standup-2026-08-29.md
+**Diff:** +293 -3 across 3 files
+
+### 2026-09-05 02:50
+
+**Areas:** general
+**Files (20):** .buzz/.scratch/core-2026-08-23.txt, .buzz/.scratch/core-2026-08-25.txt, .buzz/.scratch/core-2026-08-29.md, .buzz/.scratch/core-mem.txt, .buzz/.scratch/core-memory.md, .buzz/.scratch/core_current.md, .buzz/.scratch/standup-2026-08-14.md, .buzz/.scratch/standup-2026-08-15-post.md, .buzz/.scratch/standup-2026-08-15.md, .buzz/.scratch/standup-2026-08-22.md, .buzz/.scratch/standup-2026-08-23.md, .buzz/.scratch/standup-2026-08-25.md, .buzz/OUTBOX/2026-08-16-standup-correction.md, .buzz/OUTBOX/2026-08-16-standup.md, .buzz/OUTBOX/2026-08-21-standup.md, .buzz/OUTBOX/STANDUP_2026-08-27.md, .buzz/OUTBOX/standup-2026-08-26.md, .buzz/OUTBOX/standup-2026-08-28.md, .buzz/OUTBOX/standup-2026-08-29-correction.md, .buzz/OUTBOX/standup-2026-08-29.md
+**Diff:** +287 -3 across 3 files
+
+### 2026-09-05 02:39
+
+**Areas:** general
+**Files (20):** .buzz/.scratch/core-2026-08-23.txt, .buzz/.scratch/core-2026-08-25.txt, .buzz/.scratch/core-2026-08-29.md, .buzz/.scratch/core-mem.txt, .buzz/.scratch/core-memory.md, .buzz/.scratch/core_current.md, .buzz/.scratch/standup-2026-08-14.md, .buzz/.scratch/standup-2026-08-15-post.md, .buzz/.scratch/standup-2026-08-15.md, .buzz/.scratch/standup-2026-08-22.md, .buzz/.scratch/standup-2026-08-23.md, .buzz/.scratch/standup-2026-08-25.md, .buzz/OUTBOX/2026-08-16-standup-correction.md, .buzz/OUTBOX/2026-08-16-standup.md, .buzz/OUTBOX/2026-08-21-standup.md, .buzz/OUTBOX/STANDUP_2026-08-27.md, .buzz/OUTBOX/standup-2026-08-26.md, .buzz/OUTBOX/standup-2026-08-28.md, .buzz/OUTBOX/standup-2026-08-29-correction.md, .buzz/OUTBOX/standup-2026-08-29.md
+**Diff:** +258 -3 across 3 files
+
+### 2026-09-05 02:39
+
+**Areas:** general
+**Files (20):** .buzz/.scratch/core-2026-08-23.txt, .buzz/.scratch/core-2026-08-25.txt, .buzz/.scratch/core-2026-08-29.md, .buzz/.scratch/core-mem.txt, .buzz/.scratch/core-memory.md, .buzz/.scratch/core_current.md, .buzz/.scratch/standup-2026-08-14.md, .buzz/.scratch/standup-2026-08-15-post.md, .buzz/.scratch/standup-2026-08-15.md, .buzz/.scratch/standup-2026-08-22.md, .buzz/.scratch/standup-2026-08-23.md, .buzz/.scratch/standup-2026-08-25.md, .buzz/OUTBOX/2026-08-16-standup-correction.md, .buzz/OUTBOX/2026-08-16-standup.md, .buzz/OUTBOX/2026-08-21-standup.md, .buzz/OUTBOX/STANDUP_2026-08-27.md, .buzz/OUTBOX/standup-2026-08-26.md, .buzz/OUTBOX/standup-2026-08-28.md, .buzz/OUTBOX/standup-2026-08-29-correction.md, .buzz/OUTBOX/standup-2026-08-29.md
+**Diff:** +252 -3 across 3 files
+
+### 2026-09-05 02:37
+
+**Areas:** general
+**Files (20):** .buzz/.scratch/core-2026-08-23.txt, .buzz/.scratch/core-2026-08-25.txt, .buzz/.scratch/core-2026-08-29.md, .buzz/.scratch/core-mem.txt, .buzz/.scratch/core-memory.md, .buzz/.scratch/core_current.md, .buzz/.scratch/standup-2026-08-14.md, .buzz/.scratch/standup-2026-08-15-post.md, .buzz/.scratch/standup-2026-08-15.md, .buzz/.scratch/standup-2026-08-22.md, .buzz/.scratch/standup-2026-08-23.md, .buzz/.scratch/standup-2026-08-25.md, .buzz/OUTBOX/2026-08-16-standup-correction.md, .buzz/OUTBOX/2026-08-16-standup.md, .buzz/OUTBOX/2026-08-21-standup.md, .buzz/OUTBOX/STANDUP_2026-08-27.md, .buzz/OUTBOX/standup-2026-08-26.md, .buzz/OUTBOX/standup-2026-08-28.md, .buzz/OUTBOX/standup-2026-08-29-correction.md, .buzz/OUTBOX/standup-2026-08-29.md
+**Diff:** +246 -3 across 3 files
+
+### 2026-09-05 02:36
+
+**Areas:** general
+**Files (20):** .buzz/.scratch/core-2026-08-23.txt, .buzz/.scratch/core-2026-08-25.txt, .buzz/.scratch/core-2026-08-29.md, .buzz/.scratch/core-mem.txt, .buzz/.scratch/core-memory.md, .buzz/.scratch/core_current.md, .buzz/.scratch/standup-2026-08-14.md, .buzz/.scratch/standup-2026-08-15-post.md, .buzz/.scratch/standup-2026-08-15.md, .buzz/.scratch/standup-2026-08-22.md, .buzz/.scratch/standup-2026-08-23.md, .buzz/.scratch/standup-2026-08-25.md, .buzz/OUTBOX/2026-08-16-standup-correction.md, .buzz/OUTBOX/2026-08-16-standup.md, .buzz/OUTBOX/2026-08-21-standup.md, .buzz/OUTBOX/STANDUP_2026-08-27.md, .buzz/OUTBOX/standup-2026-08-26.md, .buzz/OUTBOX/standup-2026-08-28.md, .buzz/OUTBOX/standup-2026-08-29-correction.md, .buzz/OUTBOX/standup-2026-08-29.md
+**Diff:** +240 -3 across 3 files
+
+### 2026-09-05 02:35
+
+**Areas:** general
+**Files (20):** .buzz/.scratch/core-2026-08-23.txt, .buzz/.scratch/core-2026-08-25.txt, .buzz/.scratch/core-2026-08-29.md, .buzz/.scratch/core-mem.txt, .buzz/.scratch/core-memory.md, .buzz/.scratch/core_current.md, .buzz/.scratch/standup-2026-08-14.md, .buzz/.scratch/standup-2026-08-15-post.md, .buzz/.scratch/standup-2026-08-15.md, .buzz/.scratch/standup-2026-08-22.md, .buzz/.scratch/standup-2026-08-23.md, .buzz/.scratch/standup-2026-08-25.md, .buzz/OUTBOX/2026-08-16-standup-correction.md, .buzz/OUTBOX/2026-08-16-standup.md, .buzz/OUTBOX/2026-08-21-standup.md, .buzz/OUTBOX/STANDUP_2026-08-27.md, .buzz/OUTBOX/standup-2026-08-26.md, .buzz/OUTBOX/standup-2026-08-28.md, .buzz/OUTBOX/standup-2026-08-29-correction.md, .buzz/OUTBOX/standup-2026-08-29.md
+**Diff:** +234 -3 across 3 files
+
+### 2026-09-05 02:27
+
+**Areas:** general
+**Files (20):** .buzz/.scratch/core-2026-08-23.txt, .buzz/.scratch/core-2026-08-25.txt, .buzz/.scratch/core-2026-08-29.md, .buzz/.scratch/core-mem.txt, .buzz/.scratch/core-memory.md, .buzz/.scratch/core_current.md, .buzz/.scratch/standup-2026-08-14.md, .buzz/.scratch/standup-2026-08-15-post.md, .buzz/.scratch/standup-2026-08-15.md, .buzz/.scratch/standup-2026-08-22.md, .buzz/.scratch/standup-2026-08-23.md, .buzz/.scratch/standup-2026-08-25.md, .buzz/OUTBOX/2026-08-16-standup-correction.md, .buzz/OUTBOX/2026-08-16-standup.md, .buzz/OUTBOX/2026-08-21-standup.md, .buzz/OUTBOX/STANDUP_2026-08-27.md, .buzz/OUTBOX/standup-2026-08-26.md, .buzz/OUTBOX/standup-2026-08-28.md, .buzz/OUTBOX/standup-2026-08-29-correction.md, .buzz/OUTBOX/standup-2026-08-29.md
+**Diff:** +220 -3 across 3 files
+
+### 2026-09-05 02:25
+
+**Areas:** general
+**Files (20):** .buzz/.scratch/core-2026-08-23.txt, .buzz/.scratch/core-2026-08-25.txt, .buzz/.scratch/core-2026-08-29.md, .buzz/.scratch/core-mem.txt, .buzz/.scratch/core-memory.md, .buzz/.scratch/core_current.md, .buzz/.scratch/standup-2026-08-14.md, .buzz/.scratch/standup-2026-08-15-post.md, .buzz/.scratch/standup-2026-08-15.md, .buzz/.scratch/standup-2026-08-22.md, .buzz/.scratch/standup-2026-08-23.md, .buzz/.scratch/standup-2026-08-25.md, .buzz/OUTBOX/2026-08-16-standup-correction.md, .buzz/OUTBOX/2026-08-16-standup.md, .buzz/OUTBOX/2026-08-21-standup.md, .buzz/OUTBOX/STANDUP_2026-08-27.md, .buzz/OUTBOX/standup-2026-08-26.md, .buzz/OUTBOX/standup-2026-08-28.md, .buzz/OUTBOX/standup-2026-08-29-correction.md, .buzz/OUTBOX/standup-2026-08-29.md
+**Diff:** +214 -3 across 3 files
+
+### 2026-09-05 02:24
+
+**Areas:** general
+**Files (20):** .buzz/.scratch/core-2026-08-23.txt, .buzz/.scratch/core-2026-08-25.txt, .buzz/.scratch/core-2026-08-29.md, .buzz/.scratch/core-mem.txt, .buzz/.scratch/core-memory.md, .buzz/.scratch/core_current.md, .buzz/.scratch/standup-2026-08-14.md, .buzz/.scratch/standup-2026-08-15-post.md, .buzz/.scratch/standup-2026-08-15.md, .buzz/.scratch/standup-2026-08-22.md, .buzz/.scratch/standup-2026-08-23.md, .buzz/.scratch/standup-2026-08-25.md, .buzz/OUTBOX/2026-08-16-standup-correction.md, .buzz/OUTBOX/2026-08-16-standup.md, .buzz/OUTBOX/2026-08-21-standup.md, .buzz/OUTBOX/STANDUP_2026-08-27.md, .buzz/OUTBOX/standup-2026-08-26.md, .buzz/OUTBOX/standup-2026-08-28.md, .buzz/OUTBOX/standup-2026-08-29-correction.md, .buzz/OUTBOX/standup-2026-08-29.md
+**Diff:** +208 -3 across 3 files
+
+### 2026-09-05 02:23
+
+**Areas:** general
+**Files (20):** .buzz/.scratch/core-2026-08-23.txt, .buzz/.scratch/core-2026-08-25.txt, .buzz/.scratch/core-2026-08-29.md, .buzz/.scratch/core-mem.txt, .buzz/.scratch/core-memory.md, .buzz/.scratch/core_current.md, .buzz/.scratch/standup-2026-08-14.md, .buzz/.scratch/standup-2026-08-15-post.md, .buzz/.scratch/standup-2026-08-15.md, .buzz/.scratch/standup-2026-08-22.md, .buzz/.scratch/standup-2026-08-23.md, .buzz/.scratch/standup-2026-08-25.md, .buzz/OUTBOX/2026-08-16-standup-correction.md, .buzz/OUTBOX/2026-08-16-standup.md, .buzz/OUTBOX/2026-08-21-standup.md, .buzz/OUTBOX/STANDUP_2026-08-27.md, .buzz/OUTBOX/standup-2026-08-26.md, .buzz/OUTBOX/standup-2026-08-28.md, .buzz/OUTBOX/standup-2026-08-29-correction.md, .buzz/OUTBOX/standup-2026-08-29.md
+**Diff:** +202 -3 across 3 files
+
+### 2026-09-05 02:23
+
+**Areas:** general
+**Files (20):** .buzz/.scratch/core-2026-08-23.txt, .buzz/.scratch/core-2026-08-25.txt, .buzz/.scratch/core-2026-08-29.md, .buzz/.scratch/core-mem.txt, .buzz/.scratch/core-memory.md, .buzz/.scratch/core_current.md, .buzz/.scratch/standup-2026-08-14.md, .buzz/.scratch/standup-2026-08-15-post.md, .buzz/.scratch/standup-2026-08-15.md, .buzz/.scratch/standup-2026-08-22.md, .buzz/.scratch/standup-2026-08-23.md, .buzz/.scratch/standup-2026-08-25.md, .buzz/OUTBOX/2026-08-16-standup-correction.md, .buzz/OUTBOX/2026-08-16-standup.md, .buzz/OUTBOX/2026-08-21-standup.md, .buzz/OUTBOX/STANDUP_2026-08-27.md, .buzz/OUTBOX/standup-2026-08-26.md, .buzz/OUTBOX/standup-2026-08-28.md, .buzz/OUTBOX/standup-2026-08-29-correction.md, .buzz/OUTBOX/standup-2026-08-29.md
+**Diff:** +196 -3 across 3 files
+
+### 2026-09-05 02:21
+
+**Areas:** general
+**Files (20):** .buzz/.scratch/core-2026-08-23.txt, .buzz/.scratch/core-2026-08-25.txt, .buzz/.scratch/core-2026-08-29.md, .buzz/.scratch/core-mem.txt, .buzz/.scratch/core-memory.md, .buzz/.scratch/core_current.md, .buzz/.scratch/standup-2026-08-14.md, .buzz/.scratch/standup-2026-08-15-post.md, .buzz/.scratch/standup-2026-08-15.md, .buzz/.scratch/standup-2026-08-22.md, .buzz/.scratch/standup-2026-08-23.md, .buzz/.scratch/standup-2026-08-25.md, .buzz/OUTBOX/2026-08-16-standup-correction.md, .buzz/OUTBOX/2026-08-16-standup.md, .buzz/OUTBOX/2026-08-21-standup.md, .buzz/OUTBOX/STANDUP_2026-08-27.md, .buzz/OUTBOX/standup-2026-08-26.md, .buzz/OUTBOX/standup-2026-08-28.md, .buzz/OUTBOX/standup-2026-08-29-correction.md, .buzz/OUTBOX/standup-2026-08-29.md
+**Diff:** +90 -0 across 2 files
+
+### 2026-09-05 02:15
+
+**Areas:** general
+**Files (20):** .buzz/.scratch/core-2026-08-23.txt, .buzz/.scratch/core-2026-08-25.txt, .buzz/.scratch/core-2026-08-29.md, .buzz/.scratch/core-mem.txt, .buzz/.scratch/core-memory.md, .buzz/.scratch/core_current.md, .buzz/.scratch/standup-2026-08-14.md, .buzz/.scratch/standup-2026-08-15-post.md, .buzz/.scratch/standup-2026-08-15.md, .buzz/.scratch/standup-2026-08-22.md, .buzz/.scratch/standup-2026-08-23.md, .buzz/.scratch/standup-2026-08-25.md, .buzz/OUTBOX/2026-08-16-standup-correction.md, .buzz/OUTBOX/2026-08-16-standup.md, .buzz/OUTBOX/2026-08-21-standup.md, .buzz/OUTBOX/STANDUP_2026-08-27.md, .buzz/OUTBOX/standup-2026-08-26.md, .buzz/OUTBOX/standup-2026-08-28.md, .buzz/OUTBOX/standup-2026-08-29-correction.md, .buzz/OUTBOX/standup-2026-08-29.md
+**Diff:** +175 -2 across 2 files
+
+### 2026-09-05 02:13
+
+**Areas:** general
+**Files (20):** .buzz/.scratch/core-2026-08-23.txt, .buzz/.scratch/core-2026-08-25.txt, .buzz/.scratch/core-2026-08-29.md, .buzz/.scratch/core-mem.txt, .buzz/.scratch/core-memory.md, .buzz/.scratch/core_current.md, .buzz/.scratch/standup-2026-08-14.md, .buzz/.scratch/standup-2026-08-15-post.md, .buzz/.scratch/standup-2026-08-15.md, .buzz/.scratch/standup-2026-08-22.md, .buzz/.scratch/standup-2026-08-23.md, .buzz/.scratch/standup-2026-08-25.md, .buzz/OUTBOX/2026-08-16-standup-correction.md, .buzz/OUTBOX/2026-08-16-standup.md, .buzz/OUTBOX/2026-08-21-standup.md, .buzz/OUTBOX/STANDUP_2026-08-27.md, .buzz/OUTBOX/standup-2026-08-26.md, .buzz/OUTBOX/standup-2026-08-28.md, .buzz/OUTBOX/standup-2026-08-29-correction.md, .buzz/OUTBOX/standup-2026-08-29.md
+**Diff:** +169 -2 across 2 files
+
+### 2026-09-05 02:12
+
+**Areas:** general
+**Files (20):** .buzz/.scratch/core-2026-08-23.txt, .buzz/.scratch/core-2026-08-25.txt, .buzz/.scratch/core-2026-08-29.md, .buzz/.scratch/core-mem.txt, .buzz/.scratch/core-memory.md, .buzz/.scratch/core_current.md, .buzz/.scratch/standup-2026-08-14.md, .buzz/.scratch/standup-2026-08-15-post.md, .buzz/.scratch/standup-2026-08-15.md, .buzz/.scratch/standup-2026-08-22.md, .buzz/.scratch/standup-2026-08-23.md, .buzz/.scratch/standup-2026-08-25.md, .buzz/OUTBOX/2026-08-16-standup-correction.md, .buzz/OUTBOX/2026-08-16-standup.md, .buzz/OUTBOX/2026-08-21-standup.md, .buzz/OUTBOX/STANDUP_2026-08-27.md, .buzz/OUTBOX/standup-2026-08-26.md, .buzz/OUTBOX/standup-2026-08-28.md, .buzz/OUTBOX/standup-2026-08-29-correction.md, .buzz/OUTBOX/standup-2026-08-29.md
+**Diff:** +163 -2 across 2 files
+
+### 2026-09-05 02:12
+
+**Areas:** general
+**Files (20):** .buzz/.scratch/core-2026-08-23.txt, .buzz/.scratch/core-2026-08-25.txt, .buzz/.scratch/core-2026-08-29.md, .buzz/.scratch/core-mem.txt, .buzz/.scratch/core-memory.md, .buzz/.scratch/core_current.md, .buzz/.scratch/standup-2026-08-14.md, .buzz/.scratch/standup-2026-08-15-post.md, .buzz/.scratch/standup-2026-08-15.md, .buzz/.scratch/standup-2026-08-22.md, .buzz/.scratch/standup-2026-08-23.md, .buzz/.scratch/standup-2026-08-25.md, .buzz/OUTBOX/2026-08-16-standup-correction.md, .buzz/OUTBOX/2026-08-16-standup.md, .buzz/OUTBOX/2026-08-21-standup.md, .buzz/OUTBOX/STANDUP_2026-08-27.md, .buzz/OUTBOX/standup-2026-08-26.md, .buzz/OUTBOX/standup-2026-08-28.md, .buzz/OUTBOX/standup-2026-08-29-correction.md, .buzz/OUTBOX/standup-2026-08-29.md
+**Diff:** +157 -2 across 2 files
+
+### 2026-09-05 02:11
+
+**Areas:** general
+**Files (20):** .buzz/.scratch/core-2026-08-23.txt, .buzz/.scratch/core-2026-08-25.txt, .buzz/.scratch/core-2026-08-29.md, .buzz/.scratch/core-mem.txt, .buzz/.scratch/core-memory.md, .buzz/.scratch/core_current.md, .buzz/.scratch/standup-2026-08-14.md, .buzz/.scratch/standup-2026-08-15-post.md, .buzz/.scratch/standup-2026-08-15.md, .buzz/.scratch/standup-2026-08-22.md, .buzz/.scratch/standup-2026-08-23.md, .buzz/.scratch/standup-2026-08-25.md, .buzz/OUTBOX/2026-08-16-standup-correction.md, .buzz/OUTBOX/2026-08-16-standup.md, .buzz/OUTBOX/2026-08-21-standup.md, .buzz/OUTBOX/STANDUP_2026-08-27.md, .buzz/OUTBOX/standup-2026-08-26.md, .buzz/OUTBOX/standup-2026-08-28.md, .buzz/OUTBOX/standup-2026-08-29-correction.md, .buzz/OUTBOX/standup-2026-08-29.md
+**Diff:** +151 -2 across 2 files
+
+### 2026-09-05 02:03
+
+**Areas:** general
+**Files (20):** .buzz/.scratch/core-2026-08-23.txt, .buzz/.scratch/core-2026-08-25.txt, .buzz/.scratch/core-2026-08-29.md, .buzz/.scratch/core-mem.txt, .buzz/.scratch/core-memory.md, .buzz/.scratch/core_current.md, .buzz/.scratch/standup-2026-08-14.md, .buzz/.scratch/standup-2026-08-15-post.md, .buzz/.scratch/standup-2026-08-15.md, .buzz/.scratch/standup-2026-08-22.md, .buzz/.scratch/standup-2026-08-23.md, .buzz/.scratch/standup-2026-08-25.md, .buzz/OUTBOX/2026-08-16-standup-correction.md, .buzz/OUTBOX/2026-08-16-standup.md, .buzz/OUTBOX/2026-08-21-standup.md, .buzz/OUTBOX/STANDUP_2026-08-27.md, .buzz/OUTBOX/standup-2026-08-26.md, .buzz/OUTBOX/standup-2026-08-28.md, .buzz/OUTBOX/standup-2026-08-29-correction.md, .buzz/OUTBOX/standup-2026-08-29.md
+**Diff:** +53 -0 across 1 files
+
+### 2026-09-05 02:02
+
+**Areas:** general
+**Files (20):** .buzz/.scratch/core-2026-08-23.txt, .buzz/.scratch/core-2026-08-25.txt, .buzz/.scratch/core-2026-08-29.md, .buzz/.scratch/core-mem.txt, .buzz/.scratch/core-memory.md, .buzz/.scratch/core_current.md, .buzz/.scratch/standup-2026-08-14.md, .buzz/.scratch/standup-2026-08-15-post.md, .buzz/.scratch/standup-2026-08-15.md, .buzz/.scratch/standup-2026-08-22.md, .buzz/.scratch/standup-2026-08-23.md, .buzz/.scratch/standup-2026-08-25.md, .buzz/OUTBOX/2026-08-16-standup-correction.md, .buzz/OUTBOX/2026-08-16-standup.md, .buzz/OUTBOX/2026-08-21-standup.md, .buzz/OUTBOX/STANDUP_2026-08-27.md, .buzz/OUTBOX/standup-2026-08-26.md, .buzz/OUTBOX/standup-2026-08-28.md, .buzz/OUTBOX/standup-2026-08-29-correction.md, .buzz/OUTBOX/standup-2026-08-29.md
+**Diff:** +47 -0 across 1 files
+
+### 2026-09-05 02:01
+
+**Areas:** general
+**Files (20):** .buzz/.scratch/core-2026-08-23.txt, .buzz/.scratch/core-2026-08-25.txt, .buzz/.scratch/core-2026-08-29.md, .buzz/.scratch/core-mem.txt, .buzz/.scratch/core-memory.md, .buzz/.scratch/core_current.md, .buzz/.scratch/standup-2026-08-14.md, .buzz/.scratch/standup-2026-08-15-post.md, .buzz/.scratch/standup-2026-08-15.md, .buzz/.scratch/standup-2026-08-22.md, .buzz/.scratch/standup-2026-08-23.md, .buzz/.scratch/standup-2026-08-25.md, .buzz/OUTBOX/2026-08-16-standup-correction.md, .buzz/OUTBOX/2026-08-16-standup.md, .buzz/OUTBOX/2026-08-21-standup.md, .buzz/OUTBOX/STANDUP_2026-08-27.md, .buzz/OUTBOX/standup-2026-08-26.md, .buzz/OUTBOX/standup-2026-08-28.md, .buzz/OUTBOX/standup-2026-08-29-correction.md, .buzz/OUTBOX/standup-2026-08-29.md
+**Diff:** +41 -0 across 1 files
+
+### 2026-09-05 02:00
+
+**Areas:** general
+**Files (20):** .buzz/.scratch/core-2026-08-23.txt, .buzz/.scratch/core-2026-08-25.txt, .buzz/.scratch/core-2026-08-29.md, .buzz/.scratch/core-mem.txt, .buzz/.scratch/core-memory.md, .buzz/.scratch/core_current.md, .buzz/.scratch/standup-2026-08-14.md, .buzz/.scratch/standup-2026-08-15-post.md, .buzz/.scratch/standup-2026-08-15.md, .buzz/.scratch/standup-2026-08-22.md, .buzz/.scratch/standup-2026-08-23.md, .buzz/.scratch/standup-2026-08-25.md, .buzz/OUTBOX/2026-08-16-standup-correction.md, .buzz/OUTBOX/2026-08-16-standup.md, .buzz/OUTBOX/2026-08-21-standup.md, .buzz/OUTBOX/STANDUP_2026-08-27.md, .buzz/OUTBOX/standup-2026-08-26.md, .buzz/OUTBOX/standup-2026-08-28.md, .buzz/OUTBOX/standup-2026-08-29-correction.md, .buzz/OUTBOX/standup-2026-08-29.md
+**Diff:** +35 -0 across 1 files
+
+### 2026-09-05 01:50
+
+**Areas:** general
+**Files (20):** .buzz/.scratch/core-2026-08-23.txt, .buzz/.scratch/core-2026-08-25.txt, .buzz/.scratch/core-2026-08-29.md, .buzz/.scratch/core-mem.txt, .buzz/.scratch/core-memory.md, .buzz/.scratch/core_current.md, .buzz/.scratch/standup-2026-08-14.md, .buzz/.scratch/standup-2026-08-15-post.md, .buzz/.scratch/standup-2026-08-15.md, .buzz/.scratch/standup-2026-08-22.md, .buzz/.scratch/standup-2026-08-23.md, .buzz/.scratch/standup-2026-08-25.md, .buzz/OUTBOX/2026-08-16-standup-correction.md, .buzz/OUTBOX/2026-08-16-standup.md, .buzz/OUTBOX/2026-08-21-standup.md, .buzz/OUTBOX/STANDUP_2026-08-27.md, .buzz/OUTBOX/standup-2026-08-26.md, .buzz/OUTBOX/standup-2026-08-28.md, .buzz/OUTBOX/standup-2026-08-29-correction.md, .buzz/OUTBOX/standup-2026-08-29.md
+**Diff:** +29 -0 across 1 files
+
+### 2026-09-05 01:37
+
+**Areas:** general
+**Files (20):** .buzz/.scratch/core-2026-08-23.txt, .buzz/.scratch/core-2026-08-25.txt, .buzz/.scratch/core-2026-08-29.md, .buzz/.scratch/core-mem.txt, .buzz/.scratch/core-memory.md, .buzz/.scratch/core_current.md, .buzz/.scratch/standup-2026-08-14.md, .buzz/.scratch/standup-2026-08-15-post.md, .buzz/.scratch/standup-2026-08-15.md, .buzz/.scratch/standup-2026-08-22.md, .buzz/.scratch/standup-2026-08-23.md, .buzz/.scratch/standup-2026-08-25.md, .buzz/OUTBOX/2026-08-16-standup-correction.md, .buzz/OUTBOX/2026-08-16-standup.md, .buzz/OUTBOX/2026-08-21-standup.md, .buzz/OUTBOX/STANDUP_2026-08-27.md, .buzz/OUTBOX/standup-2026-08-26.md, .buzz/OUTBOX/standup-2026-08-28.md, .buzz/OUTBOX/standup-2026-08-29-correction.md, .buzz/OUTBOX/standup-2026-08-29.md
+**Diff:** +23 -0 across 1 files
+
+### 2026-09-05 01:21
+
+**Areas:** general
+**Files (20):** .buzz/.scratch/core-2026-08-23.txt, .buzz/.scratch/core-2026-08-25.txt, .buzz/.scratch/core-2026-08-29.md, .buzz/.scratch/core-mem.txt, .buzz/.scratch/core-memory.md, .buzz/.scratch/core_current.md, .buzz/.scratch/standup-2026-08-14.md, .buzz/.scratch/standup-2026-08-15-post.md, .buzz/.scratch/standup-2026-08-15.md, .buzz/.scratch/standup-2026-08-22.md, .buzz/.scratch/standup-2026-08-23.md, .buzz/.scratch/standup-2026-08-25.md, .buzz/OUTBOX/2026-08-16-standup-correction.md, .buzz/OUTBOX/2026-08-16-standup.md, .buzz/OUTBOX/2026-08-21-standup.md, .buzz/OUTBOX/STANDUP_2026-08-27.md, .buzz/OUTBOX/standup-2026-08-26.md, .buzz/OUTBOX/standup-2026-08-28.md, .buzz/OUTBOX/standup-2026-08-29-correction.md, .buzz/OUTBOX/standup-2026-08-29.md
+**Diff:** +17 -0 across 1 files
+
+### 2026-09-05 01:21
+
+**Areas:** general
+**Files (20):** .buzz/.scratch/core-2026-08-23.txt, .buzz/.scratch/core-2026-08-25.txt, .buzz/.scratch/core-2026-08-29.md, .buzz/.scratch/core-mem.txt, .buzz/.scratch/core-memory.md, .buzz/.scratch/core_current.md, .buzz/.scratch/standup-2026-08-14.md, .buzz/.scratch/standup-2026-08-15-post.md, .buzz/.scratch/standup-2026-08-15.md, .buzz/.scratch/standup-2026-08-22.md, .buzz/.scratch/standup-2026-08-23.md, .buzz/.scratch/standup-2026-08-25.md, .buzz/OUTBOX/2026-08-16-standup-correction.md, .buzz/OUTBOX/2026-08-16-standup.md, .buzz/OUTBOX/2026-08-21-standup.md, .buzz/OUTBOX/STANDUP_2026-08-27.md, .buzz/OUTBOX/standup-2026-08-26.md, .buzz/OUTBOX/standup-2026-08-28.md, .buzz/OUTBOX/standup-2026-08-29-correction.md, .buzz/OUTBOX/standup-2026-08-29.md
+**Diff:** +11 -0 across 1 files
+
+### 2026-09-05 01:16
+
+**Areas:** general
+**Files (20):** .buzz/.scratch/core-2026-08-23.txt, .buzz/.scratch/core-2026-08-25.txt, .buzz/.scratch/core-2026-08-29.md, .buzz/.scratch/core-mem.txt, .buzz/.scratch/core-memory.md, .buzz/.scratch/core_current.md, .buzz/.scratch/standup-2026-08-14.md, .buzz/.scratch/standup-2026-08-15-post.md, .buzz/.scratch/standup-2026-08-15.md, .buzz/.scratch/standup-2026-08-22.md, .buzz/.scratch/standup-2026-08-23.md, .buzz/.scratch/standup-2026-08-25.md, .buzz/OUTBOX/2026-08-16-standup-correction.md, .buzz/OUTBOX/2026-08-16-standup.md, .buzz/OUTBOX/2026-08-21-standup.md, .buzz/OUTBOX/STANDUP_2026-08-27.md, .buzz/OUTBOX/standup-2026-08-26.md, .buzz/OUTBOX/standup-2026-08-28.md, .buzz/OUTBOX/standup-2026-08-29-correction.md, .buzz/OUTBOX/standup-2026-08-29.md
+**Diff:** +5 -0 across 1 files
+
+### 2026-09-05 01:09
+
+**Areas:** general
+**Files (20):** .buzz/.scratch/core-2026-08-23.txt, .buzz/.scratch/core-2026-08-25.txt, .buzz/.scratch/core-2026-08-29.md, .buzz/.scratch/core-mem.txt, .buzz/.scratch/core-memory.md, .buzz/.scratch/core_current.md, .buzz/.scratch/standup-2026-08-14.md, .buzz/.scratch/standup-2026-08-15-post.md, .buzz/.scratch/standup-2026-08-15.md, .buzz/.scratch/standup-2026-08-22.md, .buzz/.scratch/standup-2026-08-23.md, .buzz/.scratch/standup-2026-08-25.md, .buzz/OUTBOX/2026-08-16-standup-correction.md, .buzz/OUTBOX/2026-08-16-standup.md, .buzz/OUTBOX/2026-08-21-standup.md, .buzz/OUTBOX/STANDUP_2026-08-27.md, .buzz/OUTBOX/standup-2026-08-26.md, .buzz/OUTBOX/standup-2026-08-28.md, .buzz/OUTBOX/standup-2026-08-29-correction.md, .buzz/OUTBOX/standup-2026-08-29.md
+
 ### 2026-09-05 00:21
 
 **Areas:** general
