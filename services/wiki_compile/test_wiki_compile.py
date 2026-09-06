@@ -11,6 +11,7 @@ level the failure was visible from — a compiled article on disk.
 """
 from __future__ import annotations
 
+import json
 import sys
 from pathlib import Path
 
@@ -18,7 +19,12 @@ import pytest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
-from services.wiki_compile.lib import Domain, compile_all, iter_source_files  # noqa: E402
+from services.wiki_compile.lib import (  # noqa: E402
+    Domain,
+    compile_all,
+    iter_source_files,
+    target_paths,
+)
 
 
 def _domain(tmp_path: Path, vault: Path) -> Domain:
@@ -53,8 +59,8 @@ def vault(tmp_path: Path) -> Path:
 def test_symlinked_category_compiles(tmp_path, vault):
     d = _domain(tmp_path, vault)
     compile_all(d)
-    assert (d.compiled / "zettelkasten" / "20260622_hooks.md").exists()
-    assert "Hooks nudge" in (d.compiled / "zettelkasten" / "20260622_hooks.md").read_text()
+    assert (d.compiled / "zettelkasten" / "zettelkasten__20260622_hooks.md").exists()
+    assert "Hooks nudge" in (d.compiled / "zettelkasten" / "zettelkasten__20260622_hooks.md").read_text()
 
 
 def test_skip_path_parts_still_prunes(tmp_path, vault):
@@ -77,7 +83,7 @@ def test_truncated_state_file_does_not_abort_the_run(tmp_path, vault):
     d.ensure_dirs()
     d.state_path.write_text("")
     compile_all(d)
-    assert (d.compiled / "zettelkasten" / "20260622_hooks.md").exists()
+    assert (d.compiled / "zettelkasten" / "zettelkasten__20260622_hooks.md").exists()
 
 
 def test_state_is_written_atomically(tmp_path, vault):
@@ -92,3 +98,36 @@ def test_same_file_by_two_paths_is_ingested_once(tmp_path, vault):
     (vault / "Alias").symlink_to(vault / "Zettelkasten")
     found = iter_source_files([vault], "*.md", ["Daily"])
     assert [p.name for p in found].count("20260622_hooks.md") == 1
+
+
+def test_same_stem_in_two_folders_keeps_two_articles(tmp_path, vault):
+    """The vault has 78 files called SKILL.md and 25 called README.md. With the
+    slug built from the stem alone they shared one `.wiki_meta` entry, so the
+    second file inherited the first's `created`/`version` and, inside one
+    category, overwrote its article."""
+    (vault / "Notes" / "a").mkdir(parents=True)
+    (vault / "Notes" / "b").mkdir(parents=True)
+    (vault / "Notes" / "a" / "skill.md").write_text("# Alpha\nalpha body\n")
+    (vault / "Notes" / "b" / "skill.md").write_text("# Beta\nbeta body\n")
+    d = _domain(tmp_path, vault)
+    compile_all(d)
+
+    bodies = [p.read_text() for p in d.compiled.rglob("*.md") if p.name != "index.md"]
+    assert sum("alpha body" in b for b in bodies) == 1
+    assert sum("beta body" in b for b in bodies) == 1
+
+    ids = [json.loads(p.read_text())["id"] for p in d.meta_dir.rglob("*.json")]
+    assert len(ids) == 5
+    assert len(set(ids)) == 5
+    assert all(json.loads(p.read_text())["version"] == 1 for p in d.meta_dir.rglob("*.json"))
+
+
+def test_target_paths_is_pure(tmp_path, vault):
+    """The gate calls this seam over the live wiki's domain, and compile_all
+    calls it before it has decided to write anything."""
+    d = _domain(tmp_path, vault)
+    wiki_path, meta_path = target_paths(d, vault / "Notes" / "kept.md")
+    assert not d.base.exists()
+    assert wiki_path.suffix == ".md" and meta_path.suffix == ".json"
+    assert wiki_path.stem == meta_path.stem
+    assert meta_path.parent == d.meta_dir

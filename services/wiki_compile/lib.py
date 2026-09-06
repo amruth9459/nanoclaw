@@ -10,13 +10,14 @@ runs the pipeline; domains stay declarative.
 from __future__ import annotations
 
 import fnmatch
+import hashlib
 import json
 import os
 import re
 from collections import defaultdict
 from dataclasses import dataclass, field
 from datetime import datetime
-from pathlib import Path
+from pathlib import Path, PurePath
 from typing import Callable, Iterable
 
 
@@ -163,6 +164,53 @@ def _file_key(file_path: Path, raw_dirs: list[Path]) -> str:
     return str(file_path)
 
 
+SLUG_SEP = "__"
+MAX_SLUG = 120
+
+
+def slug_for(file_key: str) -> str:
+    """Article id for one source file, from its whole path inside the raw root.
+
+    A stem-only slug put 3,266 Brain files into one namespace: 78 of them are
+    called SKILL.md, 25 README.md. Same stem meant one `.wiki_meta` entry, so
+    the later file inherited the earlier's `created`, accumulated its `sources`
+    and bumped its `version`, and inside one category overwrote its article.
+    The directories are what tell those files apart, so they take part in the id.
+
+    Flat by design: `.wiki_meta` stays a single directory (brain-digest.py and
+    brain-themes.py both `glob("*.json")` it and key on `id`), and a file that
+    sits directly in the raw root keeps exactly its old slug, which is why the
+    14 Jyotish ids do not move.
+    """
+    parts = [
+        p.replace(" ", "_").lower()
+        for p in PurePath(file_key).with_suffix("").parts
+        if p not in (".", "..", os.sep, "/")
+    ]
+    parts = [p for p in parts if p]
+    slug = SLUG_SEP.join(parts) or "untitled"
+    # A component that already contains the separator makes two different paths
+    # encode to one slug, and a name past the filesystem's limit gets truncated
+    # into somebody else's. Both are the bug this function exists to remove, so
+    # fall back to a digest of the real key.
+    if len(slug) > MAX_SLUG or any(SLUG_SEP in p for p in parts):
+        slug = f"{slug[:MAX_SLUG]}-{hashlib.sha1(file_key.encode('utf-8')).hexdigest()[:10]}"
+    if slug.startswith("."):
+        slug = "_" + slug[1:]
+    return slug
+
+
+def target_paths(domain: Domain, file_path: Path) -> tuple[Path, Path]:
+    """(compiled article path, meta path) for one source file.
+
+    Pure: it creates nothing. Callers that intend to write make the directory
+    themselves, so measuring the whole corpus stays a read-only operation.
+    """
+    slug = slug_for(_file_key(file_path, domain.raw))
+    wiki_path = domain.compiled / domain.categorize(file_path) / f"{slug}.md"
+    return wiki_path, domain.meta_dir / f"{slug}.json"
+
+
 def compile_file(domain: Domain, file_path: Path, force: bool = False) -> dict | None:
     state = _load_state(domain)
     file_key = _file_key(file_path, domain.raw)
@@ -180,11 +228,10 @@ def compile_file(domain: Domain, file_path: Path, force: bool = False) -> dict |
     except (FileNotFoundError, OSError, UnicodeDecodeError):
         return None
     category = domain.categorize(file_path)
-    slug = file_path.stem.replace(" ", "_").lower()
-    wiki_path = domain.compiled / category / f"{slug}.md"
+    wiki_path, meta_path = target_paths(domain, file_path)
+    slug = meta_path.stem
     wiki_path.parent.mkdir(parents=True, exist_ok=True)
 
-    meta_path = domain.meta_dir / f"{slug}.json"
     existing = json.loads(meta_path.read_text()) if meta_path.exists() else {}
 
     entities = domain.extract_entities(content)
@@ -194,6 +241,7 @@ def compile_file(domain: Domain, file_path: Path, force: bool = False) -> dict |
 
     metadata = {
         "id": slug,
+        "title": file_path.stem,
         "category": category,
         "sources": sources,
         "created": existing.get("created", datetime.now().isoformat()),
@@ -283,8 +331,10 @@ def generate_index(domain: Domain) -> None:
             continue
         meta_path = domain.meta_dir / f"{wiki_path.stem}.json"
         meta = json.loads(meta_path.read_text()) if meta_path.exists() else {}
+        # The id now carries the source's folders, so it is no longer a title.
+        title = meta.get("title") or wiki_path.stem.rsplit(SLUG_SEP, 1)[-1]
         articles_by_cat[meta.get("category", "general")].append({
-            "title": wiki_path.stem.replace("-", " ").replace("_", " ").title(),
+            "title": title.replace("-", " ").replace("_", " ").title(),
             "path": str(wiki_path.relative_to(domain.compiled)),
             "confidence": meta.get("confidence", 0),
             "entities": meta.get("entity_count", 0),
