@@ -1,0 +1,56 @@
+{
+  "task": "NanoClaw reliability, isolation, media handling, and agent quality overhaul",
+  "context": "Multi-day session fixing claw stability, adding group isolation for guest users (chinnu-claw, ishi-claw), media handling (GIFs, video, audio transcription), intelligent model routing, message spam prevention, URL validation, and agent personality/quality improvements",
+  "next_steps": [
+    "Rebuild container image — current containers still run old code without rate limiter and noise filter",
+    "Verify noise filter catches all narration patterns ('Let me...', 'I'll...', 'Checking...', '...' endings)",
+    "Monitor chinnu-claw and ishi-claw for 24h to confirm spam is reduced from 68/day to <5/day",
+    "Fix the 'Safety constraints noted' leak — comes from safety hook, needs to be suppressed at source",
+    "Clean stale auth sync keys if WA 408 loop returns (find . -name '*.json' ! -name 'creds.json' -delete in store/auth/)",
+    "Add jyotish tools to integration boundary (ultrareview bug_013 — on kanban)"
+  ],
+  "blockers": [
+    "Container image needs rebuild to deploy rate limiter + noise filter to container-side code",
+    "WA auth expires periodically — needs QR re-scan (no automated fix possible)"
+  ],
+  "last_session": "2026-05-08T02:30:00Z",
+  "decisions_made": [
+    "Streaming buffer: accumulate all chunks, send ONE message when agent finishes turn (was sending every chunk as separate WA message)",
+    "Noise filter at host level: suppress '.', 'Acknowledged', 'Standing by', 'Let me check...', short '...' messages before they reach WhatsApp",
+    "send_message rate limiter: scheduled tasks get 2 max, guest conversations 8, main 50",
+    "URL validation at code level: every URL in streaming output, IPC messages, and file attachments gets validated before delivery",
+    "Context-aware model routing: Haiku classifies using full context (recent messages + tasks.md), not just latest message",
+    "Per-group media directories: guests can only see their own media, not shared pool",
+    "isolatedPersona=true default for all non-main groups: no global CLAUDE.md access",
+    "Auto-capture (tasks, shared items) scoped to main group only — guest content never enters brain digest",
+    "Bot message detection fix: require fromMe=true for 'Claw:' prefix check — prevents quoted replies from being misclassified",
+    "Removed 'content NOT LIKE Claw:%' backstop from getNewMessages — caused false negatives on quoted replies",
+    "2-hour absolute container lifetime — prevents zombie containers from clogging the queue",
+    "process.exit removed from WA watchdog, QR auth, logged-out handlers — reconnect instead of kill"
+  ],
+  "approaches_tried": [
+    "Hard message limit (5) — too restrictive, broke multi-turn conversations. Changed to soft 3 + hard 8/10",
+    "LaunchD bootstrap/load for restart — unreliable after crash loops. kickstart -k works better",
+    "Persona embedding at startup — hung on Gemini API. Made non-blocking (fire-and-forget)",
+    "WA connect in constructor — baileys native crash with empty auth. Fixed by catching QR auth gracefully"
+  ],
+  "critical_files": [
+    "src/index.ts — streaming buffer, noise filter, auto-capture scoping, model routing",
+    "src/ipc.ts — send_message URL validation, send_file URL validation + mimetype detection, shared_items scoping, streaming_message auth",
+    "src/channels/whatsapp.ts — bot message detection fix, GIF/sticker/audio handling, media per-group copy",
+    "src/url-validator.ts — URL validation utility (new file)",
+    "src/goal-classifier.ts — Haiku-based context-aware classification",
+    "src/container-runner.ts — per-group media mounts, 2hr absolute lifetime, network default fix",
+    "src/db.ts — deleteSession, removed content NOT LIKE backstop",
+    "src/host-runner.ts — session conflict auto-retry",
+    "src/logger.ts — EADDRINUSE tolerance, SIGTERM instead of exit(1)",
+    "container/agent-runner/src/ipc-mcp-stdio.ts — send_message rate limiter, list_groups isolation, semantic_search scoping",
+    "container/agent-runner/src/index.ts — session resume fallback, CLAW_* env var isolation, isScheduledTask flag",
+    "container/agent-runner/src/content-sanitizer.ts — regex /gi flag fix (ultrareview)",
+    "groups/chinnu-claw/CLAUDE.md — elite agent personality, silent execution, one-message delivery",
+    "groups/freelance/CLAUDE.md — ishi's agent personality",
+    "groups/guest-template/CLAUDE.md — default template for all new groups"
+  ],
+  "git_branch": "claw/cost-by-provider",
+  "git_commit": "170e6e28933daaaba5ec8be9c81785a8ecadec6a"
+}
