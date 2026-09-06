@@ -29,6 +29,17 @@ renames an existing wiki onto those ids. Verified: gate exits 0, METRIC 0 (was -
   exist for it (each article takes the source whose category matches its folder), rewrites
   `compiled/index.md` link targets, and deletes `.compile_state.json` so the next compile
   rewrites every article. `--dry-run` writes nothing; a second run is a no-op.
+- `services/wiki_compile/lib.py` (`build_knowledge_graph`): an entity's `sources` recorded
+  `raw_file.name` and were then `set()`ed, which is the same flat namespace one layer over
+  (78 files called SKILL.md collapsed to one source). Now records the path relative to the
+  raw root. Its only consumer, `scripts/brain-disambiguate.py:190`, uses `sources[0]` as a
+  display string in a prompt, so a longer string is safe (read-verified, not run).
+- `scripts/brain-digest.py`: it emitted `[[slug]]` as an Obsidian wikilink, and the slug now
+  carries the note's folders so it names no vault note. Uses the meta's `title` instead.
+  Verified by reading: its other use of the id is `decided_match`, a substring test
+  (`if d["key"] in low`), so the keys already stored in `Brain/decided.md` still match the
+  longer slug; `load_meta_index` uses `id` only as an in-run dict key, and `brain-themes.py`
+  never reads `id` at all. Neither script was executed (both make paid model calls).
 - `.gitignore`: ignore `.autoresearcher/` (the gate copies the wiki there).
 
 ## Evidence
@@ -70,6 +81,7 @@ metas 2785 dup 0 bad 0 metas-without-article 1
 articles 2784 tmp leftovers 0
 products__claw-empire__tools__taste-skill__skill.json | created True | version 166 | sources ['Products/claw-empire/tools/taste-skill/skill.md']
 ```
+Gate re-run after the consumer changes: identical output, exit 0.
 Rerun of the migration on the migrated copy: `0 articles renamed, 0 metas written, 0 old metas removed`, exit 0.
 
 Deliberate limitation (not a defect the gate hides): a meta that merged 78 sources has only
