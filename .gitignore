@@ -56,3 +56,6 @@ agents-sdk-docs
 # Transient agent worktrees + venvs
 **/.claude/worktrees/
 .venv/
+
+# autoresearcher scratch (gate copies of the wiki)
+.autoresearcher/
