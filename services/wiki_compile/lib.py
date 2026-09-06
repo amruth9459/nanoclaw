@@ -300,7 +300,9 @@ def build_knowledge_graph(domain: Domain) -> dict:
             if key not in all_entities:
                 all_entities[key] = {"type": e.get("type", "entity"), "mentions": 0, "sources": []}
             all_entities[key]["mentions"] += 1
-            all_entities[key]["sources"].append(raw_file.name)
+            # The bare filename is the same flat namespace one layer over: the
+            # 78 files called SKILL.md deduped to a single "SKILL.md" source.
+            all_entities[key]["sources"].append(_file_key(raw_file, domain.raw))
 
         all_relationships.extend(relationships)
 

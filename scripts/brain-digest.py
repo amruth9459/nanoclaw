@@ -223,6 +223,9 @@ def find_relevant_notes(today_entities: set[str], meta: dict[str, dict]) -> list
             continue
         ranked.append({
             "slug": slug,
+            # The slug carries the note's folders now, so it no longer names a
+            # vault note; the meta's title does.
+            "title": m.get("title") or slug,
             "category": m.get("category", "general"),
             "shared_entities": sorted(overlap),
             "overlap": len(overlap),
@@ -431,7 +434,7 @@ def render_digest(date: str, today_entities: list[str], relevant: list[dict],
         for r in relevant[:TOP_RELEVANT]:
             shared = ", ".join(f"`{e}`" for e in r["shared_entities"][:4])
             lines.append(
-                f"- [[{r['slug']}]] _({r['category']}, conf {r['confidence']:.2f})_ — "
+                f"- [[{r['title']}]] _({r['category']}, conf {r['confidence']:.2f})_ — "
                 f"{r['overlap']} shared: {shared}"
             )
         lines.append("")
