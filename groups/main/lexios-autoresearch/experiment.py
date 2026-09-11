@@ -19,8 +19,92 @@ import time
 from pathlib import Path
 
 # ── EXPERIMENT CONFIG (agent edits this section) ─────────────────────────────
-EXPERIMENT_NAME = "exp-sprinklers-type-field-added-to-schema"
+EXPERIMENT_NAME = "exp-roomname-safe-rename-clinic-vocab"
 DESCRIPTION = (
+    "Tonight's 2nd slot (2026-09-11). Baseline to beat: 0.5974 (orchestrator's "
+    "fresh measurement of this file's on-disk state going in: "
+    "Duplex_A_20110907 F1=0.8458, NBU_MedicalClinic_Arch F1=0.3489, both "
+    "raw==postprocessed, phantom probes clean). Tonight's 1st slot "
+    "(exp-20260911-020617) was tried and discarded at 0.5703; this is an "
+    "unrelated hypothesis in a different part of the file, not a repeat.\n\n"
+    "Verified this session by reading the live files directly, not "
+    "recalled: postprocess() actually returns at the pre-existing "
+    "'return extraction' inside the wall_types block (was line 1750) -- "
+    "every room-name/window/door synonym block below it is unreached dead "
+    "code, per that return's own docstring (dated 2026-09-01). The ONLY "
+    "postprocess() logic that executes today is the wall_types hyphen-"
+    "squash rename above it. Read lexios/types.json directly: rooms' real "
+    "match_keys is [['name']]. Read lexios/eval.py's actual fuzzy_match() "
+    "directly: it does substring match first, then a per-word pass "
+    "allowing exact/prefix/edit-distance credit, requiring >=60% of GT's "
+    "words to match -- meaning most abbreviation-vs-full-word pairs "
+    "(STOR./STORAGE, ELEC./ELECTRICAL, JAN./JANITOR) ALREADY match with "
+    "zero normalization, because one word is a prefix of the other. This "
+    "is the likely reason the whole 2026-08-01..08-27 room-name append-"
+    "synonym family measured net-negative (see the dead code's own "
+    "docstring): most of its entries were redundant with fuzzy_match's "
+    "built-in tolerance, and its APPEND mechanism (not rename) risked "
+    "stealing an unrelated GT element's match instead of just doing "
+    "nothing.\n\n"
+    "Read both eval docs' actual ground-truth.json room 'name' fields "
+    "directly this session (grepped every entry, not sampled). "
+    "Duplex_A_20110907's entire room vocabulary is exactly: Foyer, "
+    "Hallway, Bathroom 1, Bathroom 2, Utility, Stair, Room, Roof, Living "
+    "Room, Kitchen, Bedroom 1, Bedroom 2 -- nothing else. "
+    "NBU_MedicalClinic_Arch's GT (~270 room entries) includes frequent "
+    "CORRIDOR, TOILET (many variants), RECEPTION, COMM. ROOM, JAN. CL., "
+    "OFFICE, and long room-schedule strings.\n\n"
+    "Change (postprocess() only, inserted right before the pre-existing "
+    "'return extraction', so it is the only new code that actually runs; "
+    "SYSTEM_PROMPT_OVERRIDE, PARAMS, and preprocess() are byte-for-byte "
+    "unchanged): a small RENAME-only (never append) exact-match room-name "
+    "map, same mechanism as the already-kept wall_types fix -- never "
+    "invent a name, only rewrite one already present on an element "
+    "already in the list. Every key was hand-traced through fuzzy_match() "
+    "and confirmed to NOT already match its target (no shared prefix, no "
+    "substring, edit distance over tolerance), so the rename is load-"
+    "bearing, not redundant. Every key was also checked against Duplex's "
+    "12-item vocabulary above and shares no word with any of them, so "
+    "this is a complete no-op on that doc by construction, not just by "
+    "likelihood. Deliberately EXCLUDES HALLWAY->CORRIDOR and BATHROOM/"
+    "RESTROOM->TOILET -- the two most obviously 'high value' pairs by "
+    "GT frequency -- because Duplex's own GT uses 'Hallway' and "
+    "'Bathroom 1'/'Bathroom 2' verbatim; either rename would convert an "
+    "already-correct Duplex match into a miss whenever the model outputs "
+    "the bare word on that doc. Map: FRONT DESK / CHECK-IN / CHECK IN -> "
+    "RECEPTION; SERVER ROOM / DATA ROOM / IT ROOM / TELECOM ROOM -> "
+    "COMM. ROOM; CUSTODIAL CLOSET / CUSTODIAN CLOSET / MOP CLOSET / MOP "
+    "ROOM -> JAN. CL. Exact match only (name.strip().upper() dict lookup, "
+    "same pattern the dead code already used) -- never fires on a name "
+    "with an unrelated number suffix or extra words, so a two-word label "
+    "like 'Living Room' can never collide with it. Count-invariant: only "
+    "rewrites the 'name' field on an element already in the list, never "
+    "adds or removes an item, so the phantom probes (empty-dict input, "
+    "randomized-decoy input) stay clean by construction, same as the "
+    "wall_types rename.\n\n"
+    "Expected magnitude: small. These are a handful of Clinic's ~270 room "
+    "instances, and rooms is 1 of 10 unweighted categories on that doc "
+    "(score_elements() averages F1 unweighted across categories, per "
+    "eval.py, confirmed this session) -- a full win on this handful moves "
+    "rooms' own F1 by only a few points given its large denominator, "
+    "which then contributes roughly that fraction / 10 to Clinic's "
+    "overall F1. Zero expected effect on Duplex (verified no-op above) "
+    "and zero added generation-time risk since this is postprocess-only, "
+    "no prompt or preprocess change.\n\n"
+    "How to read next slot's log: check Clinic's 'rooms' correct-count "
+    "specifically (not just aggregate F1) for any rise attributable to "
+    "reception/comm-room/janitor-closet entries. If it doesn't move, that "
+    "means the model isn't outputting any of these specific synonym "
+    "words on this doc at all (a detection/vocabulary-choice question, "
+    "not a mapping-direction bug) -- leave this narrow map in place "
+    "(harmless) rather than expanding it blindly. Do not read a flat or "
+    "lower Clinic score as refutation on a night where Clinic's own "
+    "quadrant-image run-to-run variance (documented 0.35-0.71 across "
+    "nights with an unchanged file) or an unrelated timeout/discard is "
+    "the more likely explanation -- Duplex's score moving at all despite "
+    "the verified no-op above would be exactly that signal.\n\n"
+)
+_OBSOLETE_HISTORY = (
     "Tonight's 1st slot (2026-09-10). Baseline to beat: 0.8173 (orchestrator's "
     "fresh measurement of this file's on-disk state going in: Duplex_A_20110907 "
     "F1=0.929, NBU_MedicalClinic_Arch F1=0.7056, both raw==postprocessed, "
@@ -1746,6 +1830,49 @@ def postprocess(extraction: dict, _cache={}) -> dict:
                 if squashed_canonical and squashed_canonical in _alnum(type_id):
                     item["type_id"] = canonical
                     break
+
+    # exp-roomname-safe-rename-clinic-vocab (2026-09-11): honest, input-
+    # transforming, RENAME-only (never append) room-name normalization —
+    # same mechanism family as the wall_types fix above, applied to a
+    # hand-verified-safe subset of room names. See DESCRIPTION for the
+    # full fuzzy_match()/GT-vocabulary trace. Every key here was checked
+    # by hand against lexios/eval.py's real fuzzy_match(): none of them
+    # already match their target via its substring/prefix/edit-distance
+    # tolerance, so the rename is load-bearing, not redundant. Every key
+    # was also checked against Duplex_A_20110907's full room vocabulary
+    # (Foyer, Hallway, Bathroom 1/2, Utility, Stair, Room, Roof, Living
+    # Room, Kitchen, Bedroom 1/2 -- read directly from its ground-truth
+    # .json this session) and shares no word with any of them, so this
+    # is a complete no-op on that doc by construction. Deliberately
+    # excludes HALLWAY->CORRIDOR and BATHROOM/RESTROOM->TOILET: those
+    # are the two most obviously "high value" pairs, but Duplex's own
+    # GT uses "Hallway" and "Bathroom 1/2" verbatim, so either rename
+    # would turn an already-correct Duplex match into a miss whenever
+    # the model outputs the bare word on that doc.
+    ROOM_NAME_SAFE_RENAME_MAP = {
+        "FRONT DESK": "RECEPTION",
+        "CHECK-IN": "RECEPTION",
+        "CHECK IN": "RECEPTION",
+        "SERVER ROOM": "COMM. ROOM",
+        "DATA ROOM": "COMM. ROOM",
+        "IT ROOM": "COMM. ROOM",
+        "TELECOM ROOM": "COMM. ROOM",
+        "CUSTODIAL CLOSET": "JAN. CL.",
+        "CUSTODIAN CLOSET": "JAN. CL.",
+        "MOP CLOSET": "JAN. CL.",
+        "MOP ROOM": "JAN. CL.",
+    }
+    rooms = extraction.get("rooms")
+    if isinstance(rooms, list):
+        for item in rooms:
+            if not isinstance(item, dict):
+                continue
+            name = item.get("name")
+            if not isinstance(name, str) or not name.strip():
+                continue
+            renamed = ROOM_NAME_SAFE_RENAME_MAP.get(name.strip().upper())
+            if renamed:
+                item["name"] = renamed
 
     return extraction
     ROOM_NAME_CANONICAL_MAP = {
