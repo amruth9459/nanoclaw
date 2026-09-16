@@ -251,3 +251,7 @@ exp83-fix-exp72-80-regressions-76-docs	2026-04-24	1.0000	76	0.00	Apply all missi
 2026-09-15T06:33:10Z	exp-20260915-021943	Tonight's 2nd slot (2026-09-15). Baseline to beat: 0.7557, r	0.7557	0.83	0.0	kept-uncommitted
 2026-09-15T06:51:17Z	exp-20260915-023310	Tonight's 3rd slot (2026-09-15). The baseline block shown to	0.83	0.3028	0.0	discarded
 2026-09-15T07:06:52Z	exp-20260915-025117	Tonight's 4th slot (2026-09-15). Baseline to beat: 0.83, the	0.83	0.6522	0.0	discarded
+2026-09-16T06:13:26Z	exp-20260916-020427	Tonight's slot (2026-09-16). Baseline to beat: 0.8013, the o	0.8013	0.7605	0.0	discarded
+2026-09-16T06:27:31Z	exp-20260916-021326	Tonight's 2nd slot (2026-09-16). Baseline to beat: 0.8013, t	0.8013	0.8003	0.0	discarded
+2026-09-16T06:44:46Z	exp-20260916-022731	Tonight's 3rd slot (2026-09-16). Baseline to beat: 0.8013 (t	0.8013	0.8326	0.0	kept
+2026-09-16T07:00:46Z	exp-20260916-024446	Tonight's 4th and final slot (2026-09-16). Baseline to beat:	0.8326	0.6086	0.0	discarded
