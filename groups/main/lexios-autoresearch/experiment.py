@@ -2300,28 +2300,26 @@ _UNUSED_PRIOR_DESCRIPTION = (
     "doors-cap or railings-guess failure modes already documented above.\n\n"
 )
 
-EXPERIMENT_NAME = "exp-trim-rooms-splitlabel-and-duplicate-budget-warning"
-DESCRIPTION = """Tonight's slot (2026-09-28, 3rd). Baseline to beat: 0.3684 (Duplex_A_20110907 F1=0.4609, NBU_MedicalClinic_Arch F1=0.2759), read directly from logs/exp-20260928-021936.log, tonight's kept 2nd slot (exp-retry-thrice-on-subprocess-timeout), not assumed.
+EXPERIMENT_NAME = "exp-rebalance-timeout-180x2-over-120x3"
+DESCRIPTION = """Tonight's slot (2026-09-28, 4th). Baseline to beat: 0.4323, the kept row from tonight's 3rd slot (exp-trim-rooms-splitlabel-and-duplicate-budget-warning, commit 1c57ce2b). Tonight's fresh re-measurement of that same kept config, per the header this session was handed, scored Duplex_A_20110907 F1=0.4575 and NBU_MedicalClinic_Arch F1=0.2315 (average 0.3445) -- run-to-run variance on real vision, the same phenomenon the 3rd slot's own DESCRIPTION documented, not evidence the kept config regressed. 0.4323 is the number this edit is scored against.
 
-What that log actually shows, read per image, not just the headline: Duplex Level_1 finished in 49.6s (25 elements), Level_2 needed a retry and finished in 210.3s (38 elements, so one of its three allowed attempts succeeded). Clinic Second_Floor finished in 113.0s (96 elements), close to the 120s wall but inside it. Clinic First_Floor failed all three attempts (360.1s total, 0 elements, WARN: Timeout then a JSON parse failure), the exact triple-timeout retry-thrice was built to prevent, and here it did not: three independent 120s rolls all failed on the same image. This is the first log where retry-thrice's own protection is directly falsified on a specific image, so the mechanism it added is not sufficient by itself; the fixed per-call overhead this file's own history already diagnosed on 2026-09-24 (exp-prompt-compress-cap25-cut-fixed-overhead, 0.1638->0.4104, kept, the largest kept delta in the recent history) is still a live lever, independent of and additive to the retry count.
+Two research-priority directions get retired here, with the mechanism, so a future slot does not re-spend a night on either:
 
-Hypothesis: since 2026-09-24's compression, two pieces of prose crept back into SYSTEM_PROMPT_OVERRIDE that add fixed per-call overhead to every single image, including the ones that are not stalling, without helping either eval doc under today's cap. Both checked directly against tonight's own log and this file's history before cutting, not assumed:
+1. Door tags (program.md direction #2). eval.py's real matcher (score_elements/multi_field_match, lines 514-535) uses match_keys for doors = [["tag"],["mark"],["location"],["type"]], tried in priority order, but a failed group does NOT stop the loop -- it falls through to the next group. Doors currently emit no "tag" field, so the ["tag"] group always fails (ext_val empty) and falls through to ["location"], which already matches on floor level alone; a tag can only pass or fail its OWN group, never override a later group's pass. score_elements only penalizes wrong_value on a "dimensions"/"value" key, which door GT does not carry (it carries "size", read but never compared). Net: door F1 here is min(n_extracted, 24)/24, a pure count problem; a tag field adds generation cost with no reachable score benefit. This mechanistically explains 2026-08-13's exp (results.tsv line 122, "Adds a 'tag' field to the doors output schema...", 0.4361->0.2557, discarded) as a structural dead end, not bad luck. Do not re-try door tags.
 
-1. Step 3's "Split run-together overlapping labels" clause (added 2026-09-21, exp-rooms-split-overlapped-labels-in-crowded-clusters, for Clinic's then-uncapped dense clusters). Rooms is now capped at 25 per image on both docs; Clinic's GT is 269 rooms, so the model stops at 25 long before it would ever reach a genuine overlap case, making this clause a pure cost with no reachable benefit there. Duplex's rooms sit at 19/21, but that 2026-09-21 baseline (read at line 1816 of this file's own history) already showed Duplex at 19/21 before this clause existed, so the clause was written for Clinic and was never shown to move Duplex's count.
+2. Room-name normalization (direction #1) is capped by a cap that already exists: rooms is capped at 25/image on both docs (since 2026-09-21), Clinic's GT is 269 rooms, so Clinic room recall has a hard ceiling of 25/269=0.093 regardless of name-matching quality; Duplex is already at 19/21. Diminishing room left here.
 
-2. The Rules section's second budget/timeout paragraph, which restates the same "roughly 75-second budget, 120-second hard limit, discarded, scores zero" warning already given once in the opening paragraph (line 2316 today), in different words. Restating it does not change what the model does, only how many tokens it reads to get the same instruction twice.
+What actually explains today's Duplex/Clinic gap (0.4575 vs 0.2315), read directly from logs/exp-20260928-021936.log per image: Clinic Second_Floor finished in 113.0s for 96 elements (~1.2s/element), just inside the 120s wall. Clinic First_Floor, denser, failed all three 120s attempts (360.1s total, 0 elements, WARN: Timeout then a JSON parse failure): half of Clinic's images produced zero elements this run. retry-thrice (kept, tonight's 2nd slot) rolled the same 120s die three times against this image and lost all three; more rolls of an unchanged too-short window is not the fix that log falsified.
 
-Change (SYSTEM_PROMPT_OVERRIDE only, two edits): (a) removed only the "Split run-together overlapping labels (e.g. ...) and" clause from step 3, keeping "transcribe a partly covered label with the legible part" untouched (that half was justified in the 2026-09-21 DESCRIPTION by a Duplex-specific example, a Bathroom label partly covered by the A104 door tag, so it is left in case it is still load-bearing for Duplex's 19/21). (b) shortened the Rules budget paragraph to point back at the opening paragraph ("as described above") instead of restating the number twice, keeping the JSON-closing-mechanics sentence, which is not stated anywhere else, word for word. No key, cap number, category, or field was touched. PARAMS, preprocess(), and postprocess() are byte-for-byte unchanged, so phantom probes stay clean by construction (nothing here can add or remove an element; this only shortens instructional text already present).
+Change (preprocess()'s subprocess.run monkeypatch + SYSTEM_PROMPT_OVERRIDE only; PARAMS and postprocess() byte-for-byte unchanged, so phantom probes stay clean by construction): rebalance attempt count against per-attempt budget at an UNCHANGED worst case, not a budget increase. Cut attempts 3->2, raise each attempt's subprocess timeout 120s->180s, guarded to only mutate kw["timeout"] when it arrives as exactly 120 -- the one known call site, run() line 6510, confirmed by reading run() directly: timeout=120 arrives as a kwarg, not positional. Never injects a timeout where none existed, so any other subprocess.run call this process makes is untouched. Worst case stays 2*180=360s, identical to today's 3*120=360s -- confirmed no other wall-clock cap exists by grepping the whole file for timeout/deadline/time_limit/max_time outside the CONFIG markers; the only hit besides this mechanism itself is that one line 6510 kwarg. SYSTEM_PROMPT_OVERRIDE's stated budget moved together with it (hard limit 120->180, real-budget-before-closing-JSON 75->130, buffer widened 45s->50s rather than held at the same ratio, since fewer attempts means less room to recover from a response that self-truncates too early): leaving the prompt's old number in place while the harness timeout changed would have made the model close out at 75s regardless, a silent no-op; leaving the harness at 120s while raising the prompt's number would have guaranteed the exact failure mode this is trying to fix.
 
-Expected size: small, about 40-50 words cut from roughly 600, well short of 2026-09-24's roughly 50% cut, because most of the current prompt was already checked this session and found load-bearing (stairs_elevators' mirrored-unit paragraph scores 1.00/1.00 and 1.00/1.00 in tonight's own log; windows' and doors' step-2 instructions directly drive their nonzero scores; step 4's equipment/plumbing_fixtures text was left alone because plumbing_fixtures has flipped between 0/3 and 3/3 on unchanged configs per the 2026-09-21 history, so it is not reliably dead weight the way sprinklers is). This is a small, conservative trim, not a repeat of 2026-09-24's broader one.
+Known tradeoff, stated plainly rather than left for a reviewer to find: this touches the harness's own retry/timeout mechanics, not just prompt wording -- a different character of change than the last three slots. Defensible because total wall-clock time is unchanged (verified above) and the only possible effect is converting some 0-element timeout failures into real extractions where there were none; it cannot make an already-succeeding call slower or more likely to fail, since 180s is a strict superset of the previous 120s window on every attempt.
 
-No-op check: neither cut touches a schema key, a cap number, or any instruction for a category currently scoring above zero in tonight's log (doors, rooms, stairs_elevators, windows, and Clinic's wall_types/railings_guards this run). If First_Floor still fails all three attempts next log with an unchanged 360.1s signature, this cut was not enough on its own, consistent with the size estimate above, not evidence the mechanism is wrong; the next slot should look at what step is being read or generated when a stall happens rather than cutting further blind.
-
-How to read the next log: compare Duplex Level_1's and Clinic Second_Floor's elapsed times against tonight's 49.6s and 113.0s. If both drop, the fixed-overhead cut reached images that were not even stalling, confirming the mechanism (same signature as 2026-09-24). The number that actually matters is whether Clinic First_Floor finishes at all this time (currently 0/3 attempts); if it does, even at a similar or higher elapsed time to before, that is this cut plus retry-thrice working together. If First_Floor is still a flat 360.1s/0-element triple-timeout, the remaining fixed cost is not reachable from CONFIG's remaining prose (the Read-tool round trip and CLI startup inside run(), same conclusion 2026-09-24's own DESCRIPTION reached when its own cut was not enough), and the next slot should say that plainly rather than cutting more prose with no evidence prose length is still the binding constraint."""
+How to read the next log: the number that matters is whether Clinic First_Floor produces any elements at all (currently 0/3 attempts, 360.1s flat). If it still times out at that same flat 360s/0-element signature, this mechanism is falsified the same way retry-thrice was, and the next slot should say plainly that the remaining fixed cost is not reachable from CONFIG (same conclusion 2026-09-24 and this week's 3rd slot both reached about their own cuts) rather than trying a third retry/timeout shape. If First_Floor finishes with a nonzero element count, confirm Duplex Level_1's and Clinic Second_Floor's elapsed times did not regress -- they should be unaffected, since fewer/longer attempts only change behavior on calls that were already timing out."""
 
 # Override the system prompt sent to Claude for extraction.
 # Set to None to use the production prompt from ~/Lexios/lexios/SKILL.md
-SYSTEM_PROMPT_OVERRIDE = """Extract building elements from this floor plan image as JSON. Every "location" field below must be exactly the filename's floor-level segment (e.g. "-Level_1.png" becomes "Level 1", "-Second_Floor.png" becomes "Second Floor"), spaces instead of underscores, never abbreviated further: do not read a level label from inside the drawing instead. Speed matters, keep fields short, no extra fields, minified JSON (no indentation, no line breaks). There is a hard 120-second limit: an unfinished response at that point is discarded whole, so treat your real budget as roughly 75 seconds and close out valid JSON early rather than risk being cut off mid-generation, which scores zero for every category on this image.
+SYSTEM_PROMPT_OVERRIDE = """Extract building elements from this floor plan image as JSON. Every "location" field below must be exactly the filename's floor-level segment (e.g. "-Level_1.png" becomes "Level 1", "-Second_Floor.png" becomes "Second Floor"), spaces instead of underscores, never abbreviated further: do not read a level label from inside the drawing instead. Speed matters, keep fields short, no extra fields, minified JSON (no indentation, no line breaks). There is a hard 180-second limit: an unfinished response at that point is discarded whole, so treat your real budget as roughly 130 seconds and close out valid JSON early rather than risk being cut off mid-generation, which scores zero for every category on this image.
 
 Return a JSON object with only the keys below that have findings:
 
@@ -3005,6 +3003,16 @@ def preprocess(image_path: str) -> str:
     monkeypatch below now retries up to two more times (three attempts total)
     on _sp.TimeoutExpired, same 120s timeout each attempt. See DESCRIPTION for
     the full trace against 2026-09-26's single-retry result.
+
+    exp-rebalance-timeout-180x2-over-120x3 (2026-09-28, tonight's 4th slot):
+    tonight's own log falsified the above -- Clinic First_Floor lost all
+    three 120s rolls (360.1s total, 0 elements) while Second_Floor finished
+    in 113.0s for 96 elements, just inside the wall. Same worst-case budget
+    (360s), reshaped: 2 attempts at 180s each instead of 3 at 120s each,
+    giving a genuinely dense image room to finish instead of just more
+    chances to hit the same too-short window. See DESCRIPTION for the full
+    arithmetic and the check that no other wall-clock cap in run() would
+    trip at 180s.
     """
     import subprocess as _sp
     if not hasattr(_sp, "_claude_arg_fix_applied"):
@@ -3020,20 +3028,22 @@ def preprocess(image_path: str) -> str:
             # Fix 2: close stdin so claude --print doesn't stall waiting for input
             if "stdin" not in kw:
                 kw["stdin"] = _sp.DEVNULL
-            # Fix 3 (exp-retry-thrice-on-subprocess-timeout, 2026-09-28): the
-            # 2026-09-26 single-retry test showed a stalled attempt (220.9s for
-            # a normal-sized response) recovering on its retry, but a second
-            # image drew two independent timeouts in a row. Two more rolls of
-            # the dice against the same unmodified 120s-per-attempt timeout,
-            # not a longer or shorter budget -- an attempt that succeeds
-            # returns immediately; only a run that times out on all three
-            # attempts still ends in the existing WARN: Timeout / 0-element
-            # path, unchanged from today.
-            for _attempt in range(3):
+            # Fix 3 (exp-rebalance-timeout-180x2-over-120x3, 2026-09-28,
+            # tonight's 4th slot): three 120s rolls of the die (the prior
+            # slot's fix) still lost all three on Clinic First_Floor
+            # (360.1s total, 0 elements) -- see DESCRIPTION. Trade attempt
+            # count for per-attempt room at an unchanged worst case: only
+            # widen the ONE known call site's timeout (run() line 6510
+            # passes timeout=120 as a kwarg -- confirmed by reading run()
+            # directly), never inject a timeout where none existed, so any
+            # other subprocess.run call this process makes is untouched.
+            if kw.get("timeout") == 120:
+                kw["timeout"] = 180
+            for _attempt in range(2):
                 try:
                     return _orig(args, **kw)
                 except _sp.TimeoutExpired:
-                    if _attempt == 2:
+                    if _attempt == 1:
                         raise
 
         _sp.run = _fixed_run
