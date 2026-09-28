@@ -2300,18 +2300,16 @@ _UNUSED_PRIOR_DESCRIPTION = (
     "doors-cap or railings-guess failure modes already documented above.\n\n"
 )
 
-EXPERIMENT_NAME = "exp-strip-omission-license-lowpriority-categories"
-DESCRIPTION = """Tonight's 3rd slot (2026-09-24). Baseline to beat: 0.4104, tonight's kept slot 2 (exp-prompt-compress-cap25-cut-fixed-overhead), read directly from logs/exp-20260924-022750.log this session, not assumed.
+EXPERIMENT_NAME = "exp-retry-thrice-on-subprocess-timeout"
+DESCRIPTION = """Tonight's slot (2026-09-28, 2nd). Baseline to beat: 0.3445 (Duplex_A_20110907 F1=0.4575, NBU_MedicalClinic_Arch F1=0.2315), from tonight's 1st slot which was itself discarded (0.3445->0.3032, logs/exp-20260928-020615.log) after Duplex Level_2 AND Clinic Second_Floor both hit the 120.0s hard timeout (0 elements each) on the same night -- read directly, not assumed.
 
-What that log actually shows: for the first time this week, all four images finished comfortably inside the 120s hard limit -- Duplex Level_1 58.1s, Level_2 72.8s, Clinic First_Floor 90.0s, Second_Floor 66.9s -- leaving 30 to 62 unused seconds per image, a reversal from every earlier night's Clinic hard-timeout. Confirmed evaluate.py's scoring loop directly this session: score_extraction() at evaluate.py:44 iterates `for category, gt_items in gt_elements.items()`, so only categories present in that doc's GT are scored, and overall_f1 is `sum(all_f1)/len(all_f1)`, an unweighted mean over GT categories, not instance-weighted. Hand-checked against the log's own per-category numbers: Duplex (0+1.0+0+0.95+0+1.0+0+0.703)/8=0.4566 and Clinic (0.329+1.0+0+0+0.313+0+0+1.0+0+1.0)/10=0.3642 both match the log exactly, so one zero Duplex category is worth 0.0625 of tonight's 0.4104 baseline and one zero Clinic category 0.05 -- getting a single zero category to even partial recall moves the total more than the cap or DPI levers do this deep in diminishing returns.
+This is not a content edit. preprocess()/postprocess() already carry a retry-once-on-TimeoutExpired patch tried on 2026-09-26 (exp-retry-once-on-subprocess-timeout, 0.3973->0.3346, discarded) -- but rereading that exact log this session shows the mechanism partially worked, it wasn't wrong: Duplex Level_1 recovered from a 220.9s/23-element run (a near-4x-normal elapsed time for a normal element count -- a stall, not a slow generation) to a successful result on its retry, while Level_2 drew two independent timeouts in a row (120.0s then another 120.0s, 240.1s total) and stayed at zero. Two failures back to back on one image, on an otherwise-recovering night, reads as "one extra roll of the dice wasn't enough," not "retrying doesn't help." That night's net regression traces to Level_2's bad luck plus a paired content edit that slot deliberately avoided testing alone (per that slot's own DESCRIPTION) -- not evidence against the retry mechanism itself.
 
-Despite the real slack, six categories scored exactly zero correct on both docs: railings_guards 0/4 (Duplex) and 0/9 (Clinic), slabs 0/21 (Duplex) and 0/3 (Clinic), beams 0/8 (Duplex, absent from Clinic GT), wall_types 0/8 (Duplex) and 0/7 (Clinic), plumbing_fixtures 0/3 (Clinic), sprinklers 0/10 (Clinic). Checked the GT directly this session, not assumed: NBU_MedicalClinic_Arch.ground-truth.json's sprinklers entries are all "type": "M_Fire Extinguisher Cabinet:...", so an earlier slot's redefinition of sprinklers as Fire Extinguisher Cabinet (not a ceiling head) already matches GT and is not the problem. What is notable instead: equipment sits in the same priority-4 tier as plumbing_fixtures and sprinklers and scored 2/2 on Clinic, so the model is clearly still attending to that tier -- it is specifically plumbing_fixtures and sprinklers, plus everything in tiers 5-7, that come back empty. Checked sprinklers' match_keys in ~/Lexios/lexios/types.json: [["location"], ["type"]], and the GT type strings all contain the literal phrase "Fire Extinguisher Cabinet", so a single correct-type guess would very likely fuzzy-match even with a wrong location. Zero correct out of 10 GT instances means the model is not attempting this category at all, not mismatching it.
+Change (preprocess() only, inside the existing subprocess.run monkeypatch): extended the single retry to two retries (three attempts total per image), each at the same untouched 120s timeout, still only on `_sp.TimeoutExpired` -- a third independent roll of the dice against whatever causes these stalls, so P(all three fail) is strictly lower than the already-tested P(both of two fail). An image that succeeds on attempt 1 is completely unaffected (zero added latency, zero added risk). An image that would fail all three attempts ends exactly where it does today: zero elements, same failure signature, same `WARN: Timeout` path in run(). Worst case per image rises from 240s to 360s, only on the subset that was already going to score zero. SYSTEM_PROMPT_OVERRIDE, PARAMS, and postprocess() are byte-for-byte unchanged, so phantom probes stay clean by construction (nothing here can fabricate an element; this only changes how many times the same unmodified CLI call is attempted).
 
-Hypothesis: priority step 4 ends with "a key with none found is still a valid, zero-cost omission," and steps 5-7 are each gated "only if time remains" / "last, only if time remains" / "lowest priority: do not let it take time from anything above." An LLM has no way to sense actual elapsed wall-clock time mid-generation, so "only if time remains" cannot function as a real timing check -- it can only be read as a low-effort/skip signal, and the "zero-cost omission" line in step 4 makes the same offer explicitly in the one tier that has no time-based hedge at all, which is why it also explains plumbing_fixtures/sprinklers where the "only if time remains" theory alone would not cover them. This edit strips the omission-permitting language from steps 4 through 7 (keeps the anti-fabrication instruction in step 4, only removes the "zero-cost, skip freely" framing; keeps steps 5-7 in the same last-priority scan order, just removes the conditional escape hatch), and adds an explicit "actively scan" instruction to plumbing_fixtures and sprinklers in step 4 since those are the two in that tier that failed outright while equipment, right next to them, did not.
+Caveat stated up front, not discovered after the fact: this eval set is 2 docs / 4 images, and effective F1 has swung roughly 0.05-0.09 between adjacent nights purely from which single image happened to hit 120s that run (compare 2026-09-26 slot 4's Clinic F1=0.353, both images clean, against tonight's slot 1 Clinic F1=0.290, Second_Floor timed out) -- a swing larger than most kept deltas in results.tsv. A discard tonight may just be an unlucky draw, not evidence this mechanism is wrong; the next slot should compare per-image elapsed times against this log, not just the headline F1.
 
-Declined this slot: PARAMS, preprocess(), postprocess(), the rooms/doors/windows cap, and the 75-second intro framing -- all separate mechanisms from the one tested here, and the cap change is exactly what fixed the 120s timeout last slot, so touching it again would confound which change caused what if effective F1 moves.
-
-How to read the next log: check whether any of railings_guards, slabs, beams, wall_types, plumbing_fixtures, or sprinklers show a nonzero correct count on either doc for the first time, while doors/rooms/windows/stairs/equipment hold their current scores and elapsed times stay under 120s. If some go nonzero, the omission-permitting language was suppressing real attempts and the next slot should keep pushing this lever. If they stay at zero even with the license removed, these elements are either genuinely not legible on these two specific renders (plausible for wall_types, whose types.json match key is the exact type_id string, which needs a legend) or need a different match key than the model can produce, and the next slot should look at preprocess (DPI, cropping toward legends/tag text) rather than more prompt wording for these categories."""
+How to read the next log: check whether any image now shows an elapsed time near 240s or 360s (meaning 2nd or 3rd attempt fired) paired with a nonzero element count where a prior night's log showed a flat 120.0s/0-element failure for that same image. If Level_2 or Second_Floor specifically flips from zero to nonzero, the extra attempt paid for itself. If every image is still either a fast single-attempt success or a full 360s triple-timeout, these stalls cluster on specific unlucky images/nights regardless of attempt count, and the next slot should stop spending retries and look elsewhere."""
 
 # Override the system prompt sent to Claude for extraction.
 # Set to None to use the production prompt from ~/Lexios/lexios/SKILL.md
@@ -2994,6 +2992,11 @@ def preprocess(image_path: str) -> str:
     pre-existing variance-driven failure mode documented in DESCRIPTION,
     unrelated to this edit — read the OTHER (non-timed-out) image's
     per-category recall, not just overall doc F1, to judge this mechanism.
+
+    exp-retry-thrice-on-subprocess-timeout (2026-09-28): the subprocess.run
+    monkeypatch below now retries up to two more times (three attempts total)
+    on _sp.TimeoutExpired, same 120s timeout each attempt. See DESCRIPTION for
+    the full trace against 2026-09-26's single-retry result.
     """
     import subprocess as _sp
     if not hasattr(_sp, "_claude_arg_fix_applied"):
@@ -3009,7 +3012,21 @@ def preprocess(image_path: str) -> str:
             # Fix 2: close stdin so claude --print doesn't stall waiting for input
             if "stdin" not in kw:
                 kw["stdin"] = _sp.DEVNULL
-            return _orig(args, **kw)
+            # Fix 3 (exp-retry-thrice-on-subprocess-timeout, 2026-09-28): the
+            # 2026-09-26 single-retry test showed a stalled attempt (220.9s for
+            # a normal-sized response) recovering on its retry, but a second
+            # image drew two independent timeouts in a row. Two more rolls of
+            # the dice against the same unmodified 120s-per-attempt timeout,
+            # not a longer or shorter budget -- an attempt that succeeds
+            # returns immediately; only a run that times out on all three
+            # attempts still ends in the existing WARN: Timeout / 0-element
+            # path, unchanged from today.
+            for _attempt in range(3):
+                try:
+                    return _orig(args, **kw)
+                except _sp.TimeoutExpired:
+                    if _attempt == 2:
+                        raise
 
         _sp.run = _fixed_run
         _sp._claude_arg_fix_applied = True
