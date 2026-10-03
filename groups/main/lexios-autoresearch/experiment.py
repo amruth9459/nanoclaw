@@ -2364,6 +2364,25 @@ Risk this can't fully rule out: the new clause is conditioned on specific fixtur
 
 How to read next slot's log: check Clinic plumbing_fixtures specifically for a move off 0/3 (1/3 confirms the one directly-verified location; 2/3 or 3/3 would mean the pattern generalizes to Second_Floor too). Watch precision on this one category specifically -- per the cannot-regress argument above a drop should not occur, but if it does, that means the model applied the new clause to a plain "Bathroom"/"Utility" label it should have excluded, and the fix next slot is tightening the word list, not reverting the mechanism outright. Confirm Duplex is unchanged (no plumbing_fixtures key, a true no-op) and that every other category's correct-count matches tonight's baseline exactly (beams 0/8, railings_guards 0/4, slabs 0/21, wall_types 0/8 on Duplex; railings_guards 0/9, slabs 0/3, sprinklers 0/10, wall_types 0/7 on Clinic; doors/rooms/windows/stairs_elevators/equipment all unchanged) to confirm nothing else moved. This is a small-denominator lever: the ceiling on tonight's overall effective F1 is about +0.033 (moving one 3-item category from 0 to 3/3 is one tenth of Clinic's own 10-category mean, halved again across the two-doc average) -- a flat or negative per-category result is evidence this one inference does not generalize past the location checked directly, not grounds for a second, wider attempt next slot."""
 
+EXPERIMENT_NAME = "exp-third-retry-attempt-at-180s-duplex-level2-double-timeout"
+DESCRIPTION = """Tonight's 2nd slot (2026-10-03). Baseline to beat: 0.4506, slot 1 tonight (exp-plumbing-fixtures-room-label-inference-toilet-wording, kept-uncommitted). That 0.4506 is the mean of Duplex 0.366 and Clinic 0.535 (logs/exp-20261003-020920.log line 39 and 55), not the 0.4174 baseline the two docs summed to going into slot 1 -- the program.md header's per-doc breakdown is last night's pre-slot-1 baseline, not slot 1's own result; read the actual slot-1 log before trusting the header's per-doc split.
+
+Read logs/exp-20261003-020920.log directly this session (not assumed): Duplex_A_20110907--ifc-render-Level_2.png lost BOTH retry attempts (360.1s total, 0 elements, "WARN: Timeout" then "WARN: Failed to parse JSON", line 36-38). That single image's total collapse (one of Duplex's two images contributing nothing) dragged seven of Duplex's eight categories down with it: windows 4/24 (vs this doc's usual 14/24), rooms 10/21 (vs usual ~19/21), doors 6/14 (vs usual 14/14) -- only stairs_elevators survived at 2/2 since one stair comes from each level. Duplex's own F1 fell to 0.366, the single biggest swing in slot 1's result, unrelated to that slot's own plumbing_fixtures hypothesis (which only touches Clinic -- Duplex has no plumbing_fixtures key at all, confirmed repeatedly in this file's history).
+
+This is not a new failure mode -- it is the SAME mechanism this file's history already fixed once for Clinic (exp-retry-thrice-on-subprocess-timeout, then exp-rebalance-timeout-180x2-over-120x3, both 2026-09-28, both kept) -- but tonight is the first time it has hit Duplex Level_2 specifically at the current 2-attempt/180s setting. Checked baseline-20261003-020005.log (run before slot 1, same image, same 2x180s code path): Level_2 succeeded that time at 289.8s total (consistent with attempt 1 timing out near 180s, attempt 2 finishing in roughly 110s) for 33 elements. So across the two most recent logs for this exact image, attempts have gone fail/succeed, then fail/fail -- 1 success in 4 individual attempts, with the successful one finishing comfortably inside its own 180s window once it got a workable roll. That pattern (sometimes finishes in ~110s, sometimes blows past 180s on both rolls) is the same "rare runaway generation, not a uniformly-too-short window" shape that justified reshaping 3x120s into 2x180s on 2026-09-28 -- re-applied here one step further since 2x180s has now also failed outright once.
+
+Grepped this file's own history and every exp-*.log from 2026-09-29 through 2026-10-02 for "range(3)", "ATTEMPTS = 3", "540s", "third attempt" before writing this -- no hits. The only prior attempt-count changes on record are 09-28's 3x120s (superseded same night) and 2x180s (current, unchanged since). A third attempt at 180s (3 attempts, 540s worst case) has not been tried.
+
+Change (preprocess() only, the subprocess.run monkeypatch's retry loop; SYSTEM_PROMPT_OVERRIDE, PARAMS, and postprocess() byte-for-byte unchanged, so phantom probes stay clean by construction and the vision prompt itself is untouched): `for _attempt in range(2)` becomes `for _attempt in range(3)`, and the raise condition moves from `_attempt == 1` to `_attempt == 2`, so a third 180s attempt fires only after the first two both raise TimeoutExpired on the same image. No other subprocess.run call is affected (the `kw.get("timeout") == 120` guard is unchanged, so this only ever touches run()'s one known 120s-timeout call site, same as every prior slot's version of this patch).
+
+Cost: this is a strict no-op for every image that already succeeds within one or two attempts (the overwhelming majority, per every log read this session) -- the extra branch is only reached after 360s is already sunk on that image with zero elements to show for it, i.e. only in the scenario this edit targets. Realistic added wall-clock this run: one more 180s on Level_2 if it rolls badly again, and possibly one more on a Clinic image if that doc's own documented timeout variance recurs same night. cost_usd stays 0 (Max subscription, confirmed in run()'s own comment at the subprocess.run call site). No fabrication risk: this changes neither item shape nor adds any output path postprocess() or the phantom probes could see.
+
+Cannot-regress argument: a third attempt can only convert a 0-element image into a populated one (more chances to succeed, never fewer); it cannot make an already-successful image worse, since the loop still returns on the first success exactly as before.
+
+Risk this can't fully rule out: if Level_2's occasional double-timeout is a genuine unbounded runaway (the model gets stuck in a repetitive pattern that no fixed-length retry escapes), a third roll may not help either -- the one data point available (last night's successful 289.8s run) shows the model CAN finish this image comfortably under 180s when it doesn't go off the rails, which is why another independent roll is the right shape of fix rather than a longer single attempt, but it is not proof the failure is memoryless across attempts.
+
+How to read next slot's log: check Duplex_A_20110907--ifc-render-Level_2.png specifically for a non-zero element count and confirm Duplex's overall F1 returns toward its usual 0.45-0.52 range (windows ~14/24, rooms ~19/21, doors ~14/14). If Level_2 still times out on all three attempts, that rules out "just needs one more roll" and the next lever is making a retried attempt cheaper or different (e.g. a shorter instruction on attempts after the first), not a fourth blind retry. A discard tonight most likely means Clinic's own independent timeout variance regressed instead (this edit cannot touch Clinic's score unless the exact same double-timeout pattern recurs there) -- check Clinic's per-category numbers against slot 1's 0.535 before concluding the retry lever itself failed."""
+
 # Override the system prompt sent to Claude for extraction.
 # Set to None to use the production prompt from ~/Lexios/lexios/SKILL.md
 SYSTEM_PROMPT_OVERRIDE = """Extract building elements from this floor plan image as JSON. Every "location" field below must be exactly the filename's floor-level segment (e.g. "-Level_1.png" becomes "Level 1", "-Second_Floor.png" becomes "Second Floor"), spaces instead of underscores, never abbreviated further: do not read a level label from inside the drawing instead. Speed matters, keep fields short, no extra fields, minified JSON (no indentation, no line breaks). There is a hard 180-second limit: an unfinished response at that point is discarded whole, so treat your real budget as roughly 130 seconds and close out valid JSON early rather than risk being cut off mid-generation, which scores zero for every category on this image.
@@ -3061,6 +3080,14 @@ def preprocess(image_path: str) -> str:
     chances to hit the same too-short window. See DESCRIPTION for the full
     arithmetic and the check that no other wall-clock cap in run() would
     trip at 180s.
+
+    exp-third-retry-attempt-at-180s-duplex-level2-double-timeout
+    (2026-10-03, tonight's 2nd slot): 2x180s has now also lost both rolls
+    outright on a different image -- Duplex Level_2 (360.1s, 0 elements,
+    logs/exp-20261003-020920.log). A third 180s attempt only fires after
+    the first two both raise TimeoutExpired on the same image; every
+    image that already succeeds in one or two attempts is unaffected.
+    See DESCRIPTION for the full attempt-history trace.
     """
     import subprocess as _sp
     if not hasattr(_sp, "_claude_arg_fix_applied"):
@@ -3087,11 +3114,11 @@ def preprocess(image_path: str) -> str:
             # other subprocess.run call this process makes is untouched.
             if kw.get("timeout") == 120:
                 kw["timeout"] = 180
-            for _attempt in range(2):
+            for _attempt in range(3):
                 try:
                     return _orig(args, **kw)
                 except _sp.TimeoutExpired:
-                    if _attempt == 1:
+                    if _attempt == 2:
                         raise
 
         _sp.run = _fixed_run
