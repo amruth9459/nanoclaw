@@ -107,20 +107,8 @@ if decision == "allow":
             reason = f"BLOCKED: This command would {desc.lower()}.\n\nThe command was: {command[:200]}\n\nUse the Read tool instead for safe file access, or ask me to check credentials safely."
             break
 
-# Outlook hands out a pre-authenticated link for attachments over 3 MB, and the bytes go up by PUT to it.
-# Approved by the owner 2026-10-07: allow PUT to that link only, when it is the only URL in the command.
-urls = re.findall(r'https?://[^\s\'"]+', command)
-outlook_attachment_put = (
-    re.search(r'\bcurl\b.*-X\s*PUT\b', command, re.IGNORECASE)
-    and not re.search(r'-X\s*(DELETE|PATCH)', command, re.IGNORECASE)
-    and urls
-    and all(re.match(r'https://outlook\.office(365)?\.com/api/v2\.0/[^\s\'"]*/AttachmentSessions\(', u) for u in urls)
-)
-
 if decision == "allow":
     for pattern, desc in HIGH:
-        if outlook_attachment_put and "PUT" in pattern:
-            continue
         if re.search(pattern, command, re.IGNORECASE):
             decision = "deny"
             reason = f"BLOCKED: This command would {desc.lower()}.\n\nThe command was: {command[:200]}\n\nIf you need this done, tell me exactly what and why — I will find the safest way."
