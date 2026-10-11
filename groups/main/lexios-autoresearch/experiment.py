@@ -2818,6 +2818,84 @@ DESCRIPTION = (
     "should be read that way rather than counted against the cap-raise "
     "lever."
 )
+EXPERIMENT_NAME = "exp-doors-rooms-cap-raise-70-to-80-firstfloor-margin-tight"
+DESCRIPTION = (
+    "Tonight's 4th slot (2026-10-11). Baseline to beat: 0.5316, this file's "
+    "on-disk state going in (exp-doors-rooms-cap-raise-50-to-70-clinic-"
+    "still-saturated, kept slot 3 tonight; logs/exp-20261011-024526.log): "
+    "Duplex_A_20110907 F1=0.5248, NBU_MedicalClinic_Arch F1=0.5384, phantom "
+    "probes clean.\n\n"
+    "Read that log directly this session, not just its own summary. Clinic "
+    "doors: correct=141/254 (P=1.00); rooms: correct=137/269 (P=1.00) -- "
+    "both sit almost exactly at the two-image cap ceiling (70+70=140), one "
+    "element over on doors from the model slightly overshooting the "
+    "instruction, confirming the cap is still the binding constraint, not "
+    "real content running out (same saturation signature as every prior "
+    "cap level: 25, 35, 50, 60, now 70). The lever is still live per slot "
+    "3's own evidence.\n\n"
+    "But timing margin shrank this slot, read directly from the per-image "
+    "lines: First_Floor finished in 162.6s for 180 elements (0.903s/el), "
+    "leaving only 17.4s before the 180s per-attempt cutoff -- tighter than "
+    "slot 2's cap-60 First_Floor (121.8s for 160 elements, 0.761s/el, 58.2s "
+    "margin). Second_Floor needed a retry this slot (322.8s total -- "
+    "consistent with one ~180s timeout on attempt 1 followed by a ~140s "
+    "success on attempt 2, since preprocess()'s per-attempt timeout is "
+    "180s). Both numbers point the same way: this specific night's "
+    "generation ran slower per-element than the cap-60 night, which this "
+    "file's own history already treats as ordinary night-to-night API "
+    "variance (documented repeatedly for Duplex's stairs_elevators/"
+    "wall_types draws), not evidence the cap-70 step itself caused the "
+    "slowdown -- but it does mean less headroom is available for another "
+    "step of the same size as before.\n\n"
+    "Hypothesis: raise the same two cap numbers from 70 to 80 -- the same "
+    "+10 step size as the 60->70 move (not a larger jump), chosen "
+    "specifically because of this slot's tighter margin. At this slot's "
+    "own observed First_Floor rate (0.903s/el), 20 more elements (10 more "
+    "doors + 10 more rooms, if both stay saturated on that image) project "
+    "to roughly 18s added, landing near 180.6s in the worst case -- right "
+    "at the edge, not comfortably clear like prior steps, which is exactly "
+    "why this step is sized at +10 and not larger. Doors and rooms are the "
+    "shortest schema entries ({\"location\": \"...\"} / {\"name\": \"...\"}), "
+    "cheaper than the blended per-element average that also includes "
+    "windows/wall_types entries, so the realistic add is expected to land "
+    "under that 18s estimate, not over it.\n\n"
+    "Change (SYSTEM_PROMPT_OVERRIDE only, the same two numeric edits as "
+    "every prior slot in this sequence): the priority-order intro's "
+    "parenthetical (\"doors and rooms capped at 70\") and step 7's cap "
+    "sentence (\"Doors and rooms are each capped at 70 instances on this "
+    "image\") both changed from 70 to 80 -- confirmed by re-reading this "
+    "file this session that these are the only two places \"70\" appears "
+    "in SYSTEM_PROMPT_OVERRIDE. Windows' separate 25 cap, every other "
+    "category's text, PARAMS, and postprocess() are byte-for-byte "
+    "unchanged. preprocess()'s LAST_ATTEMPT_SCOPE_SHRINK fallback text "
+    "reads 'up to the existing per-category cap', so it inherits 80 "
+    "automatically without a separate edit.\n\n"
+    "No-op check for Duplex, counted directly against its own ground-truth"
+    ".json this session: doors sit at 14/14 and rooms at 19/21, both far "
+    "under even the old 70 cap, so raising it to 80 cannot touch Duplex by "
+    "construction -- a provable no-op there.\n\n"
+    "Expected magnitude: the 60->70 step (+10) gained Clinic roughly +19 "
+    "doors and +16 rooms (122->141, 121->137, read from slot 2 and slot 3's "
+    "own logs). If 70->80 gains similarly, Clinic doors/rooms move toward "
+    "roughly 158/254 (F1~0.779) and 152/269 (F1~0.722), moving Clinic's "
+    "overall F1 from 0.5384 toward roughly 0.56-0.58 -- enough to clear "
+    "0.5316 if Duplex holds anywhere near its 0.52-0.54 range from the "
+    "last two slots.\n\n"
+    "Risk: First_Floor crossing 180s on attempt 1 burns one retry (costs "
+    "180s, not a zero) before attempt 2 -- Second_Floor's own retry this "
+    "slot proves that path still finishes successfully at this volume. "
+    "Only a loss of all three attempts on the same image scores zero for "
+    "it; this step is sized specifically to avoid being the step that "
+    "causes that, per the margin arithmetic above.\n\n"
+    "How to read next slot's log: check whether Clinic doors/rooms move "
+    "toward the ~158/152 projection with precision holding at 1.00, and "
+    "compare First_Floor's new per-element rate against this slot's "
+    "0.903s/el -- if the added entries cost close to that rate, marginal "
+    "cost is confirmed cheap; if First_Floor's time jumps disproportionately "
+    "or a retry is needed, that is the signal this cap sequence has reached "
+    "its ceiling and the next move is holding at 80 (or stepping back), not "
+    "raising further blind."
+)
 
 # Override the system prompt sent to Claude for extraction.
 # Set to None to use the production prompt from ~/Lexios/lexios/SKILL.md
@@ -2839,7 +2917,7 @@ Return a JSON object with only the keys below that have findings:
   "equipment": [{"type": "<HVAC unit, electrical panel, water heater, if obvious>", "location": "<floor level, see above>"}]
 }
 
-Priority order (stop enumerating a category once handled, never revisit it). Every category below counts equally toward this image's score no matter how many instances it has, so steps 1-5 (each a handful of instances at most) come before steps 6-7 (doors and rooms capped at 70, windows capped at 25): finishing steps 1-5 first banks that many complete categories cheaply, instead of risking several of them never being reached if a capped category runs long.
+Priority order (stop enumerating a category once handled, never revisit it). Every category below counts equally toward this image's score no matter how many instances it has, so steps 1-5 (each a handful of instances at most) come before steps 6-7 (doors and rooms capped at 80, windows capped at 25): finishing steps 1-5 first banks that many complete categories cheaply, instead of risking several of them never being reached if a capped category runs long.
 
 1. stairs_elevators first, usually few, list all. On a duplex or any plan with two or more mirrored/repeated units, each unit normally has its own staircase even when the symbols look identical in mirrored positions: if you found only one stair on a plan with 2+ repeated units, look again at the unit that has not yielded one before moving on, and if it is still not visible, add a second stairs_elevators entry matching the first's type. A second staircase on a mirrored-unit building is near-certain even when its symbol is hard to isolate.
 
@@ -2853,7 +2931,7 @@ Priority order (stop enumerating a category once handled, never revisit it). Eve
 
 6. windows: read the exact tag next to each window symbol -- on this kind of plan it is often a bare 1-3 digit number (e.g. "9", "23"), not an alphanumeric code like a door tag, so do not skip a window or omit its tag just because it is a lone number, and do not confuse it with a nearby dimension string; never invent one. Count small or high windows (bathroom, utility, stairwell) too, not just the prominent ones. Many plans repeat the exact same window type across several rooms (same size window in multiple bedrooms, for example) -- list one entry per physical window symbol you can actually see, not one entry per distinct type or size, and keep scanning for every other window that shares a type you have already logged once. Window tags on this kind of drawing usually run in one ascending, mostly-consecutive numeric sequence as you move around the building -- after your first pass, check your own found tags for a gap in that sequence (for example, you have 13 and 15 but not 14) and look again at that specific spot for a real window symbol you may have skipped inside a dense cluster of similar-looking windows; never invent a tag to fill a gap, only look harder for a real one. doors: each only needs the shared "location" value from above, so list every door symbol as its own entry (one per door, not deduped), including closet, bathroom, pantry, and utility doors, which are the ones a fast pass skips first.
 
-7. rooms: one entry per physical room actually labeled, not per unique name. Repeated names (two "Living Room"s in mirrored units, several "Exam Room"s down a corridor) are separate rooms, each its own entry. Transcribe a partly covered label with the legible part. Doors and rooms are each capped at 70 instances on this image; windows stay capped at 25. Stop each at its cap in scanning order and move on, do not push past it, and do not return to a finished category later. On a very dense drawing this cap is what keeps the response closing in time at all.
+7. rooms: one entry per physical room actually labeled, not per unique name. Repeated names (two "Living Room"s in mirrored units, several "Exam Room"s down a corridor) are separate rooms, each its own entry. Transcribe a partly covered label with the legible part. Doors and rooms are each capped at 80 instances on this image; windows stay capped at 25. Stop each at its cap in scanning order and move on, do not push past it, and do not return to a finished category later. On a very dense drawing this cap is what keeps the response closing in time at all.
 
 Rules:
 - Never fabricate or duplicate an element to hit a printed count or caption. Only list what you can actually see.
