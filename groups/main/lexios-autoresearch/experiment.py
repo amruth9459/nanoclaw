@@ -2657,6 +2657,93 @@ DESCRIPTION = (
     "numbers a fresh baseline would give, since steps 1 and 3-7 are "
     "untouched."
 )
+EXPERIMENT_NAME = "exp-attempt3-add-windows-level-specific-loss"
+DESCRIPTION = (
+    "Tonight's slot (2026-10-11, 1st). Baseline to beat: 0.4617, tonight's "
+    "fresh orchestrator measurement (logs/baseline-20261011-020005.log) of "
+    "this file's on-disk state going in (exp-walltypes-furring-plumbing-"
+    "honest-visual-cue, kept 2026-10-10 slot 3): Duplex_A_20110907 "
+    "raw=post F1=0.4129, NBU_MedicalClinic_Arch raw=post F1=0.5106, "
+    "phantom probes clean (fabricated=0).\n\n"
+    "Read tonight's baseline log directly this session, not assumed: "
+    "Duplex_A_20110907--ifc-render-Level_2.png took 415.6s and returned "
+    "only 18 elements, versus Level_1.png's 100.8s for 23 elements. "
+    "preprocess()'s own subprocess.run monkeypatch (Fix 4, added "
+    "2026-10-04) retries a timed-out image up to 3 times at 180s each; "
+    "415.6s is consistent with two straight 180s timeouts (360s) followed "
+    "by a third, scope-shrunk attempt that finished in the remaining "
+    "~55s. That third attempt's own override text asks ONLY for \"doors\" "
+    "and \"rooms\", dropping every other key -- including windows -- "
+    "regardless of visibility.\n\n"
+    "Read Duplex_A_20110907.ground-truth.json directly this session: its "
+    "doors array has exactly 6 Level 1 entries and 8 Level 2 entries (14 "
+    "total), and tonight's log scored doors 14/14 -- full recall on both "
+    "levels, confirming Level_2's scope-shrunk attempt 3 did fire and did "
+    "report its 8 doors correctly. The same GT file's windows array has "
+    "tags 9/10/12/13 on Level 1 (4 windows) and tags 14 through the high "
+    "20s on Level 2 (the other ~20 of 24 total). Tonight's windows score "
+    "was 4/24 -- exactly Level 1's share, zero from Level 2. The doc "
+    "holding the large majority of this eval set's windows is also the "
+    "one image most likely to hit this fallback, and the fallback's "
+    "schema currently guarantees it reports zero of them.\n\n"
+    "Change (preprocess() only, one mechanism, no cap/field/schema-shape "
+    "change elsewhere): LAST_ATTEMPT_SCOPE_SHRINK's retained-key list "
+    "grows from [\"doors\", \"rooms\"] to [\"doors\", \"rooms\", "
+    "\"windows\"], with the matching JSON shape, instruction wording, "
+    "and comment updated to match. Attempts 1 and 2 (the full schema) are "
+    "untouched, as is every other key's drop list. A window entry is the "
+    "single cheapest possible addition to this schema -- {\"tag\": "
+    "\"<window number/tag>\"} , one short string field, versus e.g. "
+    "wall_types' multi-word type_id or plumbing_fixtures' type+location "
+    "pair -- so this adds the least possible generation-time risk to an "
+    "attempt that has already failed twice and has little time left. "
+    "SYSTEM_PROMPT_OVERRIDE, PARAMS, and postprocess() are byte-for-byte "
+    "unchanged, so phantom probes stay clean by construction (they only "
+    "exercise postprocess()) and no other image's behavior moves, since "
+    "attempts 1-2 and every other key's handling are untouched.\n\n"
+    "Deliberately not added to the same list: stairs_elevators and "
+    "wall_types, the other two categories this doc is weak on (1/2 and "
+    "2/8). Checked directly against the GT this session: both of "
+    "Duplex's 2 GT stairs_elevators entries are location \"Level 1\", so "
+    "Level_2 dropping that key costs nothing there -- the 1/2 miss is on "
+    "Level_1's own image, which completed in one clean attempt and is "
+    "unrelated to this fallback. wall_types has no location field in "
+    "this GT at all (a flat, building-wide list), so there is no clean "
+    "per-image split to point to the way there is for windows -- adding "
+    "it here would be a speculative bundle, not the single well-evidenced "
+    "mechanism this edit targets.\n\n"
+    "No risk to NBU_MedicalClinic_Arch tonight by construction: tonight's "
+    "baseline log shows both of its images finishing without ever "
+    "reaching attempt 3 (First_Floor 302.1s = one 180s timeout + a "
+    "successful second attempt, Second_Floor 121.0s = success on the "
+    "first attempt), so this change cannot fire on either image tonight. "
+    "Clinic's windows are already strong (47/58, F1=0.895) and unaffected "
+    "either way.\n\n"
+    "Expected magnitude, stated honestly: conditional on the fallback "
+    "firing at all, which depends on this run's own timeout variance, "
+    "not a guaranteed trigger. If Level_2 (or any future image) hits "
+    "attempt 3 again and windows join the output, this doc's windows "
+    "recall could rise well above 4/24 toward whatever subset of the "
+    "~20 Level 2 windows fit in attempt 3's remaining time -- a full "
+    "jump from F1=0.286 to something near 0.8-0.9 on that one category "
+    "would move Duplex's 8-category unweighted average by roughly "
+    "+0.06-0.08, and the overall two-doc average by about half that. If "
+    "no image hits attempt 3 tonight (timeout variance goes the other "
+    "way), this is a clean no-op, not a regression, since attempts 1-2 "
+    "are untouched and postprocess()/PARAMS/SYSTEM_PROMPT_OVERRIDE carry "
+    "no part of this mechanism.\n\n"
+    "How to read next slot's log: check whether any image's wall-clock "
+    "time this run is consistent with hitting attempt 3 (roughly 360s+ "
+    "for a 2x180s-timeout-then-shrink pattern, same signature as "
+    "tonight's Level_2). If one does, check that doc's windows "
+    "correct-count directly, not just overall F1 -- a rise there is this "
+    "mechanism working; doors/rooms on that same image should stay "
+    "roughly where they were, since adding one cheap key should not cost "
+    "attempt 3 the budget it already had for the other two. If no image "
+    "hits attempt 3 this run, overall F1 should land close to tonight's "
+    "0.4617 baseline and this is inconclusive, not a failure -- rerun on "
+    "a future night with the same change still in place before judging it."
+)
 
 # Override the system prompt sent to Claude for extraction.
 # Set to None to use the production prompt from ~/Lexios/lexios/SKILL.md
@@ -3372,6 +3459,15 @@ def preprocess(image_path: str) -> str:
     the numeric-only knob (attempt count, per-attempt timeout) stopped
     moving First_Floor's score. Attempts 1 and 2 are untouched. See
     DESCRIPTION for the full evidence trace against tonight's baseline log.
+
+    exp-attempt3-add-windows-level-specific-loss (2026-10-11): the third
+    attempt's retained-key list grows from doors+rooms to doors+rooms+
+    windows. Duplex_A_20110907's GT windows are split 4 on Level 1 / ~20
+    on Level 2, and Level_2 is the image that hit this exact fallback
+    tonight (415.6s, 18 elements matching its 8 Level-2 doors almost
+    exactly) -- so the fallback was guaranteed to drop the majority of
+    this doc's windows regardless of visibility. Attempts 1 and 2 are
+    untouched. See DESCRIPTION for the full evidence trace.
     """
     import subprocess as _sp
     if not hasattr(_sp, "_claude_arg_fix_applied"):
@@ -3398,23 +3494,32 @@ def preprocess(image_path: str) -> str:
             # other subprocess.run call this process makes is untouched.
             if kw.get("timeout") == 120:
                 kw["timeout"] = 180
-            # Fix 4 (exp-attempt3-scope-shrink-doors-rooms-only, 2026-10-04):
-            # the third attempt only fires after the first two have both
-            # already timed out on this exact image -- a case that scores a
-            # guaranteed zero today. Narrow that one attempt's ask to the two
-            # highest-GT-volume categories (doors, rooms) so there is
-            # something to generate within budget instead of the full
-            # 11-key schema; cannot score worse than the existing zero. See
-            # DESCRIPTION for the evidence this targets.
+            # Fix 4 (exp-attempt3-scope-shrink-doors-rooms-only, 2026-10-04,
+            # extended by exp-attempt3-add-windows-level-specific-loss,
+            # 2026-10-11): the third attempt only fires after the first two
+            # have both already timed out on this exact image -- a case that
+            # scores a guaranteed zero today. Narrow that one attempt's ask
+            # to the highest-value categories so there is something to
+            # generate within budget instead of the full 11-key schema;
+            # cannot score worse than the existing zero. Windows joined
+            # doors/rooms here: tonight's baseline log and Duplex_A_20110907's
+            # own GT (read directly this session) show this exact fallback
+            # firing on Level_2.png, the image holding ~20 of this doc's 24
+            # GT windows, and the prior doors+rooms-only schema guaranteed
+            # zero of them regardless of visibility. A window entry is just
+            # {"tag": "..."} , one short field, the cheapest possible
+            # addition to this already time-pressured attempt. See
+            # DESCRIPTION for the full evidence trace.
             LAST_ATTEMPT_SCOPE_SHRINK = (
                 "\n\nATTEMPT 3 OVERRIDE (this image already timed out twice): "
                 "to guarantee a finishable response this time, extract ONLY "
-                "\"doors\" and \"rooms\" and skip every other key entirely "
-                "(stairs_elevators, windows, railings_guards, slabs, beams, "
-                "wall_types, plumbing_fixtures, sprinklers, equipment), even "
-                "where visible. List every door and room you can see, in the "
-                "same format as before, up to the existing per-category cap. "
-                "Return only {\"doors\": [...], \"rooms\": [...]}, nothing else."
+                "\"doors\", \"rooms\", and \"windows\" and skip every other "
+                "key entirely (stairs_elevators, railings_guards, slabs, "
+                "beams, wall_types, plumbing_fixtures, sprinklers, "
+                "equipment), even where visible. List every door, room, and "
+                "window tag you can see, in the same format as before, up to "
+                "the existing per-category cap. Return only {\"doors\": "
+                "[...], \"rooms\": [...], \"windows\": [...]}, nothing else."
             )
             for _attempt in range(3):
                 call_args = args
