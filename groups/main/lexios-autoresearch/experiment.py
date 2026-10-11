@@ -2744,6 +2744,80 @@ DESCRIPTION = (
     "0.4617 baseline and this is inconclusive, not a failure -- rerun on "
     "a future night with the same change still in place before judging it."
 )
+EXPERIMENT_NAME = "exp-doors-rooms-cap-raise-50-to-70-clinic-still-saturated"
+DESCRIPTION = (
+    "Tonight's 3rd slot (2026-10-11). Baseline to beat: 0.5171, this "
+    "file's on-disk state going in (exp-attempt3-add-windows-level-"
+    "specific-loss, kept slot 1 tonight; logs/exp-20261011-021545.log): "
+    "Duplex_A_20110907 F1=0.540, NBU_MedicalClinic_Arch F1=0.4942, "
+    "phantom probes clean.\n\n"
+    "Slot 2 tonight (exp-doors-rooms-cap-raise-50-to-60-clinic-still-"
+    "saturated, logs/exp-20261011-023021.log) raised this same pair of "
+    "caps 50->60 and was discarded at 0.5152 -- but read the log's own "
+    "per-doc split, not just the overall number: Clinic rose from "
+    "F1=0.4942 to F1=0.5465 (doors 100->122/254, rooms 99->121/269, both "
+    "still P=1.00, First_Floor 121.8s/160 elements vs slot 1's 122.2s/134 "
+    "elements -- 26 more elements in 0.4s LESS time, so the extra entries "
+    "cost no measurable latency, and Second_Floor similarly gained 23 "
+    "elements in 8.6s less). The mechanism worked and cost nothing in "
+    "time. The discard came entirely from Duplex, which this cap change "
+    "cannot touch by construction (its doors sit at 14/14 and rooms at "
+    "19/21, both far under even 50): Duplex F1 fell from 0.540 to 0.484 "
+    "in the same run, driven by stairs_elevators dropping 2/2->1/2, "
+    "wall_types 4/8->3/8, and rooms 19/21->18/21 -- ordinary run-to-run "
+    "real-vision variance on an unrelated doc, not a consequence of this "
+    "edit.\n\n"
+    "Change (SYSTEM_PROMPT_OVERRIDE only, the same two numeric edits as "
+    "slot 2, taken further): the priority-order intro's parenthetical "
+    "(\"doors and rooms capped at 50\") and step 7's cap sentence "
+    "(\"Doors and rooms are each capped at 50 instances on this image\") "
+    "both changed from 50 to 70 -- these are the only two places the "
+    "number 50 appears in SYSTEM_PROMPT_OVERRIDE (grepped this session, "
+    "not assumed). Windows' separate 25 cap, every other category's "
+    "text, PARAMS, and postprocess() are byte-for-byte unchanged. "
+    "preprocess()'s LAST_ATTEMPT_SCOPE_SHRINK fallback is also untouched "
+    "-- its own text says 'up to the existing per-category cap', so it "
+    "inherits 70 automatically without a separate edit.\n\n"
+    "Why 70 and not another retry at 60: the discard was Duplex noise, "
+    "not a mechanism failure, and 60's gain on Clinic (+0.052) was too "
+    "small to survive a bad Duplex draw by itself -- a bad Duplex draw "
+    "(0.484, the one slot 2 actually got) needs Clinic to reach roughly "
+    "0.56 for the two-doc mean to clear 0.5171 again; 60 only reached "
+    "0.5465. Slot 2's own time numbers (above) show 20 more one-line "
+    "door/room entries per image costs on the order of several seconds "
+    "at most, not the ~58s of remaining slack under the 180s cutoff on "
+    "First_Floor (121.8s at cap 60), so 70 is sized against that "
+    "measured per-entry cost, not a guess.\n\n"
+    "Expected magnitude: First_Floor's own caption reads 'Rooms: 154, "
+    "Doors: 151' and Second_Floor's GT-implied split is roughly 109/103 "
+    "(from 09-21 history in this file, both well above 70 per image), so "
+    "both images should stay cap-bound at 70 rather than running out of "
+    "real symbols to list -- doors toward 142/254 (F1 roughly 0.717) and "
+    "rooms toward 141/269 (F1 roughly 0.688), still P=1.00. That moves "
+    "Clinic's F1 to roughly 0.56, and the two-doc mean clears 0.5171 "
+    "whether Duplex draws its good roll (0.540, slot 1's own number) or "
+    "its bad one (0.484, slot 2's).\n\n"
+    "Risk: First_Floor crossing 180s on a slower API night returns 0 "
+    "elements for that image, the failure mode that has reverted cap "
+    "raises in this file before -- slot 2's 121.8s at cap 60 leaves "
+    "genuine but not unlimited margin for 70. If that happens, the next "
+    "step is a smaller raise (e.g. 50->65) with two nights of mechanism "
+    "evidence behind it, not abandoning the lever -- the saturation "
+    "signature (exact cap multiple, P=1.00, confirmed across caps 25, "
+    "35, 50, and now 60 tonight) is strong, repeated evidence real "
+    "recall is still being left on the table at every cap tried so far.\n\n"
+    "How to read next slot's log: check Clinic doors' and rooms' "
+    "correct-counts move off the 60-cap-consistent 122/121 toward the "
+    "140-ish ceiling 70 implies, with precision holding at 1.00 and "
+    "First_Floor finishing without a 0-element collapse. Separately "
+    "check Duplex stairs_elevators and wall_types -- if they drew low "
+    "again (1/2, 3/8) and the run still clears 0.5171, that confirms the "
+    "Clinic mechanism is strong enough to carry a bad Duplex night; if "
+    "the run fails to clear with Clinic doors/rooms both near 140 and no "
+    "timeout, the discard is Duplex variance again, not this edit, and "
+    "should be read that way rather than counted against the cap-raise "
+    "lever."
+)
 
 # Override the system prompt sent to Claude for extraction.
 # Set to None to use the production prompt from ~/Lexios/lexios/SKILL.md
@@ -2765,7 +2839,7 @@ Return a JSON object with only the keys below that have findings:
   "equipment": [{"type": "<HVAC unit, electrical panel, water heater, if obvious>", "location": "<floor level, see above>"}]
 }
 
-Priority order (stop enumerating a category once handled, never revisit it). Every category below counts equally toward this image's score no matter how many instances it has, so steps 1-5 (each a handful of instances at most) come before steps 6-7 (doors and rooms capped at 50, windows capped at 25): finishing steps 1-5 first banks that many complete categories cheaply, instead of risking several of them never being reached if a capped category runs long.
+Priority order (stop enumerating a category once handled, never revisit it). Every category below counts equally toward this image's score no matter how many instances it has, so steps 1-5 (each a handful of instances at most) come before steps 6-7 (doors and rooms capped at 70, windows capped at 25): finishing steps 1-5 first banks that many complete categories cheaply, instead of risking several of them never being reached if a capped category runs long.
 
 1. stairs_elevators first, usually few, list all. On a duplex or any plan with two or more mirrored/repeated units, each unit normally has its own staircase even when the symbols look identical in mirrored positions: if you found only one stair on a plan with 2+ repeated units, look again at the unit that has not yielded one before moving on, and if it is still not visible, add a second stairs_elevators entry matching the first's type. A second staircase on a mirrored-unit building is near-certain even when its symbol is hard to isolate.
 
@@ -2779,7 +2853,7 @@ Priority order (stop enumerating a category once handled, never revisit it). Eve
 
 6. windows: read the exact tag next to each window symbol -- on this kind of plan it is often a bare 1-3 digit number (e.g. "9", "23"), not an alphanumeric code like a door tag, so do not skip a window or omit its tag just because it is a lone number, and do not confuse it with a nearby dimension string; never invent one. Count small or high windows (bathroom, utility, stairwell) too, not just the prominent ones. Many plans repeat the exact same window type across several rooms (same size window in multiple bedrooms, for example) -- list one entry per physical window symbol you can actually see, not one entry per distinct type or size, and keep scanning for every other window that shares a type you have already logged once. Window tags on this kind of drawing usually run in one ascending, mostly-consecutive numeric sequence as you move around the building -- after your first pass, check your own found tags for a gap in that sequence (for example, you have 13 and 15 but not 14) and look again at that specific spot for a real window symbol you may have skipped inside a dense cluster of similar-looking windows; never invent a tag to fill a gap, only look harder for a real one. doors: each only needs the shared "location" value from above, so list every door symbol as its own entry (one per door, not deduped), including closet, bathroom, pantry, and utility doors, which are the ones a fast pass skips first.
 
-7. rooms: one entry per physical room actually labeled, not per unique name. Repeated names (two "Living Room"s in mirrored units, several "Exam Room"s down a corridor) are separate rooms, each its own entry. Transcribe a partly covered label with the legible part. Doors and rooms are each capped at 50 instances on this image; windows stay capped at 25. Stop each at its cap in scanning order and move on, do not push past it, and do not return to a finished category later. On a very dense drawing this cap is what keeps the response closing in time at all.
+7. rooms: one entry per physical room actually labeled, not per unique name. Repeated names (two "Living Room"s in mirrored units, several "Exam Room"s down a corridor) are separate rooms, each its own entry. Transcribe a partly covered label with the legible part. Doors and rooms are each capped at 70 instances on this image; windows stay capped at 25. Stop each at its cap in scanning order and move on, do not push past it, and do not return to a finished category later. On a very dense drawing this cap is what keeps the response closing in time at all.
 
 Rules:
 - Never fabricate or duplicate an element to hit a printed count or caption. Only list what you can actually see.
