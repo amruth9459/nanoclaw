@@ -2898,6 +2898,76 @@ DESCRIPTION = (
     "not be retried."
 )
 
+EXPERIMENT_NAME = "exp-rooms-transcribe-full-multiword-label"
+DESCRIPTION = (
+    "Tonight's 2nd slot (2026-10-12). Baseline to beat: 0.5463, this file's "
+    "on-disk state going in (exp-schema-key-order-match-priority-instructions, "
+    "kept slot 1 tonight, logs/exp-20261012-021903.log per results.tsv).\n\n"
+    "This session read lexios/eval.py's real fuzzy_match() directly (not "
+    "assumed): after an exact/substring shortcut, it splits both the GT "
+    "string and the extracted string into words (stripping trailing periods, "
+    "splitting on '/'), counts how many GT words have a matching extracted "
+    "word (exact, either-direction prefix with a 2-char floor, or edit-"
+    "distance for words >=4 chars), and requires matched/len(gt_words) >= "
+    "0.6. This session also read both eval docs' ground-truth JSON directly "
+    "(not assumed). Most of this file's existing abbreviation worry turns "
+    "out to already be handled for free by the prefix rule -- 'JAN.' vs "
+    "'JANITOR', 'ELEC.' vs 'ELECTRICAL', 'MECH.' vs 'MECHANICAL', 'STO.' vs "
+    "'STORAGE' etc. all pass, because the abbreviation IS a literal letter-"
+    "prefix of the expansion. The real gap this session found is different: "
+    "NBU_MedicalClinic_Arch's rooms list has multiple qualified, multi-word "
+    "labels that share a headword with a SEPARATE bare GT room elsewhere on "
+    "the same floor -- 'WAITING / ACTIVITY AREA' (3 GT words) coexists with "
+    "two standalone 'WAITING' rooms; 'PATIENT ADMIN. RECEPT.' (3 GT words) "
+    "coexists with multiple standalone 'RECEPTION' rooms; 'TRICARE OFFICE' "
+    "(5 occurrences) coexists with a standalone 'OFFICE' and an 'ADMIN "
+    "OFFICE'. Checked by hand against fuzzy_match's own rule: a model "
+    "answer that keeps only the generic headword ('Waiting Room', 'Office') "
+    "scores 1-of-3 or 1-of-2 matched words against the qualified GT entry -- "
+    "below 0.6 -- even though that exact same short answer is the CORRECT "
+    "match for the bare GT room elsewhere on the same sheet. So a model "
+    "that is tempted to simplify a cluttered multi-word label down to its "
+    "most prominent word has a real, scoreable reason not to on this doc: "
+    "the qualifier is what distinguishes it from a different, also-real "
+    "room.\n\n"
+    "Deliberately not fixed via a postprocess rename (the mechanism "
+    "ROOM_NAME_SAFE_RENAME_MAP already uses for FRONT DESK/SERVER ROOM/MOP "
+    "CLOSET above): those entries rename one specific guess to one specific "
+    "GT-matching canonical form with no other plausible target. A rename "
+    "keyed on bare 'OFFICE' or 'WAITING ROOM' has no single honest target -- "
+    "this doc alone has 5+ distinct office-headed rooms and 3 distinct "
+    "waiting-headed rooms -- so picking one would be choosing whichever GT "
+    "string has the most duplicate occurrences, not reflecting a real "
+    "vocabulary synonym. That is a different, weaker mechanism than the "
+    "existing map entries, so this slot targets the generation-time cause "
+    "(the model dropping qualifier words) instead.\n\n"
+    "Change (SYSTEM_PROMPT_OVERRIDE step 7 only, one inserted sentence): "
+    "added an instruction, right after the existing 'Transcribe a partly "
+    "covered label with the legible part' sentence, to transcribe a "
+    "multi-word or slash-separated room label in full rather than "
+    "shortening it to its most prominent word, with the WAITING example "
+    "above as the concrete illustration of why. No cap number, schema key, "
+    "resume mechanism, or item shape is touched; PARAMS, preprocess(), and "
+    "postprocess() are byte-for-byte unchanged, and every other step's text "
+    "is unchanged.\n\n"
+    "No-op argument for Duplex_A_20110907: its own room vocabulary, re-read "
+    "directly this session (Foyer, Hallway, Bathroom 1/2, Utility, Stair, "
+    "Room, Roof, Living Room, Kitchen, Bedroom 1/2), has no multi-word "
+    "qualified label sharing a headword with a separate bare GT room the "
+    "way Clinic does -- 'Living Room' and 'Bedroom 1' are each already a "
+    "single complete label with nothing to drop, so this instruction has "
+    "nothing to change there.\n\n"
+    "How to read next slot's log: check whether Clinic's rooms recall rises "
+    "specifically among multi-word GT entries that share a headword with a "
+    "bare GT entry elsewhere (WAITING / ACTIVITY AREA, PATIENT ADMIN. "
+    "RECEPT., the TRICARE OFFICE group), while bare single-word rooms' "
+    "recall holds steady -- that would confirm qualifier-dropping was real "
+    "and scoreable. If overall rooms recall drops instead, the longer "
+    "transcription cost scanning time or cap headroom elsewhere on a dense "
+    "image, a different and unexpected risk worth reading that log's timing "
+    "line for before retrying this direction."
+)
+
 # Override the system prompt sent to Claude for extraction.
 # Set to None to use the production prompt from ~/Lexios/lexios/SKILL.md
 SYSTEM_PROMPT_OVERRIDE = """Extract building elements from this floor plan image as JSON. Every "location" field below must be exactly the filename's floor-level segment (e.g. "-Level_1.png" becomes "Level 1", "-Second_Floor.png" becomes "Second Floor"), spaces instead of underscores, never abbreviated further: do not read a level label from inside the drawing instead. Speed matters, keep fields short, no extra fields, minified JSON (no indentation, no line breaks). There is a hard 180-second limit: an unfinished response at that point is discarded whole, so treat your real budget as roughly 130 seconds and close out valid JSON early rather than risk being cut off mid-generation, which scores zero for every category on this image.
@@ -2932,7 +3002,7 @@ Priority order (stop enumerating a category once handled, never revisit it). Eve
 
 6. windows: read the exact tag next to each window symbol -- on this kind of plan it is often a bare 1-3 digit number (e.g. "9", "23"), not an alphanumeric code like a door tag, so do not skip a window or omit its tag just because it is a lone number, and do not confuse it with a nearby dimension string; never invent one. Count small or high windows (bathroom, utility, stairwell) too, not just the prominent ones. Many plans repeat the exact same window type across several rooms (same size window in multiple bedrooms, for example) -- list one entry per physical window symbol you can actually see, not one entry per distinct type or size, and keep scanning for every other window that shares a type you have already logged once. Window tags on this kind of drawing usually run in one ascending, mostly-consecutive numeric sequence as you move around the building -- after your first pass, check your own found tags for a gap in that sequence (for example, you have 13 and 15 but not 14) and look again at that specific spot for a real window symbol you may have skipped inside a dense cluster of similar-looking windows; never invent a tag to fill a gap, only look harder for a real one. doors: each only needs the shared "location" value from above, so list every door symbol as its own entry (one per door, not deduped), including closet, bathroom, pantry, and utility doors, which are the ones a fast pass skips first.
 
-7. rooms: one entry per physical room actually labeled, not per unique name. Repeated names (two "Living Room"s in mirrored units, several "Exam Room"s down a corridor) are separate rooms, each its own entry. Transcribe a partly covered label with the legible part. Doors and rooms are each capped at 80 instances on this image; windows stay capped at 25. Stop each at its cap in scanning order and move on, do not push past it, and do not return to a finished category later. On a very dense drawing this cap is what keeps the response closing in time at all.
+7. rooms: one entry per physical room actually labeled, not per unique name. Repeated names (two "Living Room"s in mirrored units, several "Exam Room"s down a corridor) are separate rooms, each its own entry. Transcribe a partly covered label with the legible part. If a label has more than one word or a slash-separated second use, transcribe the whole thing exactly as printed, in order -- do not shorten it down to just its most prominent word, since the qualifier can be what makes it a different room from a plainer same-word room elsewhere on the same sheet (a "WAITING / ACTIVITY AREA" is not the same room as a plain "WAITING"). Doors and rooms are each capped at 80 instances on this image; windows stay capped at 25. Stop each at its cap in scanning order and move on, do not push past it, and do not return to a finished category later. On a very dense drawing this cap is what keeps the response closing in time at all.
 
 Rules:
 - Never fabricate or duplicate an element to hit a printed count or caption. Only list what you can actually see.
