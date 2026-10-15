@@ -3116,6 +3116,96 @@ DESCRIPTION = (
     "0 elements on both attempts, and confirm Duplex windows holds at "
     "14/24 as the no-op argument predicts."
 )
+EXPERIMENT_NAME = "exp-retry-narrow-scope-on-attempt2-not-just-3"
+DESCRIPTION = (
+    "Experiment #1 tonight (2026-10-15). Baseline to beat: 0.4567, the "
+    "orchestrator's fresh measurement tonight (logs/baseline-20261015-"
+    "020007.log) of this file's on-disk state going in (exp-windows-cap-"
+    "raise-25-to-35-clinic-second-floor-saturated, kept 2026-10-13 slot "
+    "3): Duplex_A_20110907 raw=post F1=0.5443, NBU_MedicalClinic_Arch "
+    "raw=post F1=0.3692, phantom probes clean (fabricated=0).\n\n"
+    "Read tonight's baseline log directly this session, not assumed: "
+    "NBU_MedicalClinic_Arch--ifc-render-First_Floor.png took 540.1s and "
+    "returned 0 elements -- 'WARN: Timeout' at the run()-level try/except, "
+    "meaning the FINAL internal attempt (preprocess()'s own 3x retry loop, "
+    "Fix 3/4) also raised TimeoutExpired, since run() only ever sees an "
+    "exception when every internal attempt has been exhausted. 540.1s / "
+    "3 = 180.0s almost exactly, consistent with all three internal "
+    "attempts individually hitting the 180s cap with nothing returned, "
+    "including the one that was supposed to be the scope-shrunk, 'guarantee "
+    "a finishable response' fallback. Second_Floor finished cleanly in "
+    "160.2s with 221 elements the same run, so this is not a blanket Clinic "
+    "failure -- it is specific to First_Floor. Grepped First_Floor's and "
+    "Second_Floor's own location/level counts directly in NBU_"
+    "MedicalClinic_Arch.ground-truth.json this session (not assumed): "
+    "'First Floor' appears 345 times across all categories, 'Second Floor' "
+    "243 times -- First_Floor genuinely carries ~42% more content than the "
+    "image that succeeded, a real, verified reason it is the one that "
+    "keeps running out of clock, not a fluke.\n\n"
+    "Read preprocess()'s own retry loop directly this session (not "
+    "assumed): the narrowed doors+rooms+windows-only ask (previously "
+    "named LAST_ATTEMPT_SCOPE_SHRINK) was gated on 'if _attempt == 2', so "
+    "it only ever fired on the 3rd and final internal attempt. Attempts 1 "
+    "and 2 were byte-identical full-11-key-schema requests -- same image, "
+    "same 180s budget, same prompt. Once attempt 1 times out on a given "
+    "image, attempt 2 under the old code could only succeed via pure LLM "
+    "sampling variance re-asking for the exact same thing that had already "
+    "lost to the clock once; it carried none of the 'generate less JSON so "
+    "it actually fits in 180s' mechanism Fix 4 itself documents as the "
+    "reason the narrow schema exists at all.\n\n"
+    "Change (preprocess() only, the retry loop's attempt-gating condition "
+    "and the override text it sends, nothing else): the condition that "
+    "appends the narrow-schema override text changed from '_attempt == 2' "
+    "to '_attempt >= 1', so attempts 2 AND 3 now use the narrow doors+"
+    "rooms+windows ask instead of only attempt 3. The except-branch "
+    "condition that decides when to finally raise and give up ('if "
+    "_attempt == 2: raise') is UNCHANGED, so total attempt count (3) and "
+    "total worst-case wall-clock (3x180s=540s) are exactly as before -- "
+    "this only changes which schema variant attempts 2 and 3 send, never "
+    "the cap numbers, the resume mechanism, or any item's shape. Renamed "
+    "LAST_ATTEMPT_SCOPE_SHRINK to RETRY_SCOPE_SHRINK and reworded its own "
+    "prompt text from 'this image already timed out twice' to 'this image "
+    "already timed out on a prior attempt', since that text is now sent "
+    "after only ONE failed attempt (on attempt 2), and the old wording "
+    "would have been a factually false claim to send the model at that "
+    "point.\n\n"
+    "No-op / cannot-regress argument: attempt 1 is completely untouched "
+    "for every image, and the loop only ever reaches attempt 2 after "
+    "attempt 1 has already timed out -- a state that, by construction, "
+    "already means the full-schema ask failed once under these exact "
+    "conditions. Replacing a same-request retry with a smaller-request "
+    "retry in that slot cannot make that image's outcome worse: either "
+    "the narrow schema succeeds (same or better than hoping attempt 2's "
+    "luckier full-schema sample pulls off what attempt 1 could not), or it "
+    "also times out, in which case attempt 3 -- narrow either way, old "
+    "code or new -- is unaffected and gets the same shot it always had. "
+    "Tonight's baseline log shows Duplex Level_1 (82.4s) and Level_2 "
+    "(137.3s) and Clinic Second_Floor (160.2s) all finishing on attempt 1 "
+    "-- the large majority case -- so this change cannot fire on any of "
+    "them and they are unaffected by construction.\n\n"
+    "Honest risk this can't rule out: tonight's own First_Floor log shows "
+    "even the narrow schema (which held attempt-3's slot both before and "
+    "after this change) can still lose to the clock on a sufficiently "
+    "dense image -- this is not a guaranteed fix for that specific image "
+    "on a night this dense, only a strictly-better-or-equal bet that gives "
+    "the faster-by-design schema two independent sampling tries instead of "
+    "one wherever attempt 1 already failed. If First_Floor times out all "
+    "three ways again next time, that is evidence the bottleneck is "
+    "something other than schema width (e.g. the narrow ask is still large "
+    "on a 345-mention image, or a non-generation stall), not evidence this "
+    "change was harmful, since it never had a worse expected outcome than "
+    "the code it replaced.\n\n"
+    "How to read next slot's log: check any image whose total elapsed time "
+    "falls in the 180-290s band (one failed full attempt, then an "
+    "attempt-2 narrow success) where the old code would have needed "
+    "360-470s (two failed full attempts before reaching attempt 3) for the "
+    "same outcome -- that band shifting down is this mechanism working. "
+    "Specifically check whether Clinic First_Floor returns ANY nonzero "
+    "doors/rooms/windows count instead of tonight's 0/0/0 across all three "
+    "attempts; a nonzero result there, even a partial one, is the clearest "
+    "possible signal, given 345 GT mentions were left entirely unscored "
+    "tonight by the all-three-attempts failure this change targets."
+)
 
 # Override the system prompt sent to Claude for extraction.
 # Set to None to use the production prompt from ~/Lexios/lexios/SKILL.md
@@ -3840,6 +3930,20 @@ def preprocess(image_path: str) -> str:
     exactly) -- so the fallback was guaranteed to drop the majority of
     this doc's windows regardless of visibility. Attempts 1 and 2 are
     untouched. See DESCRIPTION for the full evidence trace.
+
+    exp-retry-narrow-scope-on-attempt2-not-just-3 (2026-10-15): the
+    narrowed doors+rooms+windows retry schema now fires starting on
+    attempt 2, not just attempt 3. Previously attempt 2 was a byte-
+    identical re-send of the exact full-schema request attempt 1 had
+    already lost to the 180s clock -- on the same image, same budget,
+    same ask, its only chance of a different outcome was LLM sampling
+    variance. The narrow schema exists specifically because it generates
+    less JSON and is more likely to finish in budget (Fix 4's own
+    rationale); giving it two independent tries instead of one, on every
+    image where attempt 1 already failed, can only raise or hold flat
+    that image's chance of returning a non-empty extraction instead of a
+    hard zero. Attempt 1 and the 3-attempt/540s worst-case total are both
+    unchanged. See DESCRIPTION for the full evidence trace.
     """
     import subprocess as _sp
     if not hasattr(_sp, "_claude_arg_fix_applied"):
@@ -3868,36 +3972,39 @@ def preprocess(image_path: str) -> str:
                 kw["timeout"] = 180
             # Fix 4 (exp-attempt3-scope-shrink-doors-rooms-only, 2026-10-04,
             # extended by exp-attempt3-add-windows-level-specific-loss,
-            # 2026-10-11): the third attempt only fires after the first two
-            # have both already timed out on this exact image -- a case that
-            # scores a guaranteed zero today. Narrow that one attempt's ask
-            # to the highest-value categories so there is something to
-            # generate within budget instead of the full 11-key schema;
-            # cannot score worse than the existing zero. Windows joined
-            # doors/rooms here: tonight's baseline log and Duplex_A_20110907's
-            # own GT (read directly this session) show this exact fallback
-            # firing on Level_2.png, the image holding ~20 of this doc's 24
-            # GT windows, and the prior doors+rooms-only schema guaranteed
-            # zero of them regardless of visibility. A window entry is just
-            # {"tag": "..."} , one short field, the cheapest possible
-            # addition to this already time-pressured attempt. See
-            # DESCRIPTION for the full evidence trace.
-            LAST_ATTEMPT_SCOPE_SHRINK = (
-                "\n\nATTEMPT 3 OVERRIDE (this image already timed out twice): "
-                "to guarantee a finishable response this time, extract ONLY "
-                "\"doors\", \"rooms\", and \"windows\" and skip every other "
-                "key entirely (stairs_elevators, railings_guards, slabs, "
-                "beams, wall_types, plumbing_fixtures, sprinklers, "
-                "equipment), even where visible. List every door, room, and "
-                "window tag you can see, in the same format as before, up to "
-                "the existing per-category cap. Return only {\"doors\": "
-                "[...], \"rooms\": [...], \"windows\": [...]}, nothing else."
+            # 2026-10-11, extended by exp-retry-narrow-scope-on-attempt2-
+            # not-just-3, 2026-10-15): narrow the ask to the highest-value
+            # categories so there is something to generate within budget
+            # instead of the full 11-key schema. Previously this only fired
+            # on the 3rd (last) attempt, so attempt 2 was a byte-identical
+            # retry of the same full-schema request attempt 1 already lost
+            # to the clock -- the only thing that could change its outcome
+            # was pure LLM sampling variance, not a smaller ask. Now it
+            # fires from attempt 2 onward: once attempt 1 has timed out,
+            # every remaining attempt uses the narrower, lower-generation-
+            # volume request, since that is the one actually designed to
+            # finish within budget. Total attempt count (3) and total
+            # worst-case time (3x180s) are unchanged -- only which schema
+            # variant attempts 2 and 3 send. See DESCRIPTION for the full
+            # evidence trace (tonight's Clinic First_Floor: all 3 internal
+            # attempts timed out, 540.1s, 0 elements).
+            RETRY_SCOPE_SHRINK = (
+                "\n\nRETRY OVERRIDE (this image already timed out on a "
+                "prior attempt): to guarantee a finishable response this "
+                "time, extract ONLY \"doors\", \"rooms\", and \"windows\" "
+                "and skip every other key entirely (stairs_elevators, "
+                "railings_guards, slabs, beams, wall_types, "
+                "plumbing_fixtures, sprinklers, equipment), even where "
+                "visible. List every door, room, and window tag you can "
+                "see, in the same format as before, up to the existing "
+                "per-category cap. Return only {\"doors\": [...], "
+                "\"rooms\": [...], \"windows\": [...]}, nothing else."
             )
             for _attempt in range(3):
                 call_args = args
-                if (_attempt == 2 and isinstance(args, list) and args
+                if (_attempt >= 1 and isinstance(args, list) and args
                         and isinstance(args[-1], str)):
-                    call_args = list(args[:-1]) + [args[-1] + LAST_ATTEMPT_SCOPE_SHRINK]
+                    call_args = list(args[:-1]) + [args[-1] + RETRY_SCOPE_SHRINK]
                 try:
                     return _orig(call_args, **kw)
                 except _sp.TimeoutExpired:
