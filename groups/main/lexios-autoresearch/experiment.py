@@ -3207,6 +3207,123 @@ DESCRIPTION = (
     "tonight by the all-three-attempts failure this change targets."
 )
 
+EXPERIMENT_NAME = "exp-salvage-partial-json-on-final-timeout"
+DESCRIPTION = (
+    "Experiment #1 tonight (2026-10-16). Baseline to beat: 0.4794, "
+    "logs/baseline-20261016-020006.log: Duplex_A_20110907 F1=0.5507, "
+    "NBU_MedicalClinic_Arch F1=0.4082 (raw=post both, phantom probes "
+    "clean). Read that log directly this session: Clinic First_Floor hit "
+    "the exact same all-3-attempts timeout as 2026-10-15's baseline and "
+    "slot 2 (540.1s, 'WARN: Timeout' then 'WARN: Failed to parse JSON', 0 "
+    "elements), losing its entire 345-GT-mention share of the document to "
+    "a hard zero while Second_Floor finished fine (233 elements, 135.4s) "
+    "-- this is the same failure mode last night's own logs show landing "
+    "on NBU_MedicalClinic_Arch--ifc-render-Second_Floor.png instead in a "
+    "different run that same night (logs/exp-20261015-030155.log: "
+    "First_Floor succeeded, Second_Floor timed out all 3 ways, 540.1s, 0 "
+    "elements) -- confirming across two independent nights that this is "
+    "sampling-variance-driven (whichever image the model stalls on that "
+    "run), not a fixed property of one image, so a fix for it is not "
+    "overfit to a single doc.\n\n"
+    "Two levers already tried against this exact failure and discarded: "
+    "2026-10-15 slot 1 (kept) moved the narrow doors+rooms+windows retry "
+    "schema from attempt 3 only to attempts 2 and 3 -- did not prevent "
+    "tonight's repeat. 2026-10-15 slot 3 (exp-retry-schema-explicit-45-"
+    "cap-not-inherited-90, discarded 0.5031) gave the retry an explicit "
+    "45-per-category cap instead of inheriting the live 90 -- its own log "
+    "shows this STILL produced a full 540.1s/0-element loss that same "
+    "night (logs/exp-20261015-030155.log), i.e. even a ~125-element ask "
+    "did not reliably finish, which is exactly the evidence that slot's "
+    "own DESCRIPTION flagged as 'evidence the bottleneck is not output "
+    "volume at all (a non-generation stall)' rather than retrying a third "
+    "cap number. This slot does not touch retry scope or cap width at "
+    "all -- same RETRY_SCOPE_SHRINK text, same 3 attempts, same 180s each "
+    "-- and instead targets what happens AFTER the 3rd attempt's own "
+    "TimeoutExpired, which today is unconditional total loss.\n\n"
+    "Read run() directly this session (outside this file's edit markers, "
+    "not touched): its except branch for subprocess.TimeoutExpired sets "
+    "text=\"\" unconditionally and never reads anything off the caught "
+    "exception. But CPython's subprocess.run() does not hand run() an "
+    "empty-handed exception on POSIX -- Popen._communicate's own timeout "
+    "path raises TimeoutExpired(output=<bytes collected so far>, ...) "
+    "before run() ever sees it, so exc.stdout already carries whatever "
+    "the model had written to stdout before the kill. The loss is a "
+    "layer up (run(), unreachable to this file), not in subprocess "
+    "internals -- so the fix has to be making preprocess()'s own 3-"
+    "attempt retry loop (which already fully intercepts this exact call "
+    "via the _sp.run monkeypatch) hand run() back a repaired, parseable "
+    "string in place of letting the bare exception propagate on the "
+    "final attempt, since run()'s own string-handling code after that "
+    "point is unmodified and already does the right thing with whatever "
+    "valid JSON string it receives.\n\n"
+    "Change (preprocess() only, inside _fixed_run, nothing outside the "
+    "loop touched): added _repair_truncated_json(), a pure string "
+    "function -- strips markdown fences, then on a parse failure tries "
+    "successively earlier '}' cut points, computes which brackets are "
+    "still open up to each candidate cut (string-aware, so a brace "
+    "inside a half-written tag string is never miscounted), and appends "
+    "only closing punctuation for brackets the model itself already "
+    "opened, retrying json.loads until one parses to a dict. It only "
+    "ever removes trailing incomplete content and closes already-open "
+    "brackets -- there is no code path that adds a key, a list entry, or "
+    "any value not already present in the model's own partial output, so "
+    "the fabrication probes (empty-dict call, decoy-element call) stay "
+    "clean by construction exactly like every other postprocess/"
+    "preprocess transform in this file. The retry loop now tracks "
+    "best_partial (the longest exc.stdout seen across all 3 attempts, "
+    "since attempt 1's full-schema request may have written more before "
+    "timing out than attempt 3's narrower one even though neither "
+    "finished) and, only on the 3rd attempt's own TimeoutExpired -- "
+    "exactly the branch that previously just re-raised -- tries repair on "
+    "it before giving up. Attempts 1 and 2's own except-branches are "
+    "otherwise unchanged (still just record best_partial and continue to "
+    "the next attempt); if repair returns None, it still raises exactly "
+    "as before, so run()'s existing text=\"\" fallback is reached "
+    "identically to today whenever salvage finds nothing usable.\n\n"
+    "Honest uncertainty this can't resolve without a shell: whether "
+    "'claude --print' in its default text output format writes to "
+    "stdout incrementally as it generates, or buffers the whole response "
+    "and writes it once at the end. If it buffers, exc.stdout is empty "
+    "at kill time regardless of how much the model 'generated' "
+    "internally, and this slot is a clean no-op against a noisy gate, "
+    "not a harmful change (repair on an empty string returns None, "
+    "raise proceeds exactly as today). Added a diagnostic print inside "
+    "the except branch -- '[preprocess] Fix 5: all 3 attempts timed out, "
+    "best partial stdout = N bytes' -- specifically so next session can "
+    "read tonight's log and know which case happened without re-deriving "
+    "it blind: N=0 across repeats means this lever is dead and should "
+    "not be retried in another form; N>0 but still discarded means "
+    "repair itself needs work, not the capture mechanism.\n\n"
+    "Distinct from 2026-10-04 slot 2 (exp-json-truncation-repair-"
+    "malformed-not-timeout, measured 0.4313, discarded, per that night's "
+    "own kept-slot-1 DESCRIPTION): that one monkeypatched json.loads to "
+    "repair a response that finished inside the 180s window but came "
+    "back malformed (154.4s, 'Failed to parse JSON' with no preceding "
+    "'WARN: Timeout'). This slot's code path only ever runs after a real "
+    "subprocess.TimeoutExpired on the 3rd attempt -- a response that "
+    "never finished and never reached json.loads at all today -- so it "
+    "is a different trigger condition on a different exception, not a "
+    "retry of that slot's lever.\n\n"
+    "No-op / cannot-regress argument: every image that succeeds on "
+    "attempt 1 or 2 (the large majority every night checked, including "
+    "every Duplex run across both 2026-10-15 logs read this session) "
+    "never reaches the 3rd attempt's except-branch at all, so this edit "
+    "cannot touch it by construction. On the minority of nights where "
+    "attempt 3 also times out, today's code already returns zero "
+    "elements for that image -- the only two outcomes for this slot are "
+    "identical-to-today (repair fails, raises) or strictly better "
+    "(repair succeeds, some real elements score instead of none).\n\n"
+    "How to read next slot's log: check the new '[preprocess] Fix 5' "
+    "line if present. Its byte count answers the buffering question "
+    "above directly. If salvage fires (nonzero bytes, no final 'WARN: "
+    "Failed to parse JSON' for that image, some category count above "
+    "zero on an image that used to be a hard zero), that is this "
+    "mechanism working regardless of whether tonight's overall gate "
+    "clears. If the line never appears, no image hit the 3rd-attempt "
+    "timeout tonight and this edit is inert by the same no-op argument "
+    "above, not evidence against the mechanism."
+)
+
 # Override the system prompt sent to Claude for extraction.
 # Set to None to use the production prompt from ~/Lexios/lexios/SKILL.md
 SYSTEM_PROMPT_OVERRIDE = """Extract building elements from this floor plan image as JSON. Every "location" field below must be exactly the filename's floor-level segment (e.g. "-Level_1.png" becomes "Level 1", "-Second_Floor.png" becomes "Second Floor"), spaces instead of underscores, never abbreviated further: do not read a level label from inside the drawing instead. Speed matters, keep fields short, no extra fields, minified JSON (no indentation, no line breaks). There is a hard 180-second limit: an unfinished response at that point is discarded whole, so treat your real budget as roughly 130 seconds and close out valid JSON early rather than risk being cut off mid-generation, which scores zero for every category on this image.
@@ -4000,6 +4117,79 @@ def preprocess(image_path: str) -> str:
                 "per-category cap. Return only {\"doors\": [...], "
                 "\"rooms\": [...], \"windows\": [...]}, nothing else."
             )
+
+            # Fix 5 (exp-salvage-partial-json-on-final-timeout, 2026-10-16):
+            # on the 3rd attempt's TimeoutExpired, subprocess.run() has
+            # ALREADY collected whatever stdout the killed process wrote --
+            # CPython's Popen._communicate raises TimeoutExpired(output=...)
+            # with that data attached, it is not discarded by run() itself.
+            # The loss happens one layer up: run() (outside this file's
+            # edit markers) catches TimeoutExpired and unconditionally sets
+            # text="", never reading exc.stdout. This recovers it instead:
+            # truncate at the last point the model's own JSON was still
+            # well-formed and close whatever brackets it had already
+            # opened -- removes trailing incomplete content and adds only
+            # closing punctuation, never a new element -- so run()'s own
+            # unmodified json.loads(...) can parse whatever categories the
+            # model finished writing before the kill. Only engages after
+            # the 3rd attempt's own timeout, exactly where today's code
+            # already gives up and returns zero elements; attempts 1-2 and
+            # every non-timeout path are byte-identical to before.
+            def _repair_truncated_json(raw):
+                if not raw:
+                    return None
+                text = raw.decode("utf-8", "ignore") if isinstance(raw, bytes) else raw
+                text = text.strip()
+                if "```json" in text:
+                    text = text.split("```json", 1)[1].split("```", 1)[0].strip()
+                elif text.startswith("```"):
+                    parts = text.split("```")
+                    if len(parts) >= 2:
+                        text = parts[1].strip()
+                if not text.startswith("{"):
+                    return None
+                try:
+                    parsed = json.loads(text)
+                    return text if isinstance(parsed, dict) else None
+                except (json.JSONDecodeError, ValueError):
+                    pass  # not already valid -- fall through to truncate-and-close below
+                closers = {"{": "}", "[": "]"}
+                idx = text.rfind("}")
+                while idx > 0:
+                    candidate = text[: idx + 1]
+                    stack = []
+                    in_string = False
+                    escape = False
+                    for ch in candidate:
+                        if in_string:
+                            if escape:
+                                escape = False
+                            elif ch == "\\":
+                                escape = True
+                            elif ch == '"':
+                                in_string = False
+                            continue
+                        if ch == '"':
+                            in_string = True
+                        elif ch in "{[":
+                            stack.append(ch)
+                        elif ch in "}]":
+                            if stack:
+                                stack.pop()
+                    if not in_string:
+                        repaired = candidate + "".join(
+                            closers[b] for b in reversed(stack)
+                        )
+                        try:
+                            parsed = json.loads(repaired)
+                            if isinstance(parsed, dict):
+                                return repaired
+                        except (json.JSONDecodeError, ValueError):
+                            pass  # this cut point still doesn't close cleanly -- try an earlier one
+                    idx = text.rfind("}", 0, idx)
+                return None
+
+            best_partial = b""
             for _attempt in range(3):
                 call_args = args
                 if (_attempt >= 1 and isinstance(args, list) and args
@@ -4007,8 +4197,22 @@ def preprocess(image_path: str) -> str:
                     call_args = list(args[:-1]) + [args[-1] + RETRY_SCOPE_SHRINK]
                 try:
                     return _orig(call_args, **kw)
-                except _sp.TimeoutExpired:
+                except _sp.TimeoutExpired as exc:
+                    partial = exc.stdout or b""
+                    if isinstance(partial, str):
+                        partial = partial.encode("utf-8", "ignore")
+                    if len(partial) > len(best_partial):
+                        best_partial = partial
                     if _attempt == 2:
+                        print(
+                            "[preprocess] Fix 5: all 3 attempts timed out, "
+                            f"best partial stdout = {len(best_partial)} bytes"
+                        )
+                        repaired = _repair_truncated_json(best_partial)
+                        if repaired is not None:
+                            return _sp.CompletedProcess(
+                                call_args, -1, repaired, ""
+                            )
                         raise
 
         _sp.run = _fixed_run
