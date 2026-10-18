@@ -3207,121 +3207,131 @@ DESCRIPTION = (
     "tonight by the all-three-attempts failure this change targets."
 )
 
-EXPERIMENT_NAME = "exp-salvage-partial-json-on-final-timeout"
+EXPERIMENT_NAME = "exp-retry-scope-add-stairs-walltypes"
 DESCRIPTION = (
-    "Experiment #1 tonight (2026-10-16). Baseline to beat: 0.4794, "
-    "logs/baseline-20261016-020006.log: Duplex_A_20110907 F1=0.5507, "
-    "NBU_MedicalClinic_Arch F1=0.4082 (raw=post both, phantom probes "
-    "clean). Read that log directly this session: Clinic First_Floor hit "
-    "the exact same all-3-attempts timeout as 2026-10-15's baseline and "
-    "slot 2 (540.1s, 'WARN: Timeout' then 'WARN: Failed to parse JSON', 0 "
-    "elements), losing its entire 345-GT-mention share of the document to "
-    "a hard zero while Second_Floor finished fine (233 elements, 135.4s) "
-    "-- this is the same failure mode last night's own logs show landing "
-    "on NBU_MedicalClinic_Arch--ifc-render-Second_Floor.png instead in a "
-    "different run that same night (logs/exp-20261015-030155.log: "
-    "First_Floor succeeded, Second_Floor timed out all 3 ways, 540.1s, 0 "
-    "elements) -- confirming across two independent nights that this is "
-    "sampling-variance-driven (whichever image the model stalls on that "
-    "run), not a fixed property of one image, so a fix for it is not "
-    "overfit to a single doc.\n\n"
-    "Two levers already tried against this exact failure and discarded: "
-    "2026-10-15 slot 1 (kept) moved the narrow doors+rooms+windows retry "
-    "schema from attempt 3 only to attempts 2 and 3 -- did not prevent "
-    "tonight's repeat. 2026-10-15 slot 3 (exp-retry-schema-explicit-45-"
-    "cap-not-inherited-90, discarded 0.5031) gave the retry an explicit "
-    "45-per-category cap instead of inheriting the live 90 -- its own log "
-    "shows this STILL produced a full 540.1s/0-element loss that same "
-    "night (logs/exp-20261015-030155.log), i.e. even a ~125-element ask "
-    "did not reliably finish, which is exactly the evidence that slot's "
-    "own DESCRIPTION flagged as 'evidence the bottleneck is not output "
-    "volume at all (a non-generation stall)' rather than retrying a third "
-    "cap number. This slot does not touch retry scope or cap width at "
-    "all -- same RETRY_SCOPE_SHRINK text, same 3 attempts, same 180s each "
-    "-- and instead targets what happens AFTER the 3rd attempt's own "
-    "TimeoutExpired, which today is unconditional total loss.\n\n"
-    "Read run() directly this session (outside this file's edit markers, "
-    "not touched): its except branch for subprocess.TimeoutExpired sets "
-    "text=\"\" unconditionally and never reads anything off the caught "
-    "exception. But CPython's subprocess.run() does not hand run() an "
-    "empty-handed exception on POSIX -- Popen._communicate's own timeout "
-    "path raises TimeoutExpired(output=<bytes collected so far>, ...) "
-    "before run() ever sees it, so exc.stdout already carries whatever "
-    "the model had written to stdout before the kill. The loss is a "
-    "layer up (run(), unreachable to this file), not in subprocess "
-    "internals -- so the fix has to be making preprocess()'s own 3-"
-    "attempt retry loop (which already fully intercepts this exact call "
-    "via the _sp.run monkeypatch) hand run() back a repaired, parseable "
-    "string in place of letting the bare exception propagate on the "
-    "final attempt, since run()'s own string-handling code after that "
-    "point is unmodified and already does the right thing with whatever "
-    "valid JSON string it receives.\n\n"
-    "Change (preprocess() only, inside _fixed_run, nothing outside the "
-    "loop touched): added _repair_truncated_json(), a pure string "
-    "function -- strips markdown fences, then on a parse failure tries "
-    "successively earlier '}' cut points, computes which brackets are "
-    "still open up to each candidate cut (string-aware, so a brace "
-    "inside a half-written tag string is never miscounted), and appends "
-    "only closing punctuation for brackets the model itself already "
-    "opened, retrying json.loads until one parses to a dict. It only "
-    "ever removes trailing incomplete content and closes already-open "
-    "brackets -- there is no code path that adds a key, a list entry, or "
-    "any value not already present in the model's own partial output, so "
-    "the fabrication probes (empty-dict call, decoy-element call) stay "
-    "clean by construction exactly like every other postprocess/"
-    "preprocess transform in this file. The retry loop now tracks "
-    "best_partial (the longest exc.stdout seen across all 3 attempts, "
-    "since attempt 1's full-schema request may have written more before "
-    "timing out than attempt 3's narrower one even though neither "
-    "finished) and, only on the 3rd attempt's own TimeoutExpired -- "
-    "exactly the branch that previously just re-raised -- tries repair on "
-    "it before giving up. Attempts 1 and 2's own except-branches are "
-    "otherwise unchanged (still just record best_partial and continue to "
-    "the next attempt); if repair returns None, it still raises exactly "
-    "as before, so run()'s existing text=\"\" fallback is reached "
-    "identically to today whenever salvage finds nothing usable.\n\n"
-    "Honest uncertainty this can't resolve without a shell: whether "
-    "'claude --print' in its default text output format writes to "
-    "stdout incrementally as it generates, or buffers the whole response "
-    "and writes it once at the end. If it buffers, exc.stdout is empty "
-    "at kill time regardless of how much the model 'generated' "
-    "internally, and this slot is a clean no-op against a noisy gate, "
-    "not a harmful change (repair on an empty string returns None, "
-    "raise proceeds exactly as today). Added a diagnostic print inside "
-    "the except branch -- '[preprocess] Fix 5: all 3 attempts timed out, "
-    "best partial stdout = N bytes' -- specifically so next session can "
-    "read tonight's log and know which case happened without re-deriving "
-    "it blind: N=0 across repeats means this lever is dead and should "
-    "not be retried in another form; N>0 but still discarded means "
-    "repair itself needs work, not the capture mechanism.\n\n"
-    "Distinct from 2026-10-04 slot 2 (exp-json-truncation-repair-"
-    "malformed-not-timeout, measured 0.4313, discarded, per that night's "
-    "own kept-slot-1 DESCRIPTION): that one monkeypatched json.loads to "
-    "repair a response that finished inside the 180s window but came "
-    "back malformed (154.4s, 'Failed to parse JSON' with no preceding "
-    "'WARN: Timeout'). This slot's code path only ever runs after a real "
-    "subprocess.TimeoutExpired on the 3rd attempt -- a response that "
-    "never finished and never reached json.loads at all today -- so it "
-    "is a different trigger condition on a different exception, not a "
-    "retry of that slot's lever.\n\n"
-    "No-op / cannot-regress argument: every image that succeeds on "
-    "attempt 1 or 2 (the large majority every night checked, including "
-    "every Duplex run across both 2026-10-15 logs read this session) "
-    "never reaches the 3rd attempt's except-branch at all, so this edit "
-    "cannot touch it by construction. On the minority of nights where "
-    "attempt 3 also times out, today's code already returns zero "
-    "elements for that image -- the only two outcomes for this slot are "
-    "identical-to-today (repair fails, raises) or strictly better "
-    "(repair succeeds, some real elements score instead of none).\n\n"
-    "How to read next slot's log: check the new '[preprocess] Fix 5' "
-    "line if present. Its byte count answers the buffering question "
-    "above directly. If salvage fires (nonzero bytes, no final 'WARN: "
-    "Failed to parse JSON' for that image, some category count above "
-    "zero on an image that used to be a hard zero), that is this "
-    "mechanism working regardless of whether tonight's overall gate "
-    "clears. If the line never appears, no image hit the 3rd-attempt "
-    "timeout tonight and this edit is inert by the same no-op argument "
-    "above, not evidence against the mechanism."
+    "Experiment #1 tonight (2026-10-18). Baseline to beat: 0.3845, read "
+    "directly from logs/baseline-20261018-020006.log this session: "
+    "Duplex_A_20110907 F1=0.5109, NBU_MedicalClinic_Arch F1=0.2581 (raw=post "
+    "both, phantom probes clean). That log's per-category breakdown is the "
+    "basis for this hypothesis: Clinic has 7 of its 10 scored categories at "
+    "an exact 0.00 F1 (equipment 0/2, plumbing_fixtures 0/3, "
+    "railings_guards 0/9, slabs 0/3, sprinklers 0/10, stairs_elevators 0/3, "
+    "wall_types 0/7) while doors/rooms/windows all score well (0.81/0.78/"
+    "0.99) -- 70% of Clinic's category-average sitting on the floor. Both "
+    "Clinic images took far longer than the 180s-per-attempt budget "
+    "(First_Floor 325.8s, Second_Floor 507.9s), meaning both went through "
+    "at least one timeout and landed on RETRY_SCOPE_SHRINK's narrowed "
+    "schema (doors+rooms+windows only, see the Fix 4 comment chain in "
+    "preprocess()) -- Duplex's Level_2 also narrowed tonight (452.4s).\n\n"
+    "First hypothesis considered and FALSIFIED this session before "
+    "writing any code: extend Fix 5 (exp-salvage-partial-json-on-final-"
+    "timeout, kept 2026-10-16) to also recover attempt 1's partial stdout "
+    "when a LATER narrowed attempt succeeds, on the theory that attempt "
+    "1's full-schema request would have already written the cheap early "
+    "categories (steps 1-5) before being killed mid-doors. Checked "
+    "directly this session: grepped every log in logs/ for Fix 5's own "
+    "diagnostic line ('Fix 5: all 3 attempts timed out, best partial "
+    "stdout = N bytes') -- every single occurrence across 7 matches in 5 "
+    "different logs (2026-10-16 and 2026-10-17 nights) reads N=0. "
+    "subprocess.run's TimeoutExpired.stdout is empty on every timeout "
+    "recorded so far, meaning 'claude --print' in this CLI's text mode "
+    "buffers its whole response and writes nothing until completion -- "
+    "Fix 5 itself has never actually recovered a byte since it was kept, "
+    "and a stdout-merge extension of it would inherit the identical dead "
+    "mechanism. Not attempting that lever; this is why the fix below is a "
+    "prompt-scope change instead, not a stdout-capture change.\n\n"
+    "Second hypothesis, the one implemented: extend RETRY_SCOPE_SHRINK "
+    "(Fix 4, 2026-10-04, extended 2026-10-11 with windows, extended "
+    "2026-10-15 to fire from attempt 2 onward) to also retain "
+    "stairs_elevators and wall_types, instead of dropping all 8 non-door/"
+    "room/window keys unconditionally. Checked directly this session, not "
+    "assumed: logs/exp-20260801-022856.log shows Clinic finishing both "
+    "images in 52.7s/58.2s (well under 180s -- a full-schema attempt-1 "
+    "success, no narrowing) with stairs_elevators scoring a perfect 3/3 "
+    "F1=1.00 that run, proving stairs_elevators is genuinely visible and "
+    "reliably found whenever the model is actually asked for it, not a "
+    "vision-detection failure like beams/slabs/railings_guards -- this "
+    "file's own 2026-10-10 slot (exp-walltypes-furring-plumbing-honest-"
+    "visual-cue, still live in SYSTEM_PROMPT_OVERRIDE step 2 today) "
+    "already read both eval images directly and confirmed the render "
+    "legend is only Walls/Doors/Windows/Columns/Other-MEP -- Walls has a "
+    "real legend entry (unlike beams/slabs/railings_guards, which have "
+    "none and are correctly left out of this change), and that same slot "
+    "already added positional Furring/Interior-Plumbing cues for "
+    "wall_types that are fully present in the base prompt text today, so "
+    "re-asking for wall_types on retry costs nothing beyond the ask "
+    "itself -- the elaborate step-2 cue text is still in context either "
+    "way, since RETRY_SCOPE_SHRINK is appended after the full base prompt, "
+    "not a replacement for it.\n\n"
+    "Both added categories are deliberately the cheapest possible "
+    "additions: stairs_elevators and wall_types have no per-image cap "
+    "(unlike doors/rooms at 90 and windows at 35) and have never exceeded "
+    "single digits in any log checked this or the 2026-10-10 session -- "
+    "a handful of short JSON objects against a budget whose actual "
+    "pressure point is doors/rooms' own 90-instance cap. Tonight's two "
+    "narrowed Clinic completions (146s and 148s, after their own "
+    "preceding 180s timeout) finished with roughly 30s of slack under the "
+    "180s wall per the arithmetic in exp-rebalance-timeout-180x2-over-"
+    "120x3's own budget, which this addition's few extra short entries "
+    "should not meaningfully erode. railings_guards/slabs/beams/"
+    "equipment/plumbing_fixtures/sprinklers are deliberately NOT added: "
+    "per the 2026-10-10 direct-image-read, beams/slabs/railings_guards "
+    "have no legend representation at all (parked, per program.md "
+    "direction #5), and equipment/plumbing_fixtures/sprinklers have "
+    "already received extensive honest-visual-cue prompt text in step 5 "
+    "without moving off 0 on Clinic in any recent log checked -- adding "
+    "any of those six to the narrow retry would cost more generation time "
+    "for a near-certain repeat zero, a worse risk/reward than the two "
+    "categories actually added.\n\n"
+    "Change (preprocess() only, RETRY_SCOPE_SHRINK string): the retained-"
+    "key list grows from {doors, rooms, windows} to {stairs_elevators, "
+    "wall_types, doors, rooms, windows}, listed in that order (cheap "
+    "categories first, matching the main prompt's own step-ordering "
+    "rationale), and the explicit skip-list shrinks to the remaining six "
+    "keys. The JSON-shape example in the override text is updated to "
+    "match. Nothing else in preprocess() changes -- attempt count (3), "
+    "per-attempt timeout (180s), Fix 5's salvage branch, and the image-"
+    "resize/sharpen pipeline are byte-for-byte unchanged. "
+    "SYSTEM_PROMPT_OVERRIDE's own schema, step order, and Rules section "
+    "(the ones that govern attempt 1) are untouched -- this only changes "
+    "what attempts 2 and 3 ask for after attempt 1 has already timed out, "
+    "so no doc that finishes on attempt 1 (the common case for Duplex's "
+    "faster image, per tonight's 85.6s Level_1) is affected by this at "
+    "all.\n\n"
+    "No-op / cannot-regress argument: on any image that finishes on "
+    "attempt 1 (full schema, unmodified), this edit never fires -- "
+    "RETRY_SCOPE_SHRINK is only appended starting attempt 2. On an image "
+    "that already narrows today, the only two outcomes are identical-to-"
+    "today (the model still reports 0 for stairs_elevators/wall_types "
+    "despite being asked, exactly like today's unconditional drop) or "
+    "strictly better (it reports real instances, since fuzzy_match's "
+    "substring-first check combined with gt_is_minimum=True means an "
+    "extra entry that fails to match costs nothing in precision, per "
+    "score_elements() and fuzzy_match() read directly this and the "
+    "2026-10-10 session). The one real risk is time: if adding two more "
+    "keys pushes a narrowed attempt that would have JUST finished past "
+    "180s instead, that image's doors/rooms/windows could be lost to a "
+    "timeout they would not otherwise have hit. Tonight's ~30s-slack "
+    "arithmetic above is the argument this is unlikely, not a guarantee.\n\n"
+    "How to read next slot's log: check Clinic's stairs_elevators and "
+    "wall_types correct-counts specifically (today 0/3 and 0/7) against "
+    "this log's same two numbers. A rise in either is this mechanism "
+    "working. If both stay at 0 AND the per-image timing shows the "
+    "narrowed attempt still finished well under 180s (ruling out a time-"
+    "pressure explanation), that means the model is declining to report "
+    "them even when asked on retry -- a different failure mode than "
+    "today's (asked-but-not-finding, not never-asked) and the signal to "
+    "not retry this exact lever again. If a narrowed attempt's duration "
+    "grew enough to cost a previously-landing doors/rooms/windows result, "
+    "that is the time-risk above materializing, not evidence against "
+    "stairs_elevators/wall_types' own detectability.\n\n"
+    "Prior slot's history (exp-salvage-partial-json-on-final-timeout, "
+    "2026-10-16, kept 0.4794->0.5765, the state this file was in going "
+    "into tonight) is preserved verbatim in logs/baseline-20261018-"
+    "020006.log's embedded result JSON and in results.tsv -- not "
+    "re-inlined here to keep this entry from growing without bound; its "
+    "own mechanism (Fix 5, the final-attempt JSON salvage) is unchanged "
+    "by this edit and is addressed directly above."
 )
 
 # Override the system prompt sent to Claude for extraction.
@@ -4061,6 +4071,17 @@ def preprocess(image_path: str) -> str:
     that image's chance of returning a non-empty extraction instead of a
     hard zero. Attempt 1 and the 3-attempt/540s worst-case total are both
     unchanged. See DESCRIPTION for the full evidence trace.
+
+    exp-retry-scope-add-stairs-walltypes (2026-10-18): RETRY_SCOPE_SHRINK's
+    retained-key list grows from {doors, rooms, windows} to
+    {stairs_elevators, wall_types, doors, rooms, windows}. Both added keys
+    are uncapped and have never run past single digits in any log checked,
+    so they cost a handful of short JSON objects against a budget whose
+    real pressure is doors/rooms' own 90-instance cap. See DESCRIPTION for
+    the full evidence trace (stairs_elevators scoring 3/3 whenever a
+    full-schema attempt actually asks for it; both currently sitting at a
+    guaranteed 0 on every image that narrows, which per tonight's baseline
+    log is both NBU_MedicalClinic_Arch images and Duplex's Level_2).
     """
     import subprocess as _sp
     if not hasattr(_sp, "_claude_arg_fix_applied"):
@@ -4090,32 +4111,42 @@ def preprocess(image_path: str) -> str:
             # Fix 4 (exp-attempt3-scope-shrink-doors-rooms-only, 2026-10-04,
             # extended by exp-attempt3-add-windows-level-specific-loss,
             # 2026-10-11, extended by exp-retry-narrow-scope-on-attempt2-
-            # not-just-3, 2026-10-15): narrow the ask to the highest-value
-            # categories so there is something to generate within budget
-            # instead of the full 11-key schema. Previously this only fired
-            # on the 3rd (last) attempt, so attempt 2 was a byte-identical
-            # retry of the same full-schema request attempt 1 already lost
-            # to the clock -- the only thing that could change its outcome
-            # was pure LLM sampling variance, not a smaller ask. Now it
-            # fires from attempt 2 onward: once attempt 1 has timed out,
-            # every remaining attempt uses the narrower, lower-generation-
-            # volume request, since that is the one actually designed to
-            # finish within budget. Total attempt count (3) and total
-            # worst-case time (3x180s) are unchanged -- only which schema
-            # variant attempts 2 and 3 send. See DESCRIPTION for the full
-            # evidence trace (tonight's Clinic First_Floor: all 3 internal
-            # attempts timed out, 540.1s, 0 elements).
+            # not-just-3, 2026-10-15, extended by
+            # exp-retry-scope-add-stairs-walltypes, 2026-10-18): narrow the
+            # ask to the highest-value categories so there is something to
+            # generate within budget instead of the full 11-key schema.
+            # Previously this only fired on the 3rd (last) attempt, so
+            # attempt 2 was a byte-identical retry of the same full-schema
+            # request attempt 1 already lost to the clock -- the only thing
+            # that could change its outcome was pure LLM sampling variance,
+            # not a smaller ask. Now it fires from attempt 2 onward: once
+            # attempt 1 has timed out, every remaining attempt uses the
+            # narrower, lower-generation-volume request, since that is the
+            # one actually designed to finish within budget. Total attempt
+            # count (3) and total worst-case time (3x180s) are unchanged --
+            # only which schema variant attempts 2 and 3 send. 2026-10-18
+            # adds stairs_elevators and wall_types to the retained set:
+            # both are uncapped, never seen past single digits, and
+            # unconditionally dropped by this override today even though
+            # stairs_elevators scores perfectly whenever a full-schema
+            # attempt actually asks for it (see DESCRIPTION). See
+            # DESCRIPTION for the full evidence trace (tonight's Clinic
+            # First_Floor/Second_Floor: both landed on this narrowed path).
             RETRY_SCOPE_SHRINK = (
                 "\n\nRETRY OVERRIDE (this image already timed out on a "
                 "prior attempt): to guarantee a finishable response this "
-                "time, extract ONLY \"doors\", \"rooms\", and \"windows\" "
-                "and skip every other key entirely (stairs_elevators, "
-                "railings_guards, slabs, beams, wall_types, "
+                "time, extract ONLY \"stairs_elevators\", \"wall_types\", "
+                "\"doors\", \"rooms\", and \"windows\", and skip every "
+                "other key entirely (railings_guards, slabs, beams, "
                 "plumbing_fixtures, sprinklers, equipment), even where "
-                "visible. List every door, room, and window tag you can "
-                "see, in the same format as before, up to the existing "
-                "per-category cap. Return only {\"doors\": [...], "
-                "\"rooms\": [...], \"windows\": [...]}, nothing else."
+                "visible. stairs_elevators and wall_types are each usually "
+                "only a handful of instances with no per-category cap -- "
+                "list them fully first, it costs only a few seconds, then "
+                "list every door, room, and window tag you can see, in "
+                "the same format as before, up to the existing per-"
+                "category cap. Return only {\"stairs_elevators\": [...], "
+                "\"wall_types\": [...], \"doors\": [...], \"rooms\": "
+                "[...], \"windows\": [...]}, nothing else."
             )
 
             # Fix 5 (exp-salvage-partial-json-on-final-timeout, 2026-10-16):
