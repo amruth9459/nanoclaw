@@ -3402,6 +3402,91 @@ DESCRIPTION = (
     "Duplex's eight categories are not expected to move at all."
 )
 
+EXPERIMENT_NAME = "exp-attempt3-halve-doors-rooms-cap-45"
+DESCRIPTION = (
+    "Tonight's 4th slot (2026-10-19). Baseline to beat: 0.5392, this "
+    "file's on-disk state going in (exp-retryscope-add-equipment-first-"
+    "floor-timeout, kept slot 1 tonight, logs/exp-20261019-021732.log). "
+    "Slot 2 (exp-drop-invisible-slabs-beams-no-legend-symbol, logs/"
+    "exp-20261019-024721.log) was measured at 0.4324 and discarded. Slot "
+    "3 (exp-walltypes-furring-plumbing-multi-instance, logs/"
+    "exp-20261019-031703.log) was measured at 0.4521 and discarded. "
+    "Neither touched preprocess()'s retry loop; this edit repeats "
+    "neither.\n\n"
+    "Read all three of tonight's logs directly this session, not "
+    "assumed: NBU_MedicalClinic_Arch--ifc-render-First_Floor.png's own "
+    "timing tonight is 354.3s (slot 1, kept, succeeded on attempt 2) "
+    "then 540.1s/0 elements in BOTH slot 2 and slot 3 -- exactly 3x180s, "
+    "every internal attempt in preprocess()'s retry loop (lines "
+    "~4326-4349) timing out both times. Grepped directly in both slot "
+    "2's and slot 3's logs: '[preprocess] Fix 5: all 3 attempts timed "
+    "out, best partial stdout = 0 bytes' -- Fix 5's own partial-JSON "
+    "salvage (added 2026-10-16) captured zero bytes on both runs, so a "
+    "third timeout on this image is a guaranteed, unrecoverable zero for "
+    "every category, not a near-miss something could still rescue "
+    "downstream. Slot 2 removed categories and slot 3 only touched "
+    "wall_types wording, yet both produced the identical 540.1s/0-byte "
+    "failure on the identical image -- neither edit's content plausibly "
+    "explains that identity, which points at session-to-session latency "
+    "variance being a real part of tonight's slowdown (see honest risk "
+    "below), not evidence against either slot's own hypothesis.\n\n"
+    "Read preprocess()'s retry loop directly this session (not "
+    "assumed): attempts 2 and 3 currently append the exact same "
+    "RETRY_SCOPE_SHRINK string (the condition at line 4328 is only "
+    "'_attempt >= 1', no branch on which attempt it is), which states "
+    "doors and rooms are 'capped higher at 90' -- identical to the main "
+    "schema's own cap. Slot 1's own successful attempt 2 used 174.3s of "
+    "the 180s window (354.3 - 180), landing only 5.7s under the wall at "
+    "that cap. Attempt 3, when reached, is today a byte-identical resend "
+    "of that same 90-cap request with that same thin margin -- the exact "
+    "critique 2026-10-15's kept slot (exp-retry-narrow-scope-on-"
+    "attempt2-not-just-3) made of attempt 2 against attempt 1 before "
+    "that fix landed, never yet applied to attempt 3 against attempt 2.\n\n"
+    "Change (preprocess() only, the subprocess.run retry loop): a new "
+    "RETRY_SCOPE_SHRINK_FINAL string, byte-identical to RETRY_SCOPE_"
+    "SHRINK except it states doors and rooms are capped at 45 on this "
+    "attempt, not 90, overriding the main prompt's stated 90 for this "
+    "attempt only; stairs_elevators/wall_types/equipment/windows keep "
+    "their existing wording and 35-cap for windows. The loop's suffix "
+    "selection now branches on _attempt: RETRY_SCOPE_SHRINK on attempt 2 "
+    "(_attempt == 1, unchanged), RETRY_SCOPE_SHRINK_FINAL on attempt 3 "
+    "(_attempt == 2). Attempt 1, the except-branch's retry/give-up logic, "
+    "and Fix 5 are all untouched; total attempt count (3) and each "
+    "attempt's own 180s timeout are unchanged.\n\n"
+    "No-op / cannot-regress argument: this only fires on an image's "
+    "THIRD internal attempt, i.e. after attempts 1 and 2 have both "
+    "already timed out at 180s each -- today that is a guaranteed "
+    "zero-element result for every category on that image, confirmed "
+    "above via Fix 5's 0-byte salvage on both of tonight's failing runs. "
+    "An image that finishes on attempt 1 or 2 (Duplex Level_1, Clinic "
+    "Second_Floor most nights, and Clinic First_Floor itself on slot 1 "
+    "tonight) never reaches this branch; this edit is inert there by "
+    "construction. Lowering the cap on an attempt that is otherwise a "
+    "guaranteed zero can only raise or hold flat that image's score, "
+    "never lower it.\n\n"
+    "Honest risk, stated directly: 2026-10-12's log (cited in this "
+    "file's own exp-doors-rooms-cap-raise-80-to-90 history) had "
+    "First_Floor finishing attempt 1 at cap 80 in 131s -- 49s of real "
+    "margin. Tonight the same image cannot finish even at cap 90 within "
+    "180s on attempt 1. That gap looks larger than 10 extra cap "
+    "instances can explain, which points to session-to-session API "
+    "latency variance, not output volume alone, as a real part of "
+    "tonight's slowdown. If that is the dominant factor, halving the cap "
+    "may still not be enough to let attempt 3 finish, and this edit "
+    "would be a true no-op (inert, not harmful) rather than the fix.\n\n"
+    "How to read next slot's log: check whether any image reaches "
+    "attempt 3 at all tonight (grep 'Fix 5' as done above) -- if none "
+    "does, this edit never fires and the result will sit close to "
+    "0.5392 by construction, not evidence the mechanism failed. If an "
+    "image does reach attempt 3, check whether it now returns a "
+    "non-zero element count where today it would return zero, and "
+    "whether doors/rooms on that image land near 45 each instead of 0. "
+    "Duplex's own stairs_elevators sat at 1/2 tonight on slot 1 (down "
+    "from 2/2 in recent history) -- that is instance-level sampling "
+    "variance on a 2-item category, unrelated to this edit, not a "
+    "regression to chase."
+)
+
 # Override the system prompt sent to Claude for extraction.
 # Set to None to use the production prompt from ~/Lexios/lexios/SKILL.md
 SYSTEM_PROMPT_OVERRIDE = """Extract building elements from this floor plan image as JSON. Every "location" field below must be exactly the filename's floor-level segment (e.g. "-Level_1.png" becomes "Level 1", "-Second_Floor.png" becomes "Second Floor"), spaces instead of underscores, never abbreviated further: do not read a level label from inside the drawing instead. Speed matters, keep fields short, no extra fields, minified JSON (no indentation, no line breaks). There is a hard 180-second limit: an unfinished response at that point is discarded whole, so treat your real budget as roughly 130 seconds and close out valid JSON early rather than risk being cut off mid-generation, which scores zero for every category on this image.
@@ -4251,6 +4336,39 @@ def preprocess(image_path: str) -> str:
                 "[...], \"rooms\": [...]}, nothing else."
             )
 
+            # exp-attempt3-halve-doors-rooms-cap-45 (2026-10-19, tonight's
+            # 4th slot): attempts 2 and 3 previously sent the identical
+            # RETRY_SCOPE_SHRINK text above, at the same 90 doors/rooms cap
+            # as the main schema. See DESCRIPTION for the full evidence
+            # trace: slot 1 tonight's successful attempt 2 used 174.3s of
+            # the 180s window at that cap, and both slot 2 and slot 3
+            # tonight lost all 3 attempts on the same image at 540.1s with
+            # Fix 5 salvaging 0 bytes -- a third timeout is an
+            # unrecoverable zero, not a near-miss. This gives attempt 3
+            # its own, smaller ask instead of resending attempt 2's.
+            RETRY_SCOPE_SHRINK_FINAL = (
+                "\n\nRETRY OVERRIDE (this image has already timed out "
+                "twice): to guarantee a finishable response on this final "
+                "attempt, extract ONLY \"stairs_elevators\", "
+                "\"wall_types\", \"equipment\", \"windows\", \"doors\", "
+                "and \"rooms\", and skip every other key entirely "
+                "(railings_guards, slabs, beams, plumbing_fixtures, "
+                "sprinklers), even where visible. stairs_elevators, "
+                "wall_types, and equipment are each usually only a "
+                "handful of instances with no per-category cap -- list "
+                "them fully first, it costs only a few seconds. Then list "
+                "every window tag you can see, capped at 35. On THIS "
+                "final attempt only, doors and rooms are each capped at "
+                "45 instances, not 90 -- a smaller cap than stated "
+                "earlier in this prompt, overriding it, so there is room "
+                "to close out valid JSON before the clock runs out a "
+                "third time. Same format as before, up to each "
+                "category's cap on this attempt. Return only "
+                "{\"stairs_elevators\": [...], \"wall_types\": [...], "
+                "\"equipment\": [...], \"windows\": [...], \"doors\": "
+                "[...], \"rooms\": [...]}, nothing else."
+            )
+
             # Fix 5 (exp-salvage-partial-json-on-final-timeout, 2026-10-16):
             # on the 3rd attempt's TimeoutExpired, subprocess.run() has
             # ALREADY collected whatever stdout the killed process wrote --
@@ -4327,7 +4445,8 @@ def preprocess(image_path: str) -> str:
                 call_args = args
                 if (_attempt >= 1 and isinstance(args, list) and args
                         and isinstance(args[-1], str)):
-                    call_args = list(args[:-1]) + [args[-1] + RETRY_SCOPE_SHRINK]
+                    _suffix = RETRY_SCOPE_SHRINK_FINAL if _attempt == 2 else RETRY_SCOPE_SHRINK
+                    call_args = list(args[:-1]) + [args[-1] + _suffix]
                 try:
                     return _orig(call_args, **kw)
                 except _sp.TimeoutExpired as exc:
