@@ -3604,6 +3604,110 @@ DESCRIPTION = (
     "failed yet in this family's history."
 )
 
+EXPERIMENT_NAME = "exp-drop-dead-beams-sprinklers-free-doors-rooms-time"
+DESCRIPTION = (
+    "Experiment #2 tonight (2026-10-21). Baseline to beat: 0.5482, this "
+    "file's on-disk state going in (exp-walltypes-clinic-rated-toiletpartition"
+    "-cue, kept 2026-10-20 slot 2; logs/baseline-20261021-020006.log: Duplex "
+    "raw=post F1=0.5514, Clinic raw=post F1=0.545, phantom probes clean). "
+    "Slot 1 tonight (exp-railings-guards-anchor-to-stairs-and-open-edges, "
+    "logs/exp-20261021-021401.log) was measured at 0.4581 and discarded -- "
+    "railings_guards stayed flat 0/4 and 0/9 on both docs despite the new "
+    "cue, and Clinic First_Floor independently timed out at 540.1s/0 "
+    "elements (the same 3x180s/0-byte Fix-5 signature this file has logged "
+    "repeatedly as session-to-session latency variance, unrelated to that "
+    "slot's own prompt text). This edit does not touch railings_guards and "
+    "uses a different mechanism.\n\n"
+    "Re-verified this session, not assumed from any past DESCRIPTION: "
+    "grepped every logs/*.log printed per-category line (the checkmark/"
+    "triangle 'category P=... F1=...' lines, not the JSON result blob) for "
+    "beams and sprinklers scoring above zero across the full set of October "
+    "2026 logs (103 files). Zero matches for either category, on either "
+    "doc, any night, including tonight's own baseline and slot 1 (Duplex "
+    "beams 0/8 every time; Clinic has no 'beams' key in its GT at all; "
+    "Clinic sprinklers 0/10 every time). The same grep for slabs and "
+    "railings_guards over the same window shows real, if rare, nonzero "
+    "nights instead (slabs 1/3 on Clinic three times in October, 1/21 on "
+    "Duplex in tonight's own baseline; railings_guards reached F1=1.00 on "
+    "both docs as recently as 2026-09-15, confirmed in tonight's own slot-1 "
+    "history check) -- so slabs and railings_guards keep real recoverable "
+    "value and are deliberately left untouched this slot, while beams and "
+    "sprinklers are confirmed to have none, this month, on either doc.\n\n"
+    "This exact combination (both categories, unconditionally, on top of "
+    "today's live prompt) has not been tried: 2026-09-12's "
+    "exp-drop-unscoreable-clinic-output (kept, 0.6904->0.8037) dropped "
+    "sprinklers unconditionally but beams only conditionally (skipped when "
+    "rooms/doors were already capped) -- and that cut was later silently "
+    "lost; the live schema read directly this session still asks for both "
+    "keys, meaning some intervening night's full-prompt rewrite "
+    "reintroduced them without anyone flagging the regression. "
+    "2026-10-19's exp-drop-invisible-slabs-beams-no-legend-symbol "
+    "(discarded 0.5392->0.4324) dropped slabs+beams but left sprinklers in, "
+    "and never got a clean read because Clinic First_Floor independently "
+    "timed out that night too (540.1s/0 elements, same signature as "
+    "tonight's slot 1). Neither prior attempt is repeated here: this "
+    "restores 09-12's sprinklers half, extends the beams cut to "
+    "unconditional (justified now by a full month of zero rather than one "
+    "night's snapshot), and leaves slabs out of the cut unlike 10-19, since "
+    "slabs is not actually dead.\n\n"
+    "Change (SYSTEM_PROMPT_OVERRIDE only, three sites, no step renumbering): "
+    "(1) removed the 'beams' and 'sprinklers' keys from the JSON schema "
+    "template; (2) step 4's text shortens from 'slabs, then beams: ... "
+    "slabs before beams.' to 'slabs: ...', slabs' own instruction otherwise "
+    "unchanged and still its own numbered step; (3) step 5's text drops the "
+    "sprinklers clause entirely (its Fire-Extinguisher-Cabinet sentence "
+    "removed) and its closing 'never invent an entry across these three' "
+    "becomes 'across these two' (equipment, plumbing_fixtures only). No "
+    "step is renumbered or reordered, no cap or key on any other category "
+    "changes, and no Rules bullet names either category (re-read the Rules "
+    "section this session to confirm). PARAMS, preprocess(), and "
+    "postprocess() are byte-for-byte unchanged -- grepped both functions "
+    "directly this session for 'beams', 'sprinklers', and "
+    "'RETRY_SCOPE_SHRINK' and found no reference to either category "
+    "anywhere outside the schema/step text edited here, so unlike 10-19 "
+    "there is no stale retry-prose mention left to clean up.\n\n"
+    "Mechanism, stated honestly: a pure time/attention reallocation, not a "
+    "new detection capability, the same kind as the 09-12 and 10-19 "
+    "attempts. It cannot raise beams' or sprinklers' own F1 (both already "
+    "at the floor all month, confirmed above). What it can do is free "
+    "whatever share of the model's ~130s stated budget was going toward "
+    "two categories that have produced zero real matches on either doc all "
+    "October, redirecting that time toward doors and rooms (steps 6-7, "
+    "last priority, tonight's two biggest absolute point-losers: Clinic "
+    "doors 135/254 missing 119, Clinic rooms 134/269 missing 135) and "
+    "toward Duplex windows (13/24).\n\n"
+    "No-op / cannot-regress argument: beams and sprinklers cannot score "
+    "below the 0.00 they already sit at on both docs all month, so removing "
+    "the ask forecloses no currently-realized value on either category. "
+    "The only way this costs anything is if two fewer schema lines somehow "
+    "slowed scanning elsewhere, which has no plausible mechanism -- if "
+    "anything the opposite. Every other step's text, every cap, and every "
+    "other key name in the schema is untouched.\n\n"
+    "Honest risk: same confound as both predecessors -- if Clinic "
+    "First_Floor's recurring timeout is dominated by session-to-session "
+    "API latency rather than by how many categories the schema lists (this "
+    "file's own 10-19 and tonight's slot-1 logs both point that way), this "
+    "edit may do nothing measurable on a night where that timeout fires "
+    "again, the same confound that denied a clean read to both 09-12's "
+    "beams-conditional half and 10-19's attempt. If doors/rooms recall does "
+    "not rise at all next to tonight's own baseline counts (135/254, "
+    "134/269) on a run where neither Clinic image times out, that is real "
+    "evidence category count was never the binding constraint for this "
+    "prompt, not evidence this edit broke something -- a future slot "
+    "should look elsewhere.\n\n"
+    "How to read next slot's log: confirm beams and sprinklers both "
+    "disappear from the per-category breakdown entirely (expected and "
+    "correct, not a regression -- 0 requested scores the same as 0 found, "
+    "just without the wasted ask). Watch Clinic doors/rooms correct-counts "
+    "against tonight's 135/254 and 134/269 floor, and Duplex windows "
+    "against 13/24, specifically on a run where neither Clinic image times "
+    "out (check both images' own seconds in the log first) -- only then "
+    "does a flat result mean this lever is spent rather than confounded. "
+    "Confirm slabs and railings_guards land at whatever this run's own "
+    "variance gives them, unrelated to this change, since neither was "
+    "touched."
+)
+
 # Override the system prompt sent to Claude for extraction.
 # Set to None to use the production prompt from ~/Lexios/lexios/SKILL.md
 SYSTEM_PROMPT_OVERRIDE = """Extract building elements from this floor plan image as JSON. Every "location" field below must be exactly the filename's floor-level segment (e.g. "-Level_1.png" becomes "Level 1", "-Second_Floor.png" becomes "Second Floor"), spaces instead of underscores, never abbreviated further: do not read a level label from inside the drawing instead. Speed matters, keep fields short, no extra fields, minified JSON (no indentation, no line breaks). There is a hard 180-second limit: an unfinished response at that point is discarded whole, so treat your real budget as roughly 130 seconds and close out valid JSON early rather than risk being cut off mid-generation, which scores zero for every category on this image.
@@ -3615,10 +3719,8 @@ Return a JSON object with only the keys below that have findings:
   "wall_types": [{"type_id": "<wall category from linework or legend, e.g. 'Exterior', 'Interior - Partition', 'Foundation', 'Party Wall', 'Interior - Furring', 'Interior - Plumbing', 'Interior - Rated', 'Interior - Toilet Partition'>"}],
   "railings_guards": [{"type": "<Guardrail or Handrail, if obvious>", "location": "<floor level, see above>"}],
   "slabs": [{"location": "<floor level, see above>"}],
-  "beams": [{"location": "<floor level, see above>"}],
   "equipment": [{"type": "<HVAC unit, electrical panel, water heater, if obvious>", "location": "<floor level, see above>"}],
   "plumbing_fixtures": [{"type": "<Toilet, Sink, Tub, Shower, if obvious>", "location": "<nearest legible room number or door tag, NOT a floor level, only if legible>"}],
-  "sprinklers": [{"type": "<Fire Extinguisher Cabinet, a small wall-mounted cabinet, sometimes tagged FEC, NOT a ceiling sprinkler head>", "location": "<nearest legible room number or door tag, only if legible>"}],
   "windows": [{"tag": "<window number/tag>"}],
   "doors": [{"location": "<floor level, see above>"}],
   "rooms": [{"name": "<room label transcribed VERBATIM from the drawing>"}]
@@ -3632,9 +3734,9 @@ Priority order (stop enumerating a category once handled, never revisit it). Eve
 
 3. railings_guards: one entry per handrail or guardrail segment you can actually see, "type" only when the distinction is visually obvious. Check every stairwell plus every balcony, elevated walkway, or roof-access edge on the sheet, not just the most obvious stairwell -- each typically has its own rail segment. Never invent one for a stairwell where no rail line is visible.
 
-4. slabs, then beams: one entry per grouping or member you can actually see, slabs before beams. Never invent one for a level where nothing is visible.
+4. slabs: one entry per grouping you can actually see. Never invent one for a level where nothing is visible.
 
-5. Next: equipment, plumbing_fixtures, sprinklers, in that order. Each has only a handful of real instances, so a full pass costs only a few seconds. equipment: a visible bathroom, utility, or mechanical room alone is enough for one entry (omit "type" if the unit symbol is not legible). plumbing_fixtures: actively look for toilet, sink, tub, and shower symbols in every bathroom or utility room on the sheet, not just ones that stand out; add an entry when the symbol is visible and you can tell which room contains it, using that room's own number or tag (from its doorway or label, does not have to touch the symbol) as "location", or "type" only if the room is not identifiable. An ADA-compliant fixture variant -- a grab bar, shower seat, or accessible-stall outline drawn next to a standard fixture -- is typically a smaller or dashed accessory symbol, not the fixture glyph itself, but still counts as one entry under that same fixture's type (e.g. "Shower"); do not skip it just because it looks like an accessory rather than the fixture. Separately, when a room's own printed label names a specific fixture use in words ("Toilet", "Restroom", "Shower", "Specimen Toilet"), not a generic "Bathroom" or "Utility" label, that label alone is enough for one plumbing_fixtures entry even with no fixture symbol drawn, using that room's own door tag or number as "location" -- the same room-label inference equipment already uses above, narrowed here to fixture-specific wording only. sprinklers here means Fire Extinguisher Cabinet only (a small wall-mounted box, sometimes tagged, not a ceiling head): actively scan corridors and exits for this symbol, same location convention as plumbing_fixtures. Beyond a visible symbol, or for plumbing_fixtures a fixture-naming room label as described above, never invent an entry across these three, but do not skip a category without having actually scanned for it first.
+5. Next: equipment, then plumbing_fixtures. Each has only a handful of real instances, so a full pass costs only a few seconds. equipment: a visible bathroom, utility, or mechanical room alone is enough for one entry (omit "type" if the unit symbol is not legible). plumbing_fixtures: actively look for toilet, sink, tub, and shower symbols in every bathroom or utility room on the sheet, not just ones that stand out; add an entry when the symbol is visible and you can tell which room contains it, using that room's own number or tag (from its doorway or label, does not have to touch the symbol) as "location", or "type" only if the room is not identifiable. An ADA-compliant fixture variant -- a grab bar, shower seat, or accessible-stall outline drawn next to a standard fixture -- is typically a smaller or dashed accessory symbol, not the fixture glyph itself, but still counts as one entry under that same fixture's type (e.g. "Shower"); do not skip it just because it looks like an accessory rather than the fixture. Separately, when a room's own printed label names a specific fixture use in words ("Toilet", "Restroom", "Shower", "Specimen Toilet"), not a generic "Bathroom" or "Utility" label, that label alone is enough for one plumbing_fixtures entry even with no fixture symbol drawn, using that room's own door tag or number as "location" -- the same room-label inference equipment already uses above, narrowed here to fixture-specific wording only. Beyond a visible symbol, or for plumbing_fixtures a fixture-naming room label as described above, never invent an entry across these two, but do not skip a category without having actually scanned for it first.
 
 6. windows: read the exact tag next to each window symbol -- on this kind of plan it is often a bare 1-3 digit number (e.g. "9", "23"), not an alphanumeric code like a door tag, so do not skip a window or omit its tag just because it is a lone number, and do not confuse it with a nearby dimension string; never invent one. Count small or high windows (bathroom, utility, stairwell) too, not just the prominent ones. Many plans repeat the exact same window type across several rooms (same size window in multiple bedrooms, for example) -- list one entry per physical window symbol you can actually see, not one entry per distinct type or size, and keep scanning for every other window that shares a type you have already logged once. Window tags on this kind of drawing usually run in one ascending, mostly-consecutive numeric sequence as you move around the building -- after your first pass, check your own found tags for a gap in that sequence (for example, you have 13 and 15 but not 14) and look again at that specific spot for a real window symbol you may have skipped inside a dense cluster of similar-looking windows; never invent a tag to fill a gap, only look harder for a real one. doors: each only needs the shared "location" value from above, so list every door symbol as its own entry (one per door, not deduped), including closet, bathroom, pantry, and utility doors, which are the ones a fast pass skips first.
 
