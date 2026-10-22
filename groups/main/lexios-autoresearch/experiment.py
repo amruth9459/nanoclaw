@@ -3798,6 +3798,97 @@ DESCRIPTION = (
     "to transmit quickly, unverified this session without a shell)."
 )
 
+EXPERIMENT_NAME = "exp-attempt3-restore-walltypes-windows-at-cap30"
+DESCRIPTION = (
+    "Experiment #2 tonight (2026-10-22). Baseline to beat: 0.4056, "
+    "tonight's slot 1 (exp-attempt3-doors-rooms-only-cap30-maximize-"
+    "finish-odds, logs/exp-20261022-021548.log), kept on disk going in: "
+    "Duplex F1=0.4659, Clinic F1=0.3454, phantom probes clean.\n\n"
+    "Read that log directly this session, not assumed from its own "
+    "DESCRIPTION: two images reached the 3rd (final) attempt tonight, and "
+    "BOTH finished inside budget rather than timing out a third time. "
+    "Clinic First_Floor: 471.5s total elapsed, minus two prior 180s "
+    "timeouts (360s) leaves 111.5s for attempt 3, which returned 60 "
+    "elements -- exactly 30 doors + 30 rooms, both hitting slot 1's new "
+    "cap. Duplex Level_2: 418.1s total, minus 360s leaves 58.1s for "
+    "attempt 3, which returned 18 elements. The except clause only "
+    "catches TimeoutExpired, so attempts 1 and 2 each ran their full "
+    "180s before attempt 3 started -- this subtraction is exact, not "
+    "estimated.\n\n"
+    "Slot 1's own cap-30 mechanism worked exactly as designed (confirmed "
+    "above, not merely hoped for), but its DESCRIPTION's own category "
+    "table shows why the overall score barely moved: Duplex's F1 dropped "
+    "0.5556->0.4659 on the SAME run, and only two categories account for "
+    "the full -0.0898 (per-category average): windows 14/24->4/24 "
+    "(-0.451 on that category alone) and wall_types 4/8->2/8 (-0.267). "
+    "The 4 surviving windows match Level_1's own full complement exactly "
+    "(this doc's GT windows are known from prior sessions' direct GT "
+    "reads to split roughly 4 on Level 1 / ~20 on Level 2) -- meaning "
+    "Level_2 contributed zero matched windows and lost two wall_types "
+    "matches specifically because slot 1's narrowed final attempt never "
+    "asked for either key, not because the model couldn't see them (it "
+    "had already found 4/8 wall_types and un-narrowed windows earlier "
+    "the same night, per tonight's own baseline log). This is a real, "
+    "measured cost that recurs every future night any image -- Clinic or "
+    "Duplex -- lands on this branch, not a hypothetical one.\n\n"
+    "Change (preprocess() only, RETRY_SCOPE_SHRINK_FINAL string): adds "
+    "\"wall_types\" and \"windows\" back into this final-attempt-only "
+    "retry text and JSON template, ahead of doors/rooms in both the "
+    "prose and the template (wall_types first -- uncapped, historically "
+    "single digits, cheap -- then windows at its own existing 35 cap, "
+    "then doors/rooms last). Doors/rooms stay capped at 30, byte-for-byte "
+    "unchanged from slot 1. RETRY_SCOPE_SHRINK (attempt 2), the retry/"
+    "give-up loop, and Fix 5's partial-JSON salvage are untouched. "
+    "SYSTEM_PROMPT_OVERRIDE and postprocess() are untouched.\n\n"
+    "Why key order changed, not just key membership: "
+    "exp-schema-key-order-match-priority-instructions (2026-10-12, kept) "
+    "established that this model's fill order tracks the literal JSON "
+    "template key order shown to it, and exp-retryscope-windows-before-"
+    "doors-rooms (2026-10-18, kept) already applied that finding to "
+    "RETRY_SCOPE_SHRINK (attempt 2). This edit applies the same ordering "
+    "logic to RETRY_SCOPE_SHRINK_FINAL for the first time, cheapest/"
+    "uncapped category first so it is never the one squeezed out.\n\n"
+    "Not a repeat of any prior slot: 2026-10-11's "
+    "exp-attempt3-add-windows-level-specific-loss added windows at the "
+    "then-shared 90 cap, before the attempt-2/attempt-3 split and before "
+    "the 45-cap or 30-cap narrowing existed. 2026-10-19's cap-45 version "
+    "included wall_types and windows but also stairs_elevators/equipment, "
+    "at cap 45, and has lost this exact failure mode (0-byte triple "
+    "timeout) twice since, per slot 1's own baseline-log citation "
+    "tonight. Tonight is the first time wall_types+windows+doors+rooms "
+    "specifically, at cap 30, has been sent. The claim under test is "
+    "narrow: that dropping the cap from 45 to 30 (slot 1's change) is "
+    "what let both images finish attempt 3 tonight, not the four-category "
+    "cut slot 1 also made at the same time -- restoring two of those four "
+    "back in, at the same lower cap, isolates that variable.\n\n"
+    "Honest risk: this adds generation volume back to the one attempt "
+    "that must finish within 180s or the image scores zero for every "
+    "category. Tonight's own measured headroom (58.1s and 111.5s unused) "
+    "argues this is affordable -- wall_types is historically single "
+    "digits and windows is tag-only short objects -- but if a future "
+    "night's attempt 3 is already closer to the wall than tonight's two "
+    "samples, adding two more keys could be the difference between "
+    "finishing and a third timeout, which would cost MORE than the two "
+    "categories being restored (doors+rooms would also return zero). "
+    "This is the central bet this slot makes, stated as directly as "
+    "slot 1 stated its own narrowing bet. Also inert, same as every "
+    "retry-path edit in this file's history, on any night where no image "
+    "reaches attempt 3 at all.\n\n"
+    "How to read next slot's log: on any image that reaches attempt 3, "
+    "check whether it still finishes within 180s (elapsed time for that "
+    "attempt specifically, i.e. total minus the two prior 180s timeouts) "
+    "and whether wall_types/windows correct-counts rise above zero on "
+    "that specific image where slot 1's version would have guaranteed "
+    "zero for both. If an image that reached attempt 3 under slot 1's "
+    "version would have finished now times out instead, that is this "
+    "slot's risk materializing -- the fix is lowering the doors/rooms cap "
+    "further (e.g. back toward 20), not re-dropping wall_types/windows, "
+    "since the goal is keeping all four rather than returning to two. If "
+    "overall F1 rises specifically via wall_types/windows moving on an "
+    "image that already reached attempt 3, that is the mechanism working "
+    "as intended."
+)
+
 # Override the system prompt sent to Claude for extraction.
 # Set to None to use the production prompt from ~/Lexios/lexios/SKILL.md
 SYSTEM_PROMPT_OVERRIDE = """Extract building elements from this floor plan image as JSON. Every "location" field below must be exactly the filename's floor-level segment (e.g. "-Level_1.png" becomes "Level 1", "-Second_Floor.png" becomes "Second Floor"), spaces instead of underscores, never abbreviated further: do not read a level label from inside the drawing instead. Speed matters, keep fields short, no extra fields, minified JSON (no indentation, no line breaks). There is a hard 180-second limit: an unfinished response at that point is discarded whole, so treat your real budget as roughly 130 seconds and close out valid JSON early rather than risk being cut off mid-generation, which scores zero for every category on this image.
@@ -4556,6 +4647,17 @@ def preprocess(image_path: str) -> str:
     mechanism was confirmed. Windows now comes third (after the uncapped
     stairs_elevators/wall_types, before doors/rooms) in both the prose and
     the template. See DESCRIPTION for the full evidence trace.
+
+    exp-attempt3-restore-walltypes-windows-at-cap30 (2026-10-22, tonight's
+    2nd slot): RETRY_SCOPE_SHRINK_FINAL (the 3rd-attempt-only override,
+    separate from RETRY_SCOPE_SHRINK above) grows back from {doors, rooms}
+    to {wall_types, windows, doors, rooms}, doors/rooms cap unchanged at
+    30. Tonight's 1st slot narrowed this final attempt to doors+rooms
+    only and was kept (0.4054->0.4056), but its own log shows both images
+    that reached attempt 3 finished with 58-112s of the 180s window still
+    unused, and the dropped keys cost Duplex Level_2 real, measured
+    matches (windows 14/24->4/24, wall_types 4/8->2/8) on a night it
+    landed on this same branch. See DESCRIPTION for the full trace.
     """
     import subprocess as _sp
     if not hasattr(_sp, "_claude_arg_fix_applied"):
@@ -4656,29 +4758,58 @@ def preprocess(image_path: str) -> str:
             # unrecoverable zero, not a near-miss. This gives attempt 3
             # its own, smaller ask instead of resending attempt 2's.
             # exp-attempt3-doors-rooms-only-cap30-maximize-finish-odds
-            # (2026-10-22): narrowed further -- stairs_elevators/
-            # wall_types/equipment/windows dropped from this FINAL attempt
-            # only (attempt 2's RETRY_SCOPE_SHRINK above is unchanged and
-            # still asks for all 6), cap lowered 45->30. See DESCRIPTION
-            # for the full evidence trace (tonight's baseline log:
-            # First_Floor still 0 bytes on all 3 attempts even with the
-            # 45-cap/6-key version already live).
+            # (2026-10-22, tonight's 1st slot): narrowed further --
+            # stairs_elevators/wall_types/equipment/windows dropped from
+            # this FINAL attempt only (attempt 2's RETRY_SCOPE_SHRINK above
+            # is unchanged and still asks for all 6), cap lowered 45->30.
+            # Measured 0.4054->0.4056, kept. Its own log confirms the
+            # mechanism fired on BOTH images that reached attempt 3
+            # tonight and both finished with time to spare: Clinic
+            # First_Floor used 111.5s of its 180s window for 60 elements
+            # (doors+rooms both hit the 30 cap), Duplex Level_2 used only
+            # 58.1s for 18 elements. See DESCRIPTION for the full
+            # attribution of why that slot was still only flat overall.
+            # exp-attempt3-restore-walltypes-windows-at-cap30 (2026-10-22,
+            # tonight's 2nd slot): restores wall_types and windows to this
+            # final attempt, still at cap 30 for doors/rooms (unchanged).
+            # Slot 1's own log shows exactly why: Duplex Level_2 landed on
+            # this same narrowed path tonight (two prior timeouts) and its
+            # windows correct-count collapsed from 14/24 to 4/24 and
+            # wall_types from 4/8 to 2/8 -- the 4 surviving windows are
+            # Level_1's own full complement (confirmed against this doc's
+            # known 4-on-Level_1/~20-on-Level_2 GT split), meaning Level_2
+            # contributed zero windows and lost two wall_types matches,
+            # purely because this final attempt never asked for either key.
+            # That is a real, measured cost on every future night Level_2
+            # (or any image) reaches this branch -- not hypothetical. Key
+            # order now matches the key-order-drives-fill-order result
+            # already validated for the main schema (2026-10-12, kept) and
+            # for RETRY_SCOPE_SHRINK itself (2026-10-18): uncapped
+            # wall_types first (historically single digits, cheap),
+            # windows next (own cap, 35, lower than doors/rooms), then
+            # doors/rooms last at cap 30 (unchanged from slot 1). See
+            # DESCRIPTION for the full evidence trace.
             RETRY_SCOPE_SHRINK_FINAL = (
                 "\n\nRETRY OVERRIDE (this image has already timed out "
                 "twice): to guarantee a finishable response on this final "
-                "attempt, extract ONLY \"doors\" and \"rooms\", and skip "
-                "every other key entirely (stairs_elevators, wall_types, "
-                "equipment, windows, railings_guards, slabs, beams, "
-                "plumbing_fixtures, sprinklers), even where visible -- "
-                "this is the final attempt and these are the two "
-                "categories with by far the most instances still "
-                "missing. On THIS final attempt only, doors and rooms "
-                "are each capped at 30 instances, not 90 -- a smaller "
-                "cap than stated earlier in this prompt, overriding it, "
-                "so there is room to close out valid JSON before the "
-                "clock runs out a third time. Same format as before, up "
-                "to each category's cap on this attempt. Return only "
-                "{\"doors\": [...], \"rooms\": [...]}, nothing else."
+                "attempt, extract ONLY \"wall_types\", \"windows\", "
+                "\"doors\", and \"rooms\", and skip every other key "
+                "entirely (stairs_elevators, equipment, railings_guards, "
+                "slabs, beams, plumbing_fixtures, sprinklers), even where "
+                "visible -- this is the final attempt and these are the "
+                "categories with by far the most instances still missing "
+                "or most at risk of being dropped entirely. List "
+                "wall_types fully first, it is usually only a handful of "
+                "instances with no cap and costs only a few seconds. Then "
+                "every window tag you can see, capped at 35, same as "
+                "stated earlier in this prompt. Then doors and rooms, "
+                "each capped at 30 instances on THIS final attempt only, "
+                "not 90 -- a smaller cap than stated earlier in this "
+                "prompt, overriding it, so there is room to close out "
+                "valid JSON before the clock runs out a third time. Same "
+                "format as before, up to each category's cap on this "
+                "attempt. Return only {\"wall_types\": [...], \"windows\": "
+                "[...], \"doors\": [...], \"rooms\": [...]}, nothing else."
             )
 
             # Fix 5 (exp-salvage-partial-json-on-final-timeout, 2026-10-16):
