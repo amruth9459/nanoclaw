@@ -3889,6 +3889,99 @@ DESCRIPTION = (
     "as intended."
 )
 
+EXPERIMENT_NAME = "exp-attempt2-lower-doors-rooms-cap-90-to-50"
+DESCRIPTION = (
+    "Tonight's 4th slot (2026-10-22). Baseline to beat: 0.5074, this "
+    "file's on-disk state going in (exp-attempt3-restore-walltypes-"
+    "windows-at-cap30, kept slot 2 tonight; logs/exp-20261022-024703.log: "
+    "Duplex F1=0.546, Clinic F1=0.468, phantom probes clean). Slot 3 "
+    "tonight (logs/exp-20261022-031928.log) was measured at 0.4419 and "
+    "discarded -- read directly this session: NBU_MedicalClinic_Arch--"
+    "ifc-render-First_Floor.png timed out all 3 internal attempts "
+    "(540.1s total, 0 elements, 'Fix 5: all 3 attempts timed out, best "
+    "partial stdout = 0 bytes'), dragging every one of that image's "
+    "categories to zero. That is session-to-session latency variance "
+    "this file has logged repeatedly, not evidence against slot 3's own "
+    "edit or a reason to avoid this one.\n\n"
+    "Read preprocess()'s retry loop directly this session, not assumed: "
+    "RETRY_SCOPE_SHRINK (attempt 2, fires once attempt 1 has already "
+    "timed out) caps doors/rooms at 90 -- byte-identical to the main "
+    "(attempt 1) schema's own cap, despite already dropping five keys "
+    "(railings_guards, slabs, beams, plumbing_fixtures, sprinklers). "
+    "2026-10-19's exp-attempt3-halve-doors-rooms-cap-45 (read directly) "
+    "cites attempt 2's one recorded success at 174.3s of the 180s window "
+    "-- 5.7s of margin -- and every more recent log checked this session "
+    "shows Clinic First_Floor landing on attempt 3 instead: tonight's own "
+    "kept slot 2 (logs/exp-20261022-024703.log line 50) shows First_Floor "
+    "at 523.0s total, i.e. 163.0s for attempt 3 alone after two straight "
+    "180s timeouts on attempts 1 AND 2. Attempt 2's 90-cap ask is landing "
+    "at or past the 180s wall on this image just like attempt 1, not "
+    "meaningfully safer despite the five dropped keys. Grepped every "
+    "EXPERIMENT_NAME/DESCRIPTION in this file for 'RETRY_SCOPE_SHRINK' "
+    "combined with a cap number this session: every prior cap edit names "
+    "either the main schema (e.g. 80->90, kept 2026-10-19) or "
+    "RETRY_SCOPE_SHRINK_FINAL specifically (45, then 30); attempt 2's own "
+    "cap has never been edited independently of attempt 1's.\n\n"
+    "Why this specific image's attempt-3 fallback costs more than doors/"
+    "rooms alone: RETRY_SCOPE_SHRINK_FINAL (attempt 3) asks for only "
+    "wall_types, windows, doors, and rooms -- it drops stairs_elevators "
+    "and equipment entirely, both of which RETRY_SCOPE_SHRINK (attempt 2) "
+    "still asks for. Checked directly this session: Clinic equipment has "
+    "sat at 0/2 in both tonight's kept baseline and slot 3's log (and "
+    "every other log checked), and NBU_MedicalClinic_Arch.ground-truth."
+    "json's two equipment entries ('Water Closet'/'Lavatory') both carry "
+    "location='First Floor - Toilet rooms'/'First Floor - Restrooms'. "
+    "Read equipment's match_keys directly in ~/Lexios/lexios/types.json: "
+    "[['name'],['type'],['location']]. The current schema never emits a "
+    "'name' field for equipment and GT's generic type='plumbing fixture' "
+    "shares no word with the prompt's HVAC/electrical/water-heater "
+    "examples, so both of the first two match_keys groups are dead paths "
+    "on this doc -- but fuzzy_match()'s substring check ('a in e', read "
+    "directly in eval.py) means any equipment entry with location='First "
+    "Floor' (the exact string the prompt already forces every entry's "
+    "location field to be) matches either GT entry immediately, since "
+    "'First Floor' is a literal prefix of both GT location strings. "
+    "Step 5's existing instruction already covers this honestly ('a "
+    "visible bathroom, utility, or mechanical room alone is enough for "
+    "one entry') -- a restroom and a toilet room are both visible from "
+    "room labels alone, no symbol legibility required. equipment is not "
+    "a detection gap here, it is a zero-successful-generation-pass gap: "
+    "no attempt that asks for it has been finishing on this image.\n\n"
+    "Change (preprocess() only, RETRY_SCOPE_SHRINK string): the stated "
+    "doors/rooms cap on attempt 2 drops from 90 to 50 -- a new, "
+    "independent site from both the main schema's 90 (untouched) and "
+    "RETRY_SCOPE_SHRINK_FINAL's existing 30 (untouched). "
+    "stairs_elevators/wall_types/equipment stay uncapped and listed "
+    "first (unchanged); windows stays capped at 35 (unchanged). No other "
+    "key, no other attempt's text, SYSTEM_PROMPT_OVERRIDE, PARAMS, and "
+    "postprocess() are byte-for-byte unchanged.\n\n"
+    "No-op / cannot-regress argument: an image that finishes on attempt 1 "
+    "(Duplex Level_1/Level_2, Clinic Second_Floor most nights) never "
+    "reaches this text at all -- inert there by construction. An image "
+    "that is already failing attempt 2 at cap 90 and falling through to "
+    "attempt 3's unchanged cap-30 schema gets, at worst, the identical "
+    "outcome if cap-50 also times out. The only way this edit changes "
+    "anything is if cap-50 lets attempt 2 actually close out valid JSON "
+    "where cap-90 didn't -- recovering equipment/stairs_elevators/"
+    "wall_types plus doors/rooms at 50 each, strictly better than a "
+    "third timeout or attempt 3's narrower 4-key, cap-30 fallback.\n\n"
+    "Honest risk: if First_Floor's recurring timeout is dominated by "
+    "session-to-session API latency rather than output volume -- a "
+    "confound this file has flagged repeatedly, including in 2026-10-19's "
+    "and 2026-10-21 slot 1's own DESCRIPTION text -- cap-50 may still not "
+    "be enough to let attempt 2 finish, and this would be a true no-op, "
+    "not evidence the mechanism is wrong.\n\n"
+    "How to read next slot's log: for whichever Clinic image reaches "
+    "attempt 2 or later tonight, check its elapsed time against the 180s "
+    "and 360s boundaries to see which attempt it actually finished on. If "
+    "it now finishes on attempt 2 rather than falling to attempt 3, check "
+    "whether equipment moves off 0/2 and whether stairs_elevators/"
+    "wall_types hold or improve on that image. If it still falls to "
+    "attempt 3, doors/rooms there are unchanged at cap 30 -- that run "
+    "confirms this edit was inert, not harmful, and a lower cap number is "
+    "the next thing to try, not a different mechanism."
+)
+
 # Override the system prompt sent to Claude for extraction.
 # Set to None to use the production prompt from ~/Lexios/lexios/SKILL.md
 SYSTEM_PROMPT_OVERRIDE = """Extract building elements from this floor plan image as JSON. Every "location" field below must be exactly the filename's floor-level segment (e.g. "-Level_1.png" becomes "Level 1", "-Second_Floor.png" becomes "Second Floor"), spaces instead of underscores, never abbreviated further: do not read a level label from inside the drawing instead. Speed matters, keep fields short, no extra fields, minified JSON (no indentation, no line breaks). There is a hard 180-second limit: an unfinished response at that point is discarded whole, so treat your real budget as roughly 130 seconds and close out valid JSON early rather than risk being cut off mid-generation, which scores zero for every category on this image.
@@ -4658,6 +4751,18 @@ def preprocess(image_path: str) -> str:
     unused, and the dropped keys cost Duplex Level_2 real, measured
     matches (windows 14/24->4/24, wall_types 4/8->2/8) on a night it
     landed on this same branch. See DESCRIPTION for the full trace.
+
+    exp-attempt2-lower-doors-rooms-cap-90-to-50 (2026-10-22, tonight's
+    4th slot): RETRY_SCOPE_SHRINK (attempt 2, fires once attempt 1 has
+    already timed out) had its own doors/rooms cap lowered from 90 to
+    50 -- a new, independent site from both the main schema's 90 and
+    RETRY_SCOPE_SHRINK_FINAL's 30, neither of which changes here.
+    Attempt 2's 90-cap ask has been landing at or past the 180s wall on
+    the same images that then fall through to attempt 3, which drops
+    stairs_elevators and equipment entirely -- equipment has sat at 0/2
+    on Clinic in every log checked this session specifically because no
+    attempt that asks for it has been finishing on that image. See
+    DESCRIPTION for the full evidence trace.
     """
     import subprocess as _sp
     if not hasattr(_sp, "_claude_arg_fix_applied"):
@@ -4739,9 +4844,11 @@ def preprocess(image_path: str) -> str:
                 "cap -- list them fully first, it costs only a few "
                 "seconds. Then list every window tag you can see, capped "
                 "at 35, before moving on to doors and rooms, each capped "
-                "higher at 90, so windows is not the one left unfinished "
-                "if this attempt also runs short. Same format as before, "
-                "up to each category's existing cap. Return only "
+                "at 50 instances on THIS attempt, not 90 -- lower than "
+                "the main prompt's stated cap, overriding it, so there is "
+                "room to close out valid JSON before the clock runs out a "
+                "second time. Same format as before, up to each "
+                "category's cap on this attempt. Return only "
                 "{\"stairs_elevators\": [...], \"wall_types\": [...], "
                 "\"equipment\": [...], \"windows\": [...], \"doors\": "
                 "[...], \"rooms\": [...]}, nothing else."
@@ -4789,6 +4896,14 @@ def preprocess(image_path: str) -> str:
             # windows next (own cap, 35, lower than doors/rooms), then
             # doors/rooms last at cap 30 (unchanged from slot 1). See
             # DESCRIPTION for the full evidence trace.
+            # exp-attempt2-lower-doors-rooms-cap-90-to-50 (2026-10-22,
+            # tonight's 4th slot): RETRY_SCOPE_SHRINK above (attempt 2,
+            # not this FINAL string) had its own doors/rooms cap lowered
+            # from 90 to 50 -- a new, independent site from both this
+            # string's existing 30 and the main schema's 90, neither of
+            # which changes here. See DESCRIPTION for the full trace of
+            # why attempt 2 at cap 90 is landing at or past the 180s wall
+            # on the same images that then fall through to this string.
             RETRY_SCOPE_SHRINK_FINAL = (
                 "\n\nRETRY OVERRIDE (this image has already timed out "
                 "twice): to guarantee a finishable response on this final "
