@@ -4329,6 +4329,75 @@ DESCRIPTION = (
     "principle."
 )
 
+EXPERIMENT_NAME = "exp-systematic-spatial-sweep-doors-rooms-dense-wings"
+DESCRIPTION = (
+    "Experiment #4 tonight (2026-10-23). Baseline to beat: 0.7343, read "
+    "directly this session from logs/exp-20261023-025721.log (this file's "
+    "on-disk state going in -- exp-slabs-per-room-not-per-level, kept slot "
+    "3 tonight): Duplex_A_20110907 f1=0.7301 (P=0.875 R=0.6593), "
+    "NBU_MedicalClinic_Arch f1=0.7385 (P=0.9 R=0.6611), phantom probes "
+    "clean (fabricated=0).\n\n"
+    "Checked that same log's per-category breakdown directly: on Clinic, "
+    "rooms scored 150/269 correct (F1=0.716, 119 missed) and doors scored "
+    "179/254 correct (F1=0.827, 75 missed) -- the two largest absolute "
+    "miss counts of any live category in either document, both still at "
+    "P=1.00 (every reported instance was real, so this is a pure recall "
+    "gap, not a false-positive problem). Also checked both Clinic images' "
+    "own timing in that log: First_Floor finished attempt 1 in 134.5s and "
+    "Second_Floor in 96.6s, both well under the 180s cap with 45s+ of "
+    "slack unused -- neither image was time-limited, so this is not the "
+    "budget problem the doors/rooms cap and retry-schema levers already "
+    "target (and that this file's own history has already explored "
+    "exhaustively at the cap site alone: 20->30, 30->35->45->65->85, a "
+    "post-cleanup reset to 25->35->50->70->80->90, then an explicit "
+    "90->50 attempt that was measured and discarded, so 90 is a "
+    "repeatedly-confirmed local optimum, not an unexplored lever).\n\n"
+    "Grepped this file for every spatial-scan-order wording tried before "
+    "(systematic, quadrant, grid, sweep, methodical, corridor-by-corridor, "
+    "row by row) directly this session: no match in any historical "
+    "EXPERIMENT_NAME, DESCRIPTION, or prompt text. Every past doors/rooms "
+    "edit changed a cap number, a key's position in the JSON template, or "
+    "which keys a retry attempt keeps -- none ever told the model WHERE "
+    "to look next, only WHAT counts as a door or room once seen. "
+    "NBU_MedicalClinic_Arch is a multi-corridor building with 254 doors "
+    "and 269 rooms on one floor plan apiece (confirmed in its own "
+    "ground-truth.json) -- a plausible, previously untested explanation "
+    "for a 119-room/75-door miss gap with time to spare is that a pass "
+    "with no stated scan order exhausts its thoroughness on whichever "
+    "wing or corridor it happens to notice first, then covers everything "
+    "after that less carefully, rather than running out of room in the "
+    "response.\n\n"
+    "Change (step 7 only, one sentence added, nothing else in the prompt "
+    "touched): right before the existing 'Doors and rooms are each "
+    "capped at 90 instances...' sentence that already covers both keys "
+    "together, added: on a floor with multiple corridors or wings, sweep "
+    "them in one consistent spatial order (e.g. left to right along the "
+    "nearest corridor, then the next) instead of covering the first area "
+    "noticed thoroughly and the rest more lightly. Phrased as an ORDER "
+    "to follow once, not a second pass, to avoid reading as 'scan twice.' "
+    "No cap, key, or order change anywhere else; step 6's own wording is "
+    "untouched. PARAMS, preprocess(), and postprocess() are byte-for-byte "
+    "unchanged, so the phantom-fabrication probes stay clean by "
+    "construction.\n\n"
+    "Expected magnitude: modest if it transfers -- Clinic rooms/doors "
+    "recall rising within their own 9-category average, honestly bounded "
+    "at zero if tonight's miss pattern is actually spread evenly across "
+    "the floor rather than concentrated in later-scanned regions, which "
+    "this session cannot confirm without per-room spatial ground truth "
+    "or a shell to inspect the actual image. Risk: Duplex_A_20110907 "
+    "already sits near ceiling on rooms (19/21) and doors (14/14, both "
+    "unchanged by slot 3) on a much smaller, single/duplex-unit building "
+    "-- the added sentence should be a no-op there since it has no "
+    "multiple wings to sweep, but that is unverified without a shell.\n\n"
+    "How to read next slot's log: compare Clinic rooms/doors correct-"
+    "counts against tonight's 150/269 and 179/254 directly -- a rise "
+    "confirms the sweep framing is transferring; flat or lower means the "
+    "miss pattern is not regional and the next attempt at this gap needs "
+    "a different lever, not scan order. Also confirm Duplex rooms/doors "
+    "stayed at or near 19/21 and 14/14 to rule out an unintended "
+    "regression on the document that was already strong."
+)
+
 # Override the system prompt sent to Claude for extraction.
 # Set to None to use the production prompt from ~/Lexios/lexios/SKILL.md
 SYSTEM_PROMPT_OVERRIDE = """Extract building elements from this floor plan image as JSON. Every "location" field below must be exactly the filename's floor-level segment (e.g. "-Level_1.png" becomes "Level 1", "-Second_Floor.png" becomes "Second Floor"), spaces instead of underscores, never abbreviated further: do not read a level label from inside the drawing instead. Speed matters, keep fields short, no extra fields, minified JSON (no indentation, no line breaks). There is a hard 180-second limit: an unfinished response at that point is discarded whole, so treat your real budget as roughly 130 seconds and close out valid JSON early rather than risk being cut off mid-generation, which scores zero for every category on this image.
@@ -4361,7 +4430,7 @@ Priority order (stop enumerating a category once handled, never revisit it). Eve
 
 6. windows: read the exact tag next to each window symbol -- on this kind of plan it is often a bare 1-3 digit number (e.g. "9", "23"), not an alphanumeric code like a door tag, so do not skip a window or omit its tag just because it is a lone number, and do not confuse it with a nearby dimension string; never invent one. Count small or high windows (bathroom, utility, stairwell) too, not just the prominent ones. Many plans repeat the exact same window type across several rooms (same size window in multiple bedrooms, for example) -- list one entry per physical window symbol you can actually see, not one entry per distinct type or size, and keep scanning for every other window that shares a type you have already logged once. Window tags on this kind of drawing usually run in one ascending, mostly-consecutive numeric sequence as you move around the building -- after your first pass, check your own found tags for a gap in that sequence (for example, you have 13 and 15 but not 14) and look again at that specific spot for a real window symbol you may have skipped inside a dense cluster of similar-looking windows; never invent a tag to fill a gap, only look harder for a real one. doors: each only needs the shared "location" value from above, so list every door symbol as its own entry (one per door, not deduped), including closet, bathroom, pantry, and utility doors, which are the ones a fast pass skips first.
 
-7. rooms: one entry per physical room actually labeled, not per unique name. Repeated names (two "Living Room"s in mirrored units, several "Exam Room"s down a corridor) are separate rooms, each its own entry. Transcribe a partly covered label with the legible part. If a label has more than one word or a slash-separated second use, transcribe the whole thing exactly as printed, in order -- do not shorten it down to just its most prominent word, since the qualifier can be what makes it a different room from a plainer same-word room elsewhere on the same sheet (a "WAITING / ACTIVITY AREA" is not the same room as a plain "WAITING"). Doors and rooms are each capped at 90 instances on this image; windows stay capped at 35; slabs (step 4, above) stays capped at 15. Stop each at its cap in scanning order and move on, do not push past it, and do not return to a finished category later. On a very dense drawing this cap is what keeps the response closing in time at all.
+7. rooms: one entry per physical room actually labeled, not per unique name. Repeated names (two "Living Room"s in mirrored units, several "Exam Room"s down a corridor) are separate rooms, each its own entry. Transcribe a partly covered label with the legible part. If a label has more than one word or a slash-separated second use, transcribe the whole thing exactly as printed, in order -- do not shorten it down to just its most prominent word, since the qualifier can be what makes it a different room from a plainer same-word room elsewhere on the same sheet (a "WAITING / ACTIVITY AREA" is not the same room as a plain "WAITING"). On a floor with multiple corridors or wings, sweep them in one consistent spatial order for both doors and rooms together -- for example left to right along the nearest corridor, then the next corridor or wing -- instead of covering the first area you notice thoroughly and the rest more lightly; do this as a single ordered pass, not a second scan. Doors and rooms are each capped at 90 instances on this image; windows stay capped at 35; slabs (step 4, above) stays capped at 15. Stop each at its cap in scanning order and move on, do not push past it, and do not return to a finished category later. On a very dense drawing this cap is what keeps the response closing in time at all.
 
 Rules:
 - Never fabricate or duplicate an element to hit a printed count or caption. Only list what you can actually see.
