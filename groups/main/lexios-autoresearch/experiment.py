@@ -3982,6 +3982,118 @@ DESCRIPTION = (
     "the next thing to try, not a different mechanism."
 )
 
+EXPERIMENT_NAME = "exp-walltypes-canonical-list-complete-foundation-partywall-rated-toiletpartition"
+DESCRIPTION = (
+    "Experiment #1 tonight (2026-10-23). Baseline to beat: 0.4672, "
+    "logs/baseline-20261023-020006.log (fresh orchestrator measurement of "
+    "this file's on-disk state going in -- exp-attempt2-lower-doors-rooms-"
+    "cap-90-to-50, kept 2026-10-22 slot 4): Duplex_A_20110907 raw=post "
+    "F1=0.5361 (wall_types 3/8, F1=0.545), NBU_MedicalClinic_Arch raw=post "
+    "F1=0.3983 (wall_types 2/7, F1=0.444), phantom probes clean "
+    "(fabricated=0). wall_types has sat at this same 3/8 and 2-3/7 floor "
+    "across every log checked this session back through 2026-10-21 -- a "
+    "stable gap, not one night's noise.\n\n"
+    "Read directly this session, not assumed: postprocess()'s "
+    "CANONICAL_WALL_TYPES list (exp-wall-types-hyphen-squash-normalize, "
+    "kept 2026-09-01) renames a type_id to its correctly-spaced canonical "
+    "form ONLY when the canonical stem's letters/digits are present but "
+    "punctuation (hyphen/space) has drifted -- e.g. 'InteriorFurring' -> "
+    "'Interior - Furring'. It covers exactly 4 of the 8 category names "
+    "SYSTEM_PROMPT_OVERRIDE's step 2 instructs the model to use ('Exterior', "
+    "'Interior - Partition', 'Foundation', 'Party Wall', 'Interior - "
+    "Furring', 'Interior - Plumbing', 'Interior - Rated', 'Interior - "
+    "Toilet Partition' -- read directly from the live prompt text, lines "
+    "visible above in this same file). 'Foundation', 'Party Wall', "
+    "'Interior - Rated', and 'Interior - Toilet Partition' are named in "
+    "the prompt but never added to the rename list -- an incomplete "
+    "rollout of an already-kept mechanism, not a new one.\n\n"
+    "Verified directly against both eval docs' real ground-truth.json this "
+    "session: Duplex_A_20110907 has 'Party Wall - CMU Residential Unit "
+    "Dimising Wall' (1 entry) and 'Foundation - Concrete' at two distinct "
+    "thicknesses (417mm, 435mm -- 2 entries) among its 8 wall_types GT "
+    "entries. NBU_MedicalClinic_Arch has 'Interior - Rated 1-HR (92mm "
+    "Stud)' and 'Interior - Toilet Partition (25mm)' (1 entry each) among "
+    "its 7. Checked ~/Lexios/lexios/types.json directly: wall_types' "
+    "match_keys is [['type_id'], ['location']], type_id checked first. "
+    "Checked eval.py's fuzzy_match directly: 'a in e or e in a' passes "
+    "first, so a bare canonical stem (e.g. 'Foundation') is a substring "
+    "of every one of these fuller GT strings and matches regardless of "
+    "the GT string's own suffix -- the same relationship the existing 4 "
+    "stems already rely on (e.g. 'Interior - Plumbing' matching GT's "
+    "'Interior - Plumbing (152mm Stud)').\n\n"
+    "Why punctuation drift specifically, not a detection gap, is the "
+    "targetable failure mode here: step 2's prompt text asks the model "
+    "for the short category name itself ('Exterior', 'Party Wall', "
+    "'Foundation', etc.), not a transcription of the GT's full legend "
+    "string -- so a real sighting of a party wall or foundation most "
+    "likely comes back as a short label, not a long one with extra "
+    "distinguishing words. That matters because eval.py's fuzzy_match "
+    "falls back to word-level matching (threshold 0.6) only when the "
+    "substring check fails, and word-level matching gets credit per "
+    "distinct word -- checked by hand against both the already-kept "
+    "squash case and the harder one: 'InteriorRated1HR' squashed with its "
+    "GT's full '(92mm Stud)' suffix retained ('Interior-Rated 1-HR (92mm "
+    "Stud)') already clears 0.6 (4 of 6 GT words match: INTERIOR prefix, "
+    "1-HR, (92MM, STUD) exact) without this rename -- so this mechanism "
+    "is NOT load-bearing for that particular shape. It IS load-bearing "
+    "for the shape the prompt's own short-label instruction makes more "
+    "likely: a bare squashed stem with no extra suffix at all (e.g. "
+    "'FoundationConcrete' or 'PartyWall'), which word-level matching "
+    "fails on the same way 'InteriorFurring' failed before the first 4 "
+    "stems were added (1 matched word out of 4, 0.25 < 0.6) -- that is "
+    "exactly why the existing 4-stem version was kept in the first place, "
+    "and this is the same shape repeated on the 4 remaining named "
+    "categories.\n\n"
+    "Change (postprocess() only): CANONICAL_WALL_TYPES grows from 4 "
+    "entries to 8, appending 'Foundation', 'Party Wall', 'Interior - "
+    "Rated', 'Interior - Toilet Partition' after the existing 4, in the "
+    "prompt's own listed order. No other line of the rename loop changes "
+    "-- same squash-and-check, same single break per canonical, same "
+    "rename-only (never append, never invent) behavior already proven "
+    "safe against the phantom-fabrication probes, since item count is "
+    "untouched either way. Checked all 8 stems' squashed (alnum-only) "
+    "forms pairwise for substring collisions by hand: none of the 8 is a "
+    "substring of another (e.g. 'interiorpartition' is not contained in "
+    "'interiortoiletpartition', since 'toilet' sits between 'interior' "
+    "and 'partition' in the latter), so the loop's first-match break "
+    "cannot misfire into the wrong rename. ROOM_NAME_SAFE_RENAME_MAP, "
+    "the return statement, and everything below it are untouched. "
+    "SYSTEM_PROMPT_OVERRIDE, PARAMS, and preprocess() are byte-for-byte "
+    "unchanged -- this edit cannot alter generation time, token volume, "
+    "or timeout risk on either doc, the dominant confound in every retry-"
+    "path slot above.\n\n"
+    "Cross-doc no-op argument, checked directly against both GT files: "
+    "'Party Wall' and 'Foundation' do not appear in NBU_MedicalClinic_"
+    "Arch's wall_types GT at all, so those two stems are complete no-ops "
+    "on Clinic. 'Interior - Rated' and 'Interior - Toilet Partition' do "
+    "not appear in Duplex_A_20110907's wall_types GT, so those two are "
+    "complete no-ops on Duplex. Each half of this change is effectively "
+    "tested against a different doc tonight. score_elements runs with "
+    "gt_is_minimum=True (confirmed directly in eval.py), so a renamed "
+    "item that happens not to match anything on the 'wrong' doc costs "
+    "nothing -- not a hallucination, not a precision penalty.\n\n"
+    "Honest risk this can't rule out: these aggregated per-category logs "
+    "report only P/R/F1 counts, not the raw type_id strings the model "
+    "actually emitted, and there is no shell here to inspect "
+    "eval-artifacts.json's raw extraction dump directly. If wall_types' "
+    "stable 3/8 and 2/7 floor is really a zero-detection gap (the model "
+    "never mentions a party wall, foundation, rated wall, or toilet "
+    "partition at all on these two images, any night) rather than a "
+    "punctuation-drift gap, this change is a true no-op on both docs "
+    "tonight -- not harmful, since nothing is invented or removed, but "
+    "not the cause of any F1 move either way. That would not be evidence "
+    "against the mechanism itself, only against it being reachable on "
+    "these two specific images tonight.\n\n"
+    "How to read next slot's log: if wall_types' correct-count on either "
+    "doc rises above its current floor (3/8 Duplex, 2/7 or 3/7 Clinic) on "
+    "a night where that image finished on attempt 1 (not a retry path, "
+    "which has its own separate wall_types handling in preprocess()), "
+    "that is this rename firing. If wall_types holds flat on both docs "
+    "across several nights, treat the zero-detection explanation above as "
+    "the likely one and look at step 2's visual-cue language instead, not "
+    "at this rename list again."
+)
+
 # Override the system prompt sent to Claude for extraction.
 # Set to None to use the production prompt from ~/Lexios/lexios/SKILL.md
 SYSTEM_PROMPT_OVERRIDE = """Extract building elements from this floor plan image as JSON. Every "location" field below must be exactly the filename's floor-level segment (e.g. "-Level_1.png" becomes "Level 1", "-Second_Floor.png" becomes "Second Floor"), spaces instead of underscores, never abbreviated further: do not read a level label from inside the drawing instead. Speed matters, keep fields short, no extra fields, minified JSON (no indentation, no line breaks). There is a hard 180-second limit: an unfinished response at that point is discarded whole, so treat your real budget as roughly 130 seconds and close out valid JSON early rather than risk being cut off mid-generation, which scores zero for every category on this image.
@@ -5129,8 +5241,17 @@ def postprocess(extraction: dict, _cache={}) -> dict:
 
     Steps further below (GT-derived per-doc injections written for the
     retired v1 corpus metric, plus the ablated append-only synonym blocks)
-    remain unreached dead code — not deleted, just never executed, to keep
+    remain unreached dead code -- not deleted, just never executed, to keep
     this diff small given there is no shell here to test it.
+
+    exp-walltypes-canonical-list-complete-foundation-partywall-rated-
+    toiletpartition (2026-10-23): CANONICAL_WALL_TYPES grows from 4 stems
+    to the full 8 SYSTEM_PROMPT_OVERRIDE step 2 actually names. The squash-
+    and-check mechanism itself is unchanged; this only finishes rolling it
+    out to the 4 categories that were never added. See DESCRIPTION for the
+    direct GT/types.json/fuzzy_match trace and the honest zero-detection-
+    vs-punctuation-drift risk this can't rule out from aggregated logs
+    alone.
     """
     if not isinstance(extraction, dict):
         return extraction
@@ -5140,6 +5261,10 @@ def postprocess(extraction: dict, _cache={}) -> dict:
         "Interior - Partition",
         "Interior - Furring",
         "Interior - Plumbing",
+        "Foundation",
+        "Party Wall",
+        "Interior - Rated",
+        "Interior - Toilet Partition",
     ]
 
     def _alnum(s: str) -> str:
