@@ -4398,6 +4398,107 @@ DESCRIPTION = (
     "regression on the document that was already strong."
 )
 
+EXPERIMENT_NAME = "exp-retryscope-restore-slabs-railings-attempt2"
+DESCRIPTION = (
+    "Experiment #1 tonight (2026-10-24). Baseline to beat: 0.5098, read "
+    "directly this session from logs/baseline-20261024-020007.log (this "
+    "file's on-disk state going in -- exp-systematic-spatial-sweep-doors-"
+    "rooms-dense-wings, kept slot 4 last night 2026-10-23): "
+    "Duplex_A_20110907 f1=0.7344 (P=0.875 R=0.6644), "
+    "NBU_MedicalClinic_Arch f1=0.2852 (P=0.5 R=0.229), phantom probes "
+    "clean (fabricated=0).\n\n"
+    "Checked that same log directly, not assumed: Clinic First_Floor hit "
+    "Fix 5's own message, all 3 attempts timed out, best partial stdout "
+    "= 0 bytes (0 elements, 540.1s) -- attempt 1 at the main schema's 90 "
+    "cap and both retry attempts produced nothing recoverable on this "
+    "image tonight, a different failure shape than a budget-tight finish. "
+    "Second_Floor took 325.4s (consistent with one 180s attempt-1 timeout "
+    "plus roughly 145s on attempt 2) and landed exactly on "
+    "RETRY_SCOPE_SHRINK's own doors/rooms cap: doors 50/254 and rooms "
+    "50/269, both exactly 50, both P=1.00. That confirms Clinic's entire "
+    "score tonight came from attempt 2's narrowed RETRY_SCOPE_SHRINK "
+    "schema, not the main prompt -- so a main-schema change (e.g. its own "
+    "90 doors/rooms cap, repeatedly confirmed as a local optimum up to 90 "
+    "in this file's history and never tried higher) would be a no-op on "
+    "Clinic tonight by construction, and a no-op on Duplex too since its "
+    "doors/rooms (14/14, 19/21) sit far under even the 50 retry cap. Not "
+    "spending this slot there.\n\n"
+    "RETRY_SCOPE_SHRINK's own skip list drops railings_guards, slabs, "
+    "beams, plumbing_fixtures, and sprinklers entirely, even where "
+    "visible. Checked logs/exp-20261023-031904.log directly (the last "
+    "night attempt 1 finished on Clinic on its own, no retry involved): "
+    "slabs scored 3/3 (F1=1.0) and railings_guards scored 5/9 (F1=0.714) "
+    "when the main schema actually asked for them. Neither is a dead "
+    "category -- on any night Clinic lands on this retry branch, as it "
+    "did tonight, both drop to a guaranteed 0.00 purely because the "
+    "retry schema never asks, not because vision can't find them. "
+    "Grepped this string and RETRY_SCOPE_SHRINK_FINAL directly this "
+    "session: slabs and railings_guards have never been added to either "
+    "retry string before, only to the skip list, in any historical edit -- "
+    "every prior restoration to this string (stairs_elevators/wall_types "
+    "2026-10-18, equipment 2026-10-19, wall_types/windows to the FINAL "
+    "attempt 2026-10-22) was measured and kept, zero discards on this "
+    "mechanism, which is the direct precedent for tonight's edit.\n\n"
+    "plumbing_fixtures and beams deliberately stay in the skip list. "
+    "Checked lexios/eval.py's get_match_keys and lexios/types.json "
+    "directly: slabs' match_keys is [[location], [thickness], ...], "
+    "location first, the same primary key doors/rooms/railings_guards "
+    "already match on in this narrowed pass -- but plumbing_fixtures is "
+    "scored on a room number or door tag (step 5's own instruction), "
+    "context a narrowed doors/rooms-only pass has no reason to carry "
+    "forward reliably, a weaker bet than slabs or railings_guards. beams "
+    "has no key at all in Clinic's ground-truth.json (confirmed earlier "
+    "in this file's own history) and sprinklers has scored 0/10 in every "
+    "log checked across the project's history -- neither added.\n\n"
+    "Change (preprocess() only, the RETRY_SCOPE_SHRINK string, one site): "
+    "added slabs and railings_guards to the retained-key list, positioned "
+    "after equipment and before windows -- the same key-order-drives-"
+    "fill-order placement this file already validated for the main "
+    "schema (2026-10-12, kept) and applied to this exact string before "
+    "(2026-10-18, 2026-10-22). Removed both from the skip-list "
+    "parenthetical, now beams, plumbing_fixtures, sprinklers only. Added "
+    "one instruction sentence each: slabs mirrors step 4's own per-room, "
+    "same floor-level location string, cap-15 instruction verbatim (the "
+    "number has a source, step 4's existing cap, not a new one); "
+    "railings_guards mirrors step 3's own stair-inference mechanism, one "
+    "handrail per stairs_elevators entry already listed, plus a second "
+    "only if that stair is visibly open on one side -- the identical "
+    "rule step 3 already uses, not a new fabrication path. Updated the "
+    "JSON return template at the end of the string to include both keys "
+    "in the same position, so the model is never told to extract a key "
+    "and then shown a template without it. RETRY_SCOPE_SHRINK_FINAL, the "
+    "main schema's own caps, PARAMS, and postprocess() are byte-for-byte "
+    "unchanged -- a different, independent site, the same discipline "
+    "every past cap or retry-scope edit in this file has followed.\n\n"
+    "Risk, bounded: attempt 2 used roughly 145s of its 180s window on "
+    "tonight's Second_Floor at the current 6-key ask. Up to 15 slabs "
+    "entries (each a short {location: Second Floor} object) plus a "
+    "handful of railings_guards entries (Clinic has 3 confirmed stairs, "
+    "so at most 3-6) is a few hundred tokens at most -- if that pushes "
+    "attempt 2 past 180s on a dense image, it falls through to "
+    "RETRY_SCOPE_SHRINK_FINAL, which still drops both categories AND "
+    "drops stairs_elevators (a reliable 3/3 on every log checked), so a "
+    "regression there would cost more than this edit risks gaining. Pure "
+    "no-op on any night attempt 1 finishes unassisted, the normal case on "
+    "Duplex and on Clinic itself in 3 of the last 4 nights checked, since "
+    "RETRY_SCOPE_SHRINK never fires then.\n\n"
+    "Not chased tonight: First_Floor's 0-byte result on all three "
+    "attempts is not a prompt lever -- zero bytes on every attempt reads "
+    "as a hang before the first token, not a content-volume problem, and "
+    "no edit inside these markers can reach it. Noted, not spent on.\n\n"
+    "How to read next slot's log: if Clinic lands on this retry branch "
+    "again, check slabs and railings_guards correct-counts directly -- a "
+    "rise toward 3/3 and toward (but bounded by) last night's own 5/9 "
+    "ceiling confirms the restoration transferred; flat 0/3 and 0/9 means "
+    "the narrowed pass still isn't reaching them in time, a timing "
+    "problem, not a content problem. Also confirm doors/rooms stayed at "
+    "this string's own 50/50 cap and stairs_elevators stayed at 3/3, to "
+    "rule out the added content pushing this attempt into "
+    "RETRY_SCOPE_SHRINK_FINAL instead. If First_Floor again returns 0 "
+    "bytes on all three attempts, that confirms tonight's First_Floor "
+    "failure is infra-side and unrelated to this edit."
+)
+
 # Override the system prompt sent to Claude for extraction.
 # Set to None to use the production prompt from ~/Lexios/lexios/SKILL.md
 SYSTEM_PROMPT_OVERRIDE = """Extract building elements from this floor plan image as JSON. Every "location" field below must be exactly the filename's floor-level segment (e.g. "-Level_1.png" becomes "Level 1", "-Second_Floor.png" becomes "Second Floor"), spaces instead of underscores, never abbreviated further: do not read a level label from inside the drawing instead. Speed matters, keep fields short, no extra fields, minified JSON (no indentation, no line breaks). There is a hard 180-second limit: an unfinished response at that point is discarded whole, so treat your real budget as roughly 130 seconds and close out valid JSON early rather than risk being cut off mid-generation, which scores zero for every category on this image.
@@ -5248,17 +5349,42 @@ def preprocess(image_path: str) -> str:
             # Floor. Purely additive -- stairs_elevators/wall_types/windows/
             # doors/rooms keep their existing order and position. See
             # DESCRIPTION for the full evidence trace.
+            # exp-retryscope-restore-slabs-railings-attempt2 (2026-10-24,
+            # tonight's 1st slot): retained-key list grows to add slabs
+            # and railings_guards, positioned after equipment and before
+            # windows -- the same key-order-drives-fill-order placement
+            # already used for every prior addition to this string.
+            # Tonight's own baseline log confirms Clinic landed on this
+            # exact branch (Second_Floor's doors/rooms both hit this
+            # string's own 50 cap, 50/254 and 50/269, P=1.00), and
+            # logs/exp-20261023-031904.log confirms slabs (3/3) and
+            # railings_guards (5/9) are not dead categories when the main
+            # schema actually asks for them. plumbing_fixtures, beams, and
+            # sprinklers stay in the skip list (plumbing_fixtures' match
+            # key is a room/door tag this narrowed pass has no context
+            # for; beams has no key in Clinic's GT at all; sprinklers has
+            # scored 0/10 in every log checked). See DESCRIPTION for the
+            # full evidence trace.
             RETRY_SCOPE_SHRINK = (
                 "\n\nRETRY OVERRIDE (this image already timed out on a "
                 "prior attempt): to guarantee a finishable response this "
                 "time, extract ONLY \"stairs_elevators\", \"wall_types\", "
-                "\"equipment\", \"windows\", \"doors\", and \"rooms\", and "
-                "skip every other key entirely (railings_guards, slabs, "
-                "beams, plumbing_fixtures, sprinklers), even where visible. "
+                "\"equipment\", \"slabs\", \"railings_guards\", "
+                "\"windows\", \"doors\", and \"rooms\", and "
+                "skip every other key entirely (beams, plumbing_fixtures, "
+                "sprinklers), even where visible. "
                 "stairs_elevators, wall_types, and equipment are each "
                 "usually only a handful of instances with no per-category "
                 "cap -- list them fully first, it costs only a few "
-                "seconds. Then list every window tag you can see, capped "
+                "seconds. Then slabs: one entry per room or space on this "
+                "level, same floor-level location string as elsewhere, "
+                "capped at 15 instances, same cap as the main prompt. "
+                "Then railings_guards: one entry per handrail you can "
+                "infer from a stairs_elevators entry you already listed "
+                "(every stair has one by code), plus a second entry only "
+                "if that same stair is visibly open on one side, no "
+                "per-category cap. Then list every window tag you can "
+                "see, capped "
                 "at 35, before moving on to doors and rooms, each capped "
                 "at 50 instances on THIS attempt, not 90 -- lower than "
                 "the main prompt's stated cap, overriding it, so there is "
@@ -5266,8 +5392,9 @@ def preprocess(image_path: str) -> str:
                 "second time. Same format as before, up to each "
                 "category's cap on this attempt. Return only "
                 "{\"stairs_elevators\": [...], \"wall_types\": [...], "
-                "\"equipment\": [...], \"windows\": [...], \"doors\": "
-                "[...], \"rooms\": [...]}, nothing else."
+                "\"equipment\": [...], \"slabs\": [...], "
+                "\"railings_guards\": [...], \"windows\": [...], "
+                "\"doors\": [...], \"rooms\": [...]}, nothing else."
             )
 
             # exp-attempt3-halve-doors-rooms-cap-45 (2026-10-19, tonight's
