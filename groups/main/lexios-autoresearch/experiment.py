@@ -4499,8 +4499,90 @@ DESCRIPTION = (
     "failure is infra-side and unrelated to this edit."
 )
 
-EXPERIMENT_NAME = "exp-doors-rooms-cap-raise-90-to-100-clinic-cap-bound-again"
+EXPERIMENT_NAME = "exp-widen-per-attempt-timeout-180-to-210-clinic-near-miss"
 DESCRIPTION = (
+    "Experiment #1 tonight (2026-10-25). Baseline to beat: 0.73, read "
+    "directly from logs/baseline-20261025-020004.log this session (this "
+    "file's on-disk state going in is byte-identical to 2026-10-24 slot "
+    "3's kept exp-doors-rooms-cap-raise-90-to-100-clinic-cap-bound-again, "
+    "which measured 0.758 that night; tonight's fresh re-measurement of "
+    "the SAME code is 0.73, confirming real night-to-night variance on "
+    "this model/prompt pair, not a regression from any edit).\n\n"
+    "Evidence read directly this session: Duplex_A_20110907 raw=post "
+    "F1=0.734 (Level_1 39 elements/80.5s, Level_2 41 elements/74.7s, "
+    "both finished attempt 1 with large margin, unaffected by anything "
+    "below). NBU_MedicalClinic_Arch raw=post F1=0.726 -- "
+    "First_Floor: 262 elements/150.9s, finished attempt 1 cleanly (29.1s "
+    "of margin against the 180s wall, consistent with 2026-10-24's own "
+    "First_Floor margin that night, 27.8s). Second_Floor: 172 "
+    "elements/354.7s -- 354.7s = 180s (attempt 1 timed out completely, "
+    "zero bytes salvaged) + 174.7s (attempt 2, RETRY_SCOPE_SHRINK, "
+    "succeeded). Doors scored 151/254 and rooms 146/269 overall, both "
+    "consistent with First_Floor landing near its own real count under "
+    "the main schema's cap-100 and Second_Floor capped at RETRY_SCOPE_"
+    "SHRINK's 50 (100ish + 50 ~= 150ish for both categories) -- the same "
+    "cap-bound arithmetic this file's history has used repeatedly to "
+    "read these logs. Which Clinic image is the slow one has flipped "
+    "night to night (First_Floor on 2026-10-24, Second_Floor tonight) "
+    "with no prompt or cap change between those two runs, matching this "
+    "file's own repeated 'session-to-session API latency variance, not "
+    "output volume' finding (2026-10-19, 2026-10-21 slot 1, 2026-10-22 "
+    "slot 4 DESCRIPTIONs all independently reach the same conclusion).\n\n"
+    "Mechanism: attempt 2 finished with only 5.3s of its own 180s budget "
+    "unused -- the tightest margin logged on either attempt this session. "
+    "Raising attempt 2's own doors/rooms cap (the lever 2026-10-22 last "
+    "touched, lowering it 90->50) was considered and rejected for "
+    "tonight: that cap's schema grew by two categories since (slabs, "
+    "railings_guards, added 2026-10-24 slot 1, kept), so its margin is "
+    "demonstrably tighter now than when 50 was chosen, and asking for "
+    "more doors/rooms output on only 5.3s of slack risks tipping this "
+    "exact image into attempt 3's much narrower RETRY_SCOPE_SHRINK_FINAL "
+    "(drops stairs_elevators, equipment, slabs, railings_guards entirely, "
+    "cap 30) -- a strictly worse outcome than the cap-50 success just "
+    "logged. Grepped this file for any prior edit to the per-attempt "
+    "timeout value itself (180, or any number between 180 and 240) this "
+    "session: none found -- every prior timeout experiment (120->180, "
+    "2x->3x attempts) changed attempt COUNT or moved between 120 and 180, "
+    "never the 180 ceiling itself.\n\n"
+    "Change (preprocess() only, one line): the monkeypatch's enforced "
+    "subprocess timeout rises from 180 to 210 for every attempt (the "
+    "same single call site, confirmed unchanged elsewhere). "
+    "SYSTEM_PROMPT_OVERRIDE, RETRY_SCOPE_SHRINK, and RETRY_SCOPE_SHRINK_"
+    "FINAL are byte-for-byte unchanged -- none of their stated budgets "
+    "('hard 180-second limit', '~130 seconds', 'before the clock runs "
+    "out a second/third time') are touched, so the model still paces "
+    "and closes out exactly as it does today. This is deliberate: the "
+    "extra 30s is undisclosed execution-layer slack for a run that "
+    "overshoots its own stated budget on a slow API night, not a bigger "
+    "generation ask that could itself grow output and eat the new "
+    "margin. PARAMS and postprocess() are untouched.\n\n"
+    "No-op argument: any attempt that already finishes inside 180s "
+    "(Duplex's own images, Clinic First_Floor tonight) hits the same "
+    "code path with headroom to spare either way -- this cannot move "
+    "their outcome. The only attempts this can change are ones currently "
+    "landing at or past the 180s wall, which this session's log shows "
+    "is a real, present condition tonight (Second_Floor's attempt 1), "
+    "not a hypothetical.\n\n"
+    "Honest risk: if Second_Floor's attempt-1 timeout tonight was a true "
+    "180s-vs-many-minutes-needed stall rather than a near-miss, 30 more "
+    "seconds changes nothing there -- this lever is sized against "
+    "attempt 2's observed 5.3s deficit, not attempt 1's unknown deficit, "
+    "so it is a confirmed fix for the near-miss case and only a possible "
+    "one for the full-timeout case. Worst-case per-image time rises from "
+    "540s (3x180) to 630s (3x210); no outer per-doc or per-run deadline "
+    "was found in run() (read directly this session) that this would "
+    "trip.\n\n"
+    "How to read next slot's log: check which attempt each Clinic image "
+    "actually finished on and its elapsed seconds against the new 210s "
+    "wall, not just doc F1. If Second_Floor (or whichever image is slow "
+    "that night) now finishes attempt 1 under 210s with a non-zero "
+    "result, or attempt 2 finishes with more than 5.3s to spare, the "
+    "mechanism fired. If an image still burns the full 210s on attempt 1 "
+    "with zero bytes, that confirms a true stall rather than a near-miss, "
+    "and a future slot should stop raising this number further and look "
+    "elsewhere.\n\n"
+)
+_OLD_DESCRIPTION_DEAD = (
     "Tonight's 3rd slot (2026-10-24). Baseline to beat: 0.7454, read "
     "directly from logs/exp-20261024-021749.log (slot 1 tonight, kept; "
     "slot 2's exp-walltypes-explicit-8way-checklist was measured at 0.6828 "
@@ -5372,8 +5454,20 @@ def preprocess(image_path: str) -> str:
             # passes timeout=120 as a kwarg -- confirmed by reading run()
             # directly), never inject a timeout where none existed, so any
             # other subprocess.run call this process makes is untouched.
+            # exp-widen-per-attempt-timeout-180-to-210-clinic-near-miss
+            # (2026-10-25): tonight's own baseline log
+            # (logs/baseline-20261025-020004.log) shows Clinic Second_Floor
+            # burning all 180s of attempt 1 with zero output, then closing
+            # attempt 2 (RETRY_SCOPE_SHRINK, doors/rooms cap 50) at 174.7s
+            # of its own 180s window -- 5.3s of margin. This widens the
+            # enforced kill time only; SYSTEM_PROMPT_OVERRIDE's stated
+            # "hard 180-second limit" and ~130s internal budget are
+            # untouched, so the model still paces and closes out exactly as
+            # before. The extra 30s is pure execution-layer slack for a run
+            # that overshoots its own stated budget on a slow API night,
+            # not a bigger generation ask.
             if kw.get("timeout") == 120:
-                kw["timeout"] = 180
+                kw["timeout"] = 210
             # Fix 4 (exp-attempt3-scope-shrink-doors-rooms-only, 2026-10-04,
             # extended by exp-attempt3-add-windows-level-specific-loss,
             # 2026-10-11, extended by exp-retry-narrow-scope-on-attempt2-
