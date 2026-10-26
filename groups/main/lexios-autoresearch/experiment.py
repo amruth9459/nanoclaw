@@ -4720,6 +4720,112 @@ _OLD_DESCRIPTION_DEAD = (
     "same-size raise."
 )
 
+EXPERIMENT_NAME = "exp-repair-malformed-json-on-clean-subprocess-return"
+DESCRIPTION = (
+    "Experiment #4 tonight (2026-10-26). Baseline to beat: 0.7479, this "
+    "file's on-disk state going in (2026-10-25 slot 3's kept "
+    "exp-roomname-toilet-family-synonyms; all three of tonight's own "
+    "slots -- cap raise 100->130, unconditional second railings_guards "
+    "entry per stair, and a room-name gender-prefix synonym expansion -- "
+    "were measured at 0.5876, 0.6501, and 0.6855 and discarded, so "
+    "nothing they touched is on disk).\n\n"
+    "Read all three of tonight's logs directly this session, not just "
+    "their own write-ups: every discarded slot died on an image-specific "
+    "subprocess failure, not on its own hypothesis. logs/exp-20261026-"
+    "021322.log: NBU_MedicalClinic_Arch--ifc-render-First_Floor.png ran "
+    "534.9s and printed \"WARN: Failed to parse JSON\" with 0 elements. "
+    "534.9 = 210 + 210 + 114.9: attempts 1 and 2 each raised "
+    "TimeoutExpired at the real 210s cap (confirmed by reading the kw.get"
+    "(\"timeout\")==120 -> 210 override at the top of _fixed_run this "
+    "session), and attempt 3 (RETRY_SCOPE_SHRINK_FINAL, the narrowest "
+    "schema) returned normally in 114.9s with text that still failed "
+    "run()'s own json.loads(). So this was attempt 3's clean, successful "
+    "subprocess return carrying malformed JSON, not a timeout on that "
+    "attempt -- the else: branch below fires on exactly this attempt. "
+    "logs/exp-20261026-"
+    "024559.log: Duplex_A_20110907--ifc-render-Level_2.png burned exactly "
+    "630.2s (3x210s) with 0 bytes salvaged on every attempt, a true "
+    "triple-timeout, on an edit (a railings_guards prompt sentence) that "
+    "cannot plausibly add that much generation time. logs/exp-20261026-"
+    "032207.log: both Clinic images landed on RETRY_SCOPE_SHRINK's own "
+    "50-cap signature (100/254 doors, 99/269 rooms, both near the 2x50 "
+    "ceiling) on a postprocess()-only edit with zero generation-time "
+    "cost by construction. Three different failure shapes on three "
+    "different images in one night -- this session's own evidence is "
+    "that tonight's gate is clean-run probability, not hypothesis "
+    "quality.\n\n"
+    "Given that, this edit touches neither SYSTEM_PROMPT_OVERRIDE, "
+    "PARAMS, nor postprocess() -- it targets the one concretely-observed "
+    "failure mode above that preprocess()'s own existing safety net does "
+    "not yet cover. Read preprocess()'s own Fix 5 (2026-10-16) directly: "
+    "_repair_truncated_json() already recovers whatever stdout a killed "
+    "subprocess wrote before a TimeoutExpired kill, but it is only ever "
+    "called inside the except _sp.TimeoutExpired branch. First_Floor's "
+    "534.9s failure above raised that exception on attempts 1 and 2, but "
+    "attempt 3's own _orig(call_args, **kw) call returned NORMALLY with "
+    "malformed text on its stdout, so Fix 5's repair function, live "
+    "since 2026-10-16, is never reached for a failure on the CLEAN-"
+    "return path. Read run() directly this session, right after the "
+    "subprocess.run(..., text=True, timeout=120, ...) call this file's "
+    "own preprocess() patches to 210: text = result.stdout.strip(), "
+    "then a json.loads(text) wrapped only in try/except "
+    "(json.JSONDecodeError, IndexError) that sets extraction = {} on "
+    "failure -- no repair, no retry, just an empty dict, confirming the "
+    "entire image is discarded as 0 elements on exactly this failure "
+    "shape.\n\n"
+    "Change (preprocess() only, the subprocess.run retry loop): the "
+    "existing `try: return _orig(call_args, **kw)` becomes `try: result "
+    "= _orig(call_args, **kw)` with a new `else:` clause (fires only "
+    "when _orig returns without raising) that calls the SAME, already-"
+    "live _repair_truncated_json() on result.stdout. That function's own "
+    "first branch already does a plain json.loads() and returns the "
+    "input unchanged whenever it already parses -- the common case, a "
+    "provable no-op there. Only when json.loads() fails does it fall "
+    "through to the bracket-closing truncation repair Fix 5 already "
+    "uses; if that also fails, it returns None and this edit returns "
+    "the original, untouched result, identical to today's behavior. The "
+    "TimeoutExpired except branch, RETRY_SCOPE_SHRINK/_FINAL, every cap, "
+    "and the retry attempt count are byte-for-byte unchanged -- this "
+    "adds no generation time, no new attempt, and no new prompt text; "
+    "it only inspects a response preprocess() already received.\n\n"
+    "Cannot-regress argument: a response that already parses hits the "
+    "no-op branch (confirmed above). A response that does not parse "
+    "today scores a guaranteed 0 for every category on that image; "
+    "after this edit, that same failure either stays 0 (repair returns "
+    "None) or recovers whatever the model had genuinely already written "
+    "before the corruption point (repair returns a truncated, re-closed "
+    "subset of its own real output, never new content -- the same "
+    "truncate-only mechanism Fix 5 already uses, not a second, "
+    "independent one). There is no path from a parseable response to an "
+    "unparseable one through this change.\n\n"
+    "Not a repeat: this file's 2026-10-04 slot 2 "
+    "(exp-json-truncation-repair-malformed-not-timeout, discarded 0.4313 "
+    "that night, its own code never kept so unavailable to read "
+    "directly) also tried recovering malformed non-timeout JSON, but "
+    "Fix 5's bracket-closing repair function did not exist yet then "
+    "(added 2026-10-16, 12 days later) -- that slot necessarily used a "
+    "different, now-unknown heuristic. This edit reuses the specific "
+    "repair function that has been live on the timeout path since "
+    "2026-10-16 (ten days), rather than writing a second, independent "
+    "one.\n\n"
+    "Risk this can't rule out: if First_Floor's actual corruption is "
+    "not truncation-shaped (e.g. stray prose before the opening brace "
+    "that survives the ```json fence-strip, or a corrupted byte "
+    "mid-string rather than a cut-off ending), this repair will not "
+    "fire and tonight's analog of that failure stays at 0, same as "
+    "today -- stated plainly rather than assumed fixed. This also "
+    "cannot touch Duplex Level_2's true triple-timeout above, a "
+    "different failure mode this edit does not attempt to address.\n\n"
+    "How to read next slot's log: check for \"WARN: Failed to parse "
+    "JSON\" on any image that did NOT also time out (elapsed time not a "
+    "multiple of 210s) -- if that combination disappears with a "
+    "nonzero element count where it would have been 0, the mechanism "
+    "fired. Given tonight's own three-for-three clean-run failure rate, "
+    "treat a repeat full-timeout or RETRY_SCOPE_SHRINK fallthrough on "
+    "an unrelated image as this file's own documented night-to-night "
+    "variance, not evidence against this specific fix.\n\n"
+)
+
 # Override the system prompt sent to Claude for extraction.
 # Set to None to use the production prompt from ~/Lexios/lexios/SKILL.md
 SYSTEM_PROMPT_OVERRIDE = """Extract building elements from this floor plan image as JSON. Every "location" field below must be exactly the filename's floor-level segment (e.g. "-Level_1.png" becomes "Level 1", "-Second_Floor.png" becomes "Second Floor"), spaces instead of underscores, never abbreviated further: do not read a level label from inside the drawing instead. Speed matters, keep fields short, no extra fields, minified JSON (no indentation, no line breaks). There is a hard 180-second limit: an unfinished response at that point is discarded whole, so treat your real budget as roughly 130 seconds and close out valid JSON early rather than risk being cut off mid-generation, which scores zero for every category on this image.
@@ -5501,6 +5607,18 @@ def preprocess(image_path: str) -> str:
     on Clinic in every log checked this session specifically because no
     attempt that asks for it has been finishing on that image. See
     DESCRIPTION for the full evidence trace.
+
+    exp-repair-malformed-json-on-clean-subprocess-return (2026-10-26,
+    tonight's 4th slot): Fix 5 below only runs inside the
+    except _sp.TimeoutExpired branch, so an attempt that returns
+    normally (no timeout on THAT attempt) but with malformed JSON on
+    stdout was never covered -- that image scored 0 elements outright
+    with no repair attempt. A new else: clause on the try/except below
+    first tries the exact parse run() itself will do; if that already
+    succeeds, the original result is returned untouched (a true no-op).
+    Only on a parse failure does it fall back to the same, already-live
+    _repair_truncated_json(). See DESCRIPTION for the full evidence
+    trace against tonight's own log.
     """
     import subprocess as _sp
     if not hasattr(_sp, "_claude_arg_fix_applied"):
@@ -5782,7 +5900,7 @@ def preprocess(image_path: str) -> str:
                     _suffix = RETRY_SCOPE_SHRINK_FINAL if _attempt == 2 else RETRY_SCOPE_SHRINK
                     call_args = list(args[:-1]) + [args[-1] + _suffix]
                 try:
-                    return _orig(call_args, **kw)
+                    result = _orig(call_args, **kw)
                 except _sp.TimeoutExpired as exc:
                     partial = exc.stdout or b""
                     if isinstance(partial, str):
@@ -5800,6 +5918,28 @@ def preprocess(image_path: str) -> str:
                                 call_args, -1, repaired, ""
                             )
                         raise
+                else:
+                    # Fix 6 (exp-repair-malformed-json-on-clean-subprocess-
+                    # return, 2026-10-26): an attempt that returns without
+                    # raising TimeoutExpired can still carry malformed JSON
+                    # on stdout -- see DESCRIPTION. Try the same
+                    # json.loads() run() itself applies right after the
+                    # subprocess.run call, so an already-valid response
+                    # returns the ORIGINAL result object untouched -- a
+                    # true no-op, not just equivalent content. Only on a
+                    # parse failure does this reach for Fix 5's own repair
+                    # function.
+                    try:
+                        json.loads(result.stdout)
+                        return result
+                    except (json.JSONDecodeError, TypeError, ValueError):
+                        pass  # not already valid -- fall through to repair below
+                    repaired = _repair_truncated_json(result.stdout)
+                    if repaired is not None:
+                        return _sp.CompletedProcess(
+                            call_args, result.returncode, repaired, result.stderr
+                        )
+                    return result
 
         _sp.run = _fixed_run
         _sp._claude_arg_fix_applied = True
