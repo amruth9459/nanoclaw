@@ -5250,6 +5250,107 @@ DESCRIPTION = (
     "this one key, not the four slot 1 already restored tonight."
 )
 
+EXPERIMENT_NAME = "exp-restore-beams-honest-visual-cue-main-schema-only"
+DESCRIPTION = (
+    "Experiment #1 tonight (2026-10-29). Baseline to beat: 0.7246, "
+    "tonight's own orchestrator-measured run (logs/baseline-20261029-"
+    "020005.log): Duplex_A_20110907 raw/post F1=0.730 (beams 0/8, doors "
+    "14/14, railings_guards 2/4, rooms 19/21, slabs 20/21, "
+    "stairs_elevators 2/2, wall_types 3/8, windows 13/24); "
+    "NBU_MedicalClinic_Arch raw/post F1=0.719 (doors 145/254, equipment "
+    "2/2, plumbing_fixtures 1/3, railings_guards 5/9, rooms 132/269, "
+    "slabs 3/3, sprinklers 0/10, stairs_elevators 3/3, wall_types 3/7, "
+    "windows 57/58). Both docs score as an unweighted mean of their own "
+    "per-category F1 (confirmed by hand: Duplex's 8 listed values sum "
+    "to 5.85, /8 = 0.731, rounds to the logged 0.730), so one category "
+    "sitting at a hard 0.00 costs that doc 1/N of its whole score "
+    "regardless of how many instances it has.\n\n"
+    "Duplex's beams is exactly that: 0.00 F1 on 8 GT items, 1/8 of "
+    "Duplex's category count, and the only such hard zero on either doc "
+    "that is not already a known-dead category -- sprinklers (Clinic, "
+    "0/10) has been confirmed dead across 43+ prior nights (grepped "
+    "results.tsv/logs history) and Clinic's own ground-truth.json (read "
+    "directly this session) has no 'beams' key at all, so neither of "
+    "those is a live lever. beams is different: it was REMOVED from "
+    "both the main schema and both retry-scope strings on 2026-09-12 "
+    "(exp-drop-dead-beams-sprinklers-free-doors-rooms-time, read "
+    "directly in this file's dead history above) specifically because "
+    "at that time it was being filled by a guaranteed templated guess "
+    "(the file's own prior write-up calls this out: 'Duplex's own beams "
+    "category (8/8, scored every night)' from a 'guaranteed-guess of 6 "
+    "beams entries per level' -- not real extraction), and this file's "
+    "own standing disclosure (still present in postprocess()'s dead "
+    "code docstring) flags that exact mechanism as gaming the "
+    "gt_is_minimum=True asymmetry, awaiting human review, not something "
+    "a slot should revive. That disclosure is about the GUESS "
+    "mechanism, not about asking for beams at all -- so this edit asks "
+    "for beams a different way: a real, visually-gated instruction "
+    "(look for an overhead beam line, dashed or paired with a size "
+    "label, omit the key entirely when none is visible), the same kind "
+    "of honest-transform-not-fabrication standard already used for "
+    "stairs_elevators/equipment/railings_guards/slabs's restoration to "
+    "the retry scopes on 2026-10-28, just applied to the main schema "
+    "instead.\n\n"
+    "Change (SYSTEM_PROMPT_OVERRIDE only): added a 'beams' key to the "
+    "JSON schema (location-only field, same shape as railings_guards/"
+    "slabs/doors) and a new step 3 between wall_types and "
+    "railings_guards with the visual-cue text above; renumbered the "
+    "remaining steps 3-7 to 4-8 and fixed every cross-reference "
+    "(the priority-order intro's 'steps 1-5'/'steps 6-7' to "
+    "'steps 1-6'/'steps 7-8', the rooms step's 'slabs (step 4, above)' "
+    "to 'step 5', and the Rules bullet's 'step 6 or 7' to 'step 7 or "
+    "8') -- verified line by line after editing, no stale number left. "
+    "Neither RETRY_SCOPE_SHRINK nor RETRY_SCOPE_SHRINK_FINAL is touched: "
+    "both already read 'skip every other key entirely (beams, "
+    "plumbing_fixtures, sprinklers)', so beams stays excluded from both "
+    "narrowed retry paths on purpose -- it has no GT on Clinic (the doc "
+    "that actually drives most retries, per tonight's own log: Clinic "
+    "First_Floor took 310.4s this baseline, close to timing out, while "
+    "both Duplex images finished in a single attempt at 78.5s/107.5s) "
+    "and costs real generation time there for zero scoring upside. "
+    "preprocess() and postprocess() are untouched.\n\n"
+    "No-op / low-risk argument for Clinic: its GT has no beams key, so "
+    "any beams output there is never scored by score_elements (which "
+    "only iterates categories present in gt.get('elements', {})) -- the "
+    "only cost on that doc is a few seconds of step-3 reasoning on the "
+    "two Clinic images, most of which already finish with the full "
+    "schema (only First_Floor is near the 180s/210s wall per tonight's "
+    "log, and step 3 is a single short visual check before the "
+    "cheap railings_guards/slabs/equipment/plumbing_fixtures steps that "
+    "already run at that same early position). On Duplex, this is "
+    "strictly additive: every other step's text, cap, and relative "
+    "order is byte-for-byte unchanged, so doors/rooms/windows/"
+    "wall_types/slabs/stairs_elevators/railings_guards keep whatever "
+    "this baseline already produced for them; beams can only move off "
+    "its current 0.00, never regress, since there was nothing to lose.\n\n"
+    "Honest risk this can't rule out: a 2D IFC floor-plan render may "
+    "simply not draw beams as a distinguishable overhead line at all "
+    "(unlike wall_types/railings_guards, which have confirmed visual "
+    "tells), in which case this is a true no-op on both docs and "
+    "Duplex's beams stays at 0.00 -- not a regression, just an "
+    "unconfirmed capability, the same honest-failure outcome as "
+    "tonight's own sprinklers/plumbing_fixtures gaps. The risk this "
+    "edit does carry: if the model mistakes a dimension line, grid "
+    "line, or wall edge for a beam and reports a false positive, "
+    "precision on this new category could land below 1.00 -- bounded "
+    "to this one new category, cannot touch any other category's score, "
+    "and gt_is_minimum=True means it can only cost beams' own precision, "
+    "not inflate any other category's recall.\n\n"
+    "How to read next slot's log: check Duplex's beams line directly -- "
+    "any count above 0/8 with precision at or near 1.00 confirms the "
+    "mechanism found real, visible overhead lines; a continued 0/8 "
+    "means this doc's render genuinely has none, which is the file's "
+    "honest answer rather than a cost, not a signal to try a stronger "
+    "cue next. If beams comes back with precision well under 1.00 "
+    "(several false positives), that is this step over-firing on "
+    "ordinary wall or dimension lines and should be tightened or "
+    "reverted, not loosened further. Confirm every other Duplex and "
+    "Clinic category's correct-count matches tonight's own baseline "
+    "numbers listed above -- any drift there is this edit's step-"
+    "renumbering or key-order shift stealing time from a category it "
+    "was not supposed to touch, not this mechanism working as intended."
+)
+
 # Override the system prompt sent to Claude for extraction.
 # Set to None to use the production prompt from ~/Lexios/lexios/SKILL.md
 SYSTEM_PROMPT_OVERRIDE = """Extract building elements from this floor plan image as JSON. Every "location" field below must be exactly the filename's floor-level segment (e.g. "-Level_1.png" becomes "Level 1", "-Second_Floor.png" becomes "Second Floor"), spaces instead of underscores, never abbreviated further: do not read a level label from inside the drawing instead. Speed matters, keep fields short, no extra fields, minified JSON (no indentation, no line breaks). There is a hard 180-second limit: an unfinished response at that point is discarded whole, so treat your real budget as roughly 130 seconds and close out valid JSON early rather than risk being cut off mid-generation, which scores zero for every category on this image.
@@ -5259,6 +5360,7 @@ Return a JSON object with only the keys below that have findings:
 {
   "stairs_elevators": [{"type": "<Stair, Elevator, Escalator>", "location": "<floor level, see above>"}],
   "wall_types": [{"type_id": "<wall category from linework or legend, e.g. 'Exterior', 'Interior - Partition', 'Foundation', 'Party Wall', 'Interior - Furring', 'Interior - Plumbing', 'Interior - Rated', 'Interior - Toilet Partition'>"}],
+  "beams": [{"location": "<floor level, see above>"}],
   "railings_guards": [{"type": "<Guardrail or Handrail, if obvious>", "location": "<floor level, see above>"}],
   "slabs": [{"location": "<floor level, see above>"}],
   "equipment": [{"type": "<HVAC unit, electrical panel, water heater, if obvious>", "location": "<floor level, see above>"}],
@@ -5268,25 +5370,27 @@ Return a JSON object with only the keys below that have findings:
   "rooms": [{"name": "<room label transcribed VERBATIM from the drawing>"}]
 }
 
-Priority order (stop enumerating a category once handled, never revisit it). Every category below counts equally toward this image's score no matter how many instances it has, so steps 1-5 (each a handful of instances at most) come before steps 6-7 (doors and rooms capped at 100, windows capped at 35): finishing steps 1-5 first banks that many complete categories cheaply, instead of risking several of them never being reached if a capped category runs long.
+Priority order (stop enumerating a category once handled, never revisit it). Every category below counts equally toward this image's score no matter how many instances it has, so steps 1-6 (each a handful of instances at most) come before steps 7-8 (doors and rooms capped at 100, windows capped at 35): finishing steps 1-6 first banks that many complete categories cheaply, instead of risking several of them never being reached if a capped category runs long.
 
 1. stairs_elevators first, usually few, list all. On a duplex or any plan with two or more mirrored/repeated units, each unit normally has its own staircase even when the symbols look identical in mirrored positions: if you found only one stair on a plan with 2+ repeated units, look again at the unit that has not yielded one before moving on, and if it is still not visible, add a second stairs_elevators entry matching the first's type. A second staircase on a mirrored-unit building is near-certain even when its symbol is hard to isolate.
 
 2. wall_types: every distinct wall category you can identify from linework or a legend, written exactly as shown (space, hyphen, space, e.g. "Interior - Partition", not closed up or bare, minor punctuation drift here is corrected downstream so do not spend extra time re-checking it). If your first pass found only 1-2 categories, look again specifically at the building's foundation/below-grade level and at any wall shared between two units or tenants, both of which commonly use a distinct construction from typical interior partitions -- but only list a category when you can actually distinguish it by linework or legend, never invent one with no visual basis. Two more categories are easy to miss because they have no special symbol, only a position: "Interior - Furring" is a thin wall built directly against and parallel to another wall, so look for a wall line running close alongside an exterior wall or a thicker wall with only a narrow gap between the two lines. "Interior - Plumbing" is an interior wall that directly borders a bathroom or kitchen fixture area, often the wall immediately next to or between two such rooms. List either only when you can actually see that specific position in the linework, never as a default guess. A legend or the linework itself sometimes shows the same category at two different wall widths in the same building -- Furring in particular, since a thin furring strip against one wall and a thicker one elsewhere are both common on a single building: when you can actually see two visually distinct widths for the same category (Furring or any other category named in this step), list that category twice, once per width you can see -- two different widths are two distinct wall types, not a duplicate of one, so Rule 1's duplicate restriction below does not apply to this case. Only do this when a second, differently-sized instance is actually visible, never as a default guess. Two more categories have their own distinct tell: "Interior - Rated" is a fire-rated wall, commonly marked by its own hour-rating printed directly on or beside the wall line as a short numeric tag (e.g. "1-HR", "2-HR") -- transcribe the rating into your type_id exactly as tagged, only when that printed tag is actually visible, never a default guess. "Interior - Toilet Partition" is a thin, non-structural divider used only between individual stalls inside a restroom, drawn as a noticeably thinner line than any other wall on the sheet -- list it only when you can see that specific thin-stall pattern inside a restroom, never as a default guess.
 
-3. railings_guards: one entry per handrail or guardrail segment you can actually see or can infer from a stair you already confirmed, "type" only when the distinction is visually obvious. Every stair already listed under stairs_elevators is built with its own handrail by code: for each stairs_elevators entry you found, add one matching railings_guards entry for that handrail even if its own line is faint or blends into the stair symbol, the same kind of near-certain inference step 1 already uses to add a second mirrored stair. If you can actually tell that same stair is open on one side (not boxed in by walls on both sides), also add a second entry for its guardrail along that open edge; only add this second one when the open side is visually confirmable, never as a default guess. Beyond stairs, also check every balcony, elevated walkway, or roof-access edge on the sheet -- each typically has its own rail segment, but never invent one there when no rail line is actually visible.
+3. beams: look for a straight overhead line crossing a room, corridor, or open span, often drawn dashed or paired with a size/span label -- this marks a structural beam above, most visible over a garage, open living area, or any room with no load-bearing wall directly below. List one entry per beam line you can actually see, with "location" set to this level's floor-level string (see above); omit this key entirely on a level where no such line is visible, never invent one to fill it.
 
-4. slabs: this category tracks floor coverage per individual room or enclosed space, not one entry for the whole level. List one slabs entry per real room or space you can identify on this level (bedroom, living area, kitchen, bathroom, closet, hallway, stairwell landing, corridor, etc.), using the same floor-level string as "location". Omit "type" unless a floor material is actually visually distinguishable from another room's. Capped at 15 instances this image. Never invent a room or space that is not really there.
+4. railings_guards: one entry per handrail or guardrail segment you can actually see or can infer from a stair you already confirmed, "type" only when the distinction is visually obvious. Every stair already listed under stairs_elevators is built with its own handrail by code: for each stairs_elevators entry you found, add one matching railings_guards entry for that handrail even if its own line is faint or blends into the stair symbol, the same kind of near-certain inference step 1 already uses to add a second mirrored stair. If you can actually tell that same stair is open on one side (not boxed in by walls on both sides), also add a second entry for its guardrail along that open edge; only add this second one when the open side is visually confirmable, never as a default guess. Beyond stairs, also check every balcony, elevated walkway, or roof-access edge on the sheet -- each typically has its own rail segment, but never invent one there when no rail line is actually visible.
 
-5. Next: equipment, then plumbing_fixtures. Each has only a handful of real instances, so a full pass costs only a few seconds. equipment: a visible bathroom, utility, or mechanical room alone is enough for one entry (omit "type" if the unit symbol is not legible). plumbing_fixtures: actively look for toilet, sink, tub, and shower symbols in every bathroom or utility room on the sheet, not just ones that stand out; add an entry when the symbol is visible and you can tell which room contains it, using that room's own number or tag (from its doorway or label, does not have to touch the symbol) as "location"; separately, also fill "type" with the general fixture kind (Toilet, Sink, Tub, Shower) whenever the symbol's shape makes that identifiable too, even when "location" is already filled -- the two fields are not alternatives, fill whichever of them is independently knowable, and omit only the one that truly cannot be told. An ADA-compliant fixture variant -- a grab bar, shower seat, or accessible-stall outline drawn next to a standard fixture -- is typically a smaller or dashed accessory symbol, not the fixture glyph itself, but still counts as one entry under that same fixture's type (e.g. "Shower"); do not skip it just because it looks like an accessory rather than the fixture. Separately, when a room's own printed label names a specific fixture use in words ("Toilet", "Restroom", "Shower", "Specimen Toilet"), not a generic "Bathroom" or "Utility" label, that label alone is enough for one plumbing_fixtures entry even with no fixture symbol drawn, using that room's own door tag or number as "location" -- the same room-label inference equipment already uses above, narrowed here to fixture-specific wording only. Beyond a visible symbol, or for plumbing_fixtures a fixture-naming room label as described above, never invent an entry across these two, but do not skip a category without having actually scanned for it first.
+5. slabs: this category tracks floor coverage per individual room or enclosed space, not one entry for the whole level. List one slabs entry per real room or space you can identify on this level (bedroom, living area, kitchen, bathroom, closet, hallway, stairwell landing, corridor, etc.), using the same floor-level string as "location". Omit "type" unless a floor material is actually visually distinguishable from another room's. Capped at 15 instances this image. Never invent a room or space that is not really there.
 
-6. windows: read the exact tag next to each window symbol -- on this kind of plan it is often a bare 1-3 digit number (e.g. "9", "23"), not an alphanumeric code like a door tag, so do not skip a window or omit its tag just because it is a lone number, and do not confuse it with a nearby dimension string; never invent one. Count small or high windows (bathroom, utility, stairwell) too, not just the prominent ones. Many plans repeat the exact same window type across several rooms (same size window in multiple bedrooms, for example) -- list one entry per physical window symbol you can actually see, not one entry per distinct type or size, and keep scanning for every other window that shares a type you have already logged once. Window tags on this kind of drawing usually run in one ascending, mostly-consecutive numeric sequence as you move around the building -- after your first pass, check your own found tags for a gap in that sequence (for example, you have 13 and 15 but not 14) and look again at that specific spot for a real window symbol you may have skipped inside a dense cluster of similar-looking windows; never invent a tag to fill a gap, only look harder for a real one. doors: each only needs the shared "location" value from above, so list every door symbol as its own entry (one per door, not deduped), including closet, bathroom, pantry, and utility doors, which are the ones a fast pass skips first.
+6. Next: equipment, then plumbing_fixtures. Each has only a handful of real instances, so a full pass costs only a few seconds. equipment: a visible bathroom, utility, or mechanical room alone is enough for one entry (omit "type" if the unit symbol is not legible). plumbing_fixtures: actively look for toilet, sink, tub, and shower symbols in every bathroom or utility room on the sheet, not just ones that stand out; add an entry when the symbol is visible and you can tell which room contains it, using that room's own number or tag (from its doorway or label, does not have to touch the symbol) as "location"; separately, also fill "type" with the general fixture kind (Toilet, Sink, Tub, Shower) whenever the symbol's shape makes that identifiable too, even when "location" is already filled -- the two fields are not alternatives, fill whichever of them is independently knowable, and omit only the one that truly cannot be told. An ADA-compliant fixture variant -- a grab bar, shower seat, or accessible-stall outline drawn next to a standard fixture -- is typically a smaller or dashed accessory symbol, not the fixture glyph itself, but still counts as one entry under that same fixture's type (e.g. "Shower"); do not skip it just because it looks like an accessory rather than the fixture. Separately, when a room's own printed label names a specific fixture use in words ("Toilet", "Restroom", "Shower", "Specimen Toilet"), not a generic "Bathroom" or "Utility" label, that label alone is enough for one plumbing_fixtures entry even with no fixture symbol drawn, using that room's own door tag or number as "location" -- the same room-label inference equipment already uses above, narrowed here to fixture-specific wording only. Beyond a visible symbol, or for plumbing_fixtures a fixture-naming room label as described above, never invent an entry across these two, but do not skip a category without having actually scanned for it first.
 
-7. rooms: one entry per physical room actually labeled, not per unique name. Repeated names (two "Living Room"s in mirrored units, several "Exam Room"s down a corridor) are separate rooms, each its own entry. Transcribe a partly covered label with the legible part. If a label has more than one word or a slash-separated second use, transcribe the whole thing exactly as printed, in order -- do not shorten it down to just its most prominent word, since the qualifier can be what makes it a different room from a plainer same-word room elsewhere on the same sheet (a "WAITING / ACTIVITY AREA" is not the same room as a plain "WAITING"). On a floor with multiple corridors or wings, sweep them in one consistent spatial order for both doors and rooms together -- for example left to right along the nearest corridor, then the next corridor or wing -- instead of covering the first area you notice thoroughly and the rest more lightly; do this as a single ordered pass, not a second scan. Doors and rooms are each capped at 100 instances on this image; windows stay capped at 35; slabs (step 4, above) stays capped at 15. Stop each at its cap in scanning order and move on, do not push past it, and do not return to a finished category later. On a very dense drawing this cap is what keeps the response closing in time at all.
+7. windows: read the exact tag next to each window symbol -- on this kind of plan it is often a bare 1-3 digit number (e.g. "9", "23"), not an alphanumeric code like a door tag, so do not skip a window or omit its tag just because it is a lone number, and do not confuse it with a nearby dimension string; never invent one. Count small or high windows (bathroom, utility, stairwell) too, not just the prominent ones. Many plans repeat the exact same window type across several rooms (same size window in multiple bedrooms, for example) -- list one entry per physical window symbol you can actually see, not one entry per distinct type or size, and keep scanning for every other window that shares a type you have already logged once. Window tags on this kind of drawing usually run in one ascending, mostly-consecutive numeric sequence as you move around the building -- after your first pass, check your own found tags for a gap in that sequence (for example, you have 13 and 15 but not 14) and look again at that specific spot for a real window symbol you may have skipped inside a dense cluster of similar-looking windows; never invent a tag to fill a gap, only look harder for a real one. doors: each only needs the shared "location" value from above, so list every door symbol as its own entry (one per door, not deduped), including closet, bathroom, pantry, and utility doors, which are the ones a fast pass skips first.
+
+8. rooms: one entry per physical room actually labeled, not per unique name. Repeated names (two "Living Room"s in mirrored units, several "Exam Room"s down a corridor) are separate rooms, each its own entry. Transcribe a partly covered label with the legible part. If a label has more than one word or a slash-separated second use, transcribe the whole thing exactly as printed, in order -- do not shorten it down to just its most prominent word, since the qualifier can be what makes it a different room from a plainer same-word room elsewhere on the same sheet (a "WAITING / ACTIVITY AREA" is not the same room as a plain "WAITING"). On a floor with multiple corridors or wings, sweep them in one consistent spatial order for both doors and rooms together -- for example left to right along the nearest corridor, then the next corridor or wing -- instead of covering the first area you notice thoroughly and the rest more lightly; do this as a single ordered pass, not a second scan. Doors and rooms are each capped at 100 instances on this image; windows stay capped at 35; slabs (step 5, above) stays capped at 15. Stop each at its cap in scanning order and move on, do not push past it, and do not return to a finished category later. On a very dense drawing this cap is what keeps the response closing in time at all.
 
 Rules:
 - Never fabricate or duplicate an element to hit a printed count or caption. Only list what you can actually see. (Step 2's wall_types same-category-different-width case is two distinct types you can see, not a duplicate of one, and is not covered by this rule.)
-- Omit any key with no findings, EXCEPT: if time is short when you reach step 6 or 7, still emit whatever partial list you have scanned so far for that key instead of skipping the key entirely, then close out. A short list scores partial credit; a missing key scores zero.
+- Omit any key with no findings, EXCEPT: if time is short when you reach step 7 or 8, still emit whatever partial list you have scanned so far for that key instead of skipping the key entirely, then close out. A short list scores partial credit; a missing key scores zero.
 - No markdown fences, no explanation, only the minified JSON object, first character "{".
 - Keep every string value valid JSON. If a label, tag, or dimension you are transcribing contains a double-quote / inch mark (for example 10'-6") or a literal line break, write a straight apostrophe or a space instead, or backslash-escape the quote -- never leave a bare, unescaped double-quote or a real newline inside a string value. A single stray quote mark invalidates the entire response and scores every category on this image as zero.
 - If your internal budget feels short and categories remain incomplete, stop adding instances and close out valid JSON immediately, as described above. Every "[" and "{" you open must be closed in order; the response must end with "}" and nothing after it, however a category ends (finished, skipped, or cut short).
