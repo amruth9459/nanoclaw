@@ -5351,8 +5351,121 @@ DESCRIPTION = (
     "was not supposed to touch, not this mechanism working as intended."
 )
 
-EXPERIMENT_NAME = "exp-railings-stair-pair-unconditional-code-mandated"
+EXPERIMENT_NAME = "exp-png-palette-quantize-cut-payload-bytes-clinic-timeout"
 DESCRIPTION = (
+    "Experiment #3 tonight (2026-10-31). Baseline to beat: 0.5678, read "
+    "directly from logs/baseline-20261031-020006.log this session: "
+    "Duplex_A_20110907 raw=post F1=0.7717, NBU_MedicalClinic_Arch "
+    "raw=post F1=0.3639, phantom probes clean (fabricated=0). This file's "
+    "on-disk state going in is unchanged since 2026-10-30 slot 2's kept "
+    "exp-railings-stair-pair-unconditional-code-mandated -- both of "
+    "tonight's first two slots were measured and discarded, so nothing "
+    "on disk moved: slot 1 (exp-attempt3-final-doors-rooms-cap30-to-20-"
+    "margin, logs/exp-20261031-022336.log) lowered RETRY_SCOPE_SHRINK_"
+    "FINAL's doors/rooms cap 30->20 and measured 0.5544; slot 2 (exp-"
+    "hoist-doors-location-to-single-top-level-level-field, logs/exp-"
+    "20261031-030745.log) hoisted the per-door location field to a "
+    "single top-level key and measured 0.3997. This edit repeats neither "
+    "-- it does not touch SYSTEM_PROMPT_OVERRIDE, RETRY_SCOPE_SHRINK, or "
+    "RETRY_SCOPE_SHRINK_FINAL at all, and changes a different mechanism "
+    "entirely.\n\n"
+    "Re-read both discarded slots' own logs directly this session rather "
+    "than trusting their summaries, specifically the NBU_MedicalClinic_"
+    "Arch--ifc-render-First_Floor line, the one image that fails "
+    "outright on this doc: baseline log, 630.1s, 0 elements, 'Fix 5: all "
+    "3 attempts timed out, best partial stdout = 0 bytes'. Slot 1's log, "
+    "despite sending a materially smaller final-attempt ask (doors/rooms "
+    "capped at 20 instead of 30): 630.1s, 0 elements, the identical 'Fix "
+    "5: all 3 attempts timed out, best partial stdout = 0 bytes' line -- "
+    "the elapsed time matches the baseline to the tenth of a second. "
+    "Three independent attempts (full schema, then two different "
+    "narrowed schemas) each individually hit exactly the 210s per-"
+    "attempt kill (210.0 x 3 = 630.0, +0.1s of this file's own retry-loop "
+    "overhead) regardless of what was actually asked for on any of them. "
+    "A prompt-side change that shrinks the ask and produces a byte-"
+    "identical failure is the signature of a cost that does not depend "
+    "on the prompt at all -- the opposite of what every timeout/retry-"
+    "cap experiment this month (including both of tonight's own "
+    "discarded slots) has been assuming.\n\n"
+    "preprocess()'s own pre-existing docstring (unchanged, read again "
+    "this session) states its purpose directly: it resizes images ahead "
+    "of time specifically 'to remove the client-side resize+re-encode "
+    "the CLI's Read tool would otherwise have to do on oversized "
+    "originals INSIDE the timed window.' That sentence is this file's "
+    "own documented evidence that the Read tool's per-image file-read "
+    "and re-encode cost is paid inside the 210s clock, as a function of "
+    "the FILE preprocess() hands it -- not of the text prompt. Since "
+    "changing the prompt text (this month's dominant lever) measurably "
+    "failed to move First_Floor's failure at all tonight, while the "
+    "actual on-disk file preprocess() produces has stayed byte-for-byte "
+    "unchanged for weeks, the file itself is the one input to this "
+    "specific failure that has not been touched by any experiment this "
+    "session could find evidence of.\n\n"
+    "Change (preprocess() only, the final save step): the existing crop "
+    "-> resize -> autocontrast -> UnsharpMask pipeline is kept completely "
+    "unchanged, still operating on the full RGB image exactly as before "
+    "-- same pixel dimensions, same crop box, same resampling, same "
+    "sharpening. Only the line that writes the result to disk changes: "
+    "instead of saving the RGB image as a 24-bit truecolor PNG, it is "
+    "first converted to an adaptive 256-color indexed palette "
+    "(`convert('P', palette=Image.ADAPTIVE, colors=256)`) and then saved "
+    "with `optimize=True`. Both of these are pure re-encodings of the "
+    "identical pixel grid, not a resize, recrop, or resample -- no pixel "
+    "position, dimension, or drawn line moves. The eval docs' own legend "
+    "(confirmed by direct inspection in 2026-10-30's DESCRIPTION: walls "
+    "black, doors maroon, windows blue, columns red, other/MEP gray, "
+    "plus a white background) uses a small handful of named colors; 256 "
+    "palette entries is far more than needed to hold every one of those "
+    "colors plus every antialiasing blend between them and the "
+    "background, so the only pixels at any risk of requantization are "
+    "antialiased edge blends, never the linework or text glyphs "
+    "themselves. `optimize=True` spends extra CPU time (free -- "
+    "preprocess() runs before run()'s timed window per its own "
+    "docstring) searching for a better PNG filter/compression strategy "
+    "on the same pixel data. A sparse-color drawing with large flat "
+    "white regions is exactly the content PNG's indexed-palette mode and "
+    "filter search compress far better than 24-bit truecolor. Cache dir "
+    "suffix extended from '_ac1' to '_ac1_pal256opt' so a stale "
+    "truecolor PNG cached under every prior night's policy can never be "
+    "silently reused via the dst.exists() short-circuit.\n\n"
+    "Why this can't hurt: this is the first preprocess() change in this "
+    "file's history that touches only the output file's byte encoding, "
+    "never its pixel content. Every upstream step (crop, resize, "
+    "autocontrast, sharpen) is byte-for-byte identical to tonight's "
+    "baseline, and this all happens before run()'s timed window, so it "
+    "cannot add generation-time risk. If the theorized channel (on-disk "
+    "file size driving in-window Read-tool/encode cost) is wrong, this "
+    "is a pure no-op -- the same pixels, decoded identically by any "
+    "standard PNG reader, read back into an unchanged prompt and schema. "
+    "SYSTEM_PROMPT_OVERRIDE, PARAMS, and postprocess() are untouched.\n\n"
+    "Expected magnitude, stated honestly: this experiment has no way to "
+    "measure actual byte counts without a shell, so the real size of any "
+    "savings is unknown going in. The only observable this session can "
+    "point at is the failure signature itself -- First_Floor's 630.1s / "
+    "0-bytes result has been exactly reproduced, to the tenth of a "
+    "second, across baseline and slot 1 despite a real prompt change in "
+    "between. If this edit breaks that exact-210-multiple pattern on "
+    "that same image with a nonzero element count, that is the first "
+    "evidence the file-size channel is real; if it reproduces the same "
+    "630.1s/0-bytes result a third time, file size was not the (or not "
+    "the only) driver either, and the next unexplored lever is "
+    "structurally shrinking the image itself (program.md's research "
+    "direction #3, zone/quadrant splitting) rather than any more prompt- "
+    "or encoding-side tuning.\n\n"
+    "How to read next slot's log: grep the NBU_MedicalClinic_Arch--ifc-"
+    "render-First_Floor line specifically. An elapsed time that is not a "
+    "clean multiple of 210.0s, with element count > 0, confirms this "
+    "lever. An unchanged 630.1s/0-bytes result rules it out cleanly, "
+    "same as slot 1's did for prompt-side caps. Separately confirm "
+    "Duplex and Clinic Second_Floor land within ordinary night-to-night "
+    "variance of tonight's own baseline (0.7717 raw, Second_Floor's "
+    "usual ~165-element range) -- neither image's processing path "
+    "changed in any way other than the final save's byte encoding, so "
+    "a regression on either would point at something else entirely, not "
+    "this edit.\n\n"
+    "OBSOLETE TEXT BELOW (from 2026-10-30 and earlier, kept only because "
+    "it documents that slot's own reasoning: superseded by the baseline/"
+    "hypothesis above, not part of tonight's edit):\n\n"
     "Experiment #2 tonight (2026-10-30). Baseline to beat: 0.757, this "
     "file's on-disk state going in (exp-restore-beams-honest-visual-cue-"
     "main-schema-only, kept 2026-10-29): Duplex_A_20110907 raw=post "
@@ -6261,6 +6374,20 @@ def preprocess(image_path: str) -> str:
     Only on a parse failure does it fall back to the same, already-live
     _repair_truncated_json(). See DESCRIPTION for the full evidence
     trace against tonight's own log.
+
+    exp-png-palette-quantize-cut-payload-bytes-clinic-timeout
+    (2026-10-31, tonight's 3rd slot): the final save step now converts
+    the already-cropped/resized/sharpened RGB image to an adaptive
+    256-color indexed palette and saves with optimize=True, instead of
+    saving as 24-bit truecolor. Pixel dimensions, crop box, resampling,
+    and sharpening above are all unchanged -- this only re-encodes the
+    same pixel grid into fewer bytes on disk, targeting this function's
+    own documented role (see its opening paragraph) of keeping the
+    CLI Read tool's in-window file-read/re-encode cost down. See
+    DESCRIPTION for the full evidence trace (First_Floor's 630.1s/
+    0-bytes triple-timeout reproduced byte-for-byte across baseline and
+    a materially smaller prompt, ruling out prompt size as that
+    failure's driver).
     """
     import subprocess as _sp
     if not hasattr(_sp, "_claude_arg_fix_applied"):
@@ -6627,7 +6754,7 @@ def preprocess(image_path: str) -> str:
         # autocrop threshold/padding, AND autocontrast cutoff) so a stale PNG
         # produced under a different policy on a prior night can never be
         # silently reused via the dst.exists() short-circuit below.
-        cache_dir = src.parent / f"_preresized_e{MAX_LONG_EDGE}_a{MAX_AREA}_usm1-130-0_acrop-t12-p2_ac1"
+        cache_dir = src.parent / f"_preresized_e{MAX_LONG_EDGE}_a{MAX_AREA}_usm1-130-0_acrop-t12-p2_ac1_pal256opt"
         dst = cache_dir / (src.stem + ".png")
         if dst.exists():
             return str(dst)
@@ -6676,7 +6803,11 @@ def preprocess(image_path: str) -> str:
                 ImageFilter.UnsharpMask(radius=1, percent=130, threshold=0)
             )
             cache_dir.mkdir(exist_ok=True)
-            rgb.save(dst, "PNG")
+            # exp-png-palette-quantize-cut-payload-bytes-clinic-timeout
+            # (2026-10-31): re-encode only, same pixels -- see docstring
+            # above and DESCRIPTION for why.
+            indexed = rgb.convert("P", palette=Image.ADAPTIVE, colors=256)
+            indexed.save(dst, "PNG", optimize=True)
         return str(dst)
     except Exception:
         return image_path
