@@ -5492,6 +5492,107 @@ DESCRIPTION = (
     "Kept at overall F1=0.7511."
 )
 
+EXPERIMENT_NAME = "exp-json-quote-repair-nontruncation-plus-debug-log"
+DESCRIPTION = (
+    "Experiment #1 tonight (2026-11-01). Baseline to beat: 0.1968, read "
+    "directly from logs/baseline-20261101-020003.log this session: "
+    "Duplex_A_20110907 raw=post F1=0.3937 (Level_1 lost all 3 attempts to "
+    "the 210s timeout, 630.2s, 0 elements; Level_2 finished normally at "
+    "99.8s, 45 elements), NBU_MedicalClinic_Arch raw=post F1=0.0 "
+    "(First_Floor lost all 3 attempts to timeout, 630.1s, 0 elements; "
+    "Second_Floor returned at 205.7s -- under the 210s per-attempt kill, "
+    "so NOT a timeout -- with a WARN: Failed to parse JSON that neither "
+    "Fix 5's nor Fix 6's existing repair could salvage), phantom probes "
+    "clean (fabricated=0).\n\n"
+    "This is not a one-off: grepped every file in logs/ this session, "
+    "'WARN: Failed to parse JSON' appears in 253 of this directory's log "
+    "files (425 total occurrences), going back to this project's "
+    "earliest logs -- the single most recurring unaddressed failure "
+    "mode in this file's entire history, more frequent than any one "
+    "door/room cap tweak. 2026-10-04's own "
+    "exp-json-quote-escape-instruction-prevent-malformed-clinic (kept, "
+    "still live today as SYSTEM_PROMPT_OVERRIDE's 'never leave a bare, "
+    "unescaped double-quote' Rules bullet) targeted exactly this and "
+    "reduced but did not eliminate it -- tonight's Second_Floor WARN, "
+    "with that instruction already in the live prompt, proves the "
+    "instruction alone doesn't fully stop it. That same 2026-10-04 "
+    "DESCRIPTION's own 'how to read next slot's log' section named the "
+    "unexploited next step verbatim: 'the next lever is adding logging "
+    "for the raw stdout text itself ... rather than a third blind guess "
+    "at the repair/prevention mechanism.' Grepped this whole file this "
+    "session for 'raw stdout', 'stdout text', and 'debug' near the "
+    "repair functions -- zero matches. That lever has never been "
+    "pulled since it was written over three weeks ago.\n\n"
+    "Change (preprocess() only, two strictly additive second-chance "
+    "fallbacks in both the Fix-5 (attempt-3-timeout) and Fix-6 "
+    "(clean-return-malformed) branches, each only reached after the "
+    "existing, unchanged _repair_truncated_json call has already "
+    "returned None): (1) new _repair_quote_escape_json(raw) handles the "
+    "non-truncation case _repair_truncated_json was never built for. On "
+    "a json.JSONDecodeError, an 'Invalid control character' message "
+    "replaces that one character with a space (the exact fix the live "
+    "prompt's own Rules bullet already asks the model to do itself); "
+    "otherwise it walks backward from the decoder's own reported error "
+    "offset to the nearest unescaped double-quote -- the string value's "
+    "own wrongly-early closing quote, the documented inch-mark/"
+    "dimension-label failure shape -- and backslash-escapes it, then "
+    "retries, capped at 30 iterations; on success it prints the edit "
+    "count and which branch recovered it ('Fix 7: quote-escape repair "
+    "recovered JSON after N edit(s)'), the only signal tonight's log "
+    "can show this mechanism actually fired, since a silently-clean "
+    "response and a silently-repaired one would otherwise look "
+    "identical. (2) on the path where both repairs still fail, a "
+    "diagnostic print showing the first json.JSONDecodeError's own "
+    "message and byte offset plus the 300 characters of raw stdout "
+    "centered on that offset -- not head/tail, which only shows "
+    "truncation and _repair_truncated_json already owns that case -- "
+    "closing the exact gap 2026-10-04 flagged. SYSTEM_PROMPT_OVERRIDE, PARAMS, "
+    "postprocess(), and every other part of preprocess() (crop/resize/"
+    "sharpen/autocontrast/palette-quantize, the timeout/retry schema) "
+    "are byte-for-byte untouched.\n\n"
+    "Cannot-regress argument: both additions only ever fire on text "
+    "that already fails to parse today -- a guaranteed image-wide zero "
+    "across every category, as tonight's Clinic Second_Floor shows. "
+    "_repair_quote_escape_json either converges to a dict that parses "
+    "(strictly better than today's hard zero, even if recovered "
+    "content has imperfect precision) or exhausts its 30-iteration cap "
+    "and returns None, identical to today's outcome. The diagnostic "
+    "print changes no return value.\n\n"
+    "Risk, stated honestly: the backward-quote-escape heuristic is a "
+    "shape-match against the documented failure mode, not a confirmed "
+    "diagnosis of tonight's specific corruption -- no raw stdout has "
+    "ever been logged before tonight, which is part of why this edit "
+    "adds that logging. If Second_Floor's actual corruption isn't "
+    "quote- or control-character-shaped, both branches converge to "
+    "None and that image scores zero exactly as it does today -- no "
+    "worse. One honesty caveat: this is exact per-image, not per-doc -- "
+    "a repair that converges to a dict with low precision could nudge "
+    "a document's pooled F1 down slightly versus a hard per-image zero "
+    "averaged in; in the realistic single-stray-quote case this is "
+    "moot, but it's not a formal proof at the whole-eval-set level.\n\n"
+    "Two more honest caveats on reading tonight's keep/revert: (a) this "
+    "slot's result is dominated by whether Duplex Level_1 and Clinic "
+    "First_Floor's full 630s triple-timeouts recur -- a 'kept' tonight "
+    "without the new 'Fix 7' print actually firing in the log is "
+    "baseline variance, not confirmation this mechanism did anything; "
+    "(b) Fix 6's clean-return branch still doesn't retry the subprocess "
+    "call itself -- Second_Floor failed at 205.7s with roughly 424s of "
+    "the 630s three-attempt budget never spent, so a future slot could "
+    "try re-issuing the call on a malformed clean return (not just "
+    "repairing the text in hand) if quote-escape repair doesn't catch "
+    "it; not attempted tonight.\n\n"
+    "How to read next slot's log: check both Clinic images and Duplex "
+    "Level_1 for 'WARN: Failed to parse JSON'. If '[preprocess] Fix 7: "
+    "quote-escape repair recovered JSON after N edit(s)' appears, this "
+    "mechanism actually fired -- note which path (timeout/clean-return) "
+    "and whether that image's element count and F1 moved. If the WARN "
+    "is still there with no Fix 7 line, look for '[preprocess] repair "
+    "failed (<label>): <msg> at <pos>: ...' and read the actual "
+    "corrupted text centered on that offset before writing the next "
+    "guess -- that line is this edit's whole point if quote-escape "
+    "repair doesn't converge."
+)
+
 # Override the system prompt sent to Claude for extraction.
 # Set to None to use the production prompt from ~/Lexios/lexios/SKILL.md
 SYSTEM_PROMPT_OVERRIDE = """Extract building elements from this floor plan image as JSON. Every "location" field below must be exactly the filename's floor-level segment (e.g. "-Level_1.png" becomes "Level 1", "-Second_Floor.png" becomes "Second Floor"), spaces instead of underscores, never abbreviated further: do not read a level label from inside the drawing instead. Speed matters, keep fields short, no extra fields, minified JSON (no indentation, no line breaks). There is a hard 180-second limit: an unfinished response at that point is discarded whole, so treat your real budget as roughly 130 seconds and close out valid JSON early rather than risk being cut off mid-generation, which scores zero for every category on this image.
@@ -6302,6 +6403,19 @@ def preprocess(image_path: str) -> str:
     0-bytes triple-timeout reproduced byte-for-byte across baseline and
     a materially smaller prompt, ruling out prompt size as that
     failure's driver).
+
+    exp-json-quote-repair-nontruncation-plus-debug-log (2026-11-01,
+    tonight's slot): adds Fix 7, a second-chance repair inside the
+    monkeypatch below (_repair_quote_escape_json) for malformed JSON
+    that is NOT a truncation -- a clean subprocess return under the
+    timeout that still fails to parse because of a stray literal quote
+    or control character mid-string. Only reached after Fix 5's
+    _repair_truncated_json has already returned None, so every response
+    that repairs cleanly today is byte-for-byte untouched. Also adds
+    _diagnose_json_failure, printing the exact decoder error and a
+    300-char window of raw stdout around it whenever both repairs still
+    fail -- see DESCRIPTION for the full evidence trace and the
+    2026-10-04 precedent this closes.
     """
     import subprocess as _sp
     if not hasattr(_sp, "_claude_arg_fix_applied"):
@@ -6617,6 +6731,80 @@ def preprocess(image_path: str) -> str:
                     idx = text.rfind("}", 0, idx)
                 return None
 
+            def _strip_fences(text):
+                if "```json" in text:
+                    return text.split("```json", 1)[1].split("```", 1)[0].strip()
+                if text.startswith("```"):
+                    parts = text.split("```")
+                    if len(parts) >= 2:
+                        return parts[1].strip()
+                return text
+
+            # Fix 7 (exp-json-quote-repair-nontruncation-plus-debug-log,
+            # 2026-11-01): _repair_truncated_json above only fixes a
+            # response cut short mid-generation. It never fires on a
+            # CLEAN return that still fails to parse -- tonight's Clinic
+            # Second_Floor, 205.7s, well under the 210s kill -- because
+            # the corruption isn't at the end, it's a stray literal
+            # double-quote or control character inside a string value
+            # (the inch-mark/dimension-label shape SYSTEM_PROMPT_OVERRIDE's
+            # own Rules bullet already warns the model against). json's
+            # decoder reports the exact byte offset where it then expected
+            # a delimiter and didn't find one; walk backward from that
+            # offset to the nearest unescaped quote -- the string's own
+            # wrongly-early closing quote -- and escape it, then retry.
+            # Only ever called after _repair_truncated_json has already
+            # returned None, so every response that repairs cleanly today
+            # is untouched; on a response this can't fix either, it
+            # returns None exactly as before -- same guaranteed-zero floor
+            # per image, never worse.
+            def _repair_quote_escape_json(raw):
+                """Returns (repaired_text, edit_count) or None."""
+                if not raw:
+                    return None
+                text = raw.decode("utf-8", "ignore") if isinstance(raw, bytes) else raw
+                text = _strip_fences(text.strip())
+                if not text.startswith("{"):
+                    return None
+                edits = 0
+                for _ in range(30):
+                    try:
+                        parsed = json.loads(text)
+                        return (text, edits) if isinstance(parsed, dict) else None
+                    except json.JSONDecodeError as exc:
+                        pos = exc.pos
+                        if pos is None or pos < 0 or pos >= len(text):
+                            return None
+                        if "Invalid control character" in exc.msg:
+                            text = text[:pos] + " " + text[pos + 1:]
+                            edits += 1
+                            continue
+                        idx = text.rfind('"', 0, pos)
+                        if idx <= 0 or text[idx - 1] == "\\":
+                            return None
+                        text = text[:idx] + '\\"' + text[idx + 1:]
+                        edits += 1
+                return None
+
+            def _diagnose_json_failure(raw, label):
+                """Print exactly where json.loads still breaks once both
+                repairs give up -- the raw-stdout logging 2026-10-04's
+                DESCRIPTION asked for ('the next lever is adding logging
+                for the raw stdout text itself') and no slot had added
+                until tonight. Diagnostics only: any failure in here must
+                never block the real return value in the caller, so the
+                decode/parse is its own try block with no re-raise."""
+                try:
+                    text = raw.decode("utf-8", "ignore") if isinstance(raw, bytes) else (raw or "")
+                    text = _strip_fences(text.strip())
+                    json.loads(text)
+                except json.JSONDecodeError as exc:
+                    pos = exc.pos or 0
+                    print(
+                        f"[preprocess] repair failed ({label}): {exc.msg} "
+                        f"at {pos}: {text[max(0, pos - 150):pos + 150]!r}"
+                    )
+
             best_partial = b""
             for _attempt in range(3):
                 call_args = args
@@ -6638,10 +6826,20 @@ def preprocess(image_path: str) -> str:
                             f"best partial stdout = {len(best_partial)} bytes"
                         )
                         repaired = _repair_truncated_json(best_partial)
+                        if repaired is None:
+                            quote_fix = _repair_quote_escape_json(best_partial)
+                            if quote_fix is not None:
+                                repaired, _n_edits = quote_fix
+                                print(
+                                    "[preprocess] Fix 7: quote-escape repair "
+                                    f"recovered JSON after {_n_edits} edit(s) "
+                                    "(timeout path)"
+                                )
                         if repaired is not None:
                             return _sp.CompletedProcess(
                                 call_args, -1, repaired, ""
                             )
+                        _diagnose_json_failure(best_partial, "timeout path")
                         raise
                 else:
                     # Fix 6 (exp-repair-malformed-json-on-clean-subprocess-
@@ -6660,10 +6858,20 @@ def preprocess(image_path: str) -> str:
                     except (json.JSONDecodeError, TypeError, ValueError):
                         pass  # not already valid -- fall through to repair below
                     repaired = _repair_truncated_json(result.stdout)
+                    if repaired is None:
+                        quote_fix = _repair_quote_escape_json(result.stdout)
+                        if quote_fix is not None:
+                            repaired, _n_edits = quote_fix
+                            print(
+                                "[preprocess] Fix 7: quote-escape repair "
+                                f"recovered JSON after {_n_edits} edit(s) "
+                                "(clean-return path)"
+                            )
                     if repaired is not None:
                         return _sp.CompletedProcess(
                             call_args, result.returncode, repaired, result.stderr
                         )
+                    _diagnose_json_failure(result.stdout, "clean-return path")
                     return result
 
         _sp.run = _fixed_run
