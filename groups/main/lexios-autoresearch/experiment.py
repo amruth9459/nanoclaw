@@ -5584,6 +5584,120 @@ DESCRIPTION = (
     "category list further) instead of another prompt restatement."
 )
 
+EXPERIMENT_NAME = "exp-widen-per-attempt-timeout-210-to-300-clinic-full-timeout"
+DESCRIPTION = (
+    "Tonight's 1st slot (2026-11-04). Baseline to beat: 0.5831, read "
+    "directly from logs/baseline-20261104-020005.log this session: "
+    "Duplex_A_20110907 raw=post F1=0.776, NBU_MedicalClinic_Arch raw=post "
+    "F1=0.3901. Last slot's exp-retryscope-explicit-no-preamble-"
+    "instruction (the no-preamble sentence appended to both retry "
+    "suffixes) is still on disk above this block -- its own measured "
+    "result embedded in that baseline log shows it was not reached at "
+    "all: NBU_MedicalClinic_Arch--ifc-render-First_Floor.png logged "
+    "'[preprocess] Fix 5: all 3 attempts timed out, best partial stdout "
+    "= 0 bytes' at 630.1s, i.e. every one of the 3 attempts (including "
+    "the 2 that carry the new sentence, RETRY_SCOPE_SHRINK and "
+    "RETRY_SCOPE_SHRINK_FINAL) burned its full 210s timeout wall with "
+    "zero bytes salvaged -- a pure clock failure, not a malformed-JSON "
+    "or narration failure, so last slot's edit had no text to reinforce "
+    "and correctly had no effect either way.\n\n"
+    "Read the baseline log's per-category breakdown directly (not just "
+    "the doc-level F1): NBU_MedicalClinic_Arch scored absolute 0/N on "
+    "four of its ten categories -- equipment 0/2, plumbing_fixtures 0/3, "
+    "slabs 0/3, sprinklers 0/10 -- plus badly degraded recall on doors "
+    "(81/254), rooms (88/269), and wall_types (2/7). Read the ground-"
+    "truth file directly this session to check whether these are a "
+    "vocabulary problem or a coverage problem: "
+    "groups/main/lexios-autoresearch/ground-truth/NBU_MedicalClinic_Arch."
+    "ground-truth.json confirms equipment's 2 entries are both page 3 / "
+    "location 'First Floor - Toilet rooms' and 'First Floor - "
+    "Restrooms'; plumbing_fixtures' 3 entries are all page 1 with room-"
+    "tag locations '2C07'/'2C08'/'1D18'; slabs' 3 entries are all page 1, "
+    "location 'First Floor' explicitly. Every GT instance in all three "
+    "zeroed categories traces to the image that produced 0 elements this "
+    "run (First_Floor), while Second_Floor's own extraction (242 "
+    "elements in 187.7s, a healthy run) simply has no occasion to "
+    "contain them -- these three categories' zeros are not a prompt-"
+    "wording or fuzzy-match gap, they are a direct, mechanical "
+    "consequence of one image contributing nothing at all. (sprinklers' "
+    "0/10 is only partly this: its GT locations are '1BC2'/'1AC1'/"
+    "'1AC3'/'1AC5'/'1B04'/'1AC4'/'1CC1' (7, First Floor by leading "
+    "digit) and '2DC1'/'2D05'/'2D18' (3, Second Floor) -- so 3 of its 10 "
+    "instances were available to the healthy Second_Floor run and still "
+    "went unmatched, meaning sprinklers carries a second, separate gap "
+    "this edit does not address and is not claimed to fix.) Doors/rooms/"
+    "wall_types' degraded-but-nonzero recall is consistent with roughly "
+    "half of each category's GT instances living on the zeroed First_"
+    "Floor image, the other half being caught by Second_Floor alone.\n\n"
+    "Root cause of First_Floor's 630.1s/0-element outcome: preprocess()'s "
+    "subprocess.run monkeypatch enforces a 210s hard kill per attempt "
+    "(Fix 3, set 2026-10-25 by exp-widen-per-attempt-timeout-180-to-210-"
+    "clinic-near-miss, raised from 180s after that night's First_Floor "
+    "closed attempt 2 at 174.7s of its own 180s window -- only 5.3s of "
+    "margin). Tonight's own log shows a strictly worse signature than "
+    "that near-miss: all 3 attempts, including the 2 schema-narrowed "
+    "RETRY_SCOPE_SHRINK / RETRY_SCOPE_SHRINK_FINAL retries, burn the "
+    "full 210s with zero bytes salvaged (630.1s = 3x210.03s). That exact "
+    "triple-timeout/0-element signature is the same one that originally "
+    "justified the larger 120s->180s jump (exp-rebalance-timeout-180x2-"
+    "over-120x3, 2026-09-28: 'three 120s rolls of the die... still lost "
+    "all three on Clinic First_Floor (360.1s total, 0 elements)'), not "
+    "the smaller 180s->210s nudge that followed a near-miss. No widen "
+    "past 210s has been tried since 2026-10-25 -- grepped this whole "
+    "file this session for '210s'/'230s'/'250s'/'300s'/'widen'/'TIMEOUT': "
+    "every hit on the per-attempt cap traces the same 120->180->210 "
+    "lineage via comments and DESCRIPTION text; none describes a widen "
+    "beyond 210 being tried or reverted. results.tsv has no 'timeout' "
+    "row either.\n\n"
+    "Change (preprocess() only, one integer, strictly additive): in the "
+    "subprocess.run monkeypatch's Fix 3 block, change the widen target "
+    "from 210 to 300 (kw[\"timeout\"] = 300 where it currently reads "
+    "210), with a new Fix 8 comment recording this reasoning. The "
+    "condition it sits behind (kw.get(\"timeout\") == 120) is unchanged, "
+    "so this only ever fires on the same single known call site it "
+    "already did. SYSTEM_PROMPT_OVERRIDE's own stated pacing text ('hard "
+    "180-second limit... real budget as roughly 130 seconds') is left "
+    "byte-for-byte untouched, exactly as the 180->210 widen left it "
+    "untouched -- this is pure execution-layer slack, not a bigger "
+    "generation ask; the model is not told to think longer, it is simply "
+    "not killed as abruptly if a slow API night pushes it past its own "
+    "stated budget. RETRY_SCOPE_SHRINK, RETRY_SCOPE_SHRINK_FINAL, Fix 4 "
+    "through Fix 7, PARAMS, and postprocess() are untouched.\n\n"
+    "Cannot-regress argument: tonight's own log shows both Duplex images "
+    "finishing in 84.0s and 118.6s -- comfortably under even the "
+    "ORIGINAL unwidened 120s call, so Duplex's extraction this run never "
+    "enters this code path at either 210 or 300, a clean no-op for "
+    "tonight specifically. Stated honestly rather than overclaimed: "
+    "Duplex has hit this exact path on other nights (logs/exp-20261026-"
+    "024559.log records Duplex_A_20110907--ifc-render-Level_2.png "
+    "burning a true 630.2s triple-timeout, 0 bytes salvaged, on an "
+    "unrelated postprocess edit that could not plausibly have added "
+    "generation time -- pure run-to-run variance). On such a night this "
+    "edit does affect Duplex, but only in the same one direction it "
+    "affects Clinic: a hard-kill widen can only grant a stalled "
+    "generation more wall-clock room to finish, it cannot make an "
+    "already-successful generation fail, since nothing about the "
+    "request, prompt, or output volume changes -- only the point the "
+    "kill fires. The realistic failure mode is the same one already "
+    "named for Clinic: a sufficiently slow night still exhausts 300s "
+    "(this file's own documented pace variance ranges roughly 1.5 to 4.8 "
+    "elements/s across nights), not that the wider window induces a new "
+    "or different error shape.\n\n"
+    "How to read next slot's log: check NBU_MedicalClinic_Arch--ifc-"
+    "render-First_Floor.png's own elapsed time and element count first. "
+    "If it still shows 3x300s exhaustion (900.3s) with 0 elements, this "
+    "lever is falsified -- the bottleneck is not generation clock time "
+    "(possibly a hang or an upstream API issue unrelated to output "
+    "length) and the next slot should look structurally (e.g. a lower "
+    "RETRY_SCOPE_SHRINK cap) rather than widening the timeout again. If "
+    "First_Floor's element count moves off 0 with elapsed time under "
+    "300s, check specifically whether equipment, plumbing_fixtures, and "
+    "slabs (the three categories whose GT is fully explained by this "
+    "one image's failure) move off their 0/2, 0/3, 0/3 zeros -- that is "
+    "this edit's real falsification target, not sprinklers, which this "
+    "DESCRIPTION already flagged as carrying a second, separate gap."
+)
+
 # Override the system prompt sent to Claude for extraction.
 # Set to None to use the production prompt from ~/Lexios/lexios/SKILL.md
 SYSTEM_PROMPT_OVERRIDE = """Extract building elements from this floor plan image as JSON. Every "location" field below must be exactly the filename's floor-level segment (e.g. "-Level_1.png" becomes "Level 1", "-Second_Floor.png" becomes "Second Floor"), spaces instead of underscores, never abbreviated further: do not read a level label from inside the drawing instead. Speed matters, keep fields short, no extra fields, minified JSON (no indentation, no line breaks). There is a hard 180-second limit: an unfinished response at that point is discarded whole, so treat your real budget as roughly 130 seconds and close out valid JSON early rather than risk being cut off mid-generation, which scores zero for every category on this image.
@@ -6451,8 +6565,18 @@ def preprocess(image_path: str) -> str:
             # before. The extra 30s is pure execution-layer slack for a run
             # that overshoots its own stated budget on a slow API night,
             # not a bigger generation ask.
+            # Fix 8 (exp-widen-per-attempt-timeout-210-to-300-clinic-
+            # full-timeout, 2026-11-04): tonight's own baseline log
+            # (logs/baseline-20261104-020005.log) shows Clinic First_Floor
+            # burning all 3 attempts (including both RETRY_SCOPE_SHRINK /
+            # RETRY_SCOPE_SHRINK_FINAL schema-narrowed retries) to the
+            # full 210s with 0 bytes salvaged on any of them -- a
+            # strictly worse signature than the 180s near-miss that
+            # justified the prior widen. See DESCRIPTION for the full
+            # evidence trace. Same execution-layer-only framing as Fix 3:
+            # SYSTEM_PROMPT_OVERRIDE's stated pacing text is untouched.
             if kw.get("timeout") == 120:
-                kw["timeout"] = 210
+                kw["timeout"] = 300
             # Fix 4 (exp-attempt3-scope-shrink-doors-rooms-only, 2026-10-04,
             # extended by exp-attempt3-add-windows-level-specific-loss,
             # 2026-10-11, extended by exp-retry-narrow-scope-on-attempt2-
