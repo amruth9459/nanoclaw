@@ -6030,6 +6030,120 @@ DESCRIPTION = (
     "that is the precision tradeoff named above, not a bug."
 )
 
+EXPERIMENT_NAME = "exp-retry-reattach-path-plus-plumbing-fixtures"
+DESCRIPTION = (
+    "Hypothesis: one claim, two mechanisms, both needed for a retried "
+    "image to score like an attempt-1 image (preprocess()'s _fixed_run, "
+    "_attempt >= 1): it needs the image path, and it needs the same "
+    "category keys attempt 1 has. Both diagnosed directly from this "
+    "session's own log and comment-history reads, not assumed.\n\n"
+    "Defect 1, same mechanism last night's slot 4 "
+    "(exp-retry-reattach-image-reference, logs/exp-20261108-040816.log, "
+    "discarded at post F1=0.5425 on NBU / 0.6571 overall) already proved: "
+    "slot 2's kept change (now baseline, "
+    "exp-retry-standalone-prompt-drop-main-body) replaced args[-1] outright "
+    "on retry ('call_args = list(args[:-1]) + [_suffix]'), which drops the "
+    "only place the image path is ever stated -- run()'s own "
+    "f\"Read the image at {img_path_str} and extract building "
+    "elements.\\n\\n\" opening line, confirmed read directly in run() at "
+    "~line 10870-10886, outside these markers, not touched. Tonight's own "
+    "baseline (logs/baseline-20261109-020005.log) reproduces this exact "
+    "failure: NBU_MedicalClinic_Arch--ifc-render-Second_Floor.png scores 0 "
+    "elements after 354.6s (one silent 300s timeout, then two ~27s clean "
+    "returns of 'No image is attached to this message...' / 'No floor plan "
+    "image was actually attached to this message...'). The kept run that "
+    "set tonight's baseline description (logs/exp-20261108-031848.log) "
+    "never actually exercised a retry: all four images finished under 152s "
+    "that run (Duplex 59.8s/73.7s, Clinic 149.3s/151.1s), so 0.7974 was a "
+    "clean-run roll, not evidence the pathless retry works. Slot 4, the "
+    "only 11-08 run where a retry fired under this regime, is the real "
+    "test: Clinic First_Floor took 386.4s (one 300s timeout, then an ~86s "
+    "retry that returned content instead of refusing); the doc's "
+    "categories dropped relative to the kept run's doc-level numbers "
+    "(doors 116 vs 169, rooms 147 vs 193, equipment 0 vs 2, slabs 0 vs 3, "
+    "plumbing_fixtures 1 vs 2, all totals across both images). "
+    "Second_Floor's own element count was close to unchanged (233 vs "
+    "237), so the drop traces to First_Floor's retry output, not a "
+    "Second_Floor regression.\n\n"
+    "Fix for defect 1: reuse slot 4's proven parse, unchanged. Read "
+    "args[-1] (stable across attempts -- only call_args is rebuilt per "
+    "iteration) for the literal 'Read the image at ' ... ' and extract "
+    "building elements.\\n\\n' span; if present, prepend that span onto "
+    "_suffix instead of using _suffix alone. Empty-string fallback, no "
+    "regression path, if the marker text is ever absent.\n\n"
+    "The retry path's category-key list has history worth stating "
+    "accurately, not glossed over. Two prior kept slots already grew "
+    "this exact string: 10-19 (exp-retryscope-add-equipment-first-floor-"
+    "timeout) added equipment; 10-24 "
+    "(exp-retryscope-restore-slabs-railings-attempt2) added slabs and "
+    "railings_guards, and that slot's own comment (directly above "
+    "RETRY_SCOPE_SHRINK's assignment) states plumbing_fixtures was "
+    "deliberately left out because its 'match key is a room/door tag "
+    "this narrowed pass has no context for.' This slot tests that "
+    "reasoning directly rather than taking it on faith: once defect 1's "
+    "path fix lands, the retry attempt still calls the model's own Read "
+    "tool on the same image fresh, and RETRY_SCOPE_SHRINK already asks "
+    "the model to transcribe room labels verbatim (the rooms key) and to "
+    "carry a floor-level location for doors -- the model has not lost "
+    "its view of the drawing or its ability to read a room number or "
+    "door tag, only the key to put a plumbing-fixture answer under. "
+    "10-24's 'no context' reasoning conflated dropping the main "
+    "prompt's prose with losing the model's ability to see the drawing; "
+    "those are not the same thing, and this slot's edit tests the "
+    "distinction directly rather than assuming it. Slot 4's measured "
+    "plumbing_fixtures drop (1 vs 2, doc-level) is consistent with the "
+    "key being genuinely missing, not proof on its own -- the point of "
+    "this slot is to add the key and see whether a retried image can "
+    "now use it. equipment and slabs are already present in "
+    "RETRY_SCOPE_SHRINK's schema and prose from 10-19 and 10-24 -- "
+    "checked directly this slot, not left as an open question -- just "
+    "with less inference guidance than the main prompt, so this edit "
+    "does not touch them; their slot-4 drop (equipment 0 vs 2, slabs 0 "
+    "vs 3, doc-level) is a separate, unverified question this slot does "
+    "not claim to fix, to keep the change scoped to the one key 10-24 "
+    "named and deliberately skipped.\n\n"
+    "Fix for defect 2: add a \"plumbing_fixtures\" entry to "
+    "RETRY_SCOPE_SHRINK's JSON schema (same tag/type/location shape as "
+    "SYSTEM_PROMPT_OVERRIDE's own key) and one condensed instruction "
+    "sentence carrying the same toilet/sink/tub/shower-symbol and "
+    "room-label-inference guidance, shortened to fit the retry's own "
+    "brevity goal. RETRY_SCOPE_SHRINK_FINAL (attempt 3, the last resort) "
+    "is left untouched on purpose -- it should stay the shortest, most "
+    "minimal prompt of the three.\n\n"
+    "Grepped results.tsv in full this slot for 'plumbing_fixtures', "
+    "'equipment', 'slabs', 'sprinkler': only two unrelated historical rows "
+    "match by that search (exp83, a dead v1 corpus-field fix predating "
+    "this retry mechanism entirely; and a 2026-08-12 slabs-cap-raise, "
+    "about the numeric cap, not retry-prompt content) -- results.tsv "
+    "stores a log id plus a 60-char description, not the experiment "
+    "name, so that grep alone is not sufficient. Reading the comment "
+    "history directly above RETRY_SCOPE_SHRINK's own assignment is what "
+    "actually shows 10-19 added equipment and 10-24 added slabs and "
+    "railings_guards to this exact string, both kept; plumbing_fixtures "
+    "has not been added by any prior slot, kept or discarded, and 10-24 "
+    "is the one slot that considered it and chose to skip it, for the "
+    "reason addressed above. This edit is not a repeat of 10-19 or "
+    "10-24 (different key, and this slot also disputes 10-24's stated "
+    "reason for skipping its key); it is a repeat of nothing on "
+    "record.\n\n"
+    "Honest risk, stated plainly: this only moves anything on a run where "
+    "some image actually reaches attempt 2 or 3 -- same caveat slot 2 and "
+    "slot 4 both wrote about their own changes. A run where every image "
+    "finishes on attempt 1 is a pure variance roll against 0.7055 and "
+    "proves nothing either way for this edit. A longer retry prompt could "
+    "in principle push an already-slow attempt further toward its own "
+    "time limit, though one short added sentence is unlikely to be the "
+    "difference between finishing and timing out.\n\n"
+    "How to read next slot's log: check NBU_MedicalClinic_Arch's two "
+    "images first. Absence of the 'No image is attached' / 'No floor plan "
+    "image was actually attached' refusal text on an image that showed it "
+    "before confirms defect 1's fix fired. A nonzero plumbing_fixtures "
+    "count on an image whose elapsed time crossed 300s (meaning a retry "
+    "attempt produced the final output) confirms defect 2's fix fired. If "
+    "no image reaches a retry this run, both fixes are untested this "
+    "slot, not disproven."
+)
+
 # Override the system prompt sent to Claude for extraction.
 # Set to None to use the production prompt from ~/Lexios/lexios/SKILL.md
 SYSTEM_PROMPT_OVERRIDE = """Extract building elements from this floor plan image as JSON. Every "location" field below must be exactly the filename's floor-level segment (e.g. "-Level_1.png" becomes "Level 1", "-Second_Floor.png" becomes "Second Floor"), spaces instead of underscores, never abbreviated further: do not read a level label from inside the drawing instead. Speed matters, keep fields short, no extra fields, minified JSON (no indentation, no line breaks). There is a hard 180-second limit: an unfinished response at that point is discarded whole, so treat your real budget as roughly 130 seconds and close out valid JSON early rather than risk being cut off mid-generation, which scores zero for every category on this image.
@@ -6981,6 +7095,14 @@ def preprocess(image_path: str) -> str:
             # 64.6s (31%) unused. Clinic doors/rooms both read P=1.00 in
             # that same log, this file's own cap-saturation signature. See
             # DESCRIPTION for the full evidence trace.
+            # exp-retry-reattach-path-plus-plumbing-fixtures (2026-11-09,
+            # tonight's slot): plumbing_fixtures added to this string's
+            # key list. 10-24 above skipped this key on purpose, stating
+            # the model has "no context" for a room/door tag match; this
+            # slot disputes that reasoning (the retry still reads the
+            # image fresh and already transcribes room labels) and
+            # tests it directly. See DESCRIPTION for the full evidence
+            # trace.
             RETRY_SCOPE_SHRINK = (
                 "Your very first character must be \"{\" -- never a "
                 "sentence, label, or summary of what you found, and no "
@@ -7008,12 +7130,22 @@ def preprocess(image_path: str) -> str:
                 "or Guard Rail>\", \"location\": \"...\"}], \"equipment\": "
                 "[{\"type\": \"<HVAC unit, electrical panel, water "
                 "heater, if obvious>\", \"location\": \"...\"}], "
+                "\"plumbing_fixtures\": [{\"type\": \"<Toilet, Sink, Tub, "
+                "Shower, if obvious>\", \"location\": \"<nearest legible "
+                "room number or door tag, NOT a floor level, only if "
+                "legible>\"}], "
                 "\"windows\": [{\"tag\": \"<window number/tag>\"}], "
                 "\"doors\": [{\"location\": \"...\"}], \"rooms\": "
                 "[{\"name\": \"<room label transcribed VERBATIM>\"}]}\n\n"
                 "List stairs_elevators, wall_types, and equipment fully "
                 "first -- each is usually only a handful of instances, no "
-                "cap, costs only a few seconds. Every confirmed stair "
+                "cap, costs only a few seconds. Also actively look for "
+                "toilet, sink, tub, and shower symbols in every bathroom "
+                "or utility room, or a room label that names a fixture "
+                "use in words (e.g. \"Toilet\", \"Shower\"); add one "
+                "plumbing_fixtures entry per instance found this way, "
+                "using its room's own number or tag as \"location\", no "
+                "cap. Every confirmed stair "
                 "gets two railings_guards entries at its same location, "
                 "one \"Handrail\" and one \"Guard Rail\", even when "
                 "neither line is drawn (code-mandated), no cap. One "
@@ -7294,7 +7426,13 @@ def preprocess(image_path: str) -> str:
                 if (_attempt >= 1 and isinstance(args, list) and args
                         and isinstance(args[-1], str)):
                     _suffix = RETRY_SCOPE_SHRINK_FINAL if _attempt == 2 else RETRY_SCOPE_SHRINK
-                    call_args = list(args[:-1]) + [_suffix]
+                    _image_ref_prefix = ""
+                    _orig_prompt = args[-1]
+                    _marker = "Read the image at "
+                    _tail = " and extract building elements.\n\n"
+                    if _orig_prompt.startswith(_marker) and _tail in _orig_prompt:
+                        _image_ref_prefix = _orig_prompt.split(_tail, 1)[0] + _tail
+                    call_args = list(args[:-1]) + [_image_ref_prefix + _suffix]
                 try:
                     result = _orig(call_args, **kw)
                 except _sp.TimeoutExpired as exc:
