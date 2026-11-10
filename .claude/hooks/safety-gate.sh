@@ -63,7 +63,6 @@ CRITICAL = [
 HIGH = [
     (r'\brm\s', "Delete files"),
     (r'\bunlink\s', "Remove a file"),
-    (r'\bgit\s+push\b', "Push code to remote repository"),
     (r'\bgit\s+reset\b', "Reset git history — may lose changes"),
     (r'\bgit\s+checkout\s+--\s', "Discard local file changes"),
     (r'\bgit\s+branch\s+-[dD]\b', "Delete a git branch"),
@@ -78,6 +77,25 @@ HIGH = [
     (r'\blaunchctl\s+(unload|remove)\b', "Stop a macOS background service"),
     (r'\bdocker\s+(rm|rmi|system\s+prune)\b', "Remove Docker containers or images"),
 ]
+
+# PUSHING a fix branch goes through (owner yes 2026-11-10: Claude pushes tested fix branches
+# itself, never main). One shape only: git push origin <branch>, -u allowed, git -C <dir> allowed,
+# branch not main or master. Every other push still blocks: force or delete in any form, a
+# refspec, HEAD, refs/, another remote or a URL, any other flag (so no --no-verify), git -c, and
+# a second push in the same command that does not fit. Force flags are also CRITICAL above.
+GIT_DIR_ARG = r"(?:\x22[^\x22]*\x22|\x27[^\x27]*\x27|\S+)"
+PUSH = re.compile(r"\bgit(?:\s+-[Cc]\s+" + GIT_DIR_ARG + r"|\s+--?[A-Za-z][\w-]*(?:=\S+)?)*\s+push\b", re.IGNORECASE)
+PUSH_OK = re.compile(r"git(?:\s+-C\s+" + GIT_DIR_ARG + r")?\s+push(?:\s+(?:-u|--set-upstream))?\s+origin\s+([\w./-]+)\s*(?:$|[;&|\n\x29])")
+PUSH_NEVER = {"main", "master", "head"}
+
+
+def push_allowed(cmd):
+    for m in PUSH.finditer(cmd):
+        ok = PUSH_OK.match(cmd, m.start())
+        branch = ok.group(1).lower() if ok else ""
+        if not ok or branch in PUSH_NEVER or branch.startswith(("refs/", "-")):
+            return False
+    return True
 
 # ENDING A PROCESS asks instead (owner pick 2026-10-25): an approval card in the Claude app,
 # also on the phone. Only in the modes the docs say always show it; any other mode, or none
@@ -228,6 +246,10 @@ if decision == "allow":
             decision = "deny"
             reason = f"BLOCKED: This command would {desc.lower()}.\n\nThe command was: {command[:200]}\n\nIf you need this done, tell me exactly what and why — I will find the safest way."
             break
+
+if decision == "allow" and not push_allowed(command):
+    decision = "deny"
+    reason = f"BLOCKED: This command would push code to a remote repository in a form the gate does not allow.\n\nThe command was: {command[:200]}\n\nOnly git push origin <branch> (with -u if needed) goes through, for a branch other than main or master. Force, delete, refspecs, other remotes and extra flags stay blocked."
 
 if decision == "allow" and re.search(STOP, shell_view(command), re.IGNORECASE):
     if mode in STOP_ASK_MODES:
