@@ -6473,6 +6473,64 @@ DESCRIPTION = (
     "location format for NBU_MedicalClinic_Arch next, not another retry-"
     "prompt wording variant."
 )
+EXPERIMENT_NAME = "exp-attempt3-restore-plumbing-fixtures-final-retry"
+DESCRIPTION = (
+    "Tonight's 3rd slot (2026-11-13). Baseline to beat: 0.7897 (slot 1's "
+    "kept config; slot 2 tonight, exp-walltype-squash-startswith-not-"
+    "contains, measured 0.7804 and was discarded, so slot 1's config is "
+    "what is on disk going into this edit).\n\n"
+    "Hypothesis: RETRY_SCOPE_SHRINK_FINAL (the 3rd-attempt-only retry "
+    "prompt, used after an image has already timed out twice on the same "
+    "full-schema ask) is still missing plumbing_fixtures -- checked "
+    "directly against the live string below, not from a comment. Its "
+    "JSON template runs stairs_elevators, wall_types, slabs, "
+    "railings_guards, equipment, windows, doors, rooms with no "
+    "plumbing_fixtures key at all, and its prose never mentions the word. "
+    "Every one of the OTHER small-count categories this final attempt "
+    "once excluded has its own dated restoration already in this file's "
+    "history -- wall_types/windows (2026-10-22), stairs_elevators/"
+    "equipment/railings_guards (2026-10-28), slabs (2026-10-28, labeled "
+    "at the time as 'the last excluded category') -- but that label was "
+    "wrong: plumbing_fixtures was never added. RETRY_SCOPE_SHRINK itself "
+    "(the 2nd-attempt retry, one step before this final one) already "
+    "asks for plumbing_fixtures in both its JSON template and a full "
+    "guidance sentence, so this gap is specific to the FINAL string, not "
+    "shared.\n\n"
+    "Measured cost of the gap: NBU_MedicalClinic_Arch's plumbing_fixtures "
+    "GT is only 3 instances total, the same cheap-handful class as the "
+    "slabs (3 instances) and equipment (2 instances) categories already "
+    "restored here on 2026-10-28 without blowing the time budget -- "
+    "slot 1 that night landed FINAL at ~180.9s of its 210s window after "
+    "restoring three such categories at once, per that slot's own log "
+    "math. Plumbing_fixtures has also been observed flipping 0/3 and 3/3 "
+    "across otherwise-unchanged configs in this session's own logs "
+    "(slot 2 tonight scored 3/3 on Clinic without hitting this retry "
+    "branch; the 2026-09-21 history notes the same category flipping "
+    "0/3 and 3/3 and moving overall F1 by 0.025-0.05 on its own), which "
+    "is consistent with some runs losing it outright whenever an image "
+    "falls through to this final attempt and the key is simply never "
+    "asked for.\n\n"
+    "Change (RETRY_SCOPE_SHRINK_FINAL only, inside preprocess()): add a "
+    "\"plumbing_fixtures\" key to the JSON template in the same position "
+    "RETRY_SCOPE_SHRINK already uses it (between equipment and windows), "
+    "and append one guidance sentence to the prose, worded to match "
+    "RETRY_SCOPE_SHRINK's own existing plumbing_fixtures sentence "
+    "(toilet/sink/tub/shower symbols or a fixture-naming room label, "
+    "room number or door tag as location, no cap). RETRY_SCOPE_SHRINK "
+    "(attempt 2), the main SYSTEM_PROMPT_OVERRIDE, PARAMS, and "
+    "postprocess() are all untouched. This adds roughly one more short "
+    "sentence and at most 2-3 more small JSON objects to an attempt that "
+    "already has measured margin in its window, so it should not create "
+    "a new timeout where there wasn't one.\n\n"
+    "How to read next slot's log: check whether either eval doc actually "
+    "reaches attempt 3 tonight at all (two straight timeouts on attempt "
+    "1 and 2 on the same image) -- if neither does, this is a clean "
+    "no-op and tonight's F1 should sit at or very near 0.7897, say so "
+    "rather than crediting or blaming this edit. If an image does land "
+    "on FINAL, check that image's plumbing_fixtures correct-count against "
+    "its prior 0 on that same branch, and confirm doors/rooms counts and "
+    "elapsed time are not newly worse than slot 1's baseline log."
+)
 
 # Override the system prompt sent to Claude for extraction.
 # Set to None to use the production prompt from ~/Lexios/lexios/SKILL.md
@@ -7559,6 +7617,14 @@ def preprocess(image_path: str) -> str:
             # more short sentence and ~3-object output has roughly 29s of
             # proven margin to land in. doors/rooms cap and position
             # unchanged.
+            # exp-attempt3-restore-plumbing-fixtures-final-retry
+            # (2026-11-13, tonight's 3rd slot): the 2026-10-28 comment
+            # above called slabs "the last excluded category" but missed
+            # one -- plumbing_fixtures was never added to this FINAL
+            # string's JSON template or prose, even though RETRY_SCOPE_
+            # SHRINK (attempt 2, above) already asks for it. Same
+            # cheap-handful cost class (Clinic GT = 3 instances). See
+            # DESCRIPTION for the full trace.
             RETRY_SCOPE_SHRINK_FINAL = (
                 "Your very first character must be \"{\" -- never a "
                 "sentence, label, or summary of what you found, and no "
@@ -7587,12 +7653,22 @@ def preprocess(image_path: str) -> str:
                 "or Guard Rail>\", \"location\": \"...\"}], \"equipment\": "
                 "[{\"type\": \"<HVAC unit, electrical panel, water "
                 "heater, if obvious>\", \"location\": \"...\"}], "
+                "\"plumbing_fixtures\": [{\"type\": \"<Toilet, Sink, Tub, "
+                "Shower, if obvious>\", \"location\": \"<nearest legible "
+                "room number or door tag, NOT a floor level, only if "
+                "legible>\"}], "
                 "\"windows\": [{\"tag\": \"<window number/tag>\"}], "
                 "\"doors\": [{\"location\": \"...\"}], \"rooms\": "
                 "[{\"name\": \"<room label transcribed VERBATIM>\"}]}\n\n"
                 "List stairs_elevators, wall_types, and equipment fully "
                 "first -- each is usually only a handful of instances, no "
-                "cap, costs only a few seconds. Every confirmed stair "
+                "cap, costs only a few seconds. Also actively look for "
+                "toilet, sink, tub, and shower symbols in every bathroom "
+                "or utility room, or a room label that names a fixture "
+                "use in words (e.g. \"Toilet\", \"Shower\"); add one "
+                "plumbing_fixtures entry per instance found this way, "
+                "using its room's own number or tag as \"location\", no "
+                "cap. Every confirmed stair "
                 "gets two railings_guards entries at its same location, "
                 "one \"Handrail\" and one \"Guard Rail\", even when "
                 "neither line is drawn (code-mandated), no cap. One "
