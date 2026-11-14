@@ -6488,6 +6488,7 @@ Return a JSON object with only the keys below that have findings:
   "slabs": [{"location": "<floor level, see above>"}],
   "equipment": [{"type": "<HVAC unit, electrical panel, water heater, if obvious>", "location": "<floor level, see above>"}],
   "plumbing_fixtures": [{"type": "<Toilet, Sink, Tub, Shower, if obvious>", "location": "<nearest legible room number or door tag, NOT a floor level, only if legible>"}],
+  "sprinklers": [{"type": "<Fire Extinguisher Cabinet, if obvious -- despite the key name, this is a wall cabinet, not a ceiling sprinkler head>", "location": "<nearest legible room number or door tag, NOT a floor level, only if legible>"}],
   "windows": [{"tag": "<window number/tag>"}],
   "doors": [{"location": "<floor level, see above>"}],
   "rooms": [{"name": "<room label transcribed VERBATIM from the drawing>"}]
