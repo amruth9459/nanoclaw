@@ -6676,21 +6676,6 @@ DESCRIPTION = (
     "ceiling on these two categories."
 )
 
-EXPERIMENT_NAME = "exp-retryscope-windows-reorder-before-slabs-plumbing-railings"
-DESCRIPTION = """Experiment #3 tonight (2026-11-15). Baseline to beat: 0.7948 (effective F1), read directly from logs/baseline-20261115-020006.log this session: Duplex_A_20110907 F1=0.791 (raw=post, fabricated=0), NBU_MedicalClinic_Arch F1=0.798 (raw=post, fabricated=0), phantom probes clean on both docs. This file's on-disk state going in is still 2026-11-14 slot 2's kept exp-walltypes-grayother-mep-is-real-wall-furring-plumbing-cue (measured 0.8186 when kept last night; tonight's 0.7948 baseline is a fresh re-measurement of that same unchanged config, consistent with this metric's known run-to-run variance on a single-sample real-vision score). Tonight's own slot 1 (exp-beams-gray-solid-openspan-cue-renderer-never-dashes, 0.7948->0.7897, discarded) and slot 2 (doors cap 100->130, 0.7948->0.7824, discarded) are both read directly from their logs this session: slot 1 touched only SYSTEM_PROMPT_OVERRIDE step 3 (beams), slot 2 touched only SYSTEM_PROMPT_OVERRIDE's main doors cap. Neither touched preprocess() or RETRY_SCOPE_SHRINK/_FINAL, so this edit's target is untouched by both and does not repeat either.
-
-Target: Duplex_A_20110907 windows, stuck at exactly 14/24 (R=0.58, F1=0.74) across all three of tonight's runs so far -- baseline, slot 1, and slot 2 -- a stable, repeated count under three differently-worded prompts, which reads as a structural ceiling rather than sampling noise: wall_types and Clinic doors/rooms each moved by several instances between these same three runs with no related edit (e.g. Clinic doors 162->189->189, Duplex wall_types 4/8->3/8->4/8), so this metric's real noise floor is larger than a couple of counts -- windows holding exactly flat all three times is informative, not coincidence. Slot 2 tonight's own DESCRIPTION (read directly from logs/exp-20261115-024301.log this session) already established why a main-prompt windows edit would be unobservable here: it confirmed "Duplex Level_2 fell through to the untouched RETRY_SCOPE_SHRINK prompt on both runs, making any main-prompt windows edit unobservable there." Duplex's GT windows split roughly 4 on Level 1 / ~20 on Level 2 (cited directly in this file's own preprocess() docstring, exp-attempt3-add-windows-level-specific-loss, 2026-10-11) -- so the ~10 missing windows are concentrated on exactly the image that is scored against RETRY_SCOPE_SHRINK, not SYSTEM_PROMPT_OVERRIDE.
-
-Checked this session, not assumed: read preprocess()'s current RETRY_SCOPE_SHRINK and RETRY_SCOPE_SHRINK_FINAL strings end to end. Both already ask for windows, capped at 35 (not the bottleneck -- GT is ~20 on Level_2, well under cap), but in both strings windows sat AFTER plumbing_fixtures (RETRY_SCOPE_SHRINK only), railings_guards, and slabs in the prose instructions and the JSON template key order. This file's own 2026-10-12/2026-10-18 precedent (exp-schema-key-order-match-priority-instructions, exp-retryscope-windows-before-doors-rooms, both kept) already validated that this model's fill order tracks literal prompt/template key order on this exact extraction task, and 2026-10-18 specifically moved windows ahead of doors/rooms for that reason. But three later, independently-justified additions -- railings_guards + slabs on 2026-10-24, plumbing_fixtures on 2026-11-09 -- were each inserted ahead of windows's existing position without anyone re-checking windows's place relative to the new arrivals. Slabs is a per-room enumeration (capped 15, same cost class as rooms itself) and plumbing_fixtures requires scanning every bathroom/utility room -- real time costs ahead of windows on an image that, by construction, only reaches this string after already losing a full attempt to the clock. This is a demonstrated regression of the 10-18 ordering principle, not a new idea being tried for the first time. Clinic's two images in tonight's three logs returned 240-255 elements in 144.9-191.1s, counts and times consistent with attempt 1 (the full schema) succeeding directly rather than falling to this narrowed retry path, so this edit is not expected to touch Clinic's score either way.
-
-Not a repeat: grepped this file end to end for every prior RETRY_SCOPE_SHRINK/_FINAL slot. All touched caps (various raises/lowers across 30-90), added or removed whole categories, or appended a closing instruction sentence. None re-ordered windows specifically against the three categories now sitting ahead of it. This edit changes no cap and adds or removes no key -- position only, in both the prose and the JSON template, in both strings.
-
-Change (preprocess() only, RETRY_SCOPE_SHRINK and RETRY_SCOPE_SHRINK_FINAL strings): in both, moved windows's JSON template key and its prose instruction to immediately after the "stairs_elevators, wall_types, and equipment fully first" sentence, ahead of plumbing_fixtures (RETRY_SCOPE_SHRINK only), railings_guards, and slabs, which now follow in their existing relative order. Applied to both strings for consistency with this file's own practice of keeping the two retry levels aligned on structural principles, even though tonight's logs show direct evidence only for RETRY_SCOPE_SHRINK (attempt 2) actually firing on Duplex Level_2; RETRY_SCOPE_SHRINK_FINAL's half of this edit is an untested, same-principle no-op candidate, stated honestly as such. Every cap (35 for windows, 65/30 for doors/rooms, 15 for slabs) and every other sentence is byte-for-byte unchanged. SYSTEM_PROMPT_OVERRIDE, PARAMS, and postprocess() are untouched.
-
-Expected magnitude, stated honestly: a plausible no-op on Clinic (its images are not landing on this retry path tonight per the elapsed-time evidence above) and on RETRY_SCOPE_SHRINK_FINAL specifically (no confirmed attempt-3 landing tonight to measure against). On Duplex via RETRY_SCOPE_SHRINK, this only moves the needle if Level_2 is time-constrained enough inside its own window that reaching windows earlier actually recovers instances it would otherwise have run out of time for -- conditional on that, recovering even half of the ~10 missing Level_2 windows would raise windows from 0.74 toward 0.85-0.90, worth roughly +0.02 to +0.03 overall F1 on this doc at windows's 1/8 macro-average weight. If Level_2 was never actually time-constrained past slabs/plumbing_fixtures/railings_guards (i.e. 14/24 is a true visibility ceiling at this resolution, not a budget cutoff), this is a clean no-op in both directions -- no cap, schema key, or scoring mechanism changed, only where in the request windows is asked for.
-
-How to read next slot's log: if Duplex windows rises above 14/24 without wall_types or rooms regressing (the categories this edit moved windows ahead of), the reorder is real and should stay kept. If windows is still exactly 14/24, Level_2 was not time-constrained past that point inside RETRY_SCOPE_SHRINK, and the next untried lever is confirming via the log's own elapsed-time number whether Level_2 is even landing on RETRY_SCOPE_SHRINK tonight at all, rather than another reorder inside it."""
-
 # Override the system prompt sent to Claude for extraction.
 # Set to None to use the production prompt from ~/Lexios/lexios/SKILL.md
 SYSTEM_PROMPT_OVERRIDE = """Extract building elements from this floor plan image as JSON. Every "location" field below must be exactly the filename's floor-level segment (e.g. "-Level_1.png" becomes "Level 1", "-Second_Floor.png" becomes "Second Floor"), spaces instead of underscores, never abbreviated further: do not read a level label from inside the drawing instead. Speed matters, keep fields short, no extra fields, minified JSON (no indentation, no line breaks). There is a hard 180-second limit: an unfinished response at that point is discarded whole, so treat your real budget as roughly 130 seconds and close out valid JSON early rather than risk being cut off mid-generation, which scores zero for every category on this image.
@@ -7675,25 +7660,21 @@ def preprocess(image_path: str) -> str:
                 "\"wall_types\": [{\"type_id\": \"<Exterior, Interior - "
                 "Partition, Interior - Furring, Interior - Plumbing, "
                 "Foundation, Party Wall, Interior - Rated, Interior - "
-                "Toilet Partition>\"}], \"equipment\": "
+                "Toilet Partition>\"}], \"slabs\": [{\"location\": "
+                "\"...\"}], \"railings_guards\": [{\"type\": \"<Handrail "
+                "or Guard Rail>\", \"location\": \"...\"}], \"equipment\": "
                 "[{\"type\": \"<HVAC unit, electrical panel, water "
                 "heater, if obvious>\", \"location\": \"...\"}], "
-                "\"windows\": [{\"tag\": \"<window number/tag>\"}], "
                 "\"plumbing_fixtures\": [{\"type\": \"<Toilet, Sink, Tub, "
                 "Shower, if obvious>\", \"location\": \"<nearest legible "
                 "room number or door tag, NOT a floor level, only if "
-                "legible>\"}], \"railings_guards\": [{\"type\": \"<Handrail "
-                "or Guard Rail>\", \"location\": \"...\"}], \"slabs\": "
-                "[{\"location\": \"...\"}], "
+                "legible>\"}], "
+                "\"windows\": [{\"tag\": \"<window number/tag>\"}], "
                 "\"doors\": [{\"location\": \"...\"}], \"rooms\": "
                 "[{\"name\": \"<room label transcribed VERBATIM>\"}]}\n\n"
                 "List stairs_elevators, wall_types, and equipment fully "
                 "first -- each is usually only a handful of instances, no "
-                "cap, costs only a few seconds. Every visible window tag "
-                "next, capped at 35 -- this is the smallest of the "
-                "remaining capped categories and the one most likely to "
-                "be cut short if left for later on an image that has "
-                "already failed once. Also actively look for "
+                "cap, costs only a few seconds. Also actively look for "
                 "toilet, sink, tub, and shower symbols in every bathroom "
                 "or utility room, or a room label that names a fixture "
                 "use in words (e.g. \"Toilet\", \"Shower\"); add one "
@@ -7704,7 +7685,7 @@ def preprocess(image_path: str) -> str:
                 "one \"Handrail\" and one \"Guard Rail\", even when "
                 "neither line is drawn (code-mandated), no cap. One "
                 "slabs entry per room or space on this level, capped at "
-                "15. Then doors "
+                "15. Every visible window tag, capped at 35. Then doors "
                 "(one entry per door symbol, not deduped) and rooms (one "
                 "entry per physical room, repeated names are separate "
                 "entries), each capped at 65 instances on this attempt. "
@@ -7804,27 +7785,22 @@ def preprocess(image_path: str) -> str:
                 "\"wall_types\": [{\"type_id\": \"<Exterior, Interior - "
                 "Partition, Interior - Furring, Interior - Plumbing, "
                 "Foundation, Party Wall, Interior - Rated, Interior - "
-                "Toilet Partition>\"}], \"equipment\": "
+                "Toilet Partition>\"}], \"slabs\": [{\"location\": "
+                "\"...\"}], \"railings_guards\": [{\"type\": \"<Handrail "
+                "or Guard Rail>\", \"location\": \"...\"}], \"equipment\": "
                 "[{\"type\": \"<HVAC unit, electrical panel, water "
                 "heater, if obvious>\", \"location\": \"...\"}], "
                 "\"windows\": [{\"tag\": \"<window number/tag>\"}], "
-                "\"railings_guards\": [{\"type\": \"<Handrail "
-                "or Guard Rail>\", \"location\": \"...\"}], \"slabs\": "
-                "[{\"location\": \"...\"}], "
                 "\"doors\": [{\"location\": \"...\"}], \"rooms\": "
                 "[{\"name\": \"<room label transcribed VERBATIM>\"}]}\n\n"
                 "List stairs_elevators, wall_types, and equipment fully "
                 "first -- each is usually only a handful of instances, no "
-                "cap, costs only a few seconds. Every visible window tag "
-                "next, capped at 35 -- this is the smallest of the "
-                "remaining capped categories and the one most likely to "
-                "be cut short if left for later on an image that has "
-                "already failed twice. Every confirmed stair "
+                "cap, costs only a few seconds. Every confirmed stair "
                 "gets two railings_guards entries at its same location, "
                 "one \"Handrail\" and one \"Guard Rail\", even when "
                 "neither line is drawn (code-mandated), no cap. One "
                 "slabs entry per room or space on this level, capped at "
-                "15. Then doors "
+                "15. Every visible window tag, capped at 35. Then doors "
                 "(one entry per door symbol, not deduped) and rooms (one "
                 "entry per physical room, repeated names are separate "
                 "entries), each capped at 30 instances on this final "
