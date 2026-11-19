@@ -6892,117 +6892,6 @@ DESCRIPTION = (
     "to the one inserted sentence."
 )
 
-EXPERIMENT_NAME = "exp-clinic-rooms-cap-raise-130-to-160-firstfloor-undersized"
-DESCRIPTION = (
-    "Tonight's 1st slot (2026-11-19). Baseline to beat: effective overall "
-    "F1=0.799, read directly from logs/baseline-20261119-020006.log this "
-    "session (Duplex_A_20110907 raw=post F1=0.791: beams 0/8, doors 14/14, "
-    "railings_guards 4/4, rooms 19/21, slabs 20/21, stairs_elevators 2/2, "
-    "wall_types 4/8, windows 14/24; NBU_MedicalClinic_Arch raw=post "
-    "F1=0.807: doors 181/254, equipment 2/2, plumbing_fixtures 2/3, "
-    "railings_guards 9/9, rooms 196/269, slabs 3/3, sprinklers 0/10, "
-    "stairs_elevators 3/3, wall_types 3/7, windows 57/58; phantom probes "
-    "clean, fabricated=0). Note: logs/exp-20261119-020942.log exists but is "
-    "empty, not a real prior measurement of any edit -- no edit has "
-    "actually been made to this file's CONFIG section yet tonight going "
-    "into this slot.\n\n"
-    "Ruled out first, so this slot doesn't redo dead ground: beams (0/8 "
-    "every night since the 2026-10-29 honest-cue restore, including the "
-    "immediately preceding slot's own targeted gray-line-cue addition "
-    "tonight's baseline still shows flat at 0/8) and sprinklers (0/10, no "
-    "cabinet symbol ever drawn by this renderer per direct image "
-    "inspection in this file's history) are both confirmed structural "
-    "dead ends, not wording problems -- not retried here. wall_types on "
-    "both docs already carries essentially every visual cue this file "
-    "has found (gray-line Furring/Plumbing position cue, dual-width "
-    "carveout, Rated hour-tag cue, Toilet Partition thin-stall cue, Party "
-    "Wall code-certainty cue, 3-or-fewer-categories look-again threshold) "
-    "-- confirmed by reading SYSTEM_PROMPT_OVERRIDE directly this session, "
-    "not a fresh lever either. Duplex's 2 unreachable Foundation wall_"
-    "types GT entries and 2 unreachable Roof-location window GT entries "
-    "are confirmed structurally unrenderable (ifc_vision_compare.py's "
-    "storey filter at lines 319-324 excludes any storey named "
-    "roof/fdn/found/parapet/footing from the image the model ever sees), "
-    "so Duplex's real windows ceiling is 22/24, not 24/24, and that doc's "
-    "wall_types ceiling is 6/8, not 8/8 -- neither is this slot's target.\n\n"
-    "Evidence this session on Clinic rooms instead. Read NBU_"
-    "MedicalClinic_Arch's own ground-truth file directly: 154 GT rooms "
-    "carry 'level': 'First Floor' and 109 carry 'level': 'Second Floor' "
-    "(269 total, matching the doc-level F1 breakdown's 196/269). Viewed "
-    "the First_Floor render image directly this session: its own printed "
-    "caption reads 'Rooms: 154' -- confirming the single First_Floor "
-    "image alone contains more real room labels than the live rooms cap "
-    "(130 per image, confirmed by reading step 3's priority-order line "
-    "and step 8's cap sentence in SYSTEM_PROMPT_OVERRIDE directly this "
-    "session) can ever let through, independent of time budget or model "
-    "attention. This exact gap was already identified and explicitly "
-    "held back by a 2026-09-21 slot in this file's own history (its "
-    "DESCRIPTION states verbatim: 'rooms 130 to 160 if the time reading "
-    "from this slot's log shows room to spare' -- that slot raised rooms "
-    "100->130 and deliberately did not also go to 160 so its own effect "
-    "would read cleanly) and never executed since: grepped this whole "
-    "file and results.tsv for 'rooms' plus '160' this session, the only "
-    "hit is that one held-back sentence, no slot ever actually made this "
-    "change.\n\n"
-    "Separately confirmed Second_Floor is NOT cap-bound (109 real rooms, "
-    "under even the current 130 cap), so its own shortfall within tonight's "
-    "196/269 total is a time/attention problem, not a cap problem, and "
-    "raising the cap further cannot help or hurt that image -- the "
-    "mechanism below only has a path to move First_Floor's count.\n\n"
-    "Change (SYSTEM_PROMPT_OVERRIDE only, two numeric edits, same number, "
-    "no other text touched): the rooms cap in step 3's priority-order "
-    "parenthetical and in step 8's cap sentence, both 130 to 160 -- doors "
-    "stays 100, windows stays 35, slabs stays 15, every wall_types/beams/"
-    "railings/sprinklers/plumbing_fixtures/equipment sentence is byte-for-"
-    "byte unchanged. PARAMS, preprocess(), and postprocess() are also "
-    "untouched, so the phantom-fabrication probes stay clean by "
-    "construction (they only exercise postprocess()).\n\n"
-    "Distinguished from the 2026-11-05 refusal incidents cited elsewhere "
-    "in this file (narration/red-flag text instead of JSON): those were "
-    "simultaneous DOORS+ROOMS cap raises together into the 105-120 range "
-    "on both categories at once. This slot raises ONLY rooms, from a "
-    "currently-stable 130 (tonight's own baseline ran clean, no narration, "
-    "at that value) to 160, leaving doors fixed at 100 -- a narrower, "
-    "isolated step past an already-proven-stable point, not a repeat of "
-    "the combined-raise shape that triggered those refusals.\n\n"
-    "No-regression argument: this only raises a numeric ceiling on how "
-    "many rooms the model may list; it does not change what counts as a "
-    "room, remove any instruction against inventing one, or touch any "
-    "other category's cap, key, or wording. Under gt_is_minimum=True "
-    "(confirmed at run()'s scoring fallback), extra non-matching entries "
-    "cost nothing, and Clinic rooms precision is currently 1.00, so a "
-    "higher ceiling cannot lower precision, only let more real, already-"
-    "correctly-read labels through. Duplex is unaffected by construction: "
-    "both Level images report only 19-21 total GT rooms, far under even "
-    "the old 130 cap, so neither image can ever reach either cap value.\n\n"
-    "Expected magnitude, stated honestly: if First_Floor reaches the new "
-    "160 ceiling and actually finds up to 154 of its real rooms (up from "
-    "a cap-bound ~130 today, assuming today's 196/269 total reflects "
-    "First_Floor near-maxed at 130 and Second_Floor contributing roughly "
-    "66-70 of its own 109), that is at most +24 correct rooms on Clinic, "
-    "moving rooms recall from 0.73 toward roughly 0.82 (F1 0.84->0.90), "
-    "worth about +0.006 on Clinic's 10-category mean and +0.003 overall "
-    "against tonight's 0.799 baseline -- small, because rooms is one of "
-    "ten equally-weighted categories and the gain is capped at First_"
-    "Floor's own real room count. If today's 196 total instead reflects "
-    "a different split (e.g. First_Floor already under its old 130 cap "
-    "due to time, not cap-bound), this change is a clean no-op: nothing "
-    "else in the prompt changed, so no category can regress, only rooms "
-    "can rise or stay flat.\n\n"
-    "How to read next slot's log: check Clinic rooms' own correct-count "
-    "and First_Floor's own per-image element total directly against "
-    "tonight's 196/269 and the per-image numbers in baseline-20261119-"
-    "020006.log (First_Floor 281 elements, Second_Floor 237). A rise in "
-    "First_Floor's room count specifically (not Second_Floor) confirms "
-    "the cap was the binding constraint; flat at 196 with First_Floor's "
-    "own elapsed time near its prior value means the real constraint is "
-    "time/attention, not the cap, and this lever should not be retried. "
-    "Confirm rooms precision holds at 1.00, doors stays flat (cap "
-    "unchanged), and every other category on both docs matches tonight's "
-    "baseline numbers exactly, confirming this edit's scope held to the "
-    "two cap-number changes."
-)
-
 # Override the system prompt sent to Claude for extraction.
 # Set to None to use the production prompt from ~/Lexios/lexios/SKILL.md
 SYSTEM_PROMPT_OVERRIDE = """Extract building elements from this floor plan image as JSON. Every "location" field below must be exactly the filename's floor-level segment (e.g. "-Level_1.png" becomes "Level 1", "-Second_Floor.png" becomes "Second Floor"), spaces instead of underscores, never abbreviated further: do not read a level label from inside the drawing instead. Speed matters, keep fields short, no extra fields, minified JSON (no indentation, no line breaks). There is a hard 180-second limit: an unfinished response at that point is discarded whole, so treat your real budget as roughly 130 seconds and close out valid JSON early rather than risk being cut off mid-generation, which scores zero for every category on this image.
@@ -7023,7 +6912,7 @@ Return a JSON object with only the keys below that have findings:
   "rooms": [{"name": "<room label transcribed VERBATIM from the drawing>"}]
 }
 
-Priority order (stop enumerating a category once handled, never revisit it). Every category below counts equally toward this image's score no matter how many instances it has, so steps 1-6 (each a handful of instances at most) come before steps 7-8 (doors capped at 100, rooms capped at 160, windows capped at 35): finishing steps 1-6 first banks that many complete categories cheaply, instead of risking several of them never being reached if a capped category runs long.
+Priority order (stop enumerating a category once handled, never revisit it). Every category below counts equally toward this image's score no matter how many instances it has, so steps 1-6 (each a handful of instances at most) come before steps 7-8 (doors capped at 100, rooms capped at 130, windows capped at 35): finishing steps 1-6 first banks that many complete categories cheaply, instead of risking several of them never being reached if a capped category runs long.
 
 1. stairs_elevators first, usually few, list all. On a duplex or any plan with two or more mirrored/repeated units, each unit normally has its own staircase even when the symbols look identical in mirrored positions: if you found only one stair on a plan with 2+ repeated units, look again at the unit that has not yielded one before moving on, and if it is still not visible, add a second stairs_elevators entry matching the first's type. A second staircase on a mirrored-unit building is near-certain even when its symbol is hard to isolate.
 
@@ -7041,7 +6930,7 @@ Priority order (stop enumerating a category once handled, never revisit it). Eve
 
 rooms: one entry per physical room actually labeled, not per unique name. Repeated names (two "Living Room"s in mirrored units, several "Exam Room"s down a corridor) are separate rooms, each its own entry. Transcribe a partly covered label with the legible part. If a label has more than one word or a slash-separated second use, transcribe the whole thing exactly as printed, in order -- do not shorten it down to just its most prominent word, since the qualifier can be what makes it a different room from a plainer same-word room elsewhere on the same sheet (a "WAITING / ACTIVITY AREA" is not the same room as a plain "WAITING"). On a floor with multiple corridors or wings, sweep them in one consistent spatial order -- for example left to right along the nearest corridor, then the next corridor or wing -- instead of covering the first area you notice thoroughly and the rest more lightly; do this as a single ordered pass, not a second scan, and reuse that same spatial order for doors next.
 
-8. doors: each only needs the shared "location" value from above, so list every door symbol as its own entry (one per door, not deduped), including closet, bathroom, pantry, and utility doors, which are the ones a fast pass skips first, sweeping in the same spatial order rooms above just used. Doors are capped at 100 instances on this image, rooms at 160; windows stay capped at 35; slabs (step 5, above) stays capped at 15. Stop each at its cap in scanning order and move on, do not push past it, and do not return to a finished category later. On a very dense drawing this cap is what keeps the response closing in time at all.
+8. doors: each only needs the shared "location" value from above, so list every door symbol as its own entry (one per door, not deduped), including closet, bathroom, pantry, and utility doors, which are the ones a fast pass skips first, sweeping in the same spatial order rooms above just used. Doors are capped at 100 instances on this image, rooms at 130; windows stay capped at 35; slabs (step 5, above) stays capped at 15. Stop each at its cap in scanning order and move on, do not push past it, and do not return to a finished category later. On a very dense drawing this cap is what keeps the response closing in time at all.
 
 Rules:
 - Never fabricate or duplicate an element to hit a printed count or caption. Only list what you can actually see. (Step 2's wall_types same-category-different-width case is two distinct types you can see, not a duplicate of one, and is not covered by this rule. Step 4's two code-mandated railings_guards entries per confirmed stair, and step 1's second mirrored stair, are structural near-certainties from code, not fabrication, and are also not covered by this rule.)
