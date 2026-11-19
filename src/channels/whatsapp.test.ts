@@ -100,6 +100,7 @@ vi.mock('@whiskeysockets/baileys', () => {
   };
 });
 
+import makeWASocket from '@whiskeysockets/baileys';
 import { WhatsAppChannel, WhatsAppChannelOpts } from './whatsapp.js';
 import { getLastGroupSync, updateChatName, setLastGroupSync } from '../db.js';
 
@@ -220,6 +221,37 @@ describe('WhatsAppChannel', () => {
       await channel.disconnect();
       expect(channel.isConnected()).toBe(false);
       expect(fakeSocket.end).toHaveBeenCalled();
+    });
+  });
+
+  // --- Presence ---
+  // While a linked client shows as online, WhatsApp posts the owner's phone
+  // notifications silently, so the channel must never announce 'available'.
+
+  describe('presence', () => {
+    it('creates the socket with markOnlineOnConnect off', async () => {
+      const channel = new WhatsAppChannel(createTestOpts());
+
+      await connectChannel(channel);
+
+      expect(vi.mocked(makeWASocket)).toHaveBeenLastCalledWith(
+        expect.objectContaining({ markOnlineOnConnect: false }),
+      );
+    });
+
+    it('never sends available, and the heartbeat sends unavailable', async () => {
+      vi.useFakeTimers({ toFake: ['setInterval', 'clearInterval'] });
+      try {
+        const channel = new WhatsAppChannel(createTestOpts());
+        await connectChannel(channel);
+
+        vi.advanceTimersByTime(5 * 60 * 1000);
+
+        expect(fakeSocket.sendPresenceUpdate).toHaveBeenCalledWith('unavailable');
+        expect(fakeSocket.sendPresenceUpdate).not.toHaveBeenCalledWith('available');
+      } finally {
+        vi.useRealTimers();
+      }
     });
   });
 

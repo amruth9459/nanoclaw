@@ -176,6 +176,10 @@ export class WhatsAppChannel implements Channel {
       browser: Browsers.macOS('Chrome'),
       version,
       keepAliveIntervalMs: 15_000, // ping every 15s (default ~30s) — keeps NAT mappings alive
+      // Stay offline. While a linked client shows as online, WhatsApp posts the
+      // owner's phone and watch notifications silently (Baileys README,
+      // "Receive Notifications in Whatsapp App"). Never send 'available'.
+      markOnlineOnConnect: false,
       // Honor retry-receipts from recipients whose Signal session lapsed: Baileys
       // calls getMessage to re-encrypt our outbound message. Without this, a
       // session-not-found at the receiver = permanent silent drop on our side.
@@ -231,17 +235,15 @@ export class WhatsAppChannel implements Channel {
         this.resetWatchdog();
         logger.info('Connected to WhatsApp');
 
-        // Announce availability so WhatsApp relays subsequent presence updates (typing indicators)
-        this.sock.sendPresenceUpdate('available').catch(() => {});
-
         // Active 5-min heartbeat: many days messages.upsert goes quiet for hours
         // even when the socket is healthy. Send a periodic presence update to
         // both keep the pipeline warm and confirm liveness — succeeds → reset
         // watchdog, fails → let watchdog detect the dead socket.
+        // The ping says 'unavailable' to stay offline (see markOnlineOnConnect).
         if (this.heartbeatTimer) clearInterval(this.heartbeatTimer);
         this.heartbeatTimer = setInterval(() => {
           if (!this.connected || !this.sock) return;
-          this.sock.sendPresenceUpdate('available')
+          this.sock.sendPresenceUpdate('unavailable')
             .then(() => this.resetWatchdog())
             .catch((err) => logger.debug({ err }, 'Presence heartbeat failed'));
         }, WhatsAppChannel.HEARTBEAT_MS);
