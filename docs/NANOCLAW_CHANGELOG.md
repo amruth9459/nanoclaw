@@ -2,6 +2,33 @@
 
 *Version control document — auto-updated by `lexios/update-docs.py` (twice daily via NanoClaw scheduled task)*
 
+## 2026-11-18: WhatsApp channel stays offline
+
+### Problem
+WhatsApp notifications on the owner's phone and watch came in silent, on both numbers. While a linked
+client shows the account as online, WhatsApp posts the phone's notifications silently (Baileys README,
+"Receive Notifications in Whatsapp App"). The channel sent 'available' at connect and every 5 minutes.
+
+### Changed
+- `src/channels/whatsapp.ts`: the socket is created with `markOnlineOnConnect: false`, so Baileys sends
+  'unavailable' at connect. The connect-time `sendPresenceUpdate('available')` is gone. The 5-minute
+  heartbeat sends 'unavailable' and still resets the watchdog when it succeeds.
+- `src/channels/whatsapp.test.ts`: two tests under `presence`.
+
+### Tests
+- Phone log (`adb logcat -b events`, `notification_alert`), the same fresh WA2 message both ways:
+  nanoclaw stopped at 20:56, played (code 1, the owner heard it); nanoclaw running at 21:12, silent
+  (code 7). WA1 was silent too (code 7).
+- After the restart at 21:42, with both numbers connected: a WA1 group message at 21:43 played (code 1),
+  and a fresh WA2 message at 21:47:30 played (code 1; the owner felt the phone and the watch buzz). Two
+  more WA2 messages after the first 5-minute heartbeat also played.
+- `whatsapp.test.ts`: 13 passed, 28 failed, 41 total. The 28 failures are the same set as before the
+  change (5 s timeouts and the QR-exit assertion). The 2 new tests fail on the old code and pass on the new.
+
+### Notes
+- Incoming receipts now go out as 'inactive' (Baileys `messages-recv.js:1056-1060`). Messages still arrive.
+- Typing dots ('composing' is a chatstate, not a presence) may not show while the account is offline.
+
 ## Unreleased — Heterogeneous SLM Router → Production (2026-06-08)
 
 ### Added

@@ -239,7 +239,6 @@ export class WhatsAppChannel implements Channel {
         // even when the socket is healthy. Send a periodic presence update to
         // both keep the pipeline warm and confirm liveness — succeeds → reset
         // watchdog, fails → let watchdog detect the dead socket.
-        // The ping says 'unavailable' to stay offline (see markOnlineOnConnect).
         if (this.heartbeatTimer) clearInterval(this.heartbeatTimer);
         this.heartbeatTimer = setInterval(() => {
           if (!this.connected || !this.sock) return;
