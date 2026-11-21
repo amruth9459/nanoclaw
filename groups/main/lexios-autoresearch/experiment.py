@@ -5930,7 +5930,9 @@ _OBSOLETE_SLOT4_20261105_DESCRIPTION = (
     "existing 900s ceiling."
 )
 
-_OBSOLETE_DESCRIPTION_SLOT_20261108 = (
+EXPERIMENT_NAME = "exp-retry-standalone-prompt-drop-main-body"
+
+DESCRIPTION = (
     "Hypothesis: tonight's baseline and slot-1 runs both net 0 elements "
     "on NBU_MedicalClinic_Arch--ifc-render-First_Floor.png, but in two "
     "different failure shapes -- baseline-20261108-020006.log shows a "
@@ -8586,70 +8588,6 @@ def postprocess(extraction: dict, _cache={}) -> dict:
     # Bathroom 1/2, Utility, Stair, Room, Roof, Living Room, Kitchen,
     # Bedroom 1/2) and against every existing key already in this map:
     # no word overlap, no key collision.
-    #
-    # exp-roomname-cleanu-cmdr-1stsgt (2026-11-21, tonight's 4th and final
-    # slot): slot 3's own "how to read next slot's log" instruction says
-    # a flat rooms count means look at a different, still-untried room-
-    # name pair -- read logs/exp-20261121-031832.log directly this
-    # session: Clinic rooms came back 171/269 (down from the 186/269
-    # baseline slot 3's own DESCRIPTION cites), so none of slot 3's three
-    # keys fired on this run; this slot targets three different, still-
-    # untried pairs. All three target strings grepped directly from
-    # NBU_MedicalClinic_Arch.ground-truth.json this session as single
-    # rooms.name occurrences: "CLEAN U." at room_code 1D03 and 1D37 (two
-    # occurrences, same spelling), "CMDR OFFICE" at 2D11 (one occurrence),
-    # "1ST SGT" at 2D15 (one occurrence). Each plausible vision phrasing
-    # hand-traced through fuzzy_match()'s real word-split/prefix/edit-
-    # distance logic read this session from eval.py: CLEAN UTILITY vs
-    # CLEAN U. -> e_words=[CLEAN,U]; CLEAN matches exactly but U is a
-    # single character, below the prefix method's own 2-char floor
-    # (len(ew)>=2 and len(aw)>=2) and the edit-distance method's 4-char
-    # floor, so it cannot match UTILITY by any of the three methods,
-    # giving matched=1/2=0.5 under the 0.6 threshold -- this is a harder
-    # failure than slot 3's SOIL/UTL pair, not a near-miss, since no
-    # tolerance in the function can ever bridge a 1-character token.
-    # COMMANDER OFFICE vs CMDR OFFICE -> e_words=[CMDR,OFFICE]; OFFICE
-    # matches exactly but CMDR vs COMMANDER fails prefix (2nd letter M
-    # vs O) and fails edit-distance (dist=5 against a 4-char tolerance
-    # floor of max(1,8//5)=1), giving matched=1/2=0.5. FIRST SERGEANT vs
-    # 1ST SGT -> e_words=[1ST,SGT]; 1ST vs FIRST shares no prefix and is
-    # below the edit-distance floor's effective reach (dist=4 on a
-    # max(1,5//5)=1 tolerance), SGT vs SERGEANT fails prefix (2nd letter
-    # G vs E) and fails edit-distance (dist=5 against max(1,8//5)=1),
-    # giving matched=0/2=0.0 -- the single worst-scoring pair added by
-    # this map to date. Reverse-risk check, whether any of these three
-    # already correctly matches a DIFFERENT GT room entry today that a
-    # rename would steal: CLEAN UTILITY against the only other CLEAN-
-    # prefixed entry, "CLEAN SUP. & EQUIP." (1B12, e_words=[CLEAN,SUP,&,
-    # EQUIP]), scores 1/4=0.25; COMMANDER OFFICE and FIRST SERGEANT have
-    # no other GT entry sharing a word with either -- none currently
-    # match anything, so all three renames are strictly additive. Checked
-    # all three keys against Duplex_A_20110907's full room vocabulary
-    # (Foyer, Hallway, Bathroom 1/2, Utility, Stair, Room, Roof, Living
-    # Room, Kitchen, Bedroom 1/2) and against every existing key already
-    # in this map: no word overlap, no key collision. Two plausible
-    # phrasing variants added per target (with/without a trailing ROOM,
-    # a possessive 'S, or OFFICE) since the rename only fires on an exact
-    # whole-string match and a single guess is a narrower bet than slot
-    # 3's own single-variant keys already proved workable.
-    #
-    # No-regression argument (same shape as every prior slot in this
-    # map): gt_is_minimum=True on both docs, so precision only counts
-    # matched elements -- a key that never fires changes nothing, and
-    # one that fires only adds a match proven absent before the rename
-    # (traced above), never removes one already standing.
-    #
-    # How to read next slot's log: check Clinic rooms' correct-count
-    # against tonight's 171/269. A rise of exactly 2 means CLEAN U.
-    # fired on both instances and the other two pairs' phrasing guess
-    # missed; a rise of 1-4 means a mix fired; flat at 171 means the
-    # model is not producing any of these six exact strings for these
-    # four rooms (different wording, or missed entirely) and none of
-    # these three pairs should be re-tried with the same guessed
-    # wording -- the next slot should pick different still-untried
-    # rooms instead. Confirm every other category on both docs stays at
-    # or near tonight's cited numbers, since no other key, schema, cap,
-    # SYSTEM_PROMPT_OVERRIDE, PARAMS, or preprocess() line is touched.
     ROOM_NAME_SAFE_RENAME_MAP = {
         "FRONT DESK": "RECEPTION",
         "CHECK-IN": "RECEPTION",
@@ -8670,12 +8608,6 @@ def postprocess(extraction: dict, _cache={}) -> dict:
         "SOIL UTILITY": "SOIL. UTL.",
         "HOUSEKEEPING SUPERVISOR OFFICE": "HK. SUPV. OFFICE",
         "HOUSEKEEPING": "HK",
-        "CLEAN UTILITY": "CLEAN U.",
-        "CLEAN UTILITY ROOM": "CLEAN U.",
-        "COMMANDER OFFICE": "CMDR OFFICE",
-        "COMMANDER'S OFFICE": "CMDR OFFICE",
-        "FIRST SERGEANT": "1ST SGT",
-        "FIRST SERGEANT OFFICE": "1ST SGT",
     }
     rooms = extraction.get("rooms")
     if isinstance(rooms, list):
