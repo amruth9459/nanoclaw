@@ -7156,6 +7156,90 @@ DESCRIPTION = (
     "above."
 )
 
+EXPERIMENT_NAME = "exp-roomsbeforedoors-template-order-match-sweep-prose"
+DESCRIPTION = (
+    "Tonight's 4th slot (2026-11-22). Baseline to beat: effective "
+    "F1=0.8146, this file's on-disk state going in (exp-sprinklers-"
+    "recover-miscategorized-fec-from-equipment, kept slot 3 tonight; "
+    "logs/exp-20261122-025601.log). Duplex_A_20110907 F1=0.7997 (beams "
+    "0/8 parked, doors 14/14, railings_guards 4/4, rooms 19/21, slabs "
+    "20/21, stairs_elevators 2/2, wall_types 5/8, windows 13/24); "
+    "NBU_MedicalClinic_Arch F1=0.8048 (doors 194/254, equipment 2/2, "
+    "plumbing_fixtures 2/3, railings_guards 9/9, rooms 176/269, slabs "
+    "3/3, sprinklers 0/10 pending tonight's fix, stairs_elevators 3/3, "
+    "wall_types 3/7, windows 57/58).\n\n"
+    "Target: a live contradiction between SYSTEM_PROMPT_OVERRIDE's own "
+    "prose and its JSON schema template, found by reading both directly "
+    "this session (not assumed). The rooms paragraph (unnumbered, sitting "
+    "between numbered step 7 windows and step 8 doors) ends 'do this as a "
+    "single ordered pass, not a second scan, and reuse that same spatial "
+    "order for doors next'; step 8 doors itself opens 'sweeping in the "
+    "same spatial order rooms above just used'. Both sentences only make "
+    "sense if rooms is generated before doors -- doors has nothing to "
+    "reuse yet if it runs first. But the JSON template block above both "
+    "paragraphs (re-read this session, line order verified) lists the "
+    "keys as \"windows\", \"doors\", \"rooms\" -- doors BEFORE rooms, the "
+    "opposite of what the prose two paragraphs below it requires.\n\n"
+    "This file's own kept 2026-10-12 experiment (exp-schema-key-order-"
+    "match-priority-instructions, read directly this session) already "
+    "established and measured the mechanism this relies on: that "
+    "session's baseline log showed every category the JSON template "
+    "listed at-or-before 'rooms' scored on both docs that night, while "
+    "every category listed after it came back empty on both images -- "
+    "directly supporting that this model's actual fill order tracks the "
+    "literal template key order, not a separate prose paragraph "
+    "describing a different order. That experiment reordered the "
+    "template to match its prose at the time (doors before rooms, since "
+    "the prose then put doors at step 6 and rooms at step 7 -- the "
+    "opposite of tonight's prose). The prose's own doors/rooms order has "
+    "since changed (rooms now sits before doors, with the spatial-sweep-"
+    "reuse dependency quoted above added by a later slot) but the "
+    "template's key order was never updated to follow -- reintroducing "
+    "the exact class of contradiction 2026-10-12 fixed, on this specific "
+    "pair.\n\n"
+    "Tonight's own baseline numbers are consistent with the same "
+    "mechanism: template-first doors (194/254 Clinic, 14/14 Duplex) "
+    "recalls higher than template-second rooms (176/269 Clinic, 19/21 "
+    "Duplex) -- the category generated first under time pressure is the "
+    "one with fewer gaps, exactly what template-order-drives-fill-order "
+    "predicts. Rooms also carries more raw headroom either way (93 "
+    "missed on Clinic vs. doors' 60, 2 missed vs. doors' 0 on Duplex), "
+    "and both categories carry equal 1/8 and 1/10 weight in each doc's "
+    "unweighted per-category average, so moving rooms earlier trades a "
+    "small amount of doors' already-higher recall for a shot at reducing "
+    "rooms' larger deficit -- the same 'more to gain than to lose' trade "
+    "2026-10-12's own rationale used.\n\n"
+    "Change (SYSTEM_PROMPT_OVERRIDE only, one line swap): the JSON "
+    "schema block's key order changes from windows, doors, rooms to "
+    "windows, rooms, doors -- doors and rooms swap places, matching the "
+    "exact order the two prose paragraphs already require. No numbered "
+    "step, no sentence inside either paragraph, no cap, no field, no "
+    "item shape is touched -- a pure key reorder inside the example JSON "
+    "object literal, same mechanism and risk profile as 2026-10-12's "
+    "kept change. PARAMS, preprocess(), and postprocess() are byte-for-"
+    "byte unchanged.\n\n"
+    "No-op / low-risk argument: both docs' own GT confirms doors and "
+    "rooms are both real, populated categories on every image (not a "
+    "case where one is absent and the swap is moot) -- Duplex has 14 "
+    "doors/21 rooms, Clinic has 254 doors/269 rooms, so the swap is live "
+    "on both docs, not a no-op anywhere. If template order turns out not "
+    "to drive fill order after all (i.e. 2026-10-12's correlation and "
+    "tonight's matching pattern are both coincidental), this changes "
+    "nothing structural and should land within ordinary night-to-night "
+    "variance of 0.8146.\n\n"
+    "How to read next slot's log: check whether Clinic/Duplex rooms' "
+    "correct-count rises above tonight's 176/269 and 19/21 while doors' "
+    "correct-count (194/254, 14/14) holds roughly flat or drops only "
+    "slightly. If rooms rises and doors drops by a larger amount, the "
+    "two categories are trading off a shared, finite generation budget "
+    "rather than each independently reaching its own ceiling, and the "
+    "net direction of that trade (not just rooms' own number) is what "
+    "decides whether to keep leaning on template order further. If "
+    "neither number moves at all, template order was not the lever here "
+    "and the model is finishing both categories regardless of position, "
+    "unlike 2026-10-12's sample."
+)
+
 # Override the system prompt sent to Claude for extraction.
 # Set to None to use the production prompt from ~/Lexios/lexios/SKILL.md
 SYSTEM_PROMPT_OVERRIDE = """Extract building elements from this floor plan image as JSON. Every "location" field below must be exactly the filename's floor-level segment (e.g. "-Level_1.png" becomes "Level 1", "-Second_Floor.png" becomes "Second Floor"), spaces instead of underscores, never abbreviated further: do not read a level label from inside the drawing instead. Speed matters, keep fields short, no extra fields, minified JSON (no indentation, no line breaks). There is a hard 180-second limit: an unfinished response at that point is discarded whole, so treat your real budget as roughly 130 seconds and close out valid JSON early rather than risk being cut off mid-generation, which scores zero for every category on this image.
@@ -7172,8 +7256,8 @@ Return a JSON object with only the keys below that have findings:
   "plumbing_fixtures": [{"type": "<Toilet, Sink, Tub, Shower, if obvious>", "location": "<nearest legible room number or door tag, NOT a floor level, only if legible>"}],
   "sprinklers": [{"type": "<Fire Extinguisher Cabinet, if obvious -- despite the key name, this is a wall cabinet, not a ceiling sprinkler head>", "location": "<nearest legible room number or door tag, NOT a floor level, only if legible>"}],
   "windows": [{"tag": "<window number/tag>"}],
-  "doors": [{"location": "<floor level, see above>"}],
-  "rooms": [{"name": "<room label transcribed VERBATIM from the drawing>"}]
+  "rooms": [{"name": "<room label transcribed VERBATIM from the drawing>"}],
+  "doors": [{"location": "<floor level, see above>"}]
 }
 
 Priority order (stop enumerating a category once handled, never revisit it). Every category below counts equally toward this image's score no matter how many instances it has, so steps 1-6 (each a handful of instances at most) come before steps 7-8 (doors capped at 100, rooms capped at 130, windows capped at 35): finishing steps 1-6 first banks that many complete categories cheaply, instead of risking several of them never being reached if a capped category runs long.
