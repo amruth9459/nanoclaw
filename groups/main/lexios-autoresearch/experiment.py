@@ -7047,102 +7047,6 @@ DESCRIPTION = (
     "JAN. CL.) where a single fix pays out several times over."
 )
 
-EXPERIMENT_NAME = "exp-roomname-clinic-gendered-toilet-mw-prefix"
-DESCRIPTION = (
-    "Tonight's slot (2026-11-22), Lexios autoresearch experiment #2. "
-    "Baseline to beat: effective F1=0.8037, read directly from "
-    "logs/exp-20261122-021240.log this session (the kept result of "
-    "tonight's 1st slot, exp-roomname-clinic-military-admin-abbrevs): "
-    "Duplex_A_20110907 F1=0.7997 (beams 0/8, doors 14/14, railings_guards "
-    "4/4, rooms 19/21, slabs 20/21, stairs_elevators 2/2, wall_types 5/8, "
-    "windows 13/24); NBU_MedicalClinic_Arch F1=0.8077 (doors 190/254, "
-    "equipment 2/2, plumbing_fixtures 2/3, railings_guards 9/9, rooms "
-    "191/269, slabs 3/3, sprinklers 0/10, stairs_elevators 3/3, "
-    "wall_types 3/7, windows 57/58); phantom probes clean both docs. "
-    "Slot 1 tonight moved Clinic rooms from 176/269 to 191/269 (+15), "
-    "confirming the ROOM_NAME_SAFE_RENAME_MAP mechanism is actively "
-    "firing on this doc, not just theoretically sound.\n\n"
-    "Target: slot 1's own closing note named the next higher-leverage "
-    "room families to check -- CORRIDOR, INTERACTION STATION, TOILET "
-    "variants, JAN. CL. Checked CORRIDOR first and rejected it: Duplex's "
-    "own GT uses bare 'Hallway' verbatim, and this file's history "
-    "(exp-roomname-safe-rename-clinic-vocab, 2026-09-11) already "
-    "deliberately excluded HALLWAY->CORRIDOR for exactly this reason -- "
-    "adding it now would risk turning an already-correct Duplex match "
-    "into a miss the moment the model outputs the bare word there. "
-    "JAN. CL. already has four synonyms in the map (CUSTODIAL/CUSTODIAN "
-    "CLOSET, MOP CLOSET, MOP ROOM); traced the obvious fifth guess, "
-    "'JANITOR CLOSET', through fuzzy_match() this session and found it "
-    "already matches today without a rename (JAN is a prefix of JANITOR, "
-    "CL is a prefix of CLOSET, 2/2 words hit) -- adding it would be a "
-    "no-op, not a fix.\n\n"
-    "That left the TOILET family, which on closer trace splits in two. "
-    "Grepped NBU_MedicalClinic_Arch.ground-truth.json directly this "
-    "session: 'M. TOILET' occurs 4 times (lines 3630/3666/3708/3726), "
-    "'W. TOILET' 4 times (3636/3672/3702/3714) -- both 2-word GT strings "
-    "after fuzzy_match()'s period-stripping ('M'/'W' + 'TOILET'). Traced "
-    "the real function (read this session, not assumed): a 1-character "
-    "word like 'M' or 'W' can never pass the prefix check (requires both "
-    "words >=2 chars) or the edit-distance check (requires both words "
-    ">=4 chars), so any natural gender word ('Men's', 'Male', 'Women's', "
-    "'Female') scores 0 against it, leaving only TOILET matched: "
-    "1/2=0.5, below the 0.6 threshold. These two GT strings are "
-    "therefore structurally unreachable at any plausible phrasing, not "
-    "just an unlucky wording miss. By contrast the single-occurrence-"
-    "each 'M. STAFF TOILET'/'W. STAFF TOILET' are 3-word GT strings "
-    "where STAFF+TOILET alone already clear 2/3=0.667 regardless of the "
-    "gender word -- hand-traced 'MALE STAFF TOILET' and 'FEMALE STAFF "
-    "TOILET' through the same function and both already match today, so "
-    "they are deliberately left out of this change as already-solved.\n\n"
-    "Collision check, traced this session: any generic gendered guess "
-    "that still contains the literal word TOILET (e.g. 'Male Toilet') "
-    "already passes fuzzy_match's substring test against one of "
-    "Clinic's 5 plain 'TOILET' GT entries today ('TOILET' in 'MALE "
-    "TOILET'), so it is not currently scoring zero -- it is scoring a "
-    "match against the wrong, scarcer 5-slot bucket, one it shares with "
-    "every other generic toilet guess on the sheet. Renaming it to 'M. "
-    "TOILET' moves it to its own dedicated 4-slot bucket instead; since "
-    "the item was already counted correct before the rename, this can "
-    "only relieve that bottleneck or leave the count unchanged, never "
-    "regress it. The four '...RESTROOM' keys are a cleaner case: "
-    "'RESTROOM' is not a substring of 'TOILET' or vice versa, and the "
-    "existing bare RESTROOM->TOILET key only fires on an exact whole-"
-    "field match, so a two-word 'Male Restroom' extraction matches "
-    "nothing in this category today (checked its word overlap against "
-    "every multi-word Clinic GT room: ISOLATION TOILET, SPECIMEN TOILET "
-    "x2, STAFF TOILET x3, PAT. / STAFF TOILET all score at most 1/2 or "
-    "1/3, below threshold) -- these four keys are pure additions with no "
-    "prior credit to disturb.\n\n"
-    "Change (postprocess() only, ROOM_NAME_SAFE_RENAME_MAP): adds twelve "
-    "keys -- MEN'S TOILET, MENS TOILET, MEN TOILET, MALE TOILET, MEN'S "
-    "RESTROOM, MALE RESTROOM -> 'M. TOILET'; WOMEN'S TOILET, WOMENS "
-    "TOILET, WOMEN TOILET, FEMALE TOILET, WOMEN'S RESTROOM, FEMALE "
-    "RESTROOM -> 'W. TOILET'. None of the twelve collide with any "
-    "existing key already in the map. No other key, schema, cap, "
-    "SYSTEM_PROMPT_OVERRIDE, PARAMS, or preprocess() line touched.\n\n"
-    "No-regression argument: none of the twelve keys share a word with "
-    "Duplex's full room vocabulary (Foyer, Hallway, Bathroom 1/2, "
-    "Utility, Stair, Room, Roof, Living Room, Kitchen, Bedroom 1/2), so "
-    "this is a complete no-op on that doc. On Clinic, gt_is_minimum "
-    "defaults to True (confirmed by reading evaluate.py directly last "
-    "slot, unchanged tonight), so precision only counts matched "
-    "elements -- a rename that never fires changes nothing, and the "
-    "TOILET-bucket renames can only move an already-correct match to a "
-    "different correct bucket, never create an incorrect one.\n\n"
-    "How to read next slot's log: check Clinic rooms' correct-count and, "
-    "if available, the M./W. TOILET-specific outcome. A rise above "
-    "191/269 of up to 8 (if the model is producing gendered-toilet "
-    "phrasings this run and the bare-TOILET bucket was the bottleneck) "
-    "confirms the mechanism; a flat 191 most likely means the model "
-    "either does not produce these rooms as 'Men's/Women's/Male/Female "
-    "Toilet or Restroom' this run (different wording, or missed "
-    "outright), not that the rename logic is wrong -- in that case the "
-    "next slot should stop guessing TOILET-family phrasings and look at "
-    "INTERACTION STATION (12 occurrences) instead, checking first "
-    "whether the model is likely to transcribe that full-word label "
-    "correctly as-is before assuming a rename is needed there too."
-)
-
 # Override the system prompt sent to Claude for extraction.
 # Set to None to use the production prompt from ~/Lexios/lexios/SKILL.md
 SYSTEM_PROMPT_OVERRIDE = """Extract building elements from this floor plan image as JSON. Every "location" field below must be exactly the filename's floor-level segment (e.g. "-Level_1.png" becomes "Level 1", "-Second_Floor.png" becomes "Second Floor"), spaces instead of underscores, never abbreviated further: do not read a level label from inside the drawing instead. Speed matters, keep fields short, no extra fields, minified JSON (no indentation, no line breaks). There is a hard 180-second limit: an unfinished response at that point is discarded whole, so treat your real budget as roughly 130 seconds and close out valid JSON early rather than risk being cut off mid-generation, which scores zero for every category on this image.
@@ -8797,51 +8701,6 @@ def postprocess(extraction: dict, _cache={}) -> dict:
     # score above 1/3 against "COMMANDER OFFICE", so no misfire risk.
     # None of the six keys share a word with Duplex's room vocabulary
     # above, or with any existing key already in this map.
-    #
-    # exp-roomname-clinic-gendered-toilet-mw-prefix (2026-11-22, tonight's
-    # 2nd slot): adds gender-word variants mapping to "M. TOILET" (4 GT
-    # occurrences) and "W. TOILET" (4 GT occurrences) -- the single
-    # largest still-untouched room-name cluster after tonight's 1st slot.
-    # Mechanism, traced through fuzzy_match() read this session: both are
-    # 2-word GT strings ("M"/"W" + "TOILET" after period-stripping), and
-    # the match needs >=60% of GT words to hit. A gender-word guess like
-    # "MALE"/"MEN'S" fails both the >=2-char prefix check and the edit-
-    # distance check against bare "M" (1 char, under every length floor
-    # the function uses), so only "TOILET" matches: 1/2=0.5, below
-    # threshold -- these two entries are structurally unreachable at any
-    # plausible 2-word phrasing. By contrast, the document's 1-occurrence-
-    # each "M. STAFF TOILET"/"W. STAFF TOILET" are NOT included here: they
-    # are 3-word GT strings, and STAFF+TOILET alone already clear 2/3=
-    # 0.667 regardless of the gender word, verified by hand-tracing
-    # "MALE STAFF TOILET" and "FEMALE STAFF TOILET" through the same
-    # function -- already matching today, a rename there would be a no-op
-    # at best.
-    #
-    # Collision check, traced this session: a bare gendered guess that
-    # still contains the word TOILET (e.g. "MALE TOILET") currently passes
-    # fuzzy_match's substring test against Clinic's 5 plain "TOILET" GT
-    # entries ("TOILET" in "MALE TOILET"), so it is not currently scoring
-    # zero -- it is scoring a match against the wrong, scarcer bucket.
-    # Renaming it to "M. TOILET" moves it to its own dedicated slot (4
-    # available) instead of competing with every other generic toilet
-    # guess for only 5 bare slots; this can only relieve that bottleneck or
-    # leave it unchanged, never regress, since the item was already
-    # counted as correct before the rename. The "...RESTROOM" variants
-    # (MEN'S/MALE/WOMEN'S/FEMALE RESTROOM) are a cleaner case: "RESTROOM"
-    # is not a substring of "TOILET" or vice versa, and the existing bare
-    # RESTROOM->TOILET key only fires on an exact whole-field match, so
-    # today a two-word "Male Restroom" extraction matches nothing in this
-    # category (0/2 word overlap against every multi-word Clinic GT room
-    # checked) -- these four keys are pure additions with no prior credit
-    # to disturb. Also checked "ISOLATION TOILET", "SPECIMEN TOILET", the
-    # plain "STAFF TOILET" x3, and "PAT. / STAFF TOILET": a generic
-    # "MALE"/"FEMALE TOILET" guess scores at most 1/2 or 1/3 against each
-    # (only the shared TOILET word), below threshold, so none of these
-    # renames can misfire into one of those neighboring rooms either.
-    # None of the twelve keys share a word with Duplex's room vocabulary
-    # (Foyer, Hallway, Bathroom 1/2, Utility, Stair, Room, Roof, Living
-    # Room, Kitchen, Bedroom 1/2) or with any existing key already in this
-    # map, so this is a complete no-op on Duplex regardless of outcome.
     ROOM_NAME_SAFE_RENAME_MAP = {
         "FRONT DESK": "RECEPTION",
         "CHECK-IN": "RECEPTION",
@@ -8868,18 +8727,6 @@ def postprocess(extraction: dict, _cache={}) -> dict:
         "1ST SERGEANT": "1ST SGT",
         "FIRST SERGEANT": "1ST SGT",
         "CREDENTIALS MANAGER": "CREDENTIALS MGR",
-        "MEN'S TOILET": "M. TOILET",
-        "MENS TOILET": "M. TOILET",
-        "MEN TOILET": "M. TOILET",
-        "MALE TOILET": "M. TOILET",
-        "MEN'S RESTROOM": "M. TOILET",
-        "MALE RESTROOM": "M. TOILET",
-        "WOMEN'S TOILET": "W. TOILET",
-        "WOMENS TOILET": "W. TOILET",
-        "WOMEN TOILET": "W. TOILET",
-        "FEMALE TOILET": "W. TOILET",
-        "WOMEN'S RESTROOM": "W. TOILET",
-        "FEMALE RESTROOM": "W. TOILET",
     }
     rooms = extraction.get("rooms")
     if isinstance(rooms, list):
