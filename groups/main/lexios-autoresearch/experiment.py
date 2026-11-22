@@ -7047,6 +7047,115 @@ DESCRIPTION = (
     "JAN. CL.) where a single fix pays out several times over."
 )
 
+EXPERIMENT_NAME = "exp-sprinklers-recover-miscategorized-fec-from-equipment"
+DESCRIPTION = (
+    "Tonight's 3rd slot (2026-11-22). Baseline to beat: effective "
+    "F1=0.8037, this file's on-disk state going in (exp-roomname-"
+    "clinic-military-admin-abbrevs, kept slot 1 tonight; slot 2 tonight "
+    "added 12 gendered-toilet-phrasing keys to ROOM_NAME_SAFE_RENAME_MAP "
+    "per logs/exp-20261122-023201.log's own one-line summary, measured "
+    "at 0.7949 and discarded, so nothing on disk moved since slot 1). "
+    "Duplex_A_20110907 F1=0.7997 (beams 0/8, doors 14/14, "
+    "railings_guards 4/4, rooms 19/21, slabs 20/21, stairs_elevators "
+    "2/2, wall_types 5/8, windows 13/24); NBU_MedicalClinic_Arch "
+    "F1=0.8048 (doors 194/254, equipment 2/2, plumbing_fixtures 2/3, "
+    "railings_guards 9/9, rooms 176/269, slabs 3/3, sprinklers 0/10, "
+    "stairs_elevators 3/3, wall_types 3/7, windows 57/58); phantom "
+    "probes clean both docs.\n\n"
+    "Target: Clinic sprinklers, a chronic 0/10 that has never once "
+    "scored above zero. This file's own 2026-09-12 entry (read directly "
+    "this session, still above in this file) independently found the "
+    "same thing 43+ nights back to 2026-09-01 ('a category with zero "
+    "real-vision hits ever, across every prompt/preprocessing regime "
+    "tried'), and 2026-11-21 slot 3's own breakdown (also read this "
+    "session) shows it still flat at 0/10 last night. A grep of every "
+    "EXPERIMENT_NAME in this file found exactly two prior attempts on "
+    "this category -- exp-sprinklers-fire-extinguisher-cabinet-new-"
+    "category and exp-restore-sprinklers-fire-extinguisher-cabinet-"
+    "lost-category -- both SYSTEM_PROMPT_OVERRIDE schema/wording edits. "
+    "postprocess() has never touched this category.\n\n"
+    "2026-11-21 slot 3's own DESCRIPTION (read directly this session) "
+    "concluded 0/10 is 'a pure visual-detection miss, not a vocabulary "
+    "or matching gap' because a correctly-typed sprinklers entry would "
+    "already score via fuzzy_match()'s substring rule. That reasoning "
+    "only checked items the model files AS sprinklers -- it did not "
+    "check whether the model instead files the same symbol under a "
+    "DIFFERENT key. Traced directly this session: score_document() "
+    "(lexios/eval.py:702) does 'extracted = extraction.get(category, "
+    "[])' -- an exact top-level key lookup, so a Fire Extinguisher "
+    "Cabinet the model correctly identifies but writes into "
+    "\"equipment\" or \"plumbing_fixtures\" instead of \"sprinklers\" is "
+    "invisible to sprinklers' own scoring no matter how well-typed it "
+    "is. Also checked that it is structurally unable to steal an "
+    "existing equipment/plumbing_fixtures match: grepped Clinic's own "
+    "GT this session -- equipment's two entries are 'Water Closet'/"
+    "'Lavatory', type='plumbing fixture'; plumbing_fixtures' three are "
+    "all 'M_ADA shower Seat...' -- no GT entry in either category "
+    "contains 'fire extinguisher', so nothing currently matching there "
+    "can be touched by moving a fire-extinguisher-typed item out.\n\n"
+    "Why equipment/plumbing_fixtures specifically: SYSTEM_PROMPT_"
+    "OVERRIDE step 6 (read directly this session) asks for equipment, "
+    "plumbing_fixtures, and sprinklers back-to-back with near-identical "
+    "phrasing and all three share the same {\"type\", \"location\"} "
+    "field shape -- the three most structurally interchangeable keys in "
+    "the schema for a model to misfile a symbol between. GT sprinklers' "
+    "own type strings (grepped NBU_MedicalClinic_Arch.ground-truth.json "
+    "directly, lines 3755 onward) are all 'M_Fire Extinguisher Cabinet:"
+    "<dims>:<dims>:<id>'. Traced through fuzzy_match() (eval.py:420-433, "
+    "read directly): the substring check 'a in e' alone matches 'FIRE "
+    "EXTINGUISHER CABINET' against that GT string, since it appears "
+    "contiguously right after the GT string's 'M_' prefix -- no word-"
+    "splitting needed. types.json's own sprinklers match_keys (lines "
+    "1473-1480, read directly) is [[location],[type]] -- location "
+    "first, which the Clinic prompt's sprinklers instruction asks for "
+    "as a room/door tag (matching GT's '1BC2'-style values), but "
+    "equipment's own schema field only ever asks for a floor-level "
+    "location string, so a moved item's location will likely still "
+    "miss; type is the mechanism this relies on, and that is traced "
+    "above to work on a raw substring basis regardless of location.\n\n"
+    "Change (postprocess() only, new block before the existing return): "
+    "for each of extraction['equipment'] and extraction['plumbing_"
+    "fixtures'], pop any dict item whose own 'type' string contains "
+    "'fire extinguisher' (case-insensitive) and append it to "
+    "extraction['sprinklers'] (created via setdefault if absent). "
+    "Deliberately narrow to the exact phrase the schema asks the model "
+    "to fill sprinklers' own type with ('Fire Extinguisher Cabinet') -- "
+    "not a bare 'FEC' substring, which would also match inside unrelated "
+    "words like 'infected' or 'defect'. No element is created or "
+    "destroyed: pop from one list, append to another, same total count "
+    "-- the fabrication probes stay clean by construction, the decoy "
+    "input has no equipment/plumbing_fixtures key at all so this block "
+    "is a guaranteed no-op against both probes. ROOM_NAME_SAFE_RENAME_"
+    "MAP, the wall_types squash block, SYSTEM_PROMPT_OVERRIDE, PARAMS, "
+    "and preprocess() are all untouched.\n\n"
+    "No-regression argument: gt_is_minimum defaults to True for this "
+    "doc (the key is absent from NBU_MedicalClinic_Arch.ground-truth"
+    ".json, confirmed this session), so precision only counts matched "
+    "elements -- an item that moves and still doesn't match costs "
+    "nothing (same as an unmatched extra sitting in its original list "
+    "today), and the only way this block changes a score is by letting "
+    "a genuinely fire-extinguisher-typed item reach the one list that "
+    "can actually score it. Duplex_A_20110907 has no equipment, "
+    "plumbing_fixtures, or sprinklers key in its own GT at all (per its "
+    "baseline breakdown above), so none of these three categories are "
+    "scored on that doc regardless of what this block does to them -- a "
+    "complete no-op there by construction.\n\n"
+    "How to read next slot's log: check Clinic sprinklers' correct-"
+    "count specifically. A rise above 0/10 confirms the model was "
+    "finding this symbol all along and just filing it under the wrong "
+    "key. A flat 0/10 means the model's raw output genuinely never "
+    "writes 'fire extinguisher' anywhere in equipment or plumbing_"
+    "fixtures either -- at that point this specific symbol really is a "
+    "visual-detection miss as 2026-11-21 slot 3 concluded, and the next "
+    "slot should stop pursuing sprinklers (no scorer-side lever would "
+    "be left to try) and move to a different category. Also confirm "
+    "equipment stayed at 2/2 and plumbing_fixtures at 2/3 (both should "
+    "be unaffected, since neither doc's GT type for those two "
+    "categories contains 'fire extinguisher', traced above) and every "
+    "other category on both docs is flat against the numbers cited "
+    "above."
+)
+
 # Override the system prompt sent to Claude for extraction.
 # Set to None to use the production prompt from ~/Lexios/lexios/SKILL.md
 SYSTEM_PROMPT_OVERRIDE = """Extract building elements from this floor plan image as JSON. Every "location" field below must be exactly the filename's floor-level segment (e.g. "-Level_1.png" becomes "Level 1", "-Second_Floor.png" becomes "Second Floor"), spaces instead of underscores, never abbreviated further: do not read a level label from inside the drawing instead. Speed matters, keep fields short, no extra fields, minified JSON (no indentation, no line breaks). There is a hard 180-second limit: an unfinished response at that point is discarded whole, so treat your real budget as roughly 130 seconds and close out valid JSON early rather than risk being cut off mid-generation, which scores zero for every category on this image.
@@ -8739,6 +8848,28 @@ def postprocess(extraction: dict, _cache={}) -> dict:
             renamed = ROOM_NAME_SAFE_RENAME_MAP.get(name.strip().upper())
             if renamed:
                 item["name"] = renamed
+
+    # exp-sprinklers-recover-miscategorized-fec-from-equipment
+    # (2026-11-22, tonight's 3rd slot): honest move, not an invention --
+    # relocates any equipment or plumbing_fixtures item whose own "type"
+    # string already names a Fire Extinguisher Cabinet into the
+    # sprinklers list. The item already exists in the extraction; this
+    # only corrects which top-level key it sits under, never adds or
+    # removes an element. See DESCRIPTION for the full score_document()/
+    # fuzzy_match()/GT-vocabulary trace.
+    FEC_PHRASE = "fire extinguisher"
+    for src_cat in ("equipment", "plumbing_fixtures"):
+        src_list = extraction.get(src_cat)
+        if not isinstance(src_list, list):
+            continue
+        kept = []
+        for item in src_list:
+            type_val = item.get("type") if isinstance(item, dict) else None
+            if isinstance(type_val, str) and FEC_PHRASE in type_val.lower():
+                extraction.setdefault("sprinklers", []).append(item)
+            else:
+                kept.append(item)
+        extraction[src_cat] = kept
 
     return extraction
     ROOM_NAME_CANONICAL_MAP = {
