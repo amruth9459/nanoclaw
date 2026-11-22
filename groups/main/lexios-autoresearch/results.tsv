@@ -513,3 +513,4 @@ exp83-fix-exp72-80-regressions-76-docs	2026-04-24	1.0000	76	0.00	Apply all missi
 2026-11-21T09:18:48Z	exp-20261121-034902	Tonight's slot (2026-11-21), Lexios autoresearch experiment 	0.7997	0.7983	0.0	discarded
 2026-11-22T07:32:01Z	exp-20261122-021240	Tonight's slot (2026-11-22), Lexios autoresearch experiment 	0.8022	0.8037	0.0	kept-uncommitted
 2026-11-22T07:56:01Z	exp-20261122-023201	Tonight's slot (2026-11-22), Lexios autoresearch experiment 	0.8037	0.7949	0.0	discarded
+2026-11-22T08:15:04Z	exp-20261122-025601	Tonight's 3rd slot (2026-11-22). Baseline to beat: effective	0.8037	0.8146	0.0	kept
