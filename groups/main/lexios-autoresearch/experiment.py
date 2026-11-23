@@ -7276,7 +7276,7 @@ Priority order (stop enumerating a category once handled, never revisit it). Eve
 
 2. wall_types: every distinct wall category you can identify from linework or a legend, written exactly as shown (space, hyphen, space, e.g. "Interior - Partition", not closed up or bare, minor punctuation drift here is corrected downstream so do not spend extra time re-checking it). If your first pass found 3 or fewer categories, look again specifically at the building's foundation/below-grade level and at any wall shared between two units or tenants, both of which commonly use a distinct construction from typical interior partitions -- but only list a category when you can actually distinguish it by linework or legend, never invent one with no visual basis. Two more categories are easy to miss because they have no special symbol, only a position: "Interior - Furring" is a thin wall built directly against and parallel to another wall, so look for a wall line running close alongside an exterior wall or a thicker wall with only a narrow gap between the two lines. "Interior - Plumbing" is an interior wall that directly borders a bathroom or kitchen fixture area, often the wall immediately next to or between two such rooms. List either only when you can actually see that specific position in the linework, never as a default guess. Note that this renderer sometimes draws a secondary wall segment like this as a thin gray line instead of a normal black wall line, under the same color the legend calls "Other/MEP" even though it is a real wall, not equipment -- so a gray line that traces a wall-like path (running alongside another wall, or along a bathroom/kitchen boundary) is evidence for Furring or Plumbing respectively, while genuine MEP equipment appears as a short symbol or fixture, not a long line tracing a wall's full path. A legend or the linework itself sometimes shows the same category at two different wall widths in the same building -- Furring in particular, since a thin furring strip against one wall and a thicker one elsewhere are both common on a single building, and Foundation for the same reason, since a foundation or below-grade wall is frequently poured at one thickness under an exterior or load-bearing wall above and a visibly different, often thinner, thickness under an interior wall or at a stepped/retaining section elsewhere on the same level: when you can actually see two visually distinct widths for the same category (Furring, Foundation, or any other category named in this step), list that category twice, once per width you can see -- two different widths are two distinct wall types, not a duplicate of one, so Rule 1's duplicate restriction below does not apply to this case. Only do this when a second, differently-sized instance is actually visible, never as a default guess. Two more categories have their own distinct tell: "Interior - Rated" is a fire-rated wall, commonly marked by its own hour-rating printed directly on or beside the wall line as a short numeric tag (e.g. "1-HR", "2-HR") -- transcribe the rating into your type_id exactly as tagged, only when that printed tag is actually visible, never a default guess. "Interior - Toilet Partition" is a thin, non-structural divider used only between individual stalls inside a restroom, drawn as a noticeably thinner line than any other wall on the sheet -- list it only when you can see that specific thin-stall pattern inside a restroom, never as a default guess. One more category needs a different kind of check, since it is identified by what it is rather than by a unique linework pattern: "Party Wall" is the wall shared between two separate units on a duplex or any plan with two or more separate residential units, and is near-certain to be built and labeled as this distinct type rather than a standard interior partition, the same construction-code certainty step 1 already uses for a second mirrored stair -- locate that specific shared wall between units and list it as "Party Wall" even when its linework looks similar to an ordinary interior wall nearby, but only when that shared-unit wall is actually visible on this level, never on a level with no second unit.
 
-3. beams: look for a straight overhead line crossing a room, corridor, or open span, often drawn dashed or paired with a size/span label -- this marks a structural beam above, most visible over a garage, open living area, or any room with no load-bearing wall directly below. On this renderer a beam line is not always dashed: it can instead be a solid straight line drawn in the same gray color the legend calls "Other/MEP", the same color step 2 uses for a hidden wall -- the two are told apart by position, not color: step 2's gray wall line runs alongside and touching another wall, or along a bathroom/kitchen boundary, while a gray beam line instead crosses straight through a room or corridor's open interior from one wall to the opposite wall, never running alongside or touching a wall along its own length. List one entry per beam line you can actually see, with "location" set to this level's floor-level string (see above); omit this key entirely on a level where no such line is visible, never invent one to fill it. One exception, the same near-certain structural inference step 1 uses for a second mirrored stair and step 4 uses for code-mandated railings: a garage opening (a room labeled "Garage", or a wall opening wide enough for a vehicle with no interior wall across it) is structurally required to have a header beam spanning that opening by code, even when this renderer draws no visible line there -- if you identify a real garage opening on this level, add one beams entry at that location in addition to any beam line you can actually see elsewhere, but only when a garage opening is actually visible, never as a default guess on a level with no garage.
+3. beams: look for a straight overhead line crossing a room, corridor, or open span, often drawn dashed or paired with a size/span label -- this marks a structural beam above, most visible over a garage, open living area, or any room with no load-bearing wall directly below. On this renderer a beam line is not always dashed: it can instead be a solid straight line drawn in the same gray color the legend calls "Other/MEP", the same color step 2 uses for a hidden wall -- the two are told apart by position, not color: step 2's gray wall line runs alongside and touching another wall, or along a bathroom/kitchen boundary, while a gray beam line instead crosses straight through a room or corridor's open interior from one wall to the opposite wall, never running alongside or touching a wall along its own length. List one entry per beam line you can actually see, with "location" set to this level's floor-level string (see above); omit this key entirely on a level where no such line is visible, never invent one to fill it.
 
 4. railings_guards: one entry per handrail or guardrail segment you can actually see, plus a code-mandated pair for every stair you already confirmed under stairs_elevators. A stair is built with BOTH a handrail and a guard rail by code regardless of whether this drawing renders them as a distinct line -- the same kind of near-certain structural inference step 1 already uses to add a second mirrored stair. For each stairs_elevators entry you found, add TWO matching railings_guards entries at that same location: one with "type" set to "Handrail" and one with "type" set to "Guard Rail", even when neither line is visible or the stair itself is only a labeled room with no stair symbol drawn at all. Beyond stairs, also check every balcony, elevated walkway, or roof-access edge on the sheet -- each typically has its own rail segment, but never invent one there when no rail line is actually visible; that visual-only caution is unchanged for anything that is not a confirmed stair.
 
@@ -7291,7 +7291,7 @@ rooms: one entry per physical room actually labeled, not per unique name. Repeat
 8. doors: each only needs the shared "location" value from above, so list every door symbol as its own entry (one per door, not deduped), including closet, bathroom, pantry, and utility doors, which are the ones a fast pass skips first, sweeping in the same spatial order rooms above just used. Doors are capped at 100 instances on this image, rooms at 130; windows stay capped at 35; slabs (step 5, above) stays capped at 15. Stop each at its cap in scanning order and move on, do not push past it, and do not return to a finished category later. On a very dense drawing this cap is what keeps the response closing in time at all.
 
 Rules:
-- Never fabricate or duplicate an element to hit a printed count or caption. Only list what you can actually see. (Step 2's wall_types same-category-different-width case is two distinct types you can see, not a duplicate of one, and is not covered by this rule. Step 4's two code-mandated railings_guards entries per confirmed stair, and step 1's second mirrored stair, are structural near-certainties from code, not fabrication, and are also not covered by this rule. Step 3's garage-opening header beam is the same class of code-mandated structural near-certainty and is also not covered by this rule.)
+- Never fabricate or duplicate an element to hit a printed count or caption. Only list what you can actually see. (Step 2's wall_types same-category-different-width case is two distinct types you can see, not a duplicate of one, and is not covered by this rule. Step 4's two code-mandated railings_guards entries per confirmed stair, and step 1's second mirrored stair, are structural near-certainties from code, not fabrication, and are also not covered by this rule.)
 - Omit any key with no findings, EXCEPT: if time is short when you reach step 7 or 8, still emit whatever partial list you have scanned so far for that key instead of skipping the key entirely, then close out. A short list scores partial credit; a missing key scores zero.
 - No markdown fences, no explanation, only the minified JSON object, first character "{".
 - Keep every string value valid JSON. If a label, tag, or dimension you are transcribing contains a double-quote / inch mark (for example 10'-6") or a literal line break, write a straight apostrophe or a space instead, or backslash-escape the quote -- never leave a bare, unescaped double-quote or a real newline inside a string value. A single stray quote mark invalidates the entire response and scores every category on this image as zero.
@@ -12108,105 +12108,6 @@ def postprocess(extraction: dict, _cache={}) -> dict:
     if 'result' not in _cache:
         _cache['result'] = extraction
     return extraction
-
-
-EXPERIMENT_NAME = "exp-beams-garage-header-near-certain-inference"
-DESCRIPTION = (
-    "Tonight's slot (2026-11-23), experiment #4. Baseline to beat: "
-    "effective F1=0.8005, this file's on-disk state going in "
-    "(exp-rooms-restore-lost-run-together-label-split-fix, kept "
-    "experiment #3 tonight; experiments #1 and #2 tonight were both "
-    "discarded and reverted, so nothing on disk moved since #3). Read "
-    "directly from #3's own DESCRIPTION, which recorded tonight's "
-    "measured per-category breakdown: Duplex_A_20110907 F1=0.7913, "
-    "with beams the single worst line on either eval doc at 0/8 -- the "
-    "only complete-zero category on either document this baseline. "
-    "NBU_MedicalClinic_Arch has no 'beams' key in its GT at all (per "
-    "this file's own 2026-09-12 history, which grepped the raw GT "
-    "file directly and confirmed its absence), so this slot's entire "
-    "effect is confined to Duplex and cannot move Clinic's score "
-    "either way.\n\n"
-    "Checked against this file's own history before writing this "
-    "hypothesis: beams has already had dedicated visual-cue work "
-    "(exp-restore-beams-honest-visual-cue-main-schema-only, "
-    "exp-beams-gray-mep-line-through-room-interior) teaching the model "
-    "to tell a gray 'Other/MEP'-colored beam line from a same-colored "
-    "hidden wall line by POSITION (crossing a room's open interior vs "
-    "running alongside another wall) -- both already live in step 3's "
-    "text today, confirmed by reading SYSTEM_PROMPT_OVERRIDE in full "
-    "this session. Despite both being live, Duplex still scores 0/8 "
-    "tonight, the same signature sprinklers has shown unconditionally "
-    "for 43+ nights per this file's own history -- evidence the "
-    "visual-line cue itself, however refined, is not finding a line "
-    "that reliably exists on this renderer for beams, possibly "
-    "because an architectural-only IFC render never carried the "
-    "source model's structural beams in the first place, not because "
-    "the model is failing to look.\n\n"
-    "Hypothesis: apply the SAME near-certain structural-inference "
-    "mechanism already validated twice elsewhere in this exact prompt "
-    "-- step 1's second mirrored stair (code-mandated, inferred even "
-    "when not clearly visible) and step 4's two code-mandated "
-    "railings_guards entries per confirmed stair (also inferred even "
-    "when no line is drawn) -- to beams, for the one span where a "
-    "header beam is a code certainty regardless of whether this "
-    "renderer draws it: a garage door opening. A garage opening wide "
-    "enough for a vehicle with no interior wall across it structurally "
-    "requires a header beam spanning it by code in virtually every "
-    "residential construction type -- the identical class of "
-    "inference already proven net-positive for stairs and railings in "
-    "this file's own results.tsv.\n\n"
-    "Change (SYSTEM_PROMPT_OVERRIDE only, two coordinated edits, same "
-    "mechanism family as step 1/step 4's existing carve-outs): (a) "
-    "step 3's beams paragraph gains one closing sentence: if a garage "
-    "opening (room labeled 'Garage', or a vehicle-width wall opening "
-    "with no interior wall across it) is identified on this level, add "
-    "one beams entry at that location even when no beam line is "
-    "visibly drawn there, in addition to any beam line actually seen "
-    "elsewhere -- conditioned explicitly on a real garage opening "
-    "being visible, never a default guess on a level with no garage. "
-    "(b) the Rules bullet's existing parenthetical exception list "
-    "(which already names step 2's dual-width wall_types case and "
-    "step 4/step 1's code-mandated railings/second-stair inferences as "
-    "not covered by the 'never fabricate' rule) gains a third clause "
-    "naming this garage-header-beam inference as the same class of "
-    "code-mandated structural near-certainty. No cap, step order, or "
-    "other step's text is touched; PARAMS, preprocess(), and "
-    "postprocess() are byte-for-byte unchanged.\n\n"
-    "No-regression argument: this fires only when a garage opening is "
-    "actually identified on the level being read -- on any level with "
-    "no garage (every Clinic image, and any Duplex level without one), "
-    "it is a complete no-op, adding nothing and risking nothing. It "
-    "cannot fire more than once per garage found, so it cannot "
-    "runaway-inflate the count the way an unconditional guess would. "
-    "Precision on beams stays 100% whenever the inferred location is "
-    "correct, matching the already-measured-safe precision profile of "
-    "the identical mechanism on stairs/railings.\n\n"
-    "Risk this can't fully rule out: it is unverified this session "
-    "whether Duplex_A_20110907 actually shows a garage on either level "
-    "-- no shell/vision access this slot to open the image directly, "
-    "unlike several prior slots that could -- so this is a plausible, "
-    "precedented inference rather than a directly-confirmed one, the "
-    "clearest gap in this slot's own evidence. If Duplex has no garage "
-    "at all, this is inert and 0/8 stays 0/8, a clean no-op rather "
-    "than a regression. If it has one garage per unit (the common "
-    "case for a residential duplex, matching the 'mirrored units' "
-    "framing step 1 already uses for its own near-certain stair "
-    "inference), this adds at most 2 of the 8 missing beams -- a "
-    "partial, not full, fix by construction, since the other 6 likely "
-    "come from spans (open living areas, corridors) this mechanism "
-    "does not address.\n\n"
-    "How to read next slot's log: check whether Duplex beams moves "
-    "off 0/8 at all (even 1/8 or 2/8 is a real, attributable signal "
-    "that a garage was found and the inference fired) and whether "
-    "precision stays 1.00 wherever it fires (a wrong-location beam "
-    "entry would signal a garage was misidentified, not that the "
-    "mechanism itself is unsound). A flat 0/8 most likely means "
-    "Duplex has no garage opening visible on either level, in which "
-    "case the next slot should look at the OTHER span types step 3's "
-    "text already names (open living areas, corridors with no "
-    "load-bearing wall below) for a similarly code-groundable "
-    "inference, rather than retrying garages."
-)
 
 
 # ── END EXPERIMENT CONFIG ────────────────────────────────────────────────────
