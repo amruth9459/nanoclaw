@@ -7156,129 +7156,6 @@ DESCRIPTION = (
     "above."
 )
 
-EXPERIMENT_NAME = "exp-roomname-clean-utility-treatment-room-abbrev-gap"
-DESCRIPTION = (
-    "Tonight's slot (2026-11-23), experiment #2. Baseline to beat: "
-    "effective F1=0.8002, read directly from logs/baseline-20261123-"
-    "020006.log this session (tonight's fresh orchestrator measurement "
-    "of this file's on-disk state going in, the sprinklers-FEC-move "
-    "fix kept 2026-11-22): Duplex_A_20110907 F1=0.7913 (beams 0/8, "
-    "doors 14/14, railings_guards 4/4, rooms 19/21, slabs 20/21, "
-    "stairs_elevators 2/2, wall_types 4/8, windows 14/24); "
-    "NBU_MedicalClinic_Arch F1=0.809 (doors 144/254, equipment 2/2, "
-    "plumbing_fixtures 3/3, railings_guards 9/9, rooms 167/269, slabs "
-    "3/3, sprinklers 0/10, stairs_elevators 3/3, wall_types 3/7, "
-    "windows 58/58); phantom probes clean both docs. That same log "
-    "confirms tonight's 1st slot (exp-20261123-020744) measured "
-    "0.8000 and was discarded, so nothing on disk moved since the "
-    "sprinklers fix. Also confirmed per that fix's own DESCRIPTION "
-    "(still above in this file) that Clinic sprinklers is flat 0/10 "
-    "even with the FEC-move fix active, exactly the 'flat 0/10' "
-    "outcome its own closing note said means stop pursuing sprinklers "
-    "and move to a different category -- doing that here.\n\n"
-    "Target: two room-name abbreviation gaps, same structural class as "
-    "the wall_types/room renames already live in this file, neither a "
-    "repeat of any prior slot (grepped every EXPERIMENT_NAME in this "
-    "file for 'CLEAN U' and 'TRMT', zero prior hits). Grepped "
-    "NBU_MedicalClinic_Arch.ground-truth.json directly this session: "
-    "'CLEAN U.' occurs exactly twice (lines 2298, 2382) and 'TRMT "
-    "ROOM' / 'TRMT RM. DIRTY PROC.' occur once each (lines 3498, "
-    "3468). Traced both through the real fuzzy_match() word-split/"
-    "prefix(>=2-char)/edit-distance(>=4-char) logic read directly in "
-    "a prior slot's session (that read is still above in this file, "
-    "not re-assumed): GT 'CLEAN U.' strips to two words [CLEAN, U] -- "
-    "'U' is a single character and can never satisfy either check "
-    "against any natural expansion word like 'UTILITY', so a vision "
-    "transcription of 'Clean Utility' scores only 1/2=0.5, below the "
-    "0.6 threshold -- the exact same single-character-word failure "
-    "mode as the M./W. TOILET gap identified and acted on in "
-    "2026-11-22 slot 2 (read directly above: that slot's own trace "
-    "proved 'M'/'W' can never pass either check). GT 'TRMT ROOM' "
-    "strips to [TRMT, ROOM]; a vision transcription of 'Treatment "
-    "Room' gives TRMT vs TREATMENT -- not a prefix (3rd character M "
-    "vs E diverges) and the length gap (4 vs 9 characters) clears the "
-    "edit-distance tolerance by a wide margin -- and ROOM vs ROOM "
-    "matches, so only 1/2=0.5, also below threshold. 'TRMT RM. DIRTY "
-    "PROC.' strips to [TRMT, RM, DIRTY, PROC]; 'Treatment Room Dirty "
-    "Processing' matches DIRTY exactly and PROC as a prefix of "
-    "PROCESSING, but TRMT fails as above and RM is not a prefix of "
-    "ROOM (2nd character M vs O diverges) -- 2/4=0.5, again below "
-    "threshold. All three GT strings are therefore structurally "
-    "unreachable at their single most natural vision phrasing, not "
-    "just an unlucky wording miss.\n\n"
-    "Reverse-collision check (same discipline as every prior slot in "
-    "this map, traced this session): does any guessed key already "
-    "match a DIFFERENT Clinic GT room today, such that renaming it "
-    "would steal that match rather than add one? 'CLEAN UTILITY' "
-    "against every other GT room containing the word CLEAN -- 'CLEAN "
-    "SUP. & EQUIP.' ([CLEAN,SUP,EQUIP], only CLEAN matches, 1/3=0.33) "
-    "and 'DIPC CLEAN' ([DIPC,CLEAN], only CLEAN matches, 1/2=0.5) -- "
-    "both land below 0.6, so 'CLEAN UTILITY' matches nothing today; "
-    "this is a pure addition. 'TREATMENT ROOM' against every other GT "
-    "room ending in ROOM ('MAIN MECHANICAL ROOM', 'COMPUTER ROOM', "
-    "'CONF. ROOM', 'WORK ROOM', 'RADIOGRAPHIC ROOM', three 'COMM. "
-    "ROOM' entries, 'CENTRAL MECH. RM.') -- every one of these shares "
-    "only the single generic word ROOM (or fails even that, for RM.), "
-    "landing at or below 1/2=0.5 -- none clear 0.6, so 'TREATMENT "
-    "ROOM' and its two DIRTY PROCESSING compounds also match nothing "
-    "today.\n\n"
-    "Collision with Duplex_A_20110907's own room vocabulary (Foyer, "
-    "Hallway, Bathroom 1/2, Utility, Stair, Room, Roof, Living Room, "
-    "Kitchen, Bedroom 1/2), checked word by word per this file's "
-    "standing discipline: 'CLEAN UTILITY'/'CLEAN UTILITY ROOM' share "
-    "the single word UTILITY with Duplex's bare 'Utility' room, and "
-    "'TREATMENT ROOM' and its two compounds share the single generic "
-    "word ROOM with 'Living Room' -- but every live key already in "
-    "this map carries the identical single-shared-word risk today "
-    "(e.g. 'SERVER ROOM'/'DATA ROOM'/'IT ROOM'/'TELECOM ROOM' all "
-    "share ROOM with Living Room, kept in production since 2026-08), "
-    "because the rename only fires on an exact FULL-STRING match and "
-    "none of these multi-word phrases is a plausible verbatim label "
-    "for a residential duplex's own utility or living space. This is "
-    "not the collision class this file does avoid (HALLWAY->CORRIDOR, "
-    "where the proposed KEY equals Duplex's own already-correct "
-    "literal output verbatim, not just a shared word).\n\n"
-    "Change (postprocess() only, ROOM_NAME_SAFE_RENAME_MAP): adds "
-    "'CLEAN UTILITY' and 'CLEAN UTILITY ROOM' -> 'CLEAN U.'; and "
-    "'TREATMENT ROOM' -> 'TRMT ROOM', plus 'TREATMENT ROOM DIRTY "
-    "PROCESSING', 'DIRTY PROCESSING TREATMENT ROOM', and 'DIRTY "
-    "PROCESSING ROOM' -> 'TRMT RM. DIRTY PROC.' (three independent "
-    "guesses at word order/completeness for the one compound GT "
-    "string, each harmless if wrong since this is an exact-match "
-    "rename, not a substring operation). No element is created, "
-    "removed, or duplicated -- same rename-only mechanism as every "
-    "existing key in this map, so the fabrication probes stay clean "
-    "by construction. None of these six keys collide with any "
-    "existing key already in the map. SYSTEM_PROMPT_OVERRIDE, PARAMS, "
-    "preprocess(), and every other block in postprocess() are "
-    "untouched.\n\n"
-    "No-regression argument: gt_is_minimum defaults to True for this "
-    "doc (confirmed by reading evaluate.py directly in an earlier "
-    "slot's session, unchanged tonight), so precision only counts "
-    "matched elements -- a rename that never fires changes nothing, "
-    "and a rename that does fire can only turn a 0.5-or-below "
-    "near-miss into an exact match, never break an existing one, "
-    "since none of the six keys match anything today (traced above). "
-    "Duplex_A_20110907 shares no exact multi-word phrase with any of "
-    "the six keys, so this is a complete no-op on that doc by "
-    "construction regardless of the single-word overlaps discussed "
-    "above.\n\n"
-    "How to read next slot's log: check Clinic rooms' correct-count "
-    "against tonight's 167/269. A rise of 1-4 confirms the mechanism "
-    "fired (2 for CLEAN U. if both instances say 'Clean Utility', 1-2 "
-    "more for the TRMT pair). A flat 167 most likely means the model "
-    "did not produce these exact guessed phrasings this run (different "
-    "wording, or the rooms were missed outright in enumeration, not a "
-    "vocabulary gap), not that the rename logic is wrong -- in that "
-    "case the next slot should stop guessing isolated single-"
-    "occurrence room names and look at a repeated-many-times family "
-    "instead, the same INTERACTION STATION lead 2026-11-22 slot 2 "
-    "already named as the next thing worth checking (12 occurrences, "
-    "but first verify whether the model is likely to transcribe that "
-    "full two-word label correctly as-is before assuming a rename is "
-    "needed there too, per that slot's own caution)."
-)
-
 # Override the system prompt sent to Claude for extraction.
 # Set to None to use the production prompt from ~/Lexios/lexios/SKILL.md
 SYSTEM_PROMPT_OVERRIDE = """Extract building elements from this floor plan image as JSON. Every "location" field below must be exactly the filename's floor-level segment (e.g. "-Level_1.png" becomes "Level 1", "-Second_Floor.png" becomes "Second Floor"), spaces instead of underscores, never abbreviated further: do not read a level label from inside the drawing instead. Speed matters, keep fields short, no extra fields, minified JSON (no indentation, no line breaks). There is a hard 180-second limit: an unfinished response at that point is discarded whole, so treat your real budget as roughly 130 seconds and close out valid JSON early rather than risk being cut off mid-generation, which scores zero for every category on this image.
@@ -8801,14 +8678,6 @@ def postprocess(extraction: dict, _cache={}) -> dict:
     direct GT/types.json/fuzzy_match trace and the honest zero-detection-
     vs-punctuation-drift risk this can't rule out from aggregated logs
     alone.
-
-    exp-roomname-clean-utility-treatment-room-abbrev-gap (2026-11-23):
-    ROOM_NAME_SAFE_RENAME_MAP gains two more single/short-token
-    abbreviation gaps -- "CLEAN U." and "TRMT ROOM"/"TRMT RM. DIRTY
-    PROC." -- same rename-only mechanism, same reverse-collision
-    discipline as every key already in the map. See DESCRIPTION for
-    the full fuzzy_match() trace and the Duplex single-shared-word
-    check.
     """
     if not isinstance(extraction, dict):
         return extraction
@@ -8941,30 +8810,6 @@ def postprocess(extraction: dict, _cache={}) -> dict:
     # score above 1/3 against "COMMANDER OFFICE", so no misfire risk.
     # None of the six keys share a word with Duplex's room vocabulary
     # above, or with any existing key already in this map.
-    #
-    # exp-roomname-clean-utility-treatment-room-abbrev-gap (2026-11-23,
-    # tonight's slot): adds "CLEAN UTILITY"/"CLEAN UTILITY ROOM" ->
-    # "CLEAN U." and "TREATMENT ROOM" -> "TRMT ROOM" plus two word-order
-    # guesses for the compound -> "TRMT RM. DIRTY PROC.". All four GT
-    # target strings were grepped directly from
-    # NBU_MedicalClinic_Arch.ground-truth.json this session: "CLEAN U."
-    # occurs twice (lines 2298/2382), "TRMT ROOM" and "TRMT RM. DIRTY
-    # PROC." occur once each (3498/3468). Each strips (fuzzy_match's
-    # word-split) to a GT word list containing either a single-
-    # character word ("U") or a word that fails both the prefix and
-    # edit-distance checks against its natural expansion ("TRMT" vs
-    # "TREATMENT", "RM" vs "ROOM") -- so the single most natural vision
-    # phrasing for any of the three scores at or below 1/2 or 2/4=0.5,
-    # under the 0.6 threshold, same structural class as 2026-11-22 slot
-    # 2's M./W. TOILET gap. Reverse-checked this session: none of the
-    # six keys already matches a different Clinic GT room today (every
-    # other *ROOM entry and every other CLEAN-containing entry lands at
-    # or below 0.5), so none of this is a bucket reassignment, all of
-    # it is a pure addition. See DESCRIPTION for the full trace,
-    # including the Duplex single-shared-word check (UTILITY, ROOM --
-    # the same risk class every ROOM-suffixed key already in this map
-    # carries today, not the HALLWAY->CORRIDOR exact-output-collision
-    # class this file does avoid).
     ROOM_NAME_SAFE_RENAME_MAP = {
         "FRONT DESK": "RECEPTION",
         "CHECK-IN": "RECEPTION",
@@ -8991,12 +8836,6 @@ def postprocess(extraction: dict, _cache={}) -> dict:
         "1ST SERGEANT": "1ST SGT",
         "FIRST SERGEANT": "1ST SGT",
         "CREDENTIALS MANAGER": "CREDENTIALS MGR",
-        "CLEAN UTILITY": "CLEAN U.",
-        "CLEAN UTILITY ROOM": "CLEAN U.",
-        "TREATMENT ROOM": "TRMT ROOM",
-        "TREATMENT ROOM DIRTY PROCESSING": "TRMT RM. DIRTY PROC.",
-        "DIRTY PROCESSING TREATMENT ROOM": "TRMT RM. DIRTY PROC.",
-        "DIRTY PROCESSING ROOM": "TRMT RM. DIRTY PROC.",
     }
     rooms = extraction.get("rooms")
     if isinstance(rooms, list):
