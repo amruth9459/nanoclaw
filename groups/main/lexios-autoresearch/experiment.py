@@ -7156,6 +7156,98 @@ DESCRIPTION = (
     "above."
 )
 
+EXPERIMENT_NAME = "exp-roomname-appmts-trmt-histintv-immunizn-dtrsupport"
+DESCRIPTION = (
+    "Tonight's slot (2026-11-23), experiment #1. Baseline to beat: "
+    "effective F1=0.8002, tonight's fresh orchestrator measurement "
+    "(Duplex_A_20110907 raw=post F1=0.7913, NBU_MedicalClinic_Arch "
+    "raw=post F1=0.809, phantom probes clean).\n\n"
+    "Target: five more Clinic rooms.name values, same mechanism family "
+    "as every prior ROOM_NAME_SAFE_RENAME_MAP slot (2026-09-11 onward, "
+    "most recently 2026-11-22 slot 1, kept). Read "
+    "NBU_MedicalClinic_Arch.ground-truth.json's full rooms array this "
+    "session (254 entries, grepped every \"name\" value) and hand-"
+    "traced each short, non-obvious abbreviation through eval.py's "
+    "real fuzzy_match() (read this session, lines 420-477) against the "
+    "most likely vision-model expansion, the same way every prior kept "
+    "slot in this map verified its own entries -- not assumed.\n\n"
+    "Five new entries, each independently traced: (1) \"APPMTS\" (room_"
+    "code 1D20) -- single-word GT value, \"APPOINTMENTS\" does not "
+    "prefix-match it (4th char O vs M), so a 1-word field scores a "
+    "hard 0 or 1, no partial credit; expansion is unambiguous. (2) "
+    "\"TRMT ROOM\" (distinct from the separate, untouched \"TRMT RM. "
+    "DIRTY PROC.\" entry) -- \"TREATMENT ROOM\" fails on TRMT (T-R-M-T "
+    "vs T-R-E-A at char 3) and ROOM alone is only 1/2 words, 0.5 < 0.6 "
+    "threshold. (3) \"HIST. / INTV.\" (room_code 1C14) -- \"HISTORY / "
+    "INTERVIEW\" traced word-by-word: HIST prefixes HISTORY (matches), "
+    "INTV does not prefix or edit-match INTERVIEW (char 4 V vs E, "
+    "edit distance >1), 1/2=0.5 < 0.6. (4) \"IMMUNIZ'N ROOM\" -- "
+    "\"IMMUNIZATION ROOM\" traced: IMMUNIZ'N vs IMMUNIZATION is neither "
+    "a prefix nor within the ~20% edit-distance tolerance (apostrophe "
+    "truncation, not a simple suffix drop), ROOM alone is 1/2=0.5 < "
+    "0.6. (5) \"DTR SUPPORT\" -- \"DENTAL TREATMENT ROOM SUPPORT\" "
+    "traced: DTR fails against DENTAL/TREATMENT/ROOM (no prefix, no "
+    "edit match), only SUPPORT matches, 1/2=0.5 < 0.6; lower "
+    "confidence than the other four on exact phrasing (unlike them, "
+    "this guess expands a 3-letter acronym to 3 words at once), kept "
+    "in because a miss here is a no-op, not a regression.\n\n"
+    "Checked and deliberately excluded in the same pass: WTS & MEAS. "
+    "ROOM, FAC. MGR. OFFICE, DIR. INFO MGR, ADP EQUIP SPACE, BEE EQUIP. "
+    "STORAGE, SEC. WAIT, VEST., CONSULT., BMET WORK STATION, SOIL. "
+    "LIN., WAIT / ERGOM, MECH. PENTHOUSE, CENTRAL MECH. RM. -- each "
+    "hand-traced the same way and already clears the 0.6 threshold "
+    "today against its most likely expansion (their multi-word GT "
+    "phrasing gives enough surviving matched words even when one "
+    "abbreviation fails), so a rename there would be a pure no-op, "
+    "not a fix. Also excluded the seven \"GEN. DENT. DTR #N\" / \"OH "
+    "DTR #N\" entries and DIPC DECON/CLEAN: directly viewed both "
+    "preprocessed Clinic images with the Read tool this session, and "
+    "the GEN./OH DTR labels are printed on the sheet in exactly this "
+    "abbreviated form (confirmed visually, not assumed), so verbatim "
+    "transcription already substring-matches them; DIPC's expansion is "
+    "not confidently known, so no guess is safer than a wrong one "
+    "there.\n\n"
+    "Change (postprocess() only, ROOM_NAME_SAFE_RENAME_MAP literal, "
+    "five new key/value pairs added, every existing key/value and "
+    "every other block byte-for-byte unchanged): "
+    "\"APPOINTMENTS\"->\"APPMTS\", \"TREATMENT ROOM\"->\"TRMT ROOM\", "
+    "\"HISTORY / INTERVIEW\"->\"HIST. / INTV.\", \"IMMUNIZATION "
+    "ROOM\"->\"IMMUNIZ'N ROOM\", \"DENTAL TREATMENT ROOM "
+    "SUPPORT\"->\"DTR SUPPORT\". Rename-only, same mechanism as every "
+    "existing entry: fires only on an exact (post-.upper()) match of "
+    "the model's own already-present room name, never adds or removes "
+    "a list entry, so the fabrication probes (empty-dict call, decoy-"
+    "element call) stay clean by construction -- there is no new code "
+    "path that produces an element from nothing.\n\n"
+    "No-regression argument: checked all five new keys and values "
+    "against Duplex_A_20110907's full room vocabulary (Foyer, Hallway, "
+    "Bathroom 1/2, Utility, Stair, Room, Roof, Living Room, Kitchen, "
+    "Bedroom 1/2, read directly this session) -- no shared word with "
+    "any of them, and the lookup is an exact whole-string dict hit, so "
+    "Duplex can never trigger any of these five keys; a complete no-op "
+    "on that doc by construction, same shape as every prior slot in "
+    "this map. Checked each new VALUE (the renamed-to string) against "
+    "every other Clinic rooms.name entry for an accidental steal: "
+    "traced \"TRMT ROOM\" against the separate \"TRMT RM. DIRTY PROC.\" "
+    "entry specifically (the one GT entry sharing its first word) and "
+    "it scores 1/4=0.25, well under threshold, so it cannot pull a "
+    "match away from that entry's own extracted item if one exists. "
+    "The other four values (APPMTS, HIST. / INTV., IMMUNIZ'N ROOM, DTR "
+    "SUPPORT) have no other Clinic rooms.name entry sharing enough "
+    "words to risk a steal. No key collides with any existing map "
+    "entry.\n\n"
+    "How to read next slot's log: check Clinic rooms' correct-count "
+    "specifically against tonight's baseline. A rise of up to 5 (one "
+    "per new key, if the model happens to produce that exact expanded "
+    "string on that image) confirms the mechanism; a flat count means "
+    "the model's actual phrasing differs from the guesses here (a "
+    "no-op, not a regression, per the dict-exact-match design) and the "
+    "next slot should not retry these same five words. Confirm every "
+    "other category on both docs is flat against tonight's baseline "
+    "numbers above, confirming this edit's scope held to the five "
+    "dict entries."
+)
+
 # Override the system prompt sent to Claude for extraction.
 # Set to None to use the production prompt from ~/Lexios/lexios/SKILL.md
 SYSTEM_PROMPT_OVERRIDE = """Extract building elements from this floor plan image as JSON. Every "location" field below must be exactly the filename's floor-level segment (e.g. "-Level_1.png" becomes "Level 1", "-Second_Floor.png" becomes "Second Floor"), spaces instead of underscores, never abbreviated further: do not read a level label from inside the drawing instead. Speed matters, keep fields short, no extra fields, minified JSON (no indentation, no line breaks). There is a hard 180-second limit: an unfinished response at that point is discarded whole, so treat your real budget as roughly 130 seconds and close out valid JSON early rather than risk being cut off mid-generation, which scores zero for every category on this image.
@@ -8810,7 +8902,22 @@ def postprocess(extraction: dict, _cache={}) -> dict:
     # score above 1/3 against "COMMANDER OFFICE", so no misfire risk.
     # None of the six keys share a word with Duplex's room vocabulary
     # above, or with any existing key already in this map.
+    #
+    # exp-roomname-appmts-trmt-histintv-immunizn-dtrsupport (2026-11-23,
+    # tonight's slot): adds APPOINTMENTS/TREATMENT ROOM/HISTORY /
+    # INTERVIEW/IMMUNIZATION ROOM/DENTAL TREATMENT ROOM SUPPORT, each
+    # hand-traced against fuzzy_match() this session against its GT
+    # target (APPMTS, TRMT ROOM, HIST. / INTV., IMMUNIZ'N ROOM, DTR
+    # SUPPORT respectively) and confirmed to score below the 0.6
+    # threshold today, so each rename is load-bearing, not redundant.
+    # No shared word with Duplex's room vocabulary or any existing key
+    # in this map; see DESCRIPTION for the full per-entry trace.
     ROOM_NAME_SAFE_RENAME_MAP = {
+        "APPOINTMENTS": "APPMTS",
+        "TREATMENT ROOM": "TRMT ROOM",
+        "HISTORY / INTERVIEW": "HIST. / INTV.",
+        "IMMUNIZATION ROOM": "IMMUNIZ'N ROOM",
+        "DENTAL TREATMENT ROOM SUPPORT": "DTR SUPPORT",
         "FRONT DESK": "RECEPTION",
         "CHECK-IN": "RECEPTION",
         "CHECK IN": "RECEPTION",
