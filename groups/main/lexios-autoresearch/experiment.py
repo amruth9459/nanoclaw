@@ -7323,120 +7323,6 @@ DESCRIPTION = (
     "which is now measured directly from the GT population, not guessed."
 )
 
-EXPERIMENT_NAME = "exp-preprocess-crop-fixed-canvas-footer-gap-before-resize"
-DESCRIPTION = (
-    "Experiment #4 tonight (2026-11-24). Baseline to beat: effective F1=0.82, "
-    "this file's on-disk state going in (exp-doors-rooms-cap-raise-100-130-"
-    "to-160-first-floor-population-ceiling, kept as experiment #1 tonight; "
-    "experiment #2's sprinklers wall-notch cue and experiment #3's caption-"
-    "as-completeness-check were each measured and discarded, both reverting "
-    "to this same state): Duplex_A_20110907 F1=0.8147 (beams 1/8, doors "
-    "14/14, railings_guards 4/4, rooms 19/21, slabs 20/21, stairs_elevators "
-    "2/2, wall_types 4/8, windows 13/24), NBU_MedicalClinic_Arch F1=0.8254 "
-    "(doors 246/254, equipment 2/2, plumbing_fixtures 2/3, railings_guards "
-    "9/9, rooms 207/269, slabs 3/3, sprinklers 0/10, stairs_elevators 3/3, "
-    "wall_types 3/7, windows 58/58), phantom probes clean on both (read "
-    "directly from logs/exp-20261124-020546.log this session).\n\n"
-    "Both of tonight's first two follow-up slots added SYSTEM_PROMPT_OVERRIDE "
-    "text and both backfired: slot 2 (sprinklers notch cue, Clinic-only text) "
-    "still left Duplex wall_types/beams dropping run-to-run (0.8147->0.7579 "
-    "overall on Duplex alone, a doc the change was argued to be a complete "
-    "no-op on), and slot 3 (caption-read instruction) drove Clinic doors "
-    "from 246/254 (F1=0.984) to 96/254 (F1=0.549) by shrinking First_Floor's "
-    "own output to 113 elements in 83.4s versus tonight's 339 elements in "
-    "236.8s with no prompt change -- read both logs directly this session, "
-    "not assumed. Two added-text slots in a row costing real generation "
-    "budget on an already time-pressured image is strong same-night evidence "
-    "against a third attempt at the same lever; this slot changes preprocess() "
-    "instead, which runs entirely before run()'s timed subprocess window (the "
-    "same zero-generation-time-risk framing this file's own prior preprocess "
-    "edits -- autocrop, sharpen, autocontrast -- have always used), so it "
-    "carries none of the risk that just hit twice.\n\n"
-    "Viewed both NBU_MedicalClinic_Arch--ifc-render-First_Floor.png and "
-    "Duplex_A_20110907--ifc-render-Level_2.png directly with the Read tool "
-    "this session (not assumed from any prior description). Both renderer "
-    "outputs share a fixed-height canvas (3539px, confirmed directly from "
-    "the tool's own size report on each file: Clinic First_Floor 2516x3539, "
-    "Duplex Level_2 1617x3539 -- same height, different width, matching this "
-    "file's own prior finding that height is held constant across documents "
-    "while width tracks building footprint) with a title line above the "
-    "drawing and a bordered caption box ('Rooms: N, Doors: N, Windows: N, "
-    "Columns: N') near the canvas bottom. On both images the real drawing "
-    "content ends well short of the canvas bottom edge -- Clinic's lowest "
-    "room (MECH. YARD) and Duplex's lowest wall corner both sit at roughly "
-    "80-83% of the canvas height by eye -- leaving a large pure-white band "
-    "between the real content and the caption box, on the order of 15% of "
-    "the canvas height on both documents. The existing bbox-based autocrop "
-    "below (exp-autocrop-blank-margin-before-resize, 2026-09-03) cannot "
-    "remove this band: its single bounding box is pinned to the caption "
-    "box's own position, the single lowest non-white content in the entire "
-    "image, so the caption anchors the bbox to near-full canvas height "
-    "regardless of how far above it the real content actually ends -- "
-    "exactly the inertness this file's own history already flagged ('if the "
-    "mechanism never fires... these renders simply have no material blank "
-    "margin', 2026-09-03) without identifying the caption as the specific "
-    "anchor causing it.\n\n"
-    "Change (preprocess() only, inserted immediately after the existing ink/"
-    "white diff mask is computed and before the existing bbox autocrop "
-    "reads it, so the new step runs first and the existing step then "
-    "operates on its result): reuses that same mask (never recomputed from "
-    "scratch) and collapses it to one ink-or-not value per row via a BOX-"
-    "filtered resize to width 1 -- a row with any real content anywhere "
-    "across its full width averages above zero, a row with zero ink across "
-    "its entire width averages to exactly zero. Searches only the bottom "
-    "30% of the canvas (the title and legend both sit in the top band and "
-    "are never reached by this search, so this cannot touch either) for the "
-    "first run of at least 1%-of-height consecutive zero-rows; if found, "
-    "crops the image to end just past that run's start (a small fractional "
-    "padding, the same style the existing autocrop already uses), which "
-    "removes the blank band and the caption box together in one crop. A "
-    "document with no such band -- no qualifying all-zero-width row run in "
-    "that search range -- falls through completely unchanged, the same no-"
-    "op-by-construction discipline the existing bbox autocrop's own area "
-    "gate already uses. The existing bbox autocrop then runs on the "
-    "(possibly already-shrunk) result exactly as before, so if this new "
-    "step is a no-op on some document, nothing downstream changes either. "
-    "Cache dir suffix gains '_ftrim1' so a PNG cached under the prior "
-    "policy (no footer trim) can never be silently reused.\n\n"
-    "No-op / safety argument, checked directly against both images this "
-    "session, not assumed: on both documents the ONLY content below the "
-    "detected gap is the caption box itself -- nothing else was visible "
-    "beneath the blank band in either image -- so this cannot discard real "
-    "building content on either eval doc. The 30%-of-height search floor "
-    "keeps this mechanism away from the title/legend band entirely by "
-    "construction, and the 1%-of-height minimum run length (about 35px on "
-    "this canvas) is far longer than the gap between adjacent packed room "
-    "labels in the Clinic's dense interior (that content mass has ink "
-    "somewhere across its full row width almost everywhere, since labels "
-    "at different x-positions share rows), so a normal inter-label gap "
-    "inside real content should not false-positive and trigger an early "
-    "crop; this reasoning cannot be fully verified without a shell to run "
-    "it against every row directly.\n\n"
-    "Expected effect: more of the fixed MAX_LONG_EDGE/MAX_AREA pixel budget "
-    "downstream lands on real content instead of a dead canvas band, "
-    "raising effective on-page resolution for the same small window tags "
-    "and room labels this file's own history has repeatedly identified as "
-    "the binding recall constraint (direction 2/3 in program.md) -- same "
-    "lever family as the existing sharpen/autocontrast/autocrop edits, "
-    "orthogonal mechanism (more real pixels in the budget, not clearer "
-    "existing ones).\n\n"
-    "How to read next slot's log: if every per-category count on both docs "
-    "is unchanged from today's baseline, the gap-detection never fired "
-    "(check whether either doc's preprocessed image dimensions actually "
-    "shrank versus the prior '_acrop-t12-p2_ac1' cache policy's output -- a "
-    "clean no-op, not evidence against the mechanism, just evidence this "
-    "renderer's footer band is smaller than assumed or the threshold "
-    "missed it). A rise in Duplex windows or Clinic rooms/wall_types "
-    "recall, with precision holding at or near 1.00, confirms freed pixel "
-    "budget reached small text. A drop in any category together with a "
-    "logged timeout would be unrelated run-to-run variance (preprocess() "
-    "runs before the timed window, so this change cannot itself cause a "
-    "timeout) and should be re-measured, not read as this mechanism's "
-    "fault. A drop in precision or a missing element that was previously "
-    "found, on either doc, would mean the crop clipped real content and "
-    "the 30%/1% thresholds need tightening, not abandoning the approach."
-)
-
 # Override the system prompt sent to Claude for extraction.
 # Set to None to use the production prompt from ~/Lexios/lexios/SKILL.md
 SYSTEM_PROMPT_OVERRIDE = """Extract building elements from this floor plan image as JSON. Every "location" field below must be exactly the filename's floor-level segment (e.g. "-Level_1.png" becomes "Level 1", "-Second_Floor.png" becomes "Second Floor"), spaces instead of underscores, never abbreviated further: do not read a level label from inside the drawing instead. Speed matters, keep fields short, no extra fields, minified JSON (no indentation, no line breaks). There is a hard 180-second limit: an unfinished response at that point is discarded whole, so treat your real budget as roughly 130 seconds and close out valid JSON early rather than risk being cut off mid-generation, which scores zero for every category on this image.
@@ -8855,7 +8741,7 @@ def preprocess(image_path: str) -> str:
         # autocrop threshold/padding, AND autocontrast cutoff) so a stale PNG
         # produced under a different policy on a prior night can never be
         # silently reused via the dst.exists() short-circuit below.
-        cache_dir = src.parent / f"_preresized_e{MAX_LONG_EDGE}_a{MAX_AREA}_usm1-130-0_acrop-t12-p2_ftrim1_ac1_pal256opt"
+        cache_dir = src.parent / f"_preresized_e{MAX_LONG_EDGE}_a{MAX_AREA}_usm1-130-0_acrop-t12-p2_ac1_pal256opt"
         dst = cache_dir / (src.stem + ".png")
         if dst.exists():
             return str(dst)
@@ -8863,51 +8749,15 @@ def preprocess(image_path: str) -> str:
             rgb = im.convert("RGB")
             w0, h0 = rgb.size
 
-            bg = Image.new("RGB", rgb.size, (255, 255, 255))
-            diff = ImageChops.difference(rgb, bg).convert("L")
-            diff = diff.point(lambda p: 255 if p > 12 else 0)
-
-            # Footer-gap trim (exp-preprocess-crop-fixed-canvas-footer-gap-
-            # before-resize, 2026-11-24): this renderer draws a title above
-            # the content and a caption box ("Rooms: N, Doors: N, ...") near
-            # the bottom of a fixed-height canvas, with real content often
-            # ending well short of the canvas bottom -- a dead band the bbox
-            # autocrop below can't remove because its single bbox is pinned
-            # to the caption, the lowest non-white content on the page. See
-            # DESCRIPTION for the full trace against both eval images.
-            # Collapse the mask to one ink-or-not value per row (BOX-filtered
-            # resize to width 1); search only the bottom 30% of the canvas
-            # (title/legend live in the top band, never reached) for the
-            # first run of >=1%-of-height all-blank rows, and crop just past
-            # its start. No qualifying run anywhere in range -> unchanged.
-            row_ink = list(diff.resize((1, h0), Image.BOX).getdata())
-            min_gap = max(10, round(h0 * 0.01))
-            search_start = round(h0 * 0.70)
-            run_start = None
-            footer_y = None
-            for y in range(search_start, h0):
-                if row_ink[y] == 0:
-                    if run_start is None:
-                        run_start = y
-                    elif y - run_start + 1 >= min_gap:
-                        footer_y = run_start
-                        break
-                else:
-                    run_start = None
-            if footer_y is not None and footer_y > search_start:
-                pad = max(4, round(h0 * 0.01))
-                rgb = rgb.crop((0, 0, w0, min(h0, footer_y + pad)))
-                w0, h0 = rgb.size
-                bg = Image.new("RGB", rgb.size, (255, 255, 255))
-                diff = ImageChops.difference(rgb, bg).convert("L")
-                diff = diff.point(lambda p: 255 if p > 12 else 0)
-
             # Autocrop: trim blank white margin around the drawing content
             # before the fixed resize budget below, so more of that budget
             # lands on real content instead of empty border. Content bbox is
             # found by diffing against a white background; a fractional
             # area gate (not exact-bbox-equality) means a single stray
             # antialiased pixel in the margin can't silently force a no-op.
+            bg = Image.new("RGB", rgb.size, (255, 255, 255))
+            diff = ImageChops.difference(rgb, bg).convert("L")
+            diff = diff.point(lambda p: 255 if p > 12 else 0)
             bbox = diff.getbbox()
             if bbox:
                 pad_x = max(4, round(w0 * 0.02))
