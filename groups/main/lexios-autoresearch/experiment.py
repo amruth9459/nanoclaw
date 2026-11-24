@@ -7250,6 +7250,79 @@ DESCRIPTION = (
     "rather than re-trying this exact wording."
 )
 
+EXPERIMENT_NAME = "exp-doors-rooms-cap-raise-100-130-to-160-first-floor-population-ceiling"
+DESCRIPTION = (
+    "Experiment #1 tonight (2026-11-24). Baseline to beat: effective "
+    "F1=0.7954, this file's on-disk state going in (the run-together-"
+    "label-split fix above, kept 2026-11-23): Duplex_A_20110907 F1=0.7913, "
+    "NBU_MedicalClinic_Arch F1=0.7996, phantom probes clean on both.\n\n"
+    "This file's own 2026-09-20/21 history (grepped and read directly this "
+    "session, not assumed) already measured that the rooms cap is a hard "
+    "ceiling, not a soft one: raising it 100 to 130 moved Clinic's "
+    "extracted room count 196 to 224, a +28 gain for a +30 cap increase "
+    "-- near-1:1 pass-through, the signature of a cap that is still "
+    "actively truncating the model's own count, not one with slack left "
+    "over. That raise was kept and is still the live value today (step 3's "
+    "rooms cap, confirmed by reading SYSTEM_PROMPT_OVERRIDE directly this "
+    "session). The doors cap sits at 100 today after several further "
+    "raises (45->65->85->90->100 across multiple nights, also read "
+    "directly), with 100->110 and 100->120 both later tried and discarded "
+    "-- but both of those were confounded (one by a model-narration "
+    "refusal on Second_Floor, the other by an edit bug that landed the "
+    "cap at 105, not 120 -- read directly from this file's own "
+    "_OBSOLETE_SLOT4_20261105_DESCRIPTION block) and neither tested a "
+    "value large enough to matter, per the arithmetic below.\n\n"
+    "That arithmetic, run fresh this session, not reused from any past "
+    "slot: NBU_MedicalClinic_Arch.ground-truth.json has exactly 254 door "
+    "entries (grepped the doors-only field \"fire_rating\": \"Fire "
+    "Rating\", which every one of the 254 door objects carries) and "
+    "exactly 269 room entries (grepped rooms' own \"level\" field, present "
+    "on all 269). Splitting each by floor with a precise multiline grep "
+    "(door entries matched by their own preceding \"location\" line, room "
+    "entries by their own \"level\" line) gives First Floor 156 doors / "
+    "154 rooms, Second Floor 98 doors / 115 rooms. Today's live caps are "
+    "100 (doors) and 130 (rooms) -- BOTH already below First Floor's own "
+    "real population (156 and 154), so First Floor is guaranteed to lose "
+    "at least 56 doors and 24 rooms from the cap alone, before any "
+    "question of vision quality. Second Floor's 98 doors and 115 rooms "
+    "sit under both caps today, so it is not cap-bound and this change is "
+    "expected to be a no-op there. Duplex's own doors (14) and rooms (19-"
+    "21) are an order of magnitude under either cap on both its images, "
+    "so this is also expected to be a no-op on that doc, the same no-"
+    "regression framing every prior cap-raise in this file has used.\n\n"
+    "Change (SYSTEM_PROMPT_OVERRIDE only, two sites, both already named in "
+    "this file's own prior cap-raise history as the two places the number "
+    "appears): the priority-order paragraph's parenthetical ('doors "
+    "capped at 100, rooms capped at 130') and step 8's own cap sentence "
+    "('Doors are capped at 100 instances on this image, rooms at 130') "
+    "both move to 160 for each -- a single number safely above both of "
+    "First Floor's measured populations (156, 154), rounded for a shared "
+    "value rather than two different odd numbers. This is a bigger single "
+    "jump than this file's own usual 10-20-point increments, deliberately "
+    "-- the 100->110 and clean 100->105 tests already showed a small nudge "
+    "doesn't clear a ceiling that sits at 154-156, so another small step "
+    "would only repeat that same inconclusive result. windows (35), slabs "
+    "(15), and RETRY_SCOPE_SHRINK/RETRY_SCOPE_SHRINK_FINAL's own separate "
+    "cap=65/cap=30 strings are untouched -- this only raises the main-"
+    "schema, first-attempt ask.\n\n"
+    "Risk, stated plainly: a larger ask generates more JSON on an already "
+    "time-pressured image (First_Floor has landed on this file's narrowed "
+    "retry path before per several past logs cited earlier in this file), "
+    "so this could push First_Floor into a 300s timeout or a narration "
+    "refusal it would not otherwise have hit. There is no way to rule "
+    "that out without a shell to run it; the orchestrator's own gate is "
+    "the backstop if it happens.\n\n"
+    "How to read next slot's log: compare NBU_MedicalClinic_Arch's doors "
+    "and rooms correct-counts against today's 144/254 and 167/269. A rise "
+    "in either, with precision holding near 1.00, confirms the cap was "
+    "the binding constraint. A flat or lower score paired with a logged "
+    "timeout or narration failure specifically on First_Floor (where none "
+    "occurred in last night's own clean log) means this particular jump "
+    "size cost more time than it bought -- the fix then is a smaller raise "
+    "toward 156/154, not abandoning the cap-ceiling diagnosis itself, "
+    "which is now measured directly from the GT population, not guessed."
+)
+
 # Override the system prompt sent to Claude for extraction.
 # Set to None to use the production prompt from ~/Lexios/lexios/SKILL.md
 SYSTEM_PROMPT_OVERRIDE = """Extract building elements from this floor plan image as JSON. Every "location" field below must be exactly the filename's floor-level segment (e.g. "-Level_1.png" becomes "Level 1", "-Second_Floor.png" becomes "Second Floor"), spaces instead of underscores, never abbreviated further: do not read a level label from inside the drawing instead. Speed matters, keep fields short, no extra fields, minified JSON (no indentation, no line breaks). There is a hard 180-second limit: an unfinished response at that point is discarded whole, so treat your real budget as roughly 130 seconds and close out valid JSON early rather than risk being cut off mid-generation, which scores zero for every category on this image.
@@ -7270,7 +7343,7 @@ Return a JSON object with only the keys below that have findings:
   "rooms": [{"name": "<room label transcribed VERBATIM from the drawing>"}]
 }
 
-Priority order (stop enumerating a category once handled, never revisit it). Every category below counts equally toward this image's score no matter how many instances it has, so steps 1-6 (each a handful of instances at most) come before steps 7-8 (doors capped at 100, rooms capped at 130, windows capped at 35): finishing steps 1-6 first banks that many complete categories cheaply, instead of risking several of them never being reached if a capped category runs long.
+Priority order (stop enumerating a category once handled, never revisit it). Every category below counts equally toward this image's score no matter how many instances it has, so steps 1-6 (each a handful of instances at most) come before steps 7-8 (doors capped at 160, rooms capped at 160, windows capped at 35): finishing steps 1-6 first banks that many complete categories cheaply, instead of risking several of them never being reached if a capped category runs long.
 
 1. stairs_elevators first, usually few, list all. On a duplex or any plan with two or more mirrored/repeated units, each unit normally has its own staircase even when the symbols look identical in mirrored positions: if you found only one stair on a plan with 2+ repeated units, look again at the unit that has not yielded one before moving on, and if it is still not visible, add a second stairs_elevators entry matching the first's type. A second staircase on a mirrored-unit building is near-certain even when its symbol is hard to isolate.
 
@@ -7288,7 +7361,7 @@ Priority order (stop enumerating a category once handled, never revisit it). Eve
 
 rooms: one entry per physical room actually labeled, not per unique name. Repeated names (two "Living Room"s in mirrored units, several "Exam Room"s down a corridor) are separate rooms, each its own entry. Transcribe a partly covered label with the legible part. When two neighboring room labels sit close enough to print as one running stretch of text with no gap between them (for example one room's label ending exactly where the next room's own tag or name begins, so it reads as a single garbled word), treat it as the two separate labels it actually is and list each as its own room entry, rather than one combined name or dropping the second one. If a label has more than one word or a slash-separated second use, transcribe the whole thing exactly as printed, in order -- do not shorten it down to just its most prominent word, since the qualifier can be what makes it a different room from a plainer same-word room elsewhere on the same sheet (a "WAITING / ACTIVITY AREA" is not the same room as a plain "WAITING"). On a floor with multiple corridors or wings, sweep them in one consistent spatial order -- for example left to right along the nearest corridor, then the next corridor or wing -- instead of covering the first area you notice thoroughly and the rest more lightly; do this as a single ordered pass, not a second scan, and reuse that same spatial order for doors next.
 
-8. doors: each only needs the shared "location" value from above, so list every door symbol as its own entry (one per door, not deduped), including closet, bathroom, pantry, and utility doors, which are the ones a fast pass skips first, sweeping in the same spatial order rooms above just used. Doors are capped at 100 instances on this image, rooms at 130; windows stay capped at 35; slabs (step 5, above) stays capped at 15. Stop each at its cap in scanning order and move on, do not push past it, and do not return to a finished category later. On a very dense drawing this cap is what keeps the response closing in time at all.
+8. doors: each only needs the shared "location" value from above, so list every door symbol as its own entry (one per door, not deduped), including closet, bathroom, pantry, and utility doors, which are the ones a fast pass skips first, sweeping in the same spatial order rooms above just used. Doors are capped at 160 instances on this image, rooms at 160; windows stay capped at 35; slabs (step 5, above) stays capped at 15. Stop each at its cap in scanning order and move on, do not push past it, and do not return to a finished category later. On a very dense drawing this cap is what keeps the response closing in time at all.
 
 Rules:
 - Never fabricate or duplicate an element to hit a printed count or caption. Only list what you can actually see. (Step 2's wall_types same-category-different-width case is two distinct types you can see, not a duplicate of one, and is not covered by this rule. Step 4's two code-mandated railings_guards entries per confirmed stair, and step 1's second mirrored stair, are structural near-certainties from code, not fabrication, and are also not covered by this rule.)
