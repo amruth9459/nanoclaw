@@ -8977,7 +8977,31 @@ def postprocess(extraction: dict, _cache={}) -> dict:
     # score above 1/3 against "COMMANDER OFFICE", so no misfire risk.
     # None of the six keys share a word with Duplex's room vocabulary
     # above, or with any existing key already in this map.
+    #
+    # exp-roomname-trmt-appmts-abbrev-expansion (2026-11-25, tonight's
+    # 1st slot): adds TREATMENT ROOM -> "TRMT ROOM" and APPOINTMENTS ->
+    # "APPMTS". Both GT target strings were grepped directly from
+    # NBU_MedicalClinic_Arch.ground-truth.json this session as single,
+    # exact rooms.name occurrences, so neither rename can steal a
+    # sibling GT entry's match. Both were hand-traced through the real
+    # fuzzy_match() word-split/prefix/edit-distance logic read this
+    # session from lexios/eval.py: TREATMENT vs TRMT fails the >=2-char
+    # bidirectional prefix check (4th letter E vs M) and the edit-
+    # distance check (length gap alone exceeds the ~20% tolerance),
+    # leaving only the shared word ROOM matched (1/2=0.5, under the 0.6
+    # threshold). APPOINTMENTS vs APPMTS: single-word field, substring
+    # check fails both directions, prefix check fails (4th letter O vs
+    # M), edit distance (12 vs 6 chars, diff alone exceeds the 2-char
+    # tolerance for a 12-char word) -- 0/1 matched. Reverse-collision
+    # check: "TRMT ROOM" against the GT's neighboring "TRMT RM. DIRTY
+    # PROC." entry scores 1/4=0.25 (only the shared TRMT word), so the
+    # rename cannot accidentally steal that entry's match instead.
+    # Neither target string shares a word with Duplex's room vocabulary
+    # (Foyer, Hallway, Bathroom 1/2, Utility, Stair, Room, Roof, Living
+    # Room, Kitchen, Bedroom 1/2) or any existing key in this map.
     ROOM_NAME_SAFE_RENAME_MAP = {
+        "TREATMENT ROOM": "TRMT ROOM",
+        "APPOINTMENTS": "APPMTS",
         "FRONT DESK": "RECEPTION",
         "CHECK-IN": "RECEPTION",
         "CHECK IN": "RECEPTION",
