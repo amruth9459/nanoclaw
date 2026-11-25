@@ -7503,6 +7503,86 @@ DESCRIPTION = (
     "baseline numbers cited above."
 )
 
+EXPERIMENT_NAME = "exp-roomname-cleanutility-abbrev-expansion"
+DESCRIPTION = (
+    "Tonight's slot (2026-11-25), Lexios autoresearch experiment #3. "
+    "Baseline to beat: effective F1=0.8, program.md's own fresh "
+    "measurement of this file's on-disk state going in (the IMMUNIZ'N "
+    "ROOM apostrophe-elision rename, kept experiment #2 tonight): "
+    "Duplex_A_20110907 F1=0.708, NBU_MedicalClinic_Arch F1=0.7696, "
+    "phantom probes clean both docs, raw==postprocessed both docs.\n\n"
+    "Grepped NBU_MedicalClinic_Arch.ground-truth.json's rooms.name list "
+    "directly this session for the exact string \"CLEAN U.\" -- 2 "
+    "occurrences (room_codes present at both First and Second Floor "
+    "instances), and separately grepped for any GT room name containing "
+    "the word UTILITY anywhere in this file -- zero matches, so no other "
+    "GT entry uses that full word for a rename to collide with. \"CLEAN "
+    "U.\" is this document's own terse abbreviation of the common "
+    "medical/clinic room type \"Clean Utility\" (a soiled-vs-clean supply "
+    "handling room, standard in this building type, distinct from the "
+    "already-mapped \"CLEAN SUP. & EQUIP.\" entry elsewhere in this GT "
+    "file), the same abbreviation family as the already-kept SOILED "
+    "UTILITY -> SOIL. UTL. rename two slots ago.\n\n"
+    "Hand-traced against the real fuzzy_match()/_edit_distance() source "
+    "read directly this session from ~/Lexios/lexios/eval.py:420-477: "
+    "expected=\"CLEAN U.\" normalizes to e_words=[\"CLEAN\",\"U\"] "
+    "(trailing period stripped from \"U.\"). Against actual \"CLEAN "
+    "UTILITY\": a_words=[\"CLEAN\",\"UTILITY\"]. \"CLEAN\" matches "
+    "exactly. \"U\" (length 1) fails the prefix check outright -- the "
+    "prefix branch requires len(ew)>=2 AND len(aw)>=2, and \"U\" has "
+    "length 1 -- and fails the edit-distance branch the same way (that "
+    "branch requires len>=4 on both words). matched=1/2=0.5, under the "
+    "0.6 threshold: this GT entry fails today whenever the model writes "
+    "the natural full word instead of the printed abbreviation. Against "
+    "actual \"CLEAN UTILITY ROOM\": a_words=[\"CLEAN\",\"UTILITY\","
+    "\"ROOM\"], same per-word result (CLEAN matches, U still fails for "
+    "the same length-1 reason, ROOM has no corresponding e_word to "
+    "consume it) -- matched=1/2=0.5, identically under threshold.\n\n"
+    "Collision checks done directly this session, not assumed: (1) "
+    "reverse-traced \"CLEAN UTILITY\" against the file's other CLEAN-"
+    "prefixed GT entry, \"CLEAN SUP. & EQUIP.\" (e_words=[\"CLEAN\",\"SUP"
+    "\",\"&\",\"EQUIP\"]) -- only CLEAN matches (SUP/&/EQUIP have no "
+    "corresponding actual word), 1/4=0.25, nowhere near threshold, so "
+    "renaming away from \"CLEAN SUP. & EQUIP.\" risks nothing since it "
+    "was never going to match that entry anyway. (2) checked \"CLEAN "
+    "UTILITY\" and \"CLEAN UTILITY ROOM\" against Duplex_A_20110907's "
+    "full room vocabulary, read directly from its own ground-truth.json "
+    "this session: Foyer, Hallway, Bathroom 1/2, Utility (bare, 2x), "
+    "Stair, Room, Roof, Living Room, Kitchen, Bedroom 1/2 -- Duplex's "
+    "own GT room is the bare word \"Utility\", never \"Clean Utility\", "
+    "and the lookup in postprocess() is an exact full-string match on "
+    "name.strip().upper() (confirmed by reading the lookup code directly "
+    "this session), not a substring or word-level match -- so a model "
+    "output of bare \"Utility\" on Duplex can never equal either new key "
+    "and this is a complete no-op on that doc by construction. (3) "
+    "neither new key collides with any existing key already in "
+    "ROOM_NAME_SAFE_RENAME_MAP (no shared key string).\n\n"
+    "Change (postprocess() only, ROOM_NAME_SAFE_RENAME_MAP): adds two "
+    "keys targeting the same GT string -- CLEAN UTILITY -> \"CLEAN U.\" "
+    "and CLEAN UTILITY ROOM -> \"CLEAN U.\" -- covering both plausible "
+    "phrasings the model might transcribe this room as. No schema, cap, "
+    "SYSTEM_PROMPT_OVERRIDE, PARAMS, or preprocess() line touched.\n\n"
+    "No-regression argument: gt_is_minimum (confirmed True for both docs "
+    "per this file's own prior entries), so precision counts only "
+    "matched elements -- a rename that never fires (model didn't use "
+    "either exact phrasing) changes nothing, and one that fires only "
+    "adds a match proven absent before the rename (traced above), never "
+    "removes one. The decoy/empty postprocess probes have no 'rooms' key "
+    "at all (or random decoy text that won't exactly equal either new "
+    "key), so this block is a no-op against both and the fabrication "
+    "probes stay clean by construction (a rename, never an addition).\n\n"
+    "How to read next slot's log: check Clinic rooms' correct-count "
+    "specifically; this key fires only if the model's output exactly "
+    "equals 'CLEAN UTILITY' or 'CLEAN UTILITY ROOM' (case/whitespace-"
+    "insensitive) -- a flat count most likely means the model used a "
+    "different phrasing (e.g. 'Clean Util.', 'Clean Supply Room') or "
+    "printed the GT abbreviation itself verbatim (in which case it was "
+    "already matching before this rename and nothing changed); in that "
+    "case this specific guess should not be re-tried as-is. Confirm "
+    "every other category on both docs is flat against the baseline "
+    "numbers cited above."
+)
+
 # Override the system prompt sent to Claude for extraction.
 # Set to None to use the production prompt from ~/Lexios/lexios/SKILL.md
 SYSTEM_PROMPT_OVERRIDE = """Extract building elements from this floor plan image as JSON. Every "location" field below must be exactly the filename's floor-level segment (e.g. "-Level_1.png" becomes "Level 1", "-Second_Floor.png" becomes "Second Floor"), spaces instead of underscores, never abbreviated further: do not read a level label from inside the drawing instead. Speed matters, keep fields short, no extra fields, minified JSON (no indentation, no line breaks). There is a hard 180-second limit: an unfinished response at that point is discarded whole, so treat your real budget as roughly 130 seconds and close out valid JSON early rather than risk being cut off mid-generation, which scores zero for every category on this image.
@@ -9198,7 +9278,27 @@ def postprocess(extraction: dict, _cache={}) -> dict:
     # this item isn't already feeding a different GT entry's match that
     # the rename would take away. Neither key shares a word with
     # Duplex's room vocabulary above or any existing key in this map.
+    #
+    # exp-roomname-cleanutility-abbrev-expansion (2026-11-25, tonight's
+    # 3rd slot): adds CLEAN UTILITY / CLEAN UTILITY ROOM -> "CLEAN U.".
+    # GT's "CLEAN U." occurs twice (grepped this session), and no GT
+    # room name anywhere in this file contains the word UTILITY, so no
+    # rename here can steal a sibling GT entry's match. Hand-traced
+    # against the real fuzzy_match() source read this session from
+    # eval.py:420-477: "U" (length 1, from "U." with trailing period
+    # stripped) fails both the prefix check (requires len>=2 on both
+    # words) and the edit-distance check (requires len>=4 on both
+    # words) against "UTILITY" -- matched=1/2=0.5 (only CLEAN matches),
+    # under the 0.6 threshold, for either "Clean Utility" or "Clean
+    # Utility Room" phrasing. Reverse-collision check: "CLEAN UTILITY"
+    # against this file's other CLEAN-prefixed entry, "CLEAN SUP. &
+    # EQUIP.", scores only 1/4=0.25 (shared CLEAN word alone), so this
+    # item wasn't already feeding that entry's match. Neither key
+    # equals Duplex's bare "Utility" room (exact full-string lookup, not
+    # substring), so this is a no-op on that doc by construction.
     ROOM_NAME_SAFE_RENAME_MAP = {
+        "CLEAN UTILITY": "CLEAN U.",
+        "CLEAN UTILITY ROOM": "CLEAN U.",
         "TREATMENT ROOM": "TRMT ROOM",
         "APPOINTMENTS": "APPMTS",
         "IMMUNIZATION ROOM": "IMMUNIZ'N ROOM",
